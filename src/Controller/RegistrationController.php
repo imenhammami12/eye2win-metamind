@@ -19,30 +19,44 @@ class RegistrationController extends AbstractController
         UserPasswordHasherInterface $userPasswordHasher,
         EntityManagerInterface $entityManager
     ): Response {
+        // Si l'utilisateur est déjà connecté, redirection vers le dashboard
+        if ($this->getUser()) {
+            return $this->redirectToRoute('app_dashboard');
+        }
+
         $user = new User();
         $form = $this->createForm(RegistrationFormType::class, $user);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            // Hash du mot de passe
-            $user->setPassword(
-                $userPasswordHasher->hashPassword(
-                    $user,
-                    $form->get('plainPassword')->getData()
-                )
-            );
+            try {
+                // Hash du mot de passe
+                $user->setPassword(
+                    $userPasswordHasher->hashPassword(
+                        $user,
+                        $form->get('plainPassword')->getData()
+                    )
+                );
 
-            // Rôle par défaut
-            $user->setRoles(['ROLE_USER']);
+                // Rôle par défaut
+                $user->setRoles(['ROLE_USER']);
 
-            $entityManager->persist($user);
-            $entityManager->flush();
+                $entityManager->persist($user);
+                $entityManager->flush();
 
-            // Message de succès
-            $this->addFlash('success', 'Compte créé avec succès ! Vous pouvez maintenant vous connecter.');
+                // Message de succès
+                $this->addFlash('success', 'Compte créé avec succès ! Vous pouvez maintenant vous connecter.');
 
-            // Redirection vers la page de connexion
-            return $this->redirectToRoute('app_login');
+                // Redirection vers la page de connexion
+                return $this->redirectToRoute('app_login');
+                
+            } catch (\Exception $e) {
+                // En cas d'erreur lors de l'enregistrement
+                $this->addFlash('error', 'Une erreur est survenue lors de la création de votre compte. Veuillez réessayer.');
+            }
+        } elseif ($form->isSubmitted() && !$form->isValid()) {
+            // Message d'erreur si le formulaire est invalide
+            $this->addFlash('error', 'Veuillez corriger les erreurs dans le formulaire.');
         }
 
         return $this->render('registration/register.html.twig', [
