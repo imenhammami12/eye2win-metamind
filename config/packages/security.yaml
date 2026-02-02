@@ -24,10 +24,13 @@ security:
                 login_path: app_login
                 check_path: app_login
                 default_target_path: app_dashboard
+               
                 enable_csrf: true
+            
             logout:
                 path: app_logout
                 target: app_home
+            
             remember_me:
                 secret: '%kernel.secret%'
                 lifetime: 604800
