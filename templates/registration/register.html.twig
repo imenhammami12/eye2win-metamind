@@ -4,178 +4,172 @@
 
 {% block stylesheets %}
     {{ parent() }}
-    <link rel="stylesheet" href="{{ asset('assets/css/form-validation.css') }}">
+    <link rel="stylesheet" href="{{ asset('assets/css/gaming-auth.css') }}">
+    <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;600;700&display=swap" rel="stylesheet">
 {% endblock %}
 
 {% block body %}
-<!-- Breadcrumb -->
-<section class="breadcrumb breadcrumb_bg">
-    <div class="container">
-        <div class="row">
-            <div class="col-lg-12">
-                <div class="breadcrumb_iner text-center">
-                    <div class="breadcrumb_iner_item">
-                        <h2>Inscription</h2>
-                        <p><a href="{{ path('app_home') }}">Accueil</a> <span>-</span> Inscription</p>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-</section>
+<!-- Breadcrumb masqué par le CSS -->
+
 
 <section class="contact-section section_padding">
-    <div class="container">
-        <div class="row">
-            <div class="col-lg-6 mx-auto">
-                <div class="card shadow-lg">
-                    <div class="card-body p-5">
-                        <div class="text-center mb-4">
-                            <i class="fas fa-user-plus fa-4x text-success mb-3"></i>
-                            <h2>Créer un compte</h2>
-                            <p class="text-muted">Rejoignez la communauté EyeTwin</p>
-                        </div>
+    <div class="container-fluid p-0">
+        <div class="row g-0">
+            <div class="col-12">
+                <div class="auth-container">
+                    <!-- Colonne gauche - Image gaming -->
+                    <div class="auth-image-section">
+                        <!-- L'image de fond est définie dans le CSS -->
+                    </div>
 
-                        {# Affichage des erreurs globales du formulaire #}
-                        {% if form_errors(registrationForm) %}
-                            <div class="alert alert-danger alert-dismissible fade show" role="alert">
-                                <i class="fas fa-exclamation-triangle"></i>
-                                <strong>Erreur :</strong> {{ form_errors(registrationForm) }}
-                                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-                                    <span aria-hidden="true">&times;</span>
-                                </button>
-                            </div>
-                        {% endif %}
-
-                        {{ form_start(registrationForm, {'attr': {'novalidate': 'novalidate'}}) }}
-                        
-                        {# Username #}
-                        <div class="form-group">
-                            <label for="{{ registrationForm.username.vars.id }}">
-                                <i class="fas fa-user"></i> Nom d'utilisateur <span class="text-danger">*</span>
-                            </label>
-                            {{ form_widget(registrationForm.username, {
-                                'attr': {
-                                    'class': 'form-control form-control-lg' ~ (form_errors(registrationForm.username) ? ' is-invalid' : ''),
-                                    'placeholder': 'Choisissez un nom d\'utilisateur'
-                                }
-                            }) }}
-                            {% if form_errors(registrationForm.username) %}
-                                <div class="invalid-feedback">
-                                    <i class="fas fa-exclamation-circle"></i> {{ form_errors(registrationForm.username) }}
+                    <!-- Colonne droite - Formulaire -->
+                    <div class="auth-form-section">
+                        <div class="gaming-card card shadow-lg">
+                            <div class="card-body p-5">
+                                <div class="auth-header text-center mb-4">
+                                    <h2>Create Account</h2>
+                                    <p>Join EyeTwin Community</p>
                                 </div>
-                            {% endif %}
-                        </div>
 
-                        {# Email #}
-                        <div class="form-group">
-                            <label for="{{ registrationForm.email.vars.id }}">
-                                <i class="fas fa-envelope"></i> Email <span class="text-danger">*</span>
-                            </label>
-                            {{ form_widget(registrationForm.email, {
-                                'attr': {
-                                    'class': 'form-control form-control-lg' ~ (form_errors(registrationForm.email) ? ' is-invalid' : ''),
-                                    'placeholder': 'votre.email@exemple.com'
-                                }
-                            }) }}
-                            {% if form_errors(registrationForm.email) %}
-                                <div class="invalid-feedback">
-                                    <i class="fas fa-exclamation-circle"></i> {{ form_errors(registrationForm.email) }}
-                                </div>
-                            {% endif %}
-                        </div>
-
-                        {# Full Name #}
-                        <div class="form-group">
-                            <label for="{{ registrationForm.fullName.vars.id }}">
-                                <i class="fas fa-id-card"></i> Nom complet <span class="text-danger">*</span>
-                            </label>
-                            {{ form_widget(registrationForm.fullName, {
-                                'attr': {
-                                    'class': 'form-control form-control-lg' ~ (form_errors(registrationForm.fullName) ? ' is-invalid' : ''),
-                                    'placeholder': 'Prénom Nom'
-                                }
-                            }) }}
-                            {% if form_errors(registrationForm.fullName) %}
-                                <div class="invalid-feedback">
-                                    <i class="fas fa-exclamation-circle"></i> {{ form_errors(registrationForm.fullName) }}
-                                </div>
-                            {% endif %}
-                        </div>
-
-                        {# Password #}
-                        <div class="form-group">
-                            <label for="{{ registrationForm.plainPassword.first.vars.id }}">
-                                <i class="fas fa-lock"></i> Mot de passe <span class="text-danger">*</span>
-                            </label>
-                            {{ form_widget(registrationForm.plainPassword.first, {
-                                'attr': {
-                                    'class': 'form-control form-control-lg' ~ (form_errors(registrationForm.plainPassword.first) ? ' is-invalid' : ''),
-                                    'placeholder': 'Minimum 6 caractères'
-                                }
-                            }) }}
-                            {% if form_errors(registrationForm.plainPassword.first) %}
-                                <div class="invalid-feedback">
-                                    <i class="fas fa-exclamation-circle"></i> {{ form_errors(registrationForm.plainPassword.first) }}
-                                </div>
-                            {% endif %}
-                            <small class="form-text text-muted">
-                                <i class="fas fa-info-circle"></i> Le mot de passe doit contenir au moins 6 caractères
-                            </small>
-                        </div>
-
-                        {# Confirm Password #}
-                        <div class="form-group">
-                            <label for="{{ registrationForm.plainPassword.second.vars.id }}">
-                                <i class="fas fa-lock"></i> Confirmer le mot de passe <span class="text-danger">*</span>
-                            </label>
-                            {{ form_widget(registrationForm.plainPassword.second, {
-                                'attr': {
-                                    'class': 'form-control form-control-lg' ~ (form_errors(registrationForm.plainPassword.second) ? ' is-invalid' : ''),
-                                    'placeholder': 'Répétez le mot de passe'
-                                }
-                            }) }}
-                            {% if form_errors(registrationForm.plainPassword.second) %}
-                                <div class="invalid-feedback">
-                                    <i class="fas fa-exclamation-circle"></i> {{ form_errors(registrationForm.plainPassword.second) }}
-                                </div>
-                            {% endif %}
-                        </div>
-
-                        {# Agree Terms #}
-                        <div class="form-group">
-                            <div class="form-check">
-                                {{ form_widget(registrationForm.agreeTerms, {
-                                    'attr': {
-                                        'class': 'form-check-input' ~ (form_errors(registrationForm.agreeTerms) ? ' is-invalid' : '')
-                                    }
-                                }) }}
-                                <label class="form-check-label" for="{{ registrationForm.agreeTerms.vars.id }}">
-                                    J'accepte les <a href="#" target="_blank">conditions d'utilisation</a>
-                                    <span class="text-danger">*</span>
-                                </label>
-                                {% if form_errors(registrationForm.agreeTerms) %}
-                                    <div class="invalid-feedback">
-                                        <i class="fas fa-exclamation-circle"></i> {{ form_errors(registrationForm.agreeTerms) }}
+                                {# Affichage des erreurs globales du formulaire #}
+                                {% if form_errors(registrationForm) %}
+                                    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                                        <i class="fas fa-exclamation-triangle"></i>
+                                        <strong>Erreur :</strong> {{ form_errors(registrationForm) }}
+                                        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                                            <span aria-hidden="true">&times;</span>
+                                        </button>
                                     </div>
                                 {% endif %}
+
+                                {{ form_start(registrationForm, {'attr': {'novalidate': 'novalidate'}}) }}
+                                
+                                {# Username #}
+                                <div class="form-group">
+                                    <label for="{{ registrationForm.username.vars.id }}">
+                                        Username <span class="text-danger">*</span>
+                                    </label>
+                                    {{ form_widget(registrationForm.username, {
+                                        'attr': {
+                                            'class': 'form-control form-control-lg' ~ (form_errors(registrationForm.username) ? ' is-invalid' : ''),
+                                            'placeholder': 'Choisissez un nom d\'utilisateur'
+                                        }
+                                    }) }}
+                                    {% if form_errors(registrationForm.username) %}
+                                        <div class="invalid-feedback">
+                                            <i class="fas fa-exclamation-circle"></i> {{ form_errors(registrationForm.username) }}
+                                        </div>
+                                    {% endif %}
+                                </div>
+
+                                {# Email #}
+                                <div class="form-group">
+                                    <label for="{{ registrationForm.email.vars.id }}">
+                                        Email <span class="text-danger">*</span>
+                                    </label>
+                                    {{ form_widget(registrationForm.email, {
+                                        'attr': {
+                                            'class': 'form-control form-control-lg' ~ (form_errors(registrationForm.email) ? ' is-invalid' : ''),
+                                            'placeholder': 'votre.email@exemple.com'
+                                        }
+                                    }) }}
+                                    {% if form_errors(registrationForm.email) %}
+                                        <div class="invalid-feedback">
+                                            <i class="fas fa-exclamation-circle"></i> {{ form_errors(registrationForm.email) }}
+                                        </div>
+                                    {% endif %}
+                                </div>
+
+                                {# Full Name #}
+                                <div class="form-group">
+                                    <label for="{{ registrationForm.fullName.vars.id }}">
+                                        Full Name <span class="text-danger">*</span>
+                                    </label>
+                                    {{ form_widget(registrationForm.fullName, {
+                                        'attr': {
+                                            'class': 'form-control form-control-lg' ~ (form_errors(registrationForm.fullName) ? ' is-invalid' : ''),
+                                            'placeholder': 'Prénom Nom'
+                                        }
+                                    }) }}
+                                    {% if form_errors(registrationForm.fullName) %}
+                                        <div class="invalid-feedback">
+                                            <i class="fas fa-exclamation-circle"></i> {{ form_errors(registrationForm.fullName) }}
+                                        </div>
+                                    {% endif %}
+                                </div>
+
+                                {# Password #}
+                                <div class="form-group">
+                                    <label for="{{ registrationForm.plainPassword.first.vars.id }}">
+                                        Password <span class="text-danger">*</span>
+                                    </label>
+                                    {{ form_widget(registrationForm.plainPassword.first, {
+                                        'attr': {
+                                            'class': 'form-control form-control-lg' ~ (form_errors(registrationForm.plainPassword.first) ? ' is-invalid' : ''),
+                                            'placeholder': 'Minimum 6 caractères'
+                                        }
+                                    }) }}
+                                    {% if form_errors(registrationForm.plainPassword.first) %}
+                                        <div class="invalid-feedback">
+                                            <i class="fas fa-exclamation-circle"></i> {{ form_errors(registrationForm.plainPassword.first) }}
+                                        </div>
+                                    {% endif %}
+                                </div>
+
+                                {# Confirm Password #}
+                                <div class="form-group">
+                                    <label for="{{ registrationForm.plainPassword.second.vars.id }}">
+                                        Confirm Password <span class="text-danger">*</span>
+                                    </label>
+                                    {{ form_widget(registrationForm.plainPassword.second, {
+                                        'attr': {
+                                            'class': 'form-control form-control-lg' ~ (form_errors(registrationForm.plainPassword.second) ? ' is-invalid' : ''),
+                                            'placeholder': 'Répétez le mot de passe'
+                                        }
+                                    }) }}
+                                    {% if form_errors(registrationForm.plainPassword.second) %}
+                                        <div class="invalid-feedback">
+                                            <i class="fas fa-exclamation-circle"></i> {{ form_errors(registrationForm.plainPassword.second) }}
+                                        </div>
+                                    {% endif %}
+                                </div>
+
+                                {# Agree Terms #}
+                                <div class="form-group">
+                                    <div class="form-check">
+                                        {{ form_widget(registrationForm.agreeTerms, {
+                                            'attr': {
+                                                'class': 'form-check-input' ~ (form_errors(registrationForm.agreeTerms) ? ' is-invalid' : '')
+                                            }
+                                        }) }}
+                                        <label class="form-check-label" for="{{ registrationForm.agreeTerms.vars.id }}">
+                                            J'accepte les <a href="#" target="_blank">conditions d'utilisation</a>
+                                            <span class="text-danger">*</span>
+                                        </label>
+                                        {% if form_errors(registrationForm.agreeTerms) %}
+                                            <div class="invalid-feedback">
+                                                <i class="fas fa-exclamation-circle"></i> {{ form_errors(registrationForm.agreeTerms) }}
+                                            </div>
+                                        {% endif %}
+                                    </div>
+                                </div>
+
+                                <button type="submit" class="btn btn_1 btn-lg btn-block mb-3">
+                                    <i class="fas fa-check-circle"></i> Sign Up
+                                </button>
+
+                                <hr>
+
+                                <div class="text-center">
+                                    <p class="mb-2">Vous avez déjà un compte ?</p>
+                                    <a href="{{ path('app_login') }}" class="btn btn_2 btn-block">
+                                        <i class="fas fa-sign-in-alt"></i> Log In
+                                    </a>
+                                </div>
+
+                                {{ form_end(registrationForm) }}
                             </div>
                         </div>
-
-                        <button type="submit" class="btn btn_1 btn-lg btn-block mb-3">
-                            <i class="fas fa-check-circle"></i> S'inscrire
-                        </button>
-
-                        <hr>
-
-                        <div class="text-center">
-                            <p class="mb-2">Vous avez déjà un compte ?</p>
-                            <a href="{{ path('app_login') }}" class="btn btn_2 btn-block">
-                                <i class="fas fa-sign-in-alt"></i> Se connecter
-                            </a>
-                        </div>
-
-                        {{ form_end(registrationForm) }}
                     </div>
                 </div>
             </div>
