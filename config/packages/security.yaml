@@ -3,7 +3,7 @@ security:
     password_hashers:
         Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface: 'auto'
     
-    # Providers (sera activé après création de User)
+    # Providers
     providers:
         app_user_provider:
             entity:
@@ -15,31 +15,72 @@ security:
             pattern: ^/(_(profiler|wdt)|css|images|js)/
             security: false
         
+        # Firewall pour l'administration - DOIT ÊTRE AVANT 'main'
+        admin:
+            pattern: ^/admin
+            lazy: true
+            provider: app_user_provider
+            
+            # Formulaire de connexion admin
+            form_login:
+                login_path: admin_login
+                check_path: admin_login
+                default_target_path: admin_dashboard
+                enable_csrf: true
+            
+            # Déconnexion admin
+            logout:
+                path: admin_logout
+                target: admin_login
+            
+            # Remember me pour admin
+            remember_me:
+                secret: '%kernel.secret%'
+                lifetime: 604800
+                path: /admin
+        
+        # Firewall principal pour les utilisateurs normaux
         main:
             lazy: true
             provider: app_user_provider
-
-
+            
+            # Formulaire de connexion utilisateur
             form_login:
                 login_path: app_login
                 check_path: app_login
                 default_target_path: app_dashboard
-               
                 enable_csrf: true
             
+            # Déconnexion utilisateur
             logout:
                 path: app_logout
-                target: app_home
+                target: app_login
             
+            # Remember me pour utilisateurs
             remember_me:
                 secret: '%kernel.secret%'
                 lifetime: 604800
                 path: /
-                
+    
+    role_hierarchy:
+        ROLE_ADMIN: ROLE_USER
+        ROLE_SUPER_ADMIN: [ROLE_ADMIN, ROLE_USER]
+    
+    # Access control
     access_control:
+        # Routes publiques
         - { path: ^/login, roles: PUBLIC_ACCESS }
         - { path: ^/register, roles: PUBLIC_ACCESS }
+        
+        # Routes admin
+        - { path: ^/admin/login, roles: PUBLIC_ACCESS }      # Login admin accessible à tous
+        - { path: ^/admin/audit, roles: ROLE_SUPER_ADMIN }   # Audit logs = Super Admin uniquement
+        - { path: ^/admin, roles: ROLE_ADMIN }                # Backoffice = Admin minimum
+        
+        # Routes utilisateur
         - { path: ^/profile, roles: ROLE_USER }
+        - { path: ^/dashboard, roles: ROLE_USER }
+
 
 when@test:
     security:

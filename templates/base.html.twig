@@ -69,7 +69,13 @@
                                                 <i class="fas fa-user-circle"></i> {{ app.user.username }}
                                             </a>
                                             <div class="dropdown-menu" aria-labelledby="navbarDropdown">
-                                     
+                                                {% if is_granted('ROLE_ADMIN') %}
+                                                    <a class="dropdown-item admin-link" href="{{ path('admin_dashboard') }}">
+                                                        <i class="fas fa-user-shield"></i> Administration
+                                                    </a>
+                                                    <div class="dropdown-divider"></div>
+                                                {% endif %}
+                                                
                                                 <a class="dropdown-item" href="{{ path('app_logout') }}">
                                                     <i class="fas fa-sign-out-alt"></i> Déconnexion
                                                 </a>
