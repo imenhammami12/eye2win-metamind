@@ -109,7 +109,7 @@
                                 <i class="fas fa-percent"></i>
                             </div>
                             <div class="stat_info">
-                                <p class="stat_label">Win Rate: 0%</p>
+                                <p class="stat_label">Win Rate</p>
                                 <h4 class="stat_value">0%</h4>
                             </div>
                         </div>
@@ -119,8 +119,8 @@
                                 <i class="fas fa-star"></i>
                             </div>
                             <div class="stat_info">
-                                <p class="stat_label">Favorite Hero/Character: None</p>
-                                <h4 class="stat_value">0</h4>
+                                <p class="stat_label">Favorite Hero/Character</p>
+                                <h4 class="stat_value">None</h4>
                             </div>
                         </div>
                     </div>
@@ -160,7 +160,7 @@
                     <h4 class="card_title"><i class="fas fa-users"></i> My Teams</h4>
                     <div class="teams_list">
                         {% for membership in user.teamMemberships %}
-                        <div class="team_item">
+                        <a href="{{ path('team_show', {id: membership.team.id}) }}" class="team_item">
                             <div class="team_header">
                                 <h5 class="team_name">{{ membership.team.name }}</h5>
                                 {% if membership.role.value == 'owner' %}
@@ -175,7 +175,7 @@
                                 {{ membership.team.description|length > 100 ? membership.team.description|slice(0, 100) ~ '...' : membership.team.description }}
                             </p>
                             <small class="team_date">Member since {{ membership.joinedAt|date('m/d/Y') }}</small>
-                        </div>
+                        </a>
                         {% endfor %}
                     </div>
                 </div>
