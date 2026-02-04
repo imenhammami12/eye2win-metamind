@@ -133,7 +133,7 @@
     
     {# User Information #}
     <div class="col-lg-8">
-        {# Stats Cards #}
+        {# Stats Cards
         <div class="row g-3 mb-4 fade-in" style="animation-delay: 0.2s;">
             <div class="col-md-3">
                 <div class="stat-card">
@@ -175,7 +175,7 @@
                 </div>
             </div>
         </div>
-        
+         #}
         {# Personal Information #}
         <div class="table-card mb-4 fade-in" style="animation-delay: 0.3s;">
             <div class="table-header">
@@ -200,22 +200,23 @@
                         <th><i class="bi bi-person me-2"></i>Full Name</th>
                         <td>{{ user.fullName ?? 'Not provided' }}</td>
                     </tr>
+                   
                     <tr>
-                        <th><i class="bi bi-calendar-plus me-2"></i>Registration Date</th>
-                        <td>
-                            <i class="bi bi-calendar3 me-2"></i>
-                            {{ user.createdAt|date('F d, Y \\a\\t h:i A') }}
-                            <small class="text-muted ms-2">({{ user.createdAt|date('U')|date_diff('now').days }} days ago)</small>
-                        </td>
-                    </tr>
-                    <tr>
-                        <th><i class="bi bi-clock-history me-2"></i>Last Login</th>
-                        <td>
-                            <i class="bi bi-clock me-2"></i>
-                            {{ user.lastLogin|date('F d, Y \\a\\t h:i A') }}
-                            <small class="text-muted ms-2">({{ user.lastLogin|date('U')|date_diff('now').days }} days ago)</small>
-                        </td>
-                    </tr>
+    <th><i class="bi bi-calendar-plus me-2"></i>Registration Date</th>
+    <td>
+        <i class="bi bi-calendar3 me-2"></i>
+        {{ user.createdAt|date('F d, Y \\a\\t h:i A') }}
+        <small class="text-muted ms-2">({{ (('now'|date('U') - user.createdAt|date('U')) / 86400)|round }} days ago)</small>
+    </td>
+</tr>
+<tr>
+    <th><i class="bi bi-clock-history me-2"></i>Last Login</th>
+    <td>
+        <i class="bi bi-clock me-2"></i>
+        {{ user.lastLogin|date('F d, Y \\a\\t h:i A') }}
+        <small class="text-muted ms-2">({{ (('now'|date('U') - user.lastLogin|date('U')) / 86400)|round }} days ago)</small>
+    </td>
+</tr>
                     <tr>
                         <th><i class="bi bi-toggle-on me-2"></i>Account Status</th>
                         <td>

@@ -1,0 +1,268 @@
+{% extends 'admin_layout.html.twig' %}
+
+{% block title %}Coach Application #{{ application.id }}{% endblock %}
+{% block page_title %}Application Details{% endblock %}
+
+{% block body %}
+<div class="mb-3 fade-in">
+    <a href="{{ path('admin_coach_applications_index') }}" class="btn btn-outline-secondary">
+        <i class="bi bi-arrow-left me-2"></i>Back to List
+    </a>
+</div>
+
+<div class="row g-4">
+    {# Applicant Info #}
+    <div class="col-lg-4">
+        <div class="table-card text-center fade-in" style="animation-delay: 0.1s;">
+            <div class="mb-4 position-relative">
+                {% if application.user.profilePicture %}
+                    <img src="{{ asset('uploads/profiles/' ~ application.user.profilePicture) }}" 
+                         alt="{{ application.user.username }}" 
+                         style="width: 120px; height: 120px; border-radius: 50%; object-fit: cover; border: 4px solid rgba(102, 126, 234, 0.3); box-shadow: 0 6px 16px rgba(0,0,0,0.15);"
+                         loading="lazy">
+                {% else %}
+                    <div style="width: 120px; height: 120px; margin: 0 auto; border-radius: 50%; background: linear-gradient(135deg, #667eea, #764ba2); display: flex; align-items: center; justify-content: center; color: white; font-size: 42px; font-weight: bold; box-shadow: 0 6px 16px rgba(0,0,0,0.15);">
+                        {{ application.user.username|slice(0, 2)|upper }}
+                    </div>
+                {% endif %}
+            </div>
+            
+            <h5 class="mb-1">{{ application.user.fullName ?? application.user.username }}</h5>
+            <p class="text-muted mb-2">@{{ application.user.username }}</p>
+            <p class="mb-3">
+                <a href="mailto:{{ application.user.email }}" class="text-decoration-none" style="color: #4facfe;">
+                    <i class="bi bi-envelope me-1"></i>{{ application.user.email }}
+                </a>
+            </p>
+            
+            <div class="mb-3">
+                <span class="badge bg-{{ application.status.badgeClass }}">
+                    <i class="bi bi-{{ application.status.value == 'APPROVED' ? 'check-circle' : (application.status.value == 'REJECTED' ? 'x-circle' : (application.status.value == 'UNDER_REVIEW' ? 'eye' : 'clock')) }} me-1"></i>
+                    {{ application.status.label }}
+                </span>
+            </div>
+            
+            <hr>
+            
+            <table class="table table-sm table-borderless text-start mb-0">
+                <tbody>
+                    <tr>
+                        <th style="width: 130px;">
+                            <i class="bi bi-calendar-plus me-2"></i>Submitted:
+                        </th>
+                        <td>
+                            <small>{{ application.submittedAt|date('M d, Y') }}</small>
+                            <br>
+                            <small class="text-muted">{{ application.submittedAt|date('h:i A') }}</small>
+                        </td>
+                    </tr>
+                    {% if application.reviewedAt %}
+                        <tr>
+                            <th>
+                                <i class="bi bi-clock-history me-2"></i>Reviewed:
+                            </th>
+                            <td>
+                                <small>{{ application.reviewedAt|date('M d, Y') }}</small>
+                                <br>
+                                <small class="text-muted">{{ application.reviewedAt|date('h:i A') }}</small>
+                            </td>
+                        </tr>
+                    {% endif %}
+                    <tr>
+                        <th>
+                            <i class="bi bi-person-check me-2"></i>Joined:
+                        </th>
+                        <td>
+                            <small>{{ application.user.createdAt|date('M d, Y') }}</small>
+                            <br>
+                            <small class="text-muted">({{ (('now'|date('U') - application.user.createdAt|date('U')) / 86400)|round }} days ago)</small>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+            
+            <hr>
+            
+            <a href="{{ path('admin_users_show', {id: application.user.id}) }}" class="btn btn-outline-primary w-100">
+                <i class="bi bi-person me-2"></i>View Full Profile
+            </a>
+        </div>
+    </div>
+    
+    {# Application Details #}
+    <div class="col-lg-8">
+        {# Certifications #}
+        <div class="table-card mb-4 fade-in" style="animation-delay: 0.2s;">
+            <div class="table-header">
+                <h5><i class="bi bi-award me-2"></i>Certifications</h5>
+            </div>
+            <div class="p-3">
+                <p style="white-space: pre-wrap; line-height: 1.6;">{{ application.certifications }}</p>
+            </div>
+        </div>
+        
+        {# Experience #}
+        <div class="table-card mb-4 fade-in" style="animation-delay: 0.25s;">
+            <div class="table-header">
+                <h5><i class="bi bi-briefcase me-2"></i>Experience</h5>
+            </div>
+            <div class="p-3">
+                <p style="white-space: pre-wrap; line-height: 1.6;">{{ application.experience }}</p>
+            </div>
+        </div>
+        
+        {# CV File #}
+        {% if application.cvFile %}
+            <div class="table-card mb-4 fade-in" style="animation-delay: 0.3s;">
+                <div class="table-header">
+                    <h5><i class="bi bi-file-earmark-pdf me-2"></i>Resume/CV</h5>
+                </div>
+                <div class="p-3">
+                    <a href="{{ asset('uploads/cv/' ~ application.cvFile) }}" 
+                       target="_blank" 
+                       class="btn btn-outline-primary">
+                        <i class="bi bi-download me-2"></i>Download CV
+                    </a>
+                    <small class="text-muted ms-3">
+                        <i class="bi bi-file-earmark-text me-1"></i>{{ application.cvFile }}
+                    </small>
+                </div>
+            </div>
+        {% endif %}
+        
+        {# Documents #}
+        {% if application.documents %}
+            <div class="table-card mb-4 fade-in" style="animation-delay: 0.35s;">
+                <div class="table-header">
+                    <h5><i class="bi bi-folder me-2"></i>Additional Documents</h5>
+                </div>
+                <div class="p-3">
+                    <p style="line-height: 1.6;">{{ application.documents }}</p>
+                </div>
+            </div>
+        {% endif %}
+        
+        {# Review Comment (if exists) #}
+        {% if application.reviewComment %}
+            <div class="alert alert-{{ application.status.value == 'APPROVED' ? 'success' : 'danger' }} fade-in" style="animation-delay: 0.4s;">
+                <h6 class="alert-heading">
+                    <i class="bi bi-chat-left-text me-2"></i>Review Comment
+                </h6>
+                <p class="mb-0" style="line-height: 1.6;">{{ application.reviewComment }}</p>
+            </div>
+        {% endif %}
+        
+        {# Actions #}
+        {% if application.status.value != 'APPROVED' and application.status.value != 'REJECTED' %}
+            <div class="row g-3 fade-in" style="animation-delay: 0.45s;">
+                <div class="col-md-6" id="approve-section">
+                    <div class="table-card">
+                        <div class="table-header" style="background: linear-gradient(135deg, #43e97b, #38f9d7); color: white;">
+                            <h6 class="mb-0"><i class="bi bi-check-circle me-2"></i>Approve Application</h6>
+                        </div>
+                        <form method="post" action="{{ path('admin_coach_applications_approve', {id: application.id}) }}" class="p-3">
+                            <input type="hidden" name="_token" value="{{ csrf_token('approve-' ~ application.id) }}">
+                            
+                            <div class="mb-3">
+                                <label class="form-label">Comment (Optional)</label>
+                                <textarea name="comment" 
+                                          class="form-control" 
+                                          rows="3" 
+                                          placeholder="Congratulations on your application..."></textarea>
+                                <small class="text-muted">
+                                    <i class="bi bi-info-circle me-1"></i>This comment will be sent to the applicant
+                                </small>
+                            </div>
+                            
+                            <button type="submit" class="btn btn-success w-100">
+                                <i class="bi bi-check-circle me-2"></i>Approve This Application
+                            </button>
+                            
+                            <small class="text-muted d-block mt-2 text-center">
+                                <i class="bi bi-shield-check me-1"></i>User will receive COACH role and a notification
+                            </small>
+                        </form>
+                    </div>
+                </div>
+                
+                <div class="col-md-6" id="reject-section">
+                    <div class="table-card">
+                        <div class="table-header" style="background: linear-gradient(135deg, #ff6b6b, #ee5a6f); color: white;">
+                            <h6 class="mb-0"><i class="bi bi-x-circle me-2"></i>Reject Application</h6>
+                        </div>
+                        <form method="post" action="{{ path('admin_coach_applications_reject', {id: application.id}) }}" class="p-3">
+                            <input type="hidden" name="_token" value="{{ csrf_token('reject-' ~ application.id) }}">
+                            
+                            <div class="mb-3">
+                                <label class="form-label">Rejection Reason <span class="text-danger">*</span></label>
+                                <textarea name="comment" 
+                                          class="form-control" 
+                                          rows="3" 
+                                          required
+                                          placeholder="Please specify the reason for rejection..."></textarea>
+                                <small class="text-muted">
+                                    <i class="bi bi-info-circle me-1"></i>This comment will be sent to the applicant
+                                </small>
+                            </div>
+                            
+                            <button type="submit" class="btn btn-danger w-100">
+                                <i class="bi bi-x-circle me-2"></i>Reject This Application
+                            </button>
+                            
+                            <small class="text-muted d-block mt-2 text-center">
+                                <i class="bi bi-envelope me-1"></i>User will receive a notification with your comment
+                            </small>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        {% endif %}
+        
+        {# Put in Review #}
+        {% if application.status.value == 'PENDING' %}
+            <div class="table-card mt-3 fade-in" style="animation-delay: 0.5s;">
+                <form method="post" action="{{ path('admin_coach_applications_review', {id: application.id}) }}" class="p-3">
+                    <input type="hidden" name="_token" value="{{ csrf_token('review-' ~ application.id) }}">
+                    
+                    <p class="mb-3">
+                        <i class="bi bi-info-circle me-2"></i>
+                        This application is pending. You can put it under review to indicate you're working on it.
+                    </p>
+                    
+                    <button type="submit" class="btn btn-primary">
+                        <i class="bi bi-eye-fill me-2"></i>Put Under Review
+                    </button>
+                </form>
+            </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
+
+{% block javascripts %}
+<script>
+// Smooth scroll to sections when using anchor links
+document.addEventListener('DOMContentLoaded', function() {
+    // Check if URL has hash
+    if (window.location.hash) {
+        const target = document.querySelector(window.location.hash);
+        if (target) {
+            setTimeout(() => {
+                target.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                target.style.animation = 'pulse 1s ease-in-out 2';
+            }, 300);
+        }
+    }
+});
+
+// Add pulse animation
+const style = document.createElement('style');
+style.textContent = `
+    @keyframes pulse {
+        0%, 100% { transform: scale(1); }
+        50% { transform: scale(1.02); box-shadow: 0 8px 24px rgba(102, 126, 234, 0.3); }
+    }
+`;
+document.head.appendChild(style);
+</script>
+{% endblock %}

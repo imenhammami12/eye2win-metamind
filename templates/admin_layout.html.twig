@@ -55,6 +55,17 @@
                     <span>Users</span>
                 </a>
                 
+
+                <a href="{{ path('admin_coach_applications_index') }}" 
+                   class="{{ app.request.attributes.get('_route') starts with 'admin_coach_applications' ? 'active' : '' }}">
+                    <i class="bi bi-clipboard-check"></i>
+                    <span>Demandes Coach</span>
+                    {% if pendingApplicationsCount|default(0) > 0 %}
+                        <span class="badge bg-danger">{{ pendingApplicationsCount }}</span>
+                    {% endif %}
+                </a>
+
+
                 <div class="sidebar-divider"></div>
                 
                 <a href="{{ path('app_home') }}" 
@@ -125,20 +136,7 @@
             </div>
             
             {# Footer #}
-            <footer class="admin-footer">
-                <div class="row">
-                    <div class="col-md-6">
-                        <p class="mb-0" style="color: rgba(255,255,255,0.5); font-size: 13px;">
-                            <small>&copy; {{ 'now'|date('Y') }} EyeTwin E-Sport Platform. All rights reserved.</small>
-                        </p>
-                    </div>
-                    <div class="col-md-6 text-md-end">
-                        <p class="mb-0" style="color: rgba(255,255,255,0.5); font-size: 13px;">
-                            <small>Version 1.0.0 - Gaming Edition</small>
-                        </p>
-                    </div>
-                </div>
-            </footer>
+            
         </main>
     </div>
     

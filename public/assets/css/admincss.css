@@ -987,17 +987,32 @@ body::after {
 /* ============================================================================
    CUSTOM TABLE - ULTRA ENHANCED & FIXED
    ============================================================================ */
+/* ============================================================================
+   FIX COMPLET POUR TABLEAUX COHÉRENTS - À REMPLACER DANS VOTRE CSS
+   ============================================================================ */
+
+/* ============================================================================
+   CUSTOM TABLE - FIXED & COHERENT ROWS
+   ============================================================================ */
 
 .custom-table {
     width: 100%;
-    min-width: 1000px; /* Minimum width to show all columns properly */
+    min-width: 1000px;
     border-collapse: separate;
-    border-spacing: 0 8px;
-    table-layout: fixed; /* Fixed layout for consistent column widths */
+    border-spacing: 0 8px !important;
+    table-layout: auto;
+}
+
+.custom-table thead {
+    background: rgba(255, 255, 255, 0.05);
+}
+
+.custom-table thead tr {
+    background: rgba(255, 255, 255, 0.05);
 }
 
 .custom-table thead th {
-    background: rgba(255, 255, 255, 0.05);
+    background: transparent;
     color: rgba(255, 255, 255, 0.7);
     font-weight: 600;
     border: none;
@@ -1009,6 +1024,17 @@ body::after {
     position: relative;
     white-space: nowrap;
     box-sizing: border-box;
+    vertical-align: middle;
+    height: 50px;
+}
+
+.custom-table thead th:first-child {
+    border-radius: 10px 0 0 10px;
+    text-align: center;
+}
+
+.custom-table thead th:last-child {
+    border-radius: 0 10px 10px 0;
 }
 
 .custom-table thead th::after {
@@ -1021,22 +1047,38 @@ body::after {
     background: linear-gradient(90deg, transparent, rgba(255, 60, 100, 0.3), transparent);
 }
 
-.custom-table tbody td {
-    padding: 14px 16px;
-    vertical-align: middle;
+/* TBODY - Lignes cohérentes */
+.custom-table tbody tr {
+    transition: all var(--transition-base);
+    position: relative;
     background: rgba(255, 255, 255, 0.04);
+}
+
+.custom-table tbody td {
+    padding: 16px;
+    vertical-align: middle;
+    background: inherit;
     border: none;
     color: var(--text-secondary);
     font-size: 13px;
     transition: all var(--transition-base);
-    overflow: hidden;
-    text-overflow: ellipsis;
     box-sizing: border-box;
+    height: 70px;
+    line-height: 1.4;
 }
 
-.custom-table tbody tr {
-    transition: all var(--transition-base);
-    position: relative;
+/* Première cellule (Photo) - CORRECTION CRITIQUE */
+.custom-table tbody tr td:first-child {
+    border-top-left-radius: 10px;
+    border-bottom-left-radius: 10px;
+    text-align: center;
+    padding: 12px;
+}
+
+/* Dernière cellule */
+.custom-table tbody tr td:last-child {
+    border-top-right-radius: 10px;
+    border-bottom-right-radius: 10px;
 }
 
 /* Glow effect on hover */
@@ -1051,6 +1093,7 @@ body::after {
     opacity: 0;
     border-radius: 10px 0 0 10px;
     transition: opacity var(--transition-base);
+    z-index: 1;
 }
 
 .custom-table tbody tr:hover::before {
@@ -1059,19 +1102,128 @@ body::after {
 
 .custom-table tbody tr:hover {
     transform: translateX(2px);
+    background: rgba(255, 255, 255, 0.08);
 }
 
 .custom-table tbody tr:hover td {
-    background: rgba(255, 255, 255, 0.08);
+    background: inherit;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
 }
 
-.custom-table tbody tr td:first-child {
-    border-radius: 10px 0 0 10px;
+/* ============================================================================
+   USER AVATARS - CORRECTION CRITIQUE
+   ============================================================================ */
+
+.user-avatar-table,
+.user-avatar-placeholder {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    border: 2px solid rgba(255, 255, 255, 0.15);
+    transition: all var(--transition-base);
+    display: inline-block;
+    vertical-align: middle;
+    margin: 0;
 }
 
-.custom-table tbody tr td:last-child {
-    border-radius: 0 10px 10px 0;
+.user-avatar-table {
+    object-fit: cover;
+}
+
+.user-avatar-placeholder {
+    background: var(--gradient-purple);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-weight: 700;
+    font-size: 14px;
+}
+
+.user-avatar-table:hover,
+.user-avatar-placeholder:hover {
+    transform: scale(1.15);
+    border-color: rgba(255, 60, 100, 0.5);
+    box-shadow: 0 4px 16px rgba(255, 60, 100, 0.3);
+}
+
+.user-avatar-placeholder:hover {
+    transform: scale(1.15) rotate(5deg);
+    box-shadow: 0 4px 16px rgba(102, 126, 234, 0.4);
+}
+
+/* ============================================================================
+   FIX POUR DIV WRAPPER DANS TD (si vous utilisez un div pour centrer)
+   ============================================================================ */
+
+.custom-table tbody td:first-child > div {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    height: 100%;
+}
+
+/* ============================================================================
+   RESPONSIVE FIXES
+   ============================================================================ */
+
+@media (max-width: 1200px) {
+    .custom-table {
+        min-width: 950px;
+        font-size: 12px;
+    }
+    
+    .custom-table thead th,
+    .custom-table tbody td {
+        padding: 12px 10px;
+    }
+    
+    .custom-table tbody td {
+        height: 65px;
+    }
+}
+
+@media (max-width: 991px) {
+    .custom-table {
+        min-width: 900px;
+    }
+}
+
+@media (max-width: 768px) {
+    .custom-table {
+        min-width: 850px;
+        font-size: 11px;
+    }
+    
+    .custom-table thead th,
+    .custom-table tbody td {
+        padding: 10px 8px;
+    }
+    
+    .custom-table tbody td {
+        height: 60px;
+    }
+    
+    .user-avatar-table,
+    .user-avatar-placeholder {
+        width: 36px;
+        height: 36px;
+        font-size: 12px;
+    }
+}
+
+@media (max-width: 576px) {
+    .custom-table {
+        min-width: 800px;
+    }
+    
+    .user-avatar-table,
+    .user-avatar-placeholder {
+        width: 32px;
+        height: 32px;
+        font-size: 11px;
+    }
 }
 
 /* ============================================================================
