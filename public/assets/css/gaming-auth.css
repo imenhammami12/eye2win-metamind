@@ -103,7 +103,7 @@ body {
 .auth-image-section {
     flex: 1;
     background: linear-gradient(135deg, rgba(139, 0, 0, 0.2) 0%, rgba(0, 0, 0, 0.6) 100%),
-                url('/assets/img/gaming-characters.jpeg') center/cover;
+                url('/assets/img/gaming-characters.png') center/cover;
     position: relative;
     overflow: hidden;
     min-height: 500px;

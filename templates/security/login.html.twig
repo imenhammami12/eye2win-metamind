@@ -1,6 +1,6 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Connexion - EyeTwin{% endblock %}
+{% block title %}Login - EyeTwin{% endblock %}
 
 {% block stylesheets %}
     {{ parent() }}
@@ -9,26 +9,25 @@
 {% endblock %}
 
 {% block body %}
-<!-- Breadcrumb masqué par le CSS -->
-
-
 <section class="contact-section section_padding">
     <div class="container-fluid p-0">
         <div class="row g-0">
             <div class="col-12">
                 <div class="auth-container">
-                    <!-- Colonne gauche - Image gaming -->
+
+                    <!-- Left column - Gaming image -->
                     <div class="auth-image-section">
-                        <!-- L'image de fond est définie dans le CSS -->
+                        <!-- Background image handled via CSS -->
                     </div>
 
-                    <!-- Colonne droite - Formulaire -->
+                    <!-- Right column - Login form -->
                     <div class="auth-form-section">
                         <div class="gaming-card card shadow-lg">
                             <div class="card-body p-5">
+
                                 <div class="auth-header text-center mb-4">
-                                    <h2>Log In Account</h2>
-                                    <p>Welcome Back</p>
+                                    <h2>Log In to Your Account</h2>
+                                    <p>Welcome back! Please sign in</p>
                                 </div>
 
                                 {% if error %}
@@ -39,41 +38,42 @@
                                 {% endif %}
 
                                 <form method="post" action="{{ path('app_login') }}">
+
                                     <div class="form-group">
-                                        <label for="inputEmail">Enter Email</label>
-                                        <input type="email" 
-                                               value="{{ last_username }}" 
-                                               name="_username" 
-                                               id="inputEmail" 
-                                               class="form-control form-control-lg" 
-                                               autocomplete="email" 
-                                               required 
+                                        <label for="inputEmail">Email Address</label>
+                                        <input type="email"
+                                               value="{{ last_username }}"
+                                               name="_username"
+                                               id="inputEmail"
+                                               class="form-control form-control-lg"
+                                               autocomplete="email"
+                                               required
                                                autofocus
-                                               placeholder="votre@email.com">
+                                               placeholder="your@email.com">
                                     </div>
 
                                     <div class="form-group">
-                                        <label for="inputPassword">Enter Password</label>
-                                        <input type="password" 
-                                               name="_password" 
-                                               id="inputPassword" 
-                                               class="form-control form-control-lg" 
-                                               autocomplete="current-password" 
+                                        <label for="inputPassword">Password</label>
+                                        <input type="password"
+                                               name="_password"
+                                               id="inputPassword"
+                                               class="form-control form-control-lg"
+                                               autocomplete="current-password"
                                                required
                                                placeholder="••••••••">
                                     </div>
 
                                     <div class="d-flex justify-content-between align-items-center mb-3">
                                         <div class="form-check">
-                                            <input class="form-check-input" 
-                                                   type="checkbox" 
-                                                   name="_remember_me" 
+                                            <input class="form-check-input"
+                                                   type="checkbox"
+                                                   name="_remember_me"
                                                    id="remember_me">
                                             <label class="form-check-label" for="remember_me">
-                                                Se souvenir de moi
+                                                Remember me
                                             </label>
                                         </div>
-                                        <a href="#" class="text-end">Forgot Password?</a>
+                                        <a href="#" class="text-end">Forgot password?</a>
                                     </div>
 
                                     <input type="hidden" name="_csrf_token" value="{{ csrf_token('authenticate') }}">
@@ -85,15 +85,17 @@
                                     <hr>
 
                                     <div class="text-center">
-                                        <p class="mb-2">Pas encore de compte ?</p>
+                                        <p class="mb-2">Don't have an account yet?</p>
                                         <a href="{{ path('app_register') }}" class="btn btn_2 btn-block">
                                             <i class="fas fa-user-plus"></i> Sign Up
                                         </a>
                                     </div>
+
                                 </form>
                             </div>
                         </div>
                     </div>
+
                 </div>
             </div>
         </div>

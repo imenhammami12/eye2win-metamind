@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Controller;
+namespace App\Controller\Admin;
 
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
@@ -18,7 +18,8 @@ class AdminController extends AbstractController
     {
         // Si l'utilisateur est déjà connecté avec ROLE_ADMIN
         if ($this->isGranted('ROLE_ADMIN')) {
-            return $this->redirectToRoute('admin_dashboard');
+        return $this->redirectToRoute('admin_login');
+        
         }
         
         // Sinon, rediriger vers le login admin

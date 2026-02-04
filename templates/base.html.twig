@@ -62,25 +62,30 @@
                                             <a class="nav-link" href="{{ path('app_dashboard') }}">Dashboard</a>
                                         </li>
                                         
-                                        <li class="nav-item dropdown">
-                                            <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown"
-                                                role="button" data-toggle="dropdown" aria-haspopup="true"
-                                                aria-expanded="false">
-                                                <i class="fas fa-user-circle"></i> {{ app.user.username }}
-                                            </a>
-                                            <div class="dropdown-menu" aria-labelledby="navbarDropdown">
-                                                {% if is_granted('ROLE_ADMIN') %}
-                                                    <a class="dropdown-item admin-link" href="{{ path('admin_dashboard') }}">
-                                                        <i class="fas fa-user-shield"></i> Administration
-                                                    </a>
-                                                    <div class="dropdown-divider"></div>
-                                                {% endif %}
-                                                
-                                                <a class="dropdown-item" href="{{ path('app_logout') }}">
-                                                    <i class="fas fa-sign-out-alt"></i> Déconnexion
-                                                </a>
-                                            </div>
-                                        </li>
+                                                                                    <li class="nav-item dropdown">
+    <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown"
+        role="button" data-toggle="dropdown" aria-haspopup="true"
+        aria-expanded="false">
+        <i class="fas fa-user-circle"></i> {{ app.user.username }}
+    </a>
+    <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+        <a class="dropdown-item" href="{{ path('user_profile') }}">
+            <i class="fas fa-user"></i> Mon Profil
+        </a>
+        
+        {% if is_granted('ROLE_ADMIN') %}
+            <div class="dropdown-divider"></div>
+            <a class="dropdown-item admin-link" href="{{ path('admin_dashboard') }}">
+<i class="fas fa-user-shield"></i> Administration
+            </a>
+        {% endif %}
+        
+        <div class="dropdown-divider"></div>
+        <a class="dropdown-item" href="{{ path('app_logout') }}">
+            <i class="fas fa-sign-out-alt"></i> Déconnexion
+        </a>
+    </div>
+</li>
                                     {% else %}
                                         <li class="nav-item">
                                             <a class="nav-link" href="{{ path('app_login') }}">Connexion</a>
