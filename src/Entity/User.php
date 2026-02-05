@@ -14,8 +14,8 @@ use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: UserRepository::class)]
 #[ORM\Table(name: '`user`')]
-#[UniqueEntity(fields: ['email'], message: 'Un compte existe déjà avec cet email')]
-#[UniqueEntity(fields: ['username'], message: 'Ce nom d\'utilisateur est déjà pris')]
+#[UniqueEntity(fields: ['email'], message: 'This email address is already registered')]
+#[UniqueEntity(fields: ['username'], message: 'This username is already taken')]
 class User implements UserInterface, PasswordAuthenticatedUserInterface
 {
     #[ORM\Id]
@@ -24,19 +24,26 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     private ?int $id = null;
 
     #[ORM\Column(length: 180, unique: true)]
-    #[Assert\NotBlank(message: 'L\'email est obligatoire')]
-    #[Assert\Email(message: 'Email invalide')]
+    #[Assert\NotBlank(message: 'Email is required')]
+    #[Assert\Email(message: 'The email "{{ value }}" is not valid')]
     private ?string $email = null;
 
     #[ORM\Column(length: 50, unique: true)]
-    #[Assert\NotBlank(message: 'Le nom d\'utilisateur est obligatoire')]
-    #[Assert\Length(min: 3, max: 50)]
+    #[Assert\NotBlank(message: 'Username is required')]
+    #[Assert\Length(
+        min: 3,
+        max: 50,
+        minMessage: 'Username must be at least {{ limit }} characters long',
+        maxMessage: 'Username cannot be longer than {{ limit }} characters'
+    )]
+    #[Assert\Regex(
+        pattern: '/^[a-zA-Z0-9_]+$/',
+        message: 'Username can only contain letters, numbers, and underscores'
+    )]
     private ?string $username = null;
 
-
-
-#[ORM\Column(type: 'text')]
-private string $rolesJson = '[]';
+    #[ORM\Column(type: 'text')]
+    private string $rolesJson = '[]';
 
     #[ORM\Column]
     private ?string $password = null;
@@ -51,10 +58,20 @@ private string $rolesJson = '[]';
     private ?\DateTimeInterface $lastLogin = null;
 
     #[ORM\Column(length: 100, nullable: true)]
-    #[Assert\Length(max: 100)]
+    #[Assert\NotBlank(message: 'Full name is required')]
+    #[Assert\Length(
+        min: 2,
+        max: 100,
+        minMessage: 'Full name must be at least {{ limit }} characters long',
+        maxMessage: 'Full name cannot be longer than {{ limit }} characters'
+    )]
     private ?string $fullName = null;
 
     #[ORM\Column(length: 255, nullable: true)]
+    #[Assert\Length(
+        max: 255,
+        maxMessage: 'Bio cannot be longer than {{ limit }} characters'
+    )]
     private ?string $bio = null;
 
     #[ORM\Column(length: 255, nullable: true)]
@@ -93,9 +110,7 @@ private string $rolesJson = '[]';
         $this->accountStatus = AccountStatus::ACTIVE;
         $this->rolesJson = json_encode(['ROLE_USER']);
         $this->videos = new ArrayCollection();
-
-        }
-
+    }
     public function getId(): ?int
     {
         return $this->id;
@@ -128,20 +143,18 @@ private string $rolesJson = '[]';
         return (string) $this->email;
     }
 
-  
-public function getRoles(): array
-{
-    $roles = json_decode($this->rolesJson, true) ?: [];
-    $roles[] = 'ROLE_USER';
-    return array_unique($roles);
-}
+    public function getRoles(): array
+    {
+        $roles = json_decode($this->rolesJson, true) ?: [];
+        $roles[] = 'ROLE_USER';
+        return array_unique($roles);
+    }
 
-public function setRoles(array $roles): static
-{
-    $this->rolesJson = json_encode(array_values($roles));
-    return $this;
-}
-   
+    public function setRoles(array $roles): static
+    {
+        $this->rolesJson = json_encode(array_values($roles));
+        return $this;
+    }
 
     public function getPassword(): string
     {
@@ -232,9 +245,6 @@ public function setRoles(array $roles): static
         return $this->ownedTeams;
     }
 
-   
-
-   
     /**
      * @return Collection<int, TeamMembership>
      */
@@ -271,7 +281,6 @@ public function setRoles(array $roles): static
     {
         return $this->accountStatus === AccountStatus::ACTIVE;
     }
-
     /**
      * @return Collection<int, Video>
      */
@@ -301,7 +310,5 @@ public function setRoles(array $roles): static
 
         return $this;
     }
-
-    
 
 }

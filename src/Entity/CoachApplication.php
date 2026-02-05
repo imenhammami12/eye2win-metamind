@@ -146,8 +146,30 @@ class CoachApplication
         $this->documents = $documents;
         return $this;
     }
-    
-    public function getCvFile(): ?string
+
+    public function approve(string $comment = null): void
+    {
+        $this->status = ApplicationStatus::APPROVED;
+        $this->reviewedAt = new \DateTime();
+        $this->reviewComment = $comment;
+        
+        // Ajouter le rôle COACH à l'utilisateur
+        $roles = $this->user->getRoles();
+        if (!in_array('ROLE_COACH', $roles)) {
+            $roles[] = 'ROLE_COACH';
+            $this->user->setRoles($roles);
+        }
+    }
+
+    public function reject(string $comment): void
+    {
+        $this->status = ApplicationStatus::REJECTED;
+        $this->reviewedAt = new \DateTime();
+        $this->reviewComment = $comment;
+    }
+
+
+     public function getCvFile(): ?string
     {
         return $this->cvFile;
     }

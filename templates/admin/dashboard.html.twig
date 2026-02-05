@@ -1,0 +1,133 @@
+{% extends 'admin_layout.html.twig' %}
+
+{% block title %}Dashboard - Administration{% endblock %}
+{% block page_title %}Dashboard{% endblock %}
+
+{% block body %}
+<div class="row g-4 mb-4 fade-in">
+    <div class="col-12">
+        <div class="stat-card text-center py-5">
+            <div class="stat-card-icon mx-auto mb-4" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); width: 100px; height: 100px; display: flex; align-items: center; justify-content: center; border-radius: 20px;">
+                <i class="bi bi-speedometer2 text-white" style="font-size: 48px;"></i>
+            </div>
+            <h2 class="mb-3">Bienvenue dans l'administration</h2>
+            <p class="text-muted mb-4">Tableau de bord en cours de développement</p>
+            <div class="d-flex gap-3 justify-content-center flex-wrap">
+                <a href="{{ path('app_home') }}" class="btn btn-outline-primary">
+                    <i class="bi bi-house me-2"></i>Retour au site
+                </a>
+                <a href="{{ path('admin_logout') }}" class="btn btn-outline-danger">
+                    <i class="bi bi-box-arrow-right me-2"></i>Déconnexion
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row g-4 fade-in" style="animation-delay: 0.1s;">
+    <div class="col-md-6">
+        <div class="table-card">
+            <div class="table-header">
+                <h5><i class="bi bi-info-circle me-2"></i>Informations</h5>
+            </div>
+            <div class="p-4">
+                <p class="mb-3">
+                    <i class="bi bi-person-badge text-primary me-2"></i>
+                    <strong>Utilisateur connecté:</strong> {{ app.user.username }}
+                </p>
+                <p class="mb-3">
+                    <i class="bi bi-shield-check text-success me-2"></i>
+                    <strong>Rôles:</strong> 
+                    {% for role in app.user.roles %}
+                        <span class="badge bg-success">{{ role }}</span>
+                    {% endfor %}
+                </p>
+                <p class="mb-0">
+                    <i class="bi bi-envelope text-info me-2"></i>
+                    <strong>Email:</strong> {{ app.user.email }}
+                </p>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-6">
+        <div class="table-card">
+            <div class="table-header">
+                <h5><i class="bi bi-clock-history me-2"></i>Activité récente</h5>
+            </div>
+            <div class="p-4 text-center text-muted">
+                <i class="bi bi-inbox" style="font-size: 48px; opacity: 0.3;"></i>
+                <p class="mt-3 mb-0">Aucune activité à afficher</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    /* CORRECTION CRITIQUE : Ajouter forwards et opacity: 1 !important */
+    .fade-in {
+        animation: fadeIn 0.6s ease-in forwards;
+        opacity: 1 !important;
+    }
+    
+    @keyframes fadeIn {
+        from {
+            opacity: 0;
+            transform: translateY(20px);
+        }
+        to {
+            opacity: 1 !important;
+            transform: translateY(0);
+        }
+    }
+    
+    .stat-card {
+        background: rgba(255, 255, 255, 0.05);
+        border-radius: 15px;
+        padding: 30px;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        transition: all 0.3s ease;
+        /* AJOUT : Forcer la visibilité */
+        opacity: 1 !important;
+        visibility: visible !important;
+    }
+    
+    .stat-card:hover {
+        background: rgba(255, 255, 255, 0.08);
+        transform: translateY(-5px);
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+    }
+    
+    .table-card {
+        background: rgba(255, 255, 255, 0.05);
+        border-radius: 15px;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        overflow: hidden;
+        /* AJOUT : Forcer la visibilité */
+        opacity: 1 !important;
+        visibility: visible !important;
+    }
+    
+    .table-header {
+        background: rgba(255, 255, 255, 0.03);
+        padding: 20px;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    }
+    
+    .table-header h5 {
+        margin: 0;
+        color: rgba(255, 255, 255, 0.9);
+    }
+    
+    /* AJOUT : S'assurer que tous les éléments restent visibles */
+    .row {
+        opacity: 1 !important;
+        visibility: visible !important;
+    }
+    
+    .col-12, .col-md-6 {
+        opacity: 1 !important;
+        visibility: visible !important;
+    }
+</style>
+{% endblock %}
