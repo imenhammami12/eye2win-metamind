@@ -6,7 +6,7 @@
 {% block body %}
 {# Stats Row #}
 <div class="row g-4 mb-4 fade-in">
-    <div class="col-md-3">
+    <div class="col-md-4">
         <div class="stat-card">
             <div class="stat-card-icon" style="background: linear-gradient(135deg, #ffa751, #ffe259);">
                 <i class="bi bi-clock text-white"></i>
@@ -19,20 +19,7 @@
         </div>
     </div>
     
-    <div class="col-md-3">
-        <div class="stat-card">
-            <div class="stat-card-icon" style="background: linear-gradient(135deg, #4facfe, #00f2fe);">
-                <i class="bi bi-eye text-white"></i>
-            </div>
-            <div class="stat-card-title">Under Review</div>
-            <div class="stat-card-value">{{ stats.underReview }}</div>
-            <a href="{{ path('admin_coach_applications_index', {status: 'UNDER_REVIEW'}) }}" class="btn btn-sm btn-outline-primary mt-2">
-                <i class="bi bi-eye me-1"></i>View
-            </a>
-        </div>
-    </div>
-    
-    <div class="col-md-3">
+    <div class="col-md-4">
         <div class="stat-card">
             <div class="stat-card-icon" style="background: linear-gradient(135deg, #43e97b, #38f9d7);">
                 <i class="bi bi-check-circle text-white"></i>
@@ -45,7 +32,7 @@
         </div>
     </div>
     
-    <div class="col-md-3">
+    <div class="col-md-4">
         <div class="stat-card">
             <div class="stat-card-icon" style="background: linear-gradient(135deg, #ff6b6b, #ee5a6f);">
                 <i class="bi bi-x-circle text-white"></i>
@@ -191,16 +178,6 @@
                                     <i class="bi bi-eye"></i>
                                 </a>
                                 
-                                {% if application.status.value == 'PENDING' %}
-                                    <button type="button" 
-                                            class="btn btn-sm btn-primary"
-                                            onclick="confirmAction('{{ path('admin_coach_applications_review', {id: application.id}) }}', '{{ csrf_token('review-' ~ application.id) }}', 'Put this application under review?')"
-                                            title="Put Under Review"
-                                            data-bs-toggle="tooltip">
-                                        <i class="bi bi-eye-fill"></i>
-                                    </button>
-                                {% endif %}
-                                
                                 {% if application.status.value != 'APPROVED' %}
                                     <button type="button" 
                                             class="btn btn-sm btn-success"
@@ -242,23 +219,6 @@
 
 {% block javascripts %}
 <script>
-function confirmAction(url, token, message) {
-    if (confirm(message)) {
-        const form = document.createElement('form');
-        form.method = 'POST';
-        form.action = url;
-        
-        const tokenInput = document.createElement('input');
-        tokenInput.type = 'hidden';
-        tokenInput.name = '_token';
-        tokenInput.value = token;
-        
-        form.appendChild(tokenInput);
-        document.body.appendChild(form);
-        form.submit();
-    }
-}
-
 // Initialize Bootstrap tooltips
 document.addEventListener('DOMContentLoaded', function() {
     const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
