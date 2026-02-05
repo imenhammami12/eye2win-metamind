@@ -1,11 +1,9 @@
+{# templates/user/profile.html.twig #}
 {% extends 'base.html.twig' %}
 
 {% block title %}My Profile - EyeTwin{% endblock %}
 
 {% block body %}
-<!-- Breadcrumb -->
-
-
 <section class="profile_section section_padding">
     <div class="container">
         <div class="row">
@@ -29,42 +27,47 @@
                         <p class="profile_email">{{ user.email }}</p>
                         
                         <div class="profile_status">
-                            {% if user.accountStatus.value == 'active' %}
+                            {% if user.accountStatus.value == 'ACTIVE' %}
                                 <span class="status_badge status_active">
-                                    <i class="fas fa-check-circle"></i>
+                                    <i class="fas fa-check-circle"></i> Active
                                 </span>
-                            {% elseif user.accountStatus.value == 'suspended' %}
+                            {% elseif user.accountStatus.value == 'SUSPENDED' %}
                                 <span class="status_badge status_suspended">
-                                    <i class="fas fa-pause-circle"></i>
+                                    <i class="fas fa-pause-circle"></i> Suspended
                                 </span>
-                            {% elseif user.accountStatus.value == 'banned' %}
+                            {% elseif user.accountStatus.value == 'BANNED' %}
                                 <span class="status_badge status_banned">
-                                    <i class="fas fa-ban"></i>
+                                    <i class="fas fa-ban"></i> Banned
                                 </span>
                             {% endif %}
                             
                             {% if is_granted('ROLE_COACH') %}
                                 <span class="status_badge status_coach">
-                                    <i class="fas fa-graduation-cap"></i>
+                                    <i class="fas fa-graduation-cap"></i> Coach
                                 </span>
                             {% endif %}
                             
                             {% if is_granted('ROLE_ADMIN') %}
                                 <span class="status_badge status_admin">
-                                    <i class="fas fa-shield-alt"></i>
+                                    <i class="fas fa-shield-alt"></i> Admin
                                 </span>
                             {% endif %}
                         </div>
                     </div>
                     
                     <div class="profile_actions">
-                        {% if not is_granted('ROLE_ADMIN') and not is_granted('ROLE_COACH') and not latestCoachApplication %}
+                        {# Afficher le bouton de candidature seulement si :
+                           - L'utilisateur n'est PAS admin
+                           - L'utilisateur n'est PAS déjà coach
+                           - Il n'y a PAS de demande en attente #}
+                        {% if not is_granted('ROLE_ADMIN') and not is_granted('ROLE_COACH') and not hasPendingApplication %}
                             <a href="{{ path('user_apply_coach') }}" class="btn_profile btn_apply">
-                                APPLY TO BE A COACH
+                                <i class="fas fa-graduation-cap"></i> APPLY TO BE A COACH
                             </a>
                         {% endif %}
+                        
                         <a href="{{ path('user_edit_profile') }}" class="btn_profile btn_edit">
-                            EDIT PROFILE
+                            <i class="fas fa-edit"></i> EDIT PROFILE
                         </a>
                     </div>
                 </div>
@@ -72,7 +75,7 @@
                 <!-- About Me Section -->
                 {% if user.bio %}
                 <div class="profile_card mt-4">
-                    <h4 class="card_title">ABOUT ME</h4>
+                    <h4 class="card_title"><i class="fas fa-user"></i> ABOUT ME</h4>
                     <p class="card_text">{{ user.bio }}</p>
                 </div>
                 {% endif %}
@@ -80,17 +83,45 @@
             
             <!-- Game Statistics -->
             <div class="col-lg-8">
+                {# CORRECTION: Afficher la bannière de félicitations SEULEMENT si l'utilisateur a le rôle COACH 
+                   ET que sa dernière demande a été approuvée #}
+                {% if is_granted('ROLE_COACH') and latestCoachApplication and latestCoachApplication.status.value == 'APPROVED' %}
+                <div class="profile_card mb-4" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white;">
+                    <div class="text-center py-4">
+                        <i class="fas fa-graduation-cap" style="font-size: 48px; margin-bottom: 15px;"></i>
+                        <h3 class="mb-2">🎉 Congratulations!</h3>
+                        <h4 class="mb-3">You are now a certified Coach</h4>
+                        <p class="mb-0">You can now create coaching sessions and help other players improve their skills.</p>
+                        {% if latestCoachApplication.reviewedAt %}
+                            <small class="d-block mt-3" style="opacity: 0.9;">
+                                Approved on {{ latestCoachApplication.reviewedAt|date('F d, Y') }}
+                            </small>
+                        {% endif %}
+                    </div>
+                </div>
+                {% endif %}
+                
                 <div class="game_statistics">
                     <h3 class="statistics_title">GAME STATISTICS</h3>
                     
                     <div class="statistics_grid">
                         <div class="stat_item">
                             <div class="stat_icon">
-                                <i class="fas fa-gamepad"></i>
+                                <i class="fas fa-users"></i>
                             </div>
                             <div class="stat_info">
-                                <p class="stat_label">Games Played</p>
-                                <h4 class="stat_value">{{ stats.teams_count ?? 0 }}</h4>
+                                <p class="stat_label">Teams Joined</p>
+                                <h4 class="stat_value">{{ stats.teams_count }}</h4>
+                            </div>
+                        </div>
+                        
+                        <div class="stat_item">
+                            <div class="stat_icon">
+                                <i class="fas fa-crown"></i>
+                            </div>
+                            <div class="stat_info">
+                                <p class="stat_label">Teams Owned</p>
+                                <h4 class="stat_value">{{ stats.owned_teams_count }}</h4>
                             </div>
                         </div>
                         
@@ -99,18 +130,8 @@
                                 <i class="fas fa-trophy"></i>
                             </div>
                             <div class="stat_info">
-                                <p class="stat_label">Wins</p>
-                                <h4 class="stat_value">{{ stats.owned_teams_count ?? 0 }}</h4>
-                            </div>
-                        </div>
-                        
-                        <div class="stat_item">
-                            <div class="stat_icon">
-                                <i class="fas fa-percent"></i>
-                            </div>
-                            <div class="stat_info">
-                                <p class="stat_label">Win Rate</p>
-                                <h4 class="stat_value">0%</h4>
+                                <p class="stat_label">Achievements</p>
+                                <h4 class="stat_value">0</h4>
                             </div>
                         </div>
                         
@@ -119,8 +140,8 @@
                                 <i class="fas fa-star"></i>
                             </div>
                             <div class="stat_info">
-                                <p class="stat_label">Favorite Hero/Character</p>
-                                <h4 class="stat_value">None</h4>
+                                <p class="stat_label">Rating</p>
+                                <h4 class="stat_value">N/A</h4>
                             </div>
                         </div>
                     </div>
@@ -181,24 +202,24 @@
                 </div>
                 {% endif %}
                 
-                <!-- Coach Application Status -->
-                {% if latestCoachApplication %}
+                <!-- Coach Application Status (seulement si l'utilisateur n'est PAS coach) -->
+                {% if latestCoachApplication and not is_granted('ROLE_COACH') %}
                 <div class="profile_card mt-4">
-                    <h4 class="card_title"><i class="fas fa-graduation-cap"></i> Coach Application</h4>
+                    <h4 class="card_title"><i class="fas fa-graduation-cap"></i> Coach Application Status</h4>
                     <div class="coach_application">
-                        {% if latestCoachApplication.status.value == 'pending' %}
-                            <div class="application_status status_pending">
-                                <strong>Status:</strong> Pending review
+                        {% if latestCoachApplication.status.value == 'PENDING' %}
+                            <div class="alert alert-warning">
+                                <strong><i class="fas fa-clock"></i> Status:</strong> Pending Review
+                                <p class="mb-0 mt-2">Your application is currently being reviewed by our team. You will receive an email once a decision is made.</p>
                             </div>
-                        {% elseif latestCoachApplication.status.value == 'approved' %}
-                            <div class="application_status status_approved">
-                                <strong>Status:</strong> Approved ✅
-                            </div>
-                        {% elseif latestCoachApplication.status.value == 'rejected' %}
-                            <div class="application_status status_rejected">
-                                <strong>Status:</strong> Rejected ❌
+                        {% elseif latestCoachApplication.status.value == 'REJECTED' %}
+                            <div class="alert alert-danger">
+                                <strong><i class="fas fa-times-circle"></i> Status:</strong> Rejected
+                                <p class="mb-0 mt-2">Unfortunately, your application was not approved. You can submit a new application in the future.</p>
                             </div>
                         {% endif %}
+                        
+                        <hr>
                         
                         <p><strong>Submission date:</strong> {{ latestCoachApplication.submittedAt|date('m/d/Y at h:i A') }}</p>
                         
@@ -209,7 +230,17 @@
                         {% if latestCoachApplication.reviewComment %}
                             <hr>
                             <p><strong>Administrator's comment:</strong></p>
-                            <p class="mb-0">{{ latestCoachApplication.reviewComment }}</p>
+                            <div class="alert alert-info">
+                                {{ latestCoachApplication.reviewComment }}
+                            </div>
+                        {% endif %}
+                        
+                        {# Bouton pour postuler à nouveau si la demande a été rejetée #}
+                        {% if latestCoachApplication.status.value == 'REJECTED' %}
+                            <hr>
+                            <a href="{{ path('user_apply_coach') }}" class="btn btn-primary">
+                                <i class="fas fa-redo"></i> Submit New Application
+                            </a>
                         {% endif %}
                     </div>
                 </div>
