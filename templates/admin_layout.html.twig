@@ -72,6 +72,12 @@
                 </a>
 
 
+<a href="{{ path('admin_teams_index') }}" 
+   class="{{ app.request.attributes.get('_route') starts with 'admin_teams' ? 'active' : '' }}">
+    <i class="bi bi-grid-3x3"></i>
+    <span>Teams</span>
+</a>
+
                 <div class="sidebar-divider"></div>
                 
                 <a href="{{ path('app_home') }}" 

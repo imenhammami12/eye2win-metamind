@@ -2132,6 +2132,45 @@ select:-webkit-autofill:focus {
 .custom-table tbody td {
     vertical-align: middle !important;
 }
+
+/* Personal Information – Dark Teams Style */
+.personal-info-dark,
+.personal-info-dark .info-item {
+    background: linear-gradient(135deg, #1b0f2e, #12091f);
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    color: #eaeaf0;
+}
+
+/* Text colors */
+.personal-info-dark small {
+    color: rgba(255, 255, 255, 0.6);
+}
+
+.personal-info-dark a {
+    color: #6ea8ff;
+}
+
+.personal-info-dark a:hover {
+    color: #9bbcff;
+    text-decoration: underline;
+}
+
+/* Icons container */
+.personal-info-dark .info-icon {
+    background: rgba(102, 126, 234, 0.18);
+    color: #9bbcff;
+}
+
+/* Hover like Teams */
+.personal-info-dark .info-item:hover {
+    background: linear-gradient(135deg, #24133d, #1a0d2b);
+    transform: translateY(-2px);
+}
+
+
+
+
+
 /* ============================================================================
    END OF STYLESHEET
    ============================================================================ */

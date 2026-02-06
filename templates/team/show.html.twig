@@ -1,0 +1,363 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}{{ team.name }}{% endblock %}
+
+{% block body %}
+<section class="breadcrumb_part">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-12">
+                <div class="breadcrumb_iner">
+                    <h2>{{ team.name }}</h2>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="blog_part section_padding">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8">
+                {# Team Info #}
+                <div class="card mb-4">
+                    {% if team.logo %}
+                    <img src="{{ asset('uploads/teams/' ~ team.logo) }}" class="card-img-top" alt="{{ team.name }}" style="max-height: 400px; object-fit: cover;">
+                    {% endif %}
+                    
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-start mb-3">
+                            <div>
+                                <h3 class="card-title">{{ team.name }}</h3>
+                                <p class="text-muted">
+                                    <i class="fas fa-user"></i> Owner: 
+                                    <strong>{{ team.owner.username }}</strong>
+                                </p>
+                            </div>
+                           <div>
+    {% if team.owner == app.user %}
+    <a href="{{ path('app_teams_edit', {id: team.id}) }}" class="btn btn-primary">
+        <i class="fas fa-edit"></i> Edit
+    </a>
+    {% if pendingRequestsCount > 0 %}
+    <span class="badge bg-warning ms-2">
+        {{ pendingRequestsCount }} request{{ pendingRequestsCount > 1 ? 's' : '' }}
+    </span>
+    {% endif %}
+    
+    {% elseif userMembership and userMembership.status.value == 'ACTIVE' %}
+    <form method="post" action="{{ path('app_teams_leave', {id: team.id}) }}" onsubmit="return confirm('Are you sure you want to leave this team?');" style="display: inline;">
+        <button type="submit" class="btn btn-danger">
+            <i class="fas fa-sign-out-alt"></i> Leave
+        </button>
+    </form>
+    
+    {% elseif hasPendingRequest %}
+    <button class="btn btn-warning" disabled>
+        <i class="fas fa-hourglass-half"></i> Request Pending
+    </button>
+    
+    {% else %}
+    {# Show join button if user is not member and hasn't requested #}
+    {% if team.isActive %}
+        {% set activeMembersCount = team.teamMemberships|filter(m => m.status.value == 'ACTIVE')|length %}
+        {% if activeMembersCount < team.maxMembers %}
+        <form method="post" action="{{ path('app_teams_request_join', {id: team.id}) }}" style="display: inline;">
+            <button type="submit" class="btn btn-success">
+                <i class="fas fa-user-plus"></i> Request to Join
+            </button>
+        </form>
+        {% else %}
+        <button class="btn btn-secondary" disabled>
+            <i class="fas fa-users"></i> Team Full
+        </button>
+        {% endif %}
+    {% else %}
+    <button class="btn btn-secondary" disabled>
+        <i class="fas fa-lock"></i> Team Inactive
+    </button>
+    {% endif %}
+    {% endif %}
+</div>
+                           
+                           
+                         </div>
+                        
+                        <div class="mb-3">
+                            <span class="badge bg-primary">
+                                <i class="fas fa-users"></i> {{ activeMembersCount }}/{{ team.maxMembers }} members
+                            </span>
+                            {% if team.isActive %}
+                            <span class="badge bg-success">Active</span>
+                            {% else %}
+                            <span class="badge bg-secondary">Inactive</span>
+                            {% endif %}
+                        </div>
+
+                        {# Pending Join Requests (Only visible to owner) #}
+{% if team.owner == app.user and pendingRequests|length > 0 %}
+<div class="card mt-4">
+    <div class="card-header bg-warning text-dark">
+        <h5 class="mb-0">
+            <i class="fas fa-user-clock"></i> Pending Join Requests 
+            <span class="badge bg-dark">{{ pendingRequestsCount }}</span>
+        </h5>
+    </div>
+    <div class="card-body">
+        <div class="row">
+            {% for request in pendingRequests %}
+            <div class="col-md-6 mb-3">
+                <div class="d-flex align-items-center p-3 border rounded">
+                    <div class="me-3">
+                        {% if request.user.profilePicture %}
+                        <img src="{{ asset('uploads/profiles/' ~ request.user.profilePicture) }}" 
+                             alt="{{ request.user.username }}" 
+                             class="rounded-circle"
+                             style="width: 50px; height: 50px; object-fit: cover;">
+                        {% else %}
+                        <div class="rounded-circle bg-warning text-dark d-flex align-items-center justify-content-center" 
+                             style="width: 50px; height: 50px; font-weight: bold;">
+                            {{ request.user.username|slice(0, 2)|upper }}
+                        </div>
+                        {% endif %}
+                    </div>
+                    <div class="flex-grow-1">
+                        <strong>{{ request.user.username }}</strong>
+                        {% if request.user.fullName %}
+                        <br>
+                        <small class="text-muted">{{ request.user.fullName }}</small>
+                        {% endif %}
+                        <br>
+                        <small class="text-muted">
+                            <i class="fas fa-clock"></i> {{ request.invitedAt|date('m/d/Y at H:i') }}
+                        </small>
+                    </div>
+                    <div>
+                        <form method="post" action="{{ path('app_teams_request_accept', {id: request.id}) }}" style="display: inline;">
+                            <button type="submit" class="btn btn-sm btn-success" title="Accept">
+                                <i class="fas fa-check"></i>
+                            </button>
+                        </form>
+                        <form method="post" action="{{ path('app_teams_request_reject', {id: request.id}) }}" 
+                              onsubmit="return confirm('Reject this request?');" style="display: inline;">
+                            <button type="submit" class="btn btn-sm btn-danger" title="Reject">
+                                <i class="fas fa-times"></i>
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+{% endif %}
+                        
+                        {% if team.description %}
+                        <h5>Description</h5>
+                        <p>{{ team.description|nl2br }}</p>
+                        {% endif %}
+                        
+                        <p class="text-muted small">
+                            <i class="fas fa-calendar"></i> Created on {{ team.createdAt|date('m/d/Y at H:i') }}
+                        </p>
+                    </div>
+                </div>
+
+                {# Members List #}
+                <div class="card">
+                    <div class="card-header">
+                        <h5><i class="fas fa-users"></i> Team Members ({{ activeMembersCount }})</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            {% for membership in activeMembers %}
+                            <div class="col-md-6 mb-3">
+                                <div class="d-flex align-items-center p-3 border rounded">
+                                    <div class="me-3">
+                                        {% if membership.user.profilePicture %}
+                                        <img src="{{ asset('uploads/profiles/' ~ membership.user.profilePicture) }}" 
+                                             alt="{{ membership.user.username }}" 
+                                             class="rounded-circle"
+                                             style="width: 50px; height: 50px; object-fit: cover;">
+                                        {% else %}
+                                        <div class="rounded-circle bg-primary text-white d-flex align-items-center justify-content-center" 
+                                             style="width: 50px; height: 50px; font-weight: bold;">
+                                            {{ membership.user.username|slice(0, 2)|upper }}
+                                        </div>
+                                        {% endif %}
+                                    </div>
+                                    <div class="flex-grow-1">
+                                        <strong>{{ membership.user.username }}</strong>
+                                        <br>
+                                        <span class="badge bg-{{ membership.role.value == 'OWNER' ? 'warning' : (membership.role.value == 'CO_CAPTAIN' ? 'info' : 'secondary') }}">
+                                            {{ membership.role.label }}
+                                        </span>
+                                        <br>
+                                        <small class="text-muted">Member since {{ membership.joinedAt|date('m/d/Y') }}</small>
+                                    </div>
+                                    {% if team.owner == app.user and membership.role.value != 'OWNER' %}
+                                    <div>
+                                        <form method="post" action="{{ path('app_teams_remove_member', {id: team.id, membershipId: membership.id}) }}" 
+                                              onsubmit="return confirm('Remove this member?');">
+                                            <button type="submit" class="btn btn-sm btn-danger">
+                                                <i class="fas fa-user-times"></i>
+                                            </button>
+                                        </form>
+                                    </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-4">
+                {# Invite Members (Only for owner) #}
+                {% if team.owner == app.user %}
+                <div class="card mb-4">
+                    <div class="card-header bg-primary text-white">
+                        <h5 class="mb-0"><i class="fas fa-user-plus"></i> Invite Members</h5>
+                    </div>
+                    <div class="card-body">
+                        {% if activeMembersCount >= team.maxMembers %}
+                        <div class="alert alert-warning">
+                            <i class="fas fa-exclamation-triangle"></i> Team has reached maximum number of members.
+                        </div>
+                        {% else %}
+                        <div class="mb-3">
+                            <label class="form-label">Search for a user</label>
+                            <input type="text" class="form-control" id="userSearch" placeholder="Username or email">
+                            <div id="searchResults" class="list-group mt-2" style="display: none;"></div>
+                        </div>
+                        
+                        <form method="post" action="{{ path('app_teams_invite', {id: team.id}) }}" id="inviteForm">
+                            <input type="hidden" name="user_id" id="selectedUserId">
+                            <div id="selectedUserDisplay" style="display: none;" class="alert alert-info">
+                                <strong id="selectedUserName"></strong>
+                                <button type="button" class="btn-close float-end" id="clearSelection"></button>
+                            </div>
+                            <button type="submit" class="btn btn-primary w-100" id="inviteBtn" disabled>
+                                <i class="fas fa-paper-plane"></i> Send Invitation
+                            </button>
+                        </form>
+                        {% endif %}
+                    </div>
+                </div>
+                {% endif %}
+
+                {# Team Stats #}
+                <div class="card">
+                    <div class="card-header">
+                        <h5><i class="fas fa-chart-bar"></i> Statistics</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="mb-3">
+                            <div class="d-flex justify-content-between mb-2">
+                                <span>Active members</span>
+                                <strong>{{ activeMembersCount }}/{{ team.maxMembers }}</strong>
+                            </div>
+                            <div class="progress">
+                                <div class="progress-bar" role="progressbar" 
+                                     style="width: {{ (activeMembersCount / team.maxMembers * 100)|round }}%">
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <hr>
+                        
+                        <div class="d-flex justify-content-between mb-2">
+                            <span><i class="fas fa-calendar"></i> Created on</span>
+                            <strong>{{ team.createdAt|date('m/d/Y') }}</strong>
+                        </div>
+                        
+                        <div class="d-flex justify-content-between">
+                            <span><i class="fas fa-clock"></i> Age</span>
+                                <strong>{{ 'now'|date('U') - team.createdAt|date('U') }} seconds ago</strong>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+{% endblock %}
+
+{% block javascripts %}
+{{ parent() }}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const searchInput = document.getElementById('userSearch');
+    const searchResults = document.getElementById('searchResults');
+    const inviteForm = document.getElementById('inviteForm');
+    const selectedUserIdInput = document.getElementById('selectedUserId');
+    const selectedUserDisplay = document.getElementById('selectedUserDisplay');
+    const selectedUserName = document.getElementById('selectedUserName');
+    const clearSelection = document.getElementById('clearSelection');
+    const inviteBtn = document.getElementById('inviteBtn');
+    
+    let searchTimeout;
+    
+    if (searchInput) {
+        searchInput.addEventListener('input', function() {
+            clearTimeout(searchTimeout);
+            const query = this.value.trim();
+            
+            if (query.length < 2) {
+                searchResults.style.display = 'none';
+                return;
+            }
+            
+            searchTimeout = setTimeout(() => {
+                fetch(`{{ path('app_teams_search_users') }}?q=${encodeURIComponent(query)}`)
+                    .then(response => response.json())
+                    .then(users => {
+                        searchResults.innerHTML = '';
+                        
+                        if (users.length === 0) {
+                            searchResults.innerHTML = '<div class="list-group-item">No users found</div>';
+                        } else {
+                            users.forEach(user => {
+                                const item = document.createElement('a');
+                                item.href = '#';
+                                item.className = 'list-group-item list-group-item-action';
+                                item.innerHTML = `
+                                    <strong>${user.username}</strong><br>
+                                    <small class="text-muted">${user.email}</small>
+                                `;
+                                item.addEventListener('click', function(e) {
+                                    e.preventDefault();
+                                    selectUser(user);
+                                });
+                                searchResults.appendChild(item);
+                            });
+                        }
+                        
+                        searchResults.style.display = 'block';
+                    });
+            }, 300);
+        });
+    }
+    
+    function selectUser(user) {
+        selectedUserIdInput.value = user.id;
+        selectedUserName.textContent = user.username;
+        selectedUserDisplay.style.display = 'block';
+        searchResults.style.display = 'none';
+        searchInput.value = '';
+        inviteBtn.disabled = false;
+    }
+    
+    if (clearSelection) {
+        clearSelection.addEventListener('click', function() {
+            selectedUserIdInput.value = '';
+            selectedUserDisplay.style.display = 'none';
+            inviteBtn.disabled = true;
+        });
+    }
+});
+</script>
+{% endblock %}

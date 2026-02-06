@@ -190,58 +190,129 @@
     {# User Information #}
     <div class="col-lg-8">
         {# Personal Information #}
-        <div class="table-card mb-4 fade-in" style="animation-delay: 0.3s;">
-            <div class="table-header">
-                <h5><i class="bi bi-info-circle me-2"></i>Personal Information</h5>
-            </div>
-            
-            <table class="table table-borderless">
-                <tbody>
-                    <tr>
-                        <th style="width: 200px;"><i class="bi bi-envelope me-2"></i>Email</th>
-                        <td>
+     {# Personal Information #}
+<div class="table-card mb-4 fade-in" style="animation-delay: 0.3s;">
+    <div class="table-header">
+        <h5>
+            <i class="bi bi-info-circle me-2"></i>
+            Personal Information
+        </h5>
+    </div>
+
+    <div class="p-4">
+
+        <div class="row g-4">
+
+            {# Email #}
+            <div class="col-md-6">
+                <div class="d-flex align-items-start gap-3 info-item">
+                    <div class="info-icon text-primary">
+                        <i class="bi bi-envelope"></i>
+                    </div>
+                    <div>
+                        <small class="text-muted">Email</small>
+                        <div class="fw-semibold">
                             <a href="mailto:{{ user.email }}" class="text-decoration-none">
                                 {{ user.email }}
                             </a>
-                        </td>
-                    </tr>
-                    <tr>
-                        <th><i class="bi bi-at me-2"></i>Username</th>
-                        <td>@{{ user.username }}</td>
-                    </tr>
-                    <tr>
-                        <th><i class="bi bi-person me-2"></i>Full Name</th>
-                        <td>{{ user.fullName ?? 'Not provided' }}</td>
-                    </tr>
-                    <tr>
-                        <th><i class="bi bi-calendar-plus me-2"></i>Registration Date</th>
-                        <td>
-                            <i class="bi bi-calendar3 me-2"></i>
-                            {{ user.createdAt|date('F d, Y \\a\\t h:i A') }}
-                            <small class="text-muted ms-2">({{ (('now'|date('U') - user.createdAt|date('U')) / 86400)|round }} days ago)</small>
-                        </td>
-                    </tr>
-                    <tr>
-                        <th><i class="bi bi-clock-history me-2"></i>Last Login</th>
-                        <td>
-                            <i class="bi bi-clock me-2"></i>
-                            {{ user.lastLogin|date('F d, Y \\a\\t h:i A') }}
-                            <small class="text-muted ms-2">({{ (('now'|date('U') - user.lastLogin|date('U')) / 86400)|round }} days ago)</small>
-                        </td>
-                    </tr>
-                    <tr>
-                        <th><i class="bi bi-toggle-on me-2"></i>Account Status</th>
-                        <td>
-                            <span class="badge bg-{{ user.accountStatus.badgeClass }}" 
-                                  data-bs-toggle="tooltip" 
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            {# Username #}
+            <div class="col-md-6">
+                <div class="d-flex align-items-start gap-3 info-item">
+                    <div class="info-icon text-info">
+                        <i class="bi bi-at"></i>
+                    </div>
+                    <div>
+                        <small class="text-muted">Username</small>
+                        <div class="fw-semibold">@{{ user.username }}</div>
+                    </div>
+                </div>
+            </div>
+
+            {# Full Name #}
+            <div class="col-md-6">
+                <div class="d-flex align-items-start gap-3 info-item">
+                    <div class="info-icon text-success">
+                        <i class="bi bi-person"></i>
+                    </div>
+                    <div>
+                        <small class="text-muted">Full Name</small>
+                        <div class="fw-semibold">
+                            {{ user.fullName ?? 'Not provided' }}
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            {# Registration Date #}
+            <div class="col-md-6">
+                <div class="d-flex align-items-start gap-3 info-item">
+                    <div class="info-icon text-warning">
+                        <i class="bi bi-calendar-plus"></i>
+                    </div>
+                    <div>
+                        <small class="text-muted">Registered</small>
+                        <div class="fw-semibold">
+                            {{ user.createdAt|date('M d, Y · h:i A') }}
+                            <span class="text-muted ms-2">
+                                ({{ (('now'|date('U') - user.createdAt|date('U')) / 86400)|round }} days ago)
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            {# Last Login #}
+            <div class="col-md-6">
+                <div class="d-flex align-items-start gap-3 info-item">
+                    <div class="info-icon text-secondary">
+                        <i class="bi bi-clock-history"></i>
+                    </div>
+                    <div>
+                        <small class="text-muted">Last Login</small>
+                        <div class="fw-semibold">
+                            {% if user.lastLogin %}
+                                {{ user.lastLogin|date('M d, Y · h:i A') }}
+                            {% else %}
+                                <span class="text-muted">Never</span>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            {# Account Status #}
+            <div class="col-md-6">
+                <div class="d-flex align-items-start gap-3 info-item">
+                    <div class="info-icon text-primary">
+                        <i class="bi bi-toggle-on"></i>
+                    </div>
+                    <div>
+                        <small class="text-muted">Account Status</small>
+                        <div>
+                            <span class="badge bg-{{ user.accountStatus.badgeClass }}"
+                                  data-bs-toggle="tooltip"
                                   title="{{ user.accountStatus.description }}">
+                                <i class="bi bi-{{ user.accountStatus.value == 'ACTIVE'
+                                    ? 'check-circle'
+                                    : (user.accountStatus.value == 'SUSPENDED'
+                                        ? 'exclamation-triangle'
+                                        : 'x-circle') }} me-1"></i>
                                 {{ user.accountStatus.label }}
                             </span>
-                        </td>
-                    </tr>
-                </tbody>
-            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
         </div>
+    </div>
+</div>
+
         
         {# Teams #}
         <div class="table-card mb-4 fade-in" style="animation-delay: 0.4s;">

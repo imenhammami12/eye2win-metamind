@@ -16,47 +16,38 @@ class TeamMembership
 
     #[ORM\ManyToOne(inversedBy: 'teamMemberships')]
     #[ORM\JoinColumn(nullable: false)]
-    private ?User $user = null;
+    private ?Team $team = null;
 
     #[ORM\ManyToOne(inversedBy: 'teamMemberships')]
     #[ORM\JoinColumn(nullable: false)]
-    private ?Team $team = null;
+    private ?User $user = null;
 
-    #[ORM\Column(length: 20, enumType: MemberRole::class)]
-    private ?MemberRole $role = MemberRole::MEMBER;
+    #[ORM\Column(enumType: MemberRole::class)]
+    private ?MemberRole $role = null;
 
-    #[ORM\Column(length: 20, enumType: MembershipStatus::class)]
-    private ?MembershipStatus $status = MembershipStatus::INVITED;
-
-    #[ORM\Column(type: Types::DATETIME_MUTABLE)]
-    private ?\DateTimeInterface $joinedAt = null;
+    #[ORM\Column(enumType: MembershipStatus::class)]
+    private ?MembershipStatus $status = null;
 
     #[ORM\Column(type: Types::DATETIME_MUTABLE, nullable: true)]
     private ?\DateTimeInterface $invitedAt = null;
 
+    /**
+     * IMPORTANT: joinedAt is nullable because:
+     * - PENDING requests don't have a joinedAt yet
+     * - INVITED users haven't joined yet
+     * - Only ACTIVE members have joinedAt set
+     */
     #[ORM\Column(type: Types::DATETIME_MUTABLE, nullable: true)]
-    private ?\DateTimeInterface $respondedAt = null;
+    private ?\DateTimeInterface $joinedAt = null;
 
     public function __construct()
     {
         $this->invitedAt = new \DateTime();
-        $this->status = MembershipStatus::INVITED;
     }
 
     public function getId(): ?int
     {
         return $this->id;
-    }
-
-    public function getUser(): ?User
-    {
-        return $this->user;
-    }
-
-    public function setUser(?User $user): static
-    {
-        $this->user = $user;
-        return $this;
     }
 
     public function getTeam(): ?Team
@@ -67,6 +58,17 @@ class TeamMembership
     public function setTeam(?Team $team): static
     {
         $this->team = $team;
+        return $this;
+    }
+
+    public function getUser(): ?User
+    {
+        return $this->user;
+    }
+
+    public function setUser(?User $user): static
+    {
+        $this->user = $user;
         return $this;
     }
 
@@ -92,17 +94,6 @@ class TeamMembership
         return $this;
     }
 
-    public function getJoinedAt(): ?\DateTimeInterface
-    {
-        return $this->joinedAt;
-    }
-
-    public function setJoinedAt(?\DateTimeInterface $joinedAt): static
-    {
-        $this->joinedAt = $joinedAt;
-        return $this;
-    }
-
     public function getInvitedAt(): ?\DateTimeInterface
     {
         return $this->invitedAt;
@@ -114,27 +105,60 @@ class TeamMembership
         return $this;
     }
 
-    public function getRespondedAt(): ?\DateTimeInterface
+    public function getJoinedAt(): ?\DateTimeInterface
     {
-        return $this->respondedAt;
+        return $this->joinedAt;
     }
 
-    public function setRespondedAt(?\DateTimeInterface $respondedAt): static
+    public function setJoinedAt(?\DateTimeInterface $joinedAt): static
     {
-        $this->respondedAt = $respondedAt;
+        $this->joinedAt = $joinedAt;
         return $this;
     }
 
+    /**
+     * Accept invitation or join request
+     * Sets status to ACTIVE and sets joinedAt to now
+     */
     public function accept(): void
     {
         $this->status = MembershipStatus::ACTIVE;
-        $this->joinedAt = new \DateTime();
-        $this->respondedAt = new \DateTime();
+        // Set joinedAt when accepting (if not already set)
+        if ($this->joinedAt === null) {
+            $this->joinedAt = new \DateTime();
+        }
     }
 
+    /**
+     * Decline invitation
+     * Sets status to INACTIVE
+     */
     public function decline(): void
     {
         $this->status = MembershipStatus::INACTIVE;
-        $this->respondedAt = new \DateTime();
+    }
+
+    /**
+     * Check if membership is active
+     */
+    public function isActive(): bool
+    {
+        return $this->status === MembershipStatus::ACTIVE;
+    }
+
+    /**
+     * Check if membership is pending
+     */
+    public function isPending(): bool
+    {
+        return $this->status === MembershipStatus::PENDING;
+    }
+
+    /**
+     * Check if user was invited
+     */
+    public function isInvited(): bool
+    {
+        return $this->status === MembershipStatus::INVITED;
     }
 }
