@@ -1,0 +1,53 @@
+{% extends 'admin_layout.html.twig' %}
+{% block body %}
+    <h2>Channels (Admin)</h2>
+
+    <a class="btn btn-outline-light" href="{{ path('admin_channels_pending') }}">Voir Pending</a>
+    <a class="btn btn-danger mb-3" href="{{ path('admin_channels_new') }}">+ Add Channel</a>
+
+    <table class="table mt-3">
+        <thead>
+        <tr>
+            <th>Name</th><th>Game</th><th>Type</th><th>Status</th><th>Active</th><th>Actions</th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for c in channels %}
+            <tr>
+                <td>{{ c.name }}</td>
+                <td>{{ c.game }}</td>
+                <td>{{ c.type }}</td>
+                <td>{{ c.status }}</td>
+                <td>{{ c.isActive ? 'Yes' : 'No' }}</td>
+                <td class="d-flex gap-2">
+                    <a class="btn btn-sm btn-warning" href="{{ path('admin_channels_edit', {id: c.id}) }}">Edit</a>
+
+                    <form method="post" action="{{ path('admin_channels_toggle', {id: c.id}) }}">
+                        <input type="hidden" name="_token" value="{{ csrf_token('toggle_' ~ c.id) }}">
+                        <button class="btn btn-sm btn-secondary">Toggle</button>
+                    </form>
+
+                    <form method="post"
+                          action="{{ path('admin_channels_delete', {id: c.id}) }}"
+                          style="display:inline"
+                          onsubmit="return confirmChannelDelete({{ c.messages|length }});">
+                        <input type="hidden" name="_token" value="{{ csrf_token('admin_delete_channel_' ~ c.id) }}">
+                        <button class="btn btn-sm btn-danger">Delete</button>
+                    </form>
+
+                </td>
+
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+    <script>
+        function confirmChannelDelete(count) {
+            if (count > 0) {
+                return confirm("⚠️ Le channel n’est pas vide (" + count + " message(s)). Ils discutent dedans.\n\nÊtes-vous sûr de vouloir le supprimer ?");
+            }
+            return confirm("Supprimer ce channel ?");
+        }
+    </script>
+
+{% endblock %}

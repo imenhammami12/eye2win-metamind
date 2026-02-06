@@ -5,10 +5,18 @@ namespace App\Entity;
 use App\Repository\ChannelRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
+use App\Entity\Message;
 
 #[ORM\Entity(repositoryClass: ChannelRepository::class)]
 class Channel
 {
+    public const TYPE_PUBLIC = 'public';
+    public const TYPE_PRIVATE = 'private';
+    public const STATUS_PENDING = 'pending';
+    public const STATUS_APPROVED = 'approved';
+    public const STATUS_REJECTED = 'rejected';
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
@@ -50,8 +58,14 @@ class Channel
     #[ORM\Column(type: Types::TEXT, nullable: true)]
     private ?string $rejectionReason = null;
 
-    #[ORM\Column(type: Types::TEXT, nullable: true)]
-    private ?string $allowedUsers = null;
+    #[ORM\OneToMany(
+        mappedBy: 'channel',
+        targetEntity: Message::class,
+        orphanRemoval: true,
+        cascade: ['remove']
+    )]
+    private Collection $messages;
+
 
     public function getId(): ?int
     {
@@ -202,15 +216,36 @@ class Channel
         return $this;
     }
 
-    public function getAllowedUsers(): ?string
+    public function __construct()
     {
-        return $this->allowedUsers;
+        $this->messages = new ArrayCollection();
     }
 
-    public function setAllowedUsers(?string $allowedUsers): static
+    public function getMessages(): Collection
     {
-        $this->allowedUsers = $allowedUsers;
+        return $this->messages;
+    }
+
+    public function addMessage(Message $message): self
+    {
+        if (!$this->messages->contains($message)) {
+            $this->messages->add($message);
+            $message->setChannel($this);
+        }
 
         return $this;
     }
+
+    public function removeMessage(Message $message): self
+    {
+        if ($this->messages->removeElement($message)) {
+            if ($message->getChannel() === $this) {
+                $message->setChannel(null);
+            }
+        }
+
+        return $this;
+    }
+
+
 }

@@ -1,0 +1,15 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Edit Channel{% endblock %}
+
+{% block body %}
+    <div class="container mt-5 mb-5">
+        <h2 class="mb-4">Edit Channel</h2>
+
+        {{ form_start(form) }}
+        {{ form_widget(form) }}
+        <button class="btn btn-primary mt-3">Save</button>
+        <a href="{{ path('community_channels_index') }}" class="btn btn-secondary mt-3">Cancel</a>
+        {{ form_end(form) }}
+    </div>
+{% endblock %}

@@ -40,4 +40,16 @@ class MessageRepository extends ServiceEntityRepository
     //            ->getOneOrNullResult()
     //        ;
     //    }
+
+    public function findForChannelVisible(int $channelId): array
+    {
+        return $this->createQueryBuilder('m')
+            ->andWhere('m.channel = :cid')
+            ->andWhere('m.isDeleted = :del')
+            ->setParameter('cid', $channelId)
+            ->setParameter('del', false)
+            ->orderBy('m.sentAt', 'ASC')
+            ->getQuery()->getResult();
+    }
+
 }

@@ -40,4 +40,35 @@ class ChannelRepository extends ServiceEntityRepository
     //            ->getOneOrNullResult()
     //        ;
     //    }
+
+    public function findVisibleForUser(): array
+    {
+        $qb = $this->createQueryBuilder('c')
+            ->andWhere('c.status = :approved')
+            ->andWhere('c.isActive = :active')
+            ->setParameter('approved', \App\Entity\Channel::STATUS_APPROVED)
+            ->setParameter('active', true)
+            ->orderBy('c.createdAt', 'DESC')
+            ;
+
+        return $qb->getQuery()->getResult();
+
+    }
+
+    public function findPending(): array
+    {
+        return $this->createQueryBuilder('c')
+            ->andWhere('c.status = :pending')
+            ->setParameter('pending', \App\Entity\Channel::STATUS_PENDING)
+            ->orderBy('c.createdAt', 'DESC')
+            ->getQuery()->getResult();
+    }
+
+    public function findAllForAdmin(): array
+    {
+        return $this->createQueryBuilder('c')
+            ->orderBy('c.createdAt', 'DESC')
+            ->getQuery()->getResult();
+    }
+
 }

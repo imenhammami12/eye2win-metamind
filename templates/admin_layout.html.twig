@@ -65,6 +65,25 @@
                     {% endif %}
                 </a>
 
+                <a href="{{ path('admin_channels_index') }}"
+                   class="{{ app.request.attributes.get('_route') starts with 'admin_channels' ? 'active' : '' }}">
+                    <i class="bi bi-chat-left-text"></i>
+                    <span>Channels</span>
+                </a>
+
+                <a href="{{ path('admin_channels_pending') }}"
+                   class="{{ app.request.attributes.get('_route') == 'admin_channels_pending' ? 'active' : '' }}">
+                    <i class="bi bi-hourglass-split"></i>
+                    <span>Channels Pending</span>
+                </a>
+
+                <a href="{{ path('admin_messages_index') }}"
+                   class="{{ app.request.attributes.get('_route') starts with 'admin_messages' ? 'active' : '' }}">
+                    <i class="bi bi-chat-dots"></i>
+                    <span>Messages</span>
+                </a>
+
+
 
                 <div class="sidebar-divider"></div>
                 
@@ -105,7 +124,7 @@
         <main class="main-content">
             {# Top Bar #}
             <header class="top-bar">
-                <h1 class="page-title">{% block page_title %}Dashboard{% endblock %}</h1>
+                <h1 class="page-title">{% block page_title %}Channels Management{% endblock %}</h1>
                 
                 <div class="header-actions">
                     <div class="user-info">
