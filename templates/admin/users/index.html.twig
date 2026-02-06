@@ -102,6 +102,10 @@
             </thead>
             <tbody>
                 {% for user in users %}
+                    {% set isCurrentUser = user.id == app.user.id %}
+                    {% set isTargetAdmin = 'ROLE_ADMIN' in user.roles %}
+                    {% set canModify = not isCurrentUser and (not isTargetAdmin or is_granted('ROLE_SUPER_ADMIN')) %}
+                    
                     <tr class="fade-in" style="animation-delay: {{ loop.index * 0.05 }}s;">
                         <td style="width: 70px; text-align: center;">
                             {% if user.profilePicture %}
@@ -117,6 +121,9 @@
                         </td>
                         <td style="width: 180px;">
                             <strong>{{ user.fullName ?? 'N/A' }}</strong>
+                            {% if isCurrentUser %}
+                                <span class="badge badge-sm bg-info ms-1">You</span>
+                            {% endif %}
                         </td>
                         <td style="width: 220px;">
                             <a href="mailto:{{ user.email }}" class="text-decoration-none" style="color: #4facfe;">
@@ -146,7 +153,9 @@
                             {% endif %}
                         </td>
                         <td style="width: 110px;">
-                            <span class="badge bg-{{ user.accountStatus.badgeClass }}">
+                            <span class="badge bg-{{ user.accountStatus.badgeClass }}" 
+                                  data-bs-toggle="tooltip" 
+                                  title="{{ user.accountStatus.description }}">
                                 {{ user.accountStatus.label }}
                             </span>
                         </td>
@@ -168,18 +177,19 @@
                                 {% if user.accountStatus.value == 'ACTIVE' %}
                                     <button type="button" 
                                             class="btn btn-sm btn-warning"
-                                            onclick="confirmAction('{{ path('admin_users_suspend', {id: user.id}) }}', '{{ csrf_token('suspend-' ~ user.id) }}', 'Suspend this user?')"
-                                            title="Suspend User"
+                                            onclick="confirmAction('{{ path('admin_users_suspend', {id: user.id}) }}', '{{ csrf_token('suspend-' ~ user.id) }}', 'Suspend this user? They will not be able to log in until reactivated.')"
+                                            title="{% if not canModify %}{{ isTargetAdmin ? 'Only Super Admins can suspend Admins' : 'Cannot suspend yourself' }}{% else %}Suspend User (Temporary){% endif %}"
                                             data-bs-toggle="tooltip"
-                                            {% if user.id == app.user.id %}disabled{% endif %}>
+                                            {% if not canModify %}disabled{% endif %}>
                                         <i class="bi bi-exclamation-triangle"></i>
                                     </button>
                                 {% else %}
                                     <button type="button" 
                                             class="btn btn-sm btn-success"
                                             onclick="confirmAction('{{ path('admin_users_activate', {id: user.id}) }}', '{{ csrf_token('activate-' ~ user.id) }}', 'Reactivate this user?')"
-                                            title="Reactivate User"
-                                            data-bs-toggle="tooltip">
+                                            title="{% if not canModify and user.accountStatus.value == 'BANNED' %}Only Super Admins can reactivate banned Admins{% else %}Reactivate User{% endif %}"
+                                            data-bs-toggle="tooltip"
+                                            {% if not canModify and user.accountStatus.value == 'BANNED' and isTargetAdmin %}disabled{% endif %}>
                                         <i class="bi bi-check-circle"></i>
                                     </button>
                                 {% endif %}
@@ -187,9 +197,9 @@
                                 <button type="button" 
                                         class="btn btn-sm btn-danger"
                                         onclick="confirmAction('{{ path('admin_users_delete', {id: user.id}) }}', '{{ csrf_token('delete-' ~ user.id) }}', 'Permanently delete this user? This action cannot be undone!')"
-                                        title="Delete User"
+                                        title="{% if not canModify %}{{ isTargetAdmin ? 'Only Super Admins can delete Admins' : 'Cannot delete yourself' }}{% else %}Delete User{% endif %}"
                                         data-bs-toggle="tooltip"
-                                        {% if user.id == app.user.id %}disabled{% endif %}>
+                                        {% if not canModify %}disabled{% endif %}>
                                     <i class="bi bi-trash"></i>
                                 </button>
                             </div>
@@ -262,6 +272,14 @@
             </div>
         </div>
     </div>
+</div>
+{% endif %}
+
+{# Permission Info Alert #}
+{% if not is_granted('ROLE_SUPER_ADMIN') %}
+<div class="alert alert-info mt-4 fade-in" style="animation-delay: 0.4s;">
+    <i class="bi bi-info-circle me-2"></i>
+    <strong>Permission Notice:</strong> You have ROLE_ADMIN access. Only Super Administrators can suspend, ban, or delete other Administrators.
 </div>
 {% endif %}
 {% endblock %}
