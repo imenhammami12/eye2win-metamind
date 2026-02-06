@@ -12,83 +12,115 @@
 
 <div class="row g-4">
     {# Applicant Info #}
-    <div class="col-lg-4">
-        <div class="table-card text-center fade-in" style="animation-delay: 0.1s;">
-            <div class="mb-4 position-relative">
+   
+    <div class="col-lg-4 fade-in" style="animation-delay: 0.1s;">
+    <div class="table-card h-100">
+        <div class="text-center p-4">
+
+            {# Avatar #}
+            <div class="mb-3">
                 {% if application.user.profilePicture %}
-                    <img src="{{ asset('uploads/profiles/' ~ application.user.profilePicture) }}" 
-                         alt="{{ application.user.username }}" 
-                         style="width: 120px; height: 120px; border-radius: 50%; object-fit: cover; border: 4px solid rgba(102, 126, 234, 0.3); box-shadow: 0 6px 16px rgba(0,0,0,0.15);"
-                         loading="lazy">
+                    <img src="{{ asset('uploads/profiles/' ~ application.user.profilePicture) }}"
+                         alt="{{ application.user.username }}"
+                         style="width:100px;height:100px;border-radius:50%;object-fit:cover;
+                                border:4px solid rgba(102,126,234,.2);
+                                box-shadow:0 4px 12px rgba(0,0,0,.1);">
                 {% else %}
-                    <div style="width: 120px; height: 120px; margin: 0 auto; border-radius: 50%; background: linear-gradient(135deg, #667eea, #764ba2); display: flex; align-items: center; justify-content: center; color: white; font-size: 42px; font-weight: bold; box-shadow: 0 6px 16px rgba(0,0,0,0.15);">
-                        {{ application.user.username|slice(0, 2)|upper }}
+                    <div style="width:100px;height:100px;margin:0 auto;border-radius:50%;
+                                background:linear-gradient(135deg,#667eea,#764ba2);
+                                display:flex;align-items:center;justify-content:center;
+                                color:white;font-size:36px;font-weight:bold;
+                                box-shadow:0 4px 12px rgba(0,0,0,.1);">
+                        {{ application.user.username|slice(0,2)|upper }}
                     </div>
                 {% endif %}
             </div>
-            
-            <h5 class="mb-1">{{ application.user.fullName ?? application.user.username }}</h5>
-            <p class="text-muted mb-2">@{{ application.user.username }}</p>
-            <p class="mb-3">
-                <a href="mailto:{{ application.user.email }}" class="text-decoration-none" style="color: #4facfe;">
-                    <i class="bi bi-envelope me-1"></i>{{ application.user.email }}
-                </a>
+
+            {# Name #}
+            <h5 class="mb-1">
+                {{ application.user.fullName ?? application.user.username }}
+            </h5>
+            <p class="text-muted mb-2">
+                <i class="bi bi-at"></i>{{ application.user.username }}
             </p>
-            
+
+            {# Badges #}
             <div class="mb-3">
+                <span class="badge bg-warning">
+                    <i class="bi bi-award-fill me-1"></i>Coach Applicant
+                </span>
+
                 <span class="badge bg-{{ application.status.badgeClass }}">
-                    <i class="bi bi-{{ application.status.value == 'APPROVED' ? 'check-circle' : (application.status.value == 'REJECTED' ? 'x-circle' : (application.status.value == 'UNDER_REVIEW' ? 'eye' : 'clock')) }} me-1"></i>
+                    <i class="bi bi-{{ 
+                        application.status.value == 'APPROVED' ? 'check-circle' :
+                        application.status.value == 'REJECTED' ? 'x-circle' :
+                        application.status.value == 'UNDER_REVIEW' ? 'eye' : 'clock'
+                    }} me-1"></i>
                     {{ application.status.label }}
                 </span>
             </div>
-            
+
+            {# Bio #}
+            <div class="mb-3 p-3"
+                 style="background:rgba(255,255,255,.03);border-radius:8px;min-height:80px;">
+                {% if application.user.bio %}
+                    <p class="text-muted small mb-0" style="line-height:1.5;">
+                        {{ application.user.bio|slice(0,120) }}
+                        {% if application.user.bio|length > 120 %}...{% endif %}
+                    </p>
+                {% else %}
+                    <p class="text-muted small mb-0 fst-italic">
+                        No bio provided
+                    </p>
+                {% endif %}
+            </div>
+
             <hr>
-            
-            <table class="table table-sm table-borderless text-start mb-0">
-                <tbody>
-                    <tr>
-                        <th style="width: 130px;">
-                            <i class="bi bi-calendar-plus me-2"></i>Submitted:
-                        </th>
-                        <td>
-                            <small>{{ application.submittedAt|date('M d, Y') }}</small>
-                            <br>
-                            <small class="text-muted">{{ application.submittedAt|date('h:i A') }}</small>
-                        </td>
-                    </tr>
-                    {% if application.reviewedAt %}
-                        <tr>
-                            <th>
-                                <i class="bi bi-clock-history me-2"></i>Reviewed:
-                            </th>
-                            <td>
-                                <small>{{ application.reviewedAt|date('M d, Y') }}</small>
-                                <br>
-                                <small class="text-muted">{{ application.reviewedAt|date('h:i A') }}</small>
-                            </td>
-                        </tr>
-                    {% endif %}
-                    <tr>
-                        <th>
-                            <i class="bi bi-person-check me-2"></i>Joined:
-                        </th>
-                        <td>
-                            <small>{{ application.user.createdAt|date('M d, Y') }}</small>
-                            <br>
-                            <small class="text-muted">({{ (('now'|date('U') - application.user.createdAt|date('U')) / 86400)|round }} days ago)</small>
-                        </td>
-                    </tr>
-                </tbody>
-            </table>
-            
-            <hr>
-            
-            <a href="{{ path('admin_users_show', {id: application.user.id}) }}" class="btn btn-outline-primary w-100">
-                <i class="bi bi-person me-2"></i>View Full Profile
-            </a>
+
+            {# Mini Stats #}
+            <div class="row text-center mb-3">
+                <div class="col-4">
+                    <div style="padding:8px;border-radius:8px;background:rgba(102,126,234,.1);">
+                        <i class="bi bi-calendar-plus" style="color:#667eea;"></i>
+                        <small class="d-block text-muted mt-1">Applied</small>
+                        <strong>{{ application.submittedAt|date('m/Y') }}</strong>
+                    </div>
+                </div>
+
+                <div class="col-4">
+                    <div style="padding:8px;border-radius:8px;background:rgba(67,233,123,.1);">
+                        <i class="bi bi-person-check" style="color:#43e97b;"></i>
+                        <small class="d-block text-muted mt-1">Joined</small>
+                        <strong>{{ application.user.createdAt|date('m/Y') }}</strong>
+                    </div>
+                </div>
+
+                <div class="col-4">
+                    <div style="padding:8px;border-radius:8px;background:rgba(74,172,254,.1);">
+                        <i class="bi bi-grid-3x3" style="color:#4facfe;"></i>
+                        <small class="d-block text-muted mt-1">Teams</small>
+                        <strong>{{ application.user.teamMemberships|length }}</strong>
+                    </div>
+                </div>
+            </div>
+
+            {# Actions #}
+            <div class="d-grid gap-2">
+                <a href="{{ path('admin_users_show', {id: application.user.id}) }}"
+                   class="btn btn-sm btn-primary">
+                    <i class="bi bi-eye me-2"></i>View Profile
+                </a>
+
+                <a href="mailto:{{ application.user.email }}"
+                   class="btn btn-sm btn-outline-secondary">
+                    <i class="bi bi-envelope me-2"></i>Contact
+                </a>
+            </div>
+
         </div>
     </div>
-    
+</div>
+
     {# Application Details #}
     <div class="col-lg-8">
         {# Certifications #}

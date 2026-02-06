@@ -1,0 +1,219 @@
+{% extends 'admin_layout.html.twig' %}
+
+{% block title %}Teams Management{% endblock %}
+{% block page_title %}Teams Management{% endblock %}
+
+{% block body %}
+
+{# ================= FILTERS ================= #}
+<div class="table-card mb-4 fade-in">
+    <div class="table-header">
+        <h5><i class="bi bi-funnel me-2"></i>Filters</h5>
+    </div>
+
+    <form method="get" class="p-3">
+        <div class="row g-3 align-items-end">
+            <div class="col-md-4">
+                <label class="form-label">
+                    <i class="bi bi-toggle-on me-1"></i>Status
+                </label>
+                <select name="status" class="form-select" onchange="this.form.submit()">
+                    <option value="">All Teams</option>
+                    <option value="active" {{ statusFilter == 'active' ? 'selected' : '' }}>Active</option>
+                    <option value="inactive" {{ statusFilter == 'inactive' ? 'selected' : '' }}>Inactive</option>
+                </select>
+            </div>
+
+            <div class="col-md-3">
+                <button type="submit" class="btn btn-primary w-100">
+                    <i class="bi bi-search me-1"></i>Filter
+                </button>
+            </div>
+
+            {% if statusFilter %}
+                <div class="col-md-2">
+                    <a href="{{ path('admin_teams_index') }}" class="btn btn-outline-secondary w-100">
+                        <i class="bi bi-x-lg"></i> Clear
+                    </a>
+                </div>
+            {% endif %}
+        </div>
+    </form>
+</div>
+
+{# ================= SUMMARY ================= #}
+<div class="mb-3 fade-in" style="animation-delay: 0.1s;">
+    <div class="d-flex justify-content-between align-items-center">
+        <h6 class="text-muted mb-0">
+            <i class="bi bi-info-circle me-2"></i>
+            Found <strong>{{ teams|length }}</strong> team{{ teams|length != 1 ? 's' : '' }}
+        </h6>
+    </div>
+</div>
+
+{# ================= TEAMS TABLE ================= #}
+<div class="table-card fade-in" style="animation-delay: 0.2s;">
+    <div class="table-header">
+        <h5><i class="bi bi-grid-3x3 me-2"></i>Teams List</h5>
+    </div>
+
+    {% if teams|length > 0 %}
+    <div class="table-responsive">
+        <table class="custom-table table">
+            <thead>
+                <tr>
+                    <th style="width:70px;text-align:center;">Logo</th>
+                    <th style="width:220px;">Team Name</th>
+                    <th style="width:180px;">Owner</th>
+                    <th style="width:160px;">Members</th>
+                    <th style="width:120px;">Status</th>
+                    <th style="width:130px;">Created</th>
+                    <th style="width:180px;">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for team in teams %}
+                    {% set activeMembers = team.teamMemberships
+                        |filter(m => m.status.value == 'ACTIVE')
+                        |length %}
+
+                    <tr class="fade-in" style="animation-delay: {{ loop.index * 0.05 }}s;">
+                        {# Logo #}
+                        <td style="text-align:center;">
+                            {% if team.logo %}
+                                <img src="{{ asset('uploads/teams/' ~ team.logo) }}"
+                                     class="user-avatar-table"
+                                     alt="{{ team.name }}">
+                            {% else %}
+                                <div class="user-avatar-placeholder mx-auto">
+                                    {{ team.name|slice(0,2)|upper }}
+                                </div>
+                            {% endif %}
+                        </td>
+
+                        {# Name #}
+                        <td>
+                            <strong>{{ team.name }}</strong>
+                            {% if team.description %}
+                                <div class="text-muted small">
+                                    {{ team.description|slice(0,50) }}...
+                                </div>
+                            {% endif %}
+                        </td>
+
+                        {# Owner #}
+                        <td>
+                            <i class="bi bi-person-circle me-1"></i>
+                            {{ team.owner.username }}
+                        </td>
+
+                        {# Members #}
+                        <td>
+                            <div class="progress" style="height:20px;">
+                                <div class="progress-bar bg-primary"
+                                     style="width: {{ (activeMembers / team.maxMembers * 100)|round }}%">
+                                    {{ activeMembers }}/{{ team.maxMembers }}
+                                </div>
+                            </div>
+                        </td>
+
+                        {# Status #}
+                        <td>
+                            {% if team.isActive %}
+                                <span class="badge bg-success">
+                                    <i class="bi bi-check-circle me-1"></i>Active
+                                </span>
+                            {% else %}
+                                <span class="badge bg-secondary">
+                                    <i class="bi bi-x-circle me-1"></i>Inactive
+                                </span>
+                            {% endif %}
+                        </td>
+
+                        {# Created #}
+                        <td>
+                            <small class="text-muted">
+                                <i class="bi bi-calendar3 me-1"></i>
+                                {{ team.createdAt|date('M d, Y') }}
+                            </small>
+                        </td>
+
+                        {# Actions #}
+                        <td>
+                            <div class="btn-group" role="group">
+                                <a href="{{ path('admin_teams_show', {id: team.id}) }}"
+                                   class="btn btn-sm btn-info"
+                                   data-bs-toggle="tooltip"
+                                   title="View Details">
+                                    <i class="bi bi-eye"></i>
+                                </a>
+
+                                <button type="button"
+                                        class="btn btn-sm btn-{{ team.isActive ? 'warning' : 'success' }}"
+                                        onclick="confirmAction(
+                                            '{{ path('admin_teams_toggle_status', {id: team.id}) }}',
+                                            '{{ csrf_token('toggle-' ~ team.id) }}',
+                                            'Change team status?'
+                                        )"
+                                        data-bs-toggle="tooltip"
+                                        title="{{ team.isActive ? 'Deactivate' : 'Activate' }}">
+                                    <i class="bi bi-{{ team.isActive ? 'pause-circle' : 'play-circle' }}"></i>
+                                </button>
+
+                                <button type="button"
+                                        class="btn btn-sm btn-danger"
+                                        onclick="confirmAction(
+                                            '{{ path('admin_teams_delete', {id: team.id}) }}',
+                                            '{{ csrf_token('delete-' ~ team.id) }}',
+                                            'Delete this team permanently?'
+                                        )"
+                                        data-bs-toggle="tooltip"
+                                        title="Delete">
+                                    <i class="bi bi-trash"></i>
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% else %}
+        <div class="text-center py-5">
+            <i class="bi bi-inbox" style="font-size:64px;opacity:.2;"></i>
+            <h4 class="mt-3">No Teams Found</h4>
+            <p class="text-muted">No teams match the current filter</p>
+        </div>
+    {% endif %}
+</div>
+
+{% endblock %}
+
+{% block javascripts %}
+{{ parent() }}
+<script>
+function confirmAction(url, token, message) {
+    if (confirm(message)) {
+        const form = document.createElement('form');
+        form.method = 'POST';
+        form.action = url;
+
+        const input = document.createElement('input');
+        input.type = 'hidden';
+        input.name = '_token';
+        input.value = token;
+
+        form.appendChild(input);
+        document.body.appendChild(form);
+        form.submit();
+    }
+}
+
+// Tooltips
+document.addEventListener('DOMContentLoaded', () => {
+    document.querySelectorAll('[data-bs-toggle="tooltip"]').forEach(el => {
+        new bootstrap.Tooltip(el);
+    });
+});
+</script>
+{% endblock %}
