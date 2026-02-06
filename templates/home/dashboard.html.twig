@@ -1,0 +1,49 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Dashboard - EyeTwin{% endblock %}
+
+{% block body %}
+<!-- Breadcrumb -->
+<section class="breadcrumb breadcrumb_bg">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-12">
+                <div class="breadcrumb_iner text-center">
+                    <div class="breadcrumb_iner_item">
+                        <h2>Dashboard</h2>
+                        <p><a href="{{ path('app_home') }}">Accueil</a> <span>-</span> Dashboard</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="blog_part section_padding">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-12">
+                <div class="card">
+                    <div class="card-body text-center p-5">
+                        <i class="fas fa-user-circle fa-5x text-primary mb-4"></i>
+                        <h1>Bienvenue, {{ user.username }} !</h1>
+                        <p class="lead">Email : {{ user.email }}</p>
+                        <p>Membre depuis le {{ user.createdAt|date('d/m/Y') }}</p>
+                        
+                        <hr class="my-4">
+                        
+                        <div class="alert alert-info">
+                            <i class="fas fa-info-circle"></i> 
+                            Votre compte est actif et fonctionnel !
+                        </div>
+                        
+                        <a href="{{ path('app_logout') }}" class="btn btn-danger btn-lg mt-3">
+                            <i class="fas fa-sign-out-alt"></i> Se déconnecter
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

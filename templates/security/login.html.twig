@@ -1,0 +1,104 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Login - EyeTwin{% endblock %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    <link rel="stylesheet" href="{{ asset('assets/css/gaming-auth.css') }}">
+    <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;600;700&display=swap" rel="stylesheet">
+{% endblock %}
+
+{% block body %}
+<section class="contact-section section_padding">
+    <div class="container-fluid p-0">
+        <div class="row g-0">
+            <div class="col-12">
+                <div class="auth-container">
+
+                    <!-- Left column - Gaming image -->
+                    <div class="auth-image-section">
+                        <!-- Background image handled via CSS -->
+                    </div>
+
+                    <!-- Right column - Login form -->
+                    <div class="auth-form-section">
+                        <div class="gaming-card card shadow-lg">
+                            <div class="card-body p-5">
+
+                                <div class="auth-header text-center mb-4">
+                                    <h2>Log In to Your Account</h2>
+                                    <p>Welcome back! Please sign in</p>
+                                </div>
+
+                                {% if error %}
+                                    <div class="alert alert-danger">
+                                        <i class="fas fa-exclamation-triangle"></i>
+                                        {{ error.messageKey|trans(error.messageData, 'security') }}
+                                    </div>
+                                {% endif %}
+
+                                <form method="post" action="{{ path('app_login') }}">
+
+                                    <div class="form-group">
+                                        <label for="inputEmail">Email Address</label>
+                                        <input type="email"
+                                               value="{{ last_username }}"
+                                               name="_username"
+                                               id="inputEmail"
+                                               class="form-control form-control-lg"
+                                               autocomplete="email"
+                                               required
+                                               autofocus
+                                               placeholder="your@email.com">
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label for="inputPassword">Password</label>
+                                        <input type="password"
+                                               name="_password"
+                                               id="inputPassword"
+                                               class="form-control form-control-lg"
+                                               autocomplete="current-password"
+                                               required
+                                               placeholder="••••••••">
+                                    </div>
+
+                                    <div class="d-flex justify-content-between align-items-center mb-3">
+                                        <div class="form-check">
+                                            <input class="form-check-input"
+                                                   type="checkbox"
+                                                   name="_remember_me"
+                                                   id="remember_me">
+                                            <label class="form-check-label" for="remember_me">
+                                                Remember me
+                                            </label>
+                                        </div>
+                                        <a href="#" class="text-end">Forgot password?</a>
+                                    </div>
+
+                                    <input type="hidden" name="_csrf_token" value="{{ csrf_token('authenticate') }}">
+
+                                    <button class="btn btn_1 btn-lg btn-block mb-3" type="submit">
+                                        <i class="fas fa-sign-in-alt"></i> Log In
+                                    </button>
+
+                                    <hr>
+
+                                    <div class="text-center">
+                                        <p class="mb-2">Don't have an account yet?</p>
+                                        <a href="{{ path('app_register') }}" class="btn btn_2 btn-block">
+                                            <i class="fas fa-user-plus"></i> Sign Up
+                                        </a>
+                                    </div>
+
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

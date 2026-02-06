@@ -1,0 +1,230 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Edit My Profile - EyeTwin{% endblock %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    <link rel="stylesheet" href="{{ asset('css/profile.css') }}">
+{% endblock %}
+
+{% block body %}
+<!-- Breadcrumb -->
+
+
+<section class="edit_profile_section section_padding">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-10">
+                <div class="edit_profile_wrapper">
+                    <!-- Profile Preview Card -->
+                    <div class="row">
+                        <div class="col-lg-4">
+                            <div class="profile_preview_card">
+                                <div class="preview_header">
+                                    <h4><i class="fas fa-eye"></i> PROFILE PREVIEW</h4>
+                                </div>
+                                <div class="preview_content">
+                                    <div class="preview_image_wrapper">
+                                        {% if user.profilePicture %}
+                                            <img src="{{ asset('uploads/profiles/' ~ user.profilePicture) }}" 
+                                                 alt="{{ user.username }}" 
+                                                 class="preview_image"
+                                                 id="profilePreview">
+                                        {% else %}
+                                            <div class="preview_image_placeholder" id="profilePreview">
+                                                {{ user.username|slice(0, 1)|upper }}
+                                            </div>
+                                        {% endif %}
+                                        <div class="preview_overlay">
+                                            <i class="fas fa-camera"></i>
+                                        </div>
+                                    </div>
+                                    <h3 class="preview_username">{{ user.username }}</h3>
+                                    <p class="preview_email">{{ user.email }}</p>
+                                    
+                                    <div class="preview_stats">
+                                        <div class="preview_stat_item">
+                                            <i class="fas fa-users"></i>
+                                            <span>{{ user.teamMemberships|length }} Teams</span>
+                                        </div>
+                                        <div class="preview_stat_item">
+                                            <i class="fas fa-calendar"></i>
+                                            <span>Member since {{ user.createdAt|date('Y') }}</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                        
+                        </div>
+                        
+                        <!-- Edit Form -->
+                        <div class="col-lg-8">
+                            <div class="edit_form_card">
+                                <div class="form_header">
+                                    <h3><i class="fas fa-user-edit"></i> EDIT MY INFORMATION</h3>
+                                </div>
+                                
+                                <div class="form_body">
+                                    {{ form_start(form, {'attr': {'novalidate': 'novalidate', 'id': 'editProfileForm'}}) }}
+                                    
+                                    <!-- Profile Picture Section -->
+                                    <div class="form_section">
+                                        <h4 class="section_title">
+                                            <i class="fas fa-image"></i> Profile Picture
+                                        </h4>
+                                        <div class="profile_picture_upload">
+                                            <div class="upload_area">
+                                                {{ form_widget(form.profilePictureFile, {'attr': {'class': 'file-input', 'id': 'profilePictureInput'}}) }}
+                                                <label for="profilePictureInput" class="upload_label">
+                                                    <i class="fas fa-cloud-upload-alt"></i>
+                                                    <span>Click to upload</span>
+                                                    <small>or drag and drop your image</small>
+                                                </label>
+                                            </div>
+                                            <div class="upload_info">
+                                                <i class="fas fa-info-circle"></i>
+                                                <span>Accepted formats: JPG, PNG, WEBP (max 2MB)</span>
+                                            </div>
+                                            {{ form_errors(form.profilePictureFile) }}
+                                        </div>
+                                    </div>
+                                    
+                                    <!-- Personal Information Section -->
+                                    <div class="form_section">
+                                        <h4 class="section_title">
+                                            <i class="fas fa-user"></i> Personal Information
+                                        </h4>
+                                        
+                                        <div class="row">
+                                            <div class="col-md-6">
+                                                <div class="form_group">
+                                                    {{ form_label(form.username, 'Username', {'label_attr': {'class': 'form_label'}}) }}
+                                                    <div class="input_wrapper">
+                                                        <i class="fas fa-user input_icon"></i>
+                                                        {{ form_widget(form.username, {'attr': {'class': 'form_input', 'readonly': 'readonly'}}) }}
+                                                    </div>
+                                                    <small class="input_hint">
+                                                        <i class="fas fa-lock"></i> Username cannot be changed
+                                                    </small>
+                                                    {{ form_errors(form.username) }}
+                                                </div>
+                                            </div>
+                                            
+                                            <div class="col-md-6">
+                                                <div class="form_group">
+                                                    {{ form_label(form.email, 'Email', {'label_attr': {'class': 'form_label'}}) }}
+                                                    <div class="input_wrapper">
+                                                        <i class="fas fa-envelope input_icon"></i>
+                                                        {{ form_widget(form.email, {'attr': {'class': 'form_input', 'placeholder': 'your@email.com'}}) }}
+                                                    </div>
+                                                    {{ form_errors(form.email) }}
+                                                </div>
+                                            </div>
+                                        </div>
+                                        
+                                        <div class="form_group">
+                                            {{ form_label(form.fullName, 'Full Name', {'label_attr': {'class': 'form_label'}}) }}
+                                            <div class="input_wrapper">
+                                                <i class="fas fa-id-card input_icon"></i>
+                                                {{ form_widget(form.fullName, {'attr': {'class': 'form_input', 'placeholder': 'John Doe'}}) }}
+                                            </div>
+                                            {{ form_errors(form.fullName) }}
+                                        </div>
+                                    </div>
+                                    
+                                    <!-- Bio Section -->
+                                    <div class="form_section">
+                                        <h4 class="section_title">
+                                            <i class="fas fa-pen"></i> About Me
+                                        </h4>
+                                        
+                                        <div class="form_group">
+                                            {{ form_label(form.bio, 'Biography', {'label_attr': {'class': 'form_label'}}) }}
+                                            <div class="textarea_wrapper">
+                                                {{ form_widget(form.bio, {'attr': {'class': 'form_textarea', 'placeholder': 'Tell us about yourself, your gaming experience, your favorite games...', 'rows': '6'}}) }}
+                                                <span class="char_counter">
+                                                    <span id="charCount">0</span> / 500 characters
+                                                </span>
+                                            </div>
+                                            {{ form_errors(form.bio) }}
+                                        </div>
+                                    </div>
+                                    
+                                    <!-- Action Buttons -->
+                                    <div class="form_actions">
+                                        <a href="{{ path('user_profile') }}" class="btn_cancel">
+                                            <i class="fas fa-times"></i> Cancel
+                                        </a>
+                                        <button type="submit" class="btn_save">
+                                            <i class="fas fa-save"></i> Save Changes
+                                        </button>
+                                    </div>
+                                    
+                                    {{ form_end(form) }}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    <script>
+        // Preview image on file select
+        document.getElementById('profilePictureInput').addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const preview = document.getElementById('profilePreview');
+                    if (preview.tagName === 'IMG') {
+                        preview.src = e.target.result;
+                    } else {
+                        const img = document.createElement('img');
+                        img.src = e.target.result;
+                        img.className = 'preview_image';
+                        img.id = 'profilePreview';
+                        preview.parentNode.replaceChild(img, preview);
+                    }
+                }
+                reader.readAsDataURL(file);
+            }
+        });
+        
+        // Character counter for bio
+        const bioTextarea = document.querySelector('textarea[name*="bio"]');
+        const charCount = document.getElementById('charCount');
+        
+        if (bioTextarea && charCount) {
+            bioTextarea.addEventListener('input', function() {
+                charCount.textContent = this.value.length;
+                
+                if (this.value.length > 500) {
+                    charCount.parentElement.style.color = '#f44a40';
+                } else {
+                    charCount.parentElement.style.color = '#8a8a8a';
+                }
+            });
+            
+            // Initialize counter
+            charCount.textContent = bioTextarea.value.length;
+        }
+        
+        // Form validation feedback
+        const form = document.getElementById('editProfileForm');
+        if (form) {
+            form.addEventListener('submit', function(e) {
+                const submitBtn = form.querySelector('.btn_save');
+                submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Saving...';
+                submitBtn.disabled = true;
+            });
+        }
+    </script>
+{% endblock %}

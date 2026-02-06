@@ -1,0 +1,189 @@
+{% extends 'admin_layout.html.twig' %}
+
+{% block title %}Coaches List{% endblock %}
+{% block page_title %}Certified Coaches{% endblock %}
+
+{% block body %}
+<div class="mb-3 fade-in">
+    <a href="{{ path('admin_coach_applications_index') }}" class="btn btn-outline-secondary">
+        <i class="bi bi-arrow-left me-2"></i>Back to Applications
+    </a>
+</div>
+
+{# Stats Card #}
+<div class="table-card mb-4 fade-in" style="animation-delay: 0.1s;">
+    <div class="alert alert-info mb-0">
+        <div class="d-flex align-items-center">
+            <i class="bi bi-info-circle me-3" style="font-size: 24px;"></i>
+            <div>
+                <strong style="font-size: 1.1em;">{{ coaches|length }} Certified Coach{{ coaches|length != 1 ? 'es' : '' }}</strong>
+                <p class="mb-0 mt-1 text-muted">All users with COACH role are displayed here</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% if coaches|length > 0 %}
+    {# Coaches Grid #}
+    <div class="row g-4">
+        {% for coach in coaches %}
+            <div class="col-md-6 col-lg-4 fade-in" style="animation-delay: {{ 0.2 + (loop.index * 0.05) }}s;">
+                <div class="table-card h-100">
+                    <div class="text-center p-4">
+                        {# Profile Picture #}
+                        <div class="mb-3">
+                            {% if coach.profilePicture %}
+                                <img src="{{ asset('uploads/profiles/' ~ coach.profilePicture) }}" 
+                                     alt="{{ coach.username }}" 
+                                     style="width: 100px; height: 100px; border-radius: 50%; object-fit: cover; border: 4px solid rgba(102, 126, 234, 0.2); box-shadow: 0 4px 12px rgba(0,0,0,0.1);"
+                                     loading="lazy">
+                            {% else %}
+                                <div style="width: 100px; height: 100px; margin: 0 auto; border-radius: 50%; background: linear-gradient(135deg, #667eea, #764ba2); display: flex; align-items: center; justify-content: center; color: white; font-size: 36px; font-weight: bold; box-shadow: 0 4px 12px rgba(0,0,0,0.1);">
+                                    {{ coach.username|slice(0, 2)|upper }}
+                                </div>
+                            {% endif %}
+                        </div>
+                        
+                        {# Name & Username #}
+                        <h5 class="mb-1">{{ coach.fullName ?? coach.username }}</h5>
+                        <p class="text-muted mb-3">
+                            <i class="bi bi-at"></i>{{ coach.username }}
+                        </p>
+                        
+                        {# Badges #}
+                        <div class="mb-3">
+                            <span class="badge bg-warning">
+                                <i class="bi bi-award-fill me-1"></i>Coach
+                            </span>
+                            <span class="badge bg-{{ coach.accountStatus.badgeClass }}">
+                                <i class="bi bi-{{ coach.accountStatus.value == 'ACTIVE' ? 'check-circle' : (coach.accountStatus.value == 'SUSPENDED' ? 'exclamation-triangle' : 'x-circle') }} me-1"></i>
+                                {{ coach.accountStatus.label }}
+                            </span>
+                        </div>
+                        
+                        {# Bio #}
+                        {% if coach.bio %}
+                            <div class="mb-3 p-3" style="background: rgba(255,255,255,0.03); border-radius: 8px; min-height: 80px;">
+                                <p class="text-muted small mb-0" style="line-height: 1.5;">
+                                    {{ coach.bio|slice(0, 120) }}{% if coach.bio|length > 120 %}...{% endif %}
+                                </p>
+                            </div>
+                        {% else %}
+                            <div class="mb-3 p-3" style="background: rgba(255,255,255,0.03); border-radius: 8px; min-height: 80px;">
+                                <p class="text-muted small mb-0 fst-italic">
+                                    No bio provided
+                                </p>
+                            </div>
+                        {% endif %}
+                        
+                        <hr>
+                        
+                        {# Stats #}
+                        <div class="row text-center mb-3">
+                            <div class="col-4">
+                                <div style="padding: 8px; border-radius: 8px; background: rgba(102, 126, 234, 0.1);">
+                                    <i class="bi bi-grid-3x3" style="font-size: 20px; color: #667eea;"></i>
+                                    <small class="text-muted d-block mt-1" style="font-size: 0.75rem;">Teams</small>
+                                    <strong style="font-size: 1.1em;">{{ coach.teamMemberships|length }}</strong>
+                                </div>
+                            </div>
+                            <div class="col-4">
+                                <div style="padding: 8px; border-radius: 8px; background: rgba(67, 233, 123, 0.1);">
+                                    <i class="bi bi-trophy" style="font-size: 20px; color: #43e97b;"></i>
+                                    <small class="text-muted d-block mt-1" style="font-size: 0.75rem;">Owned</small>
+                                    <strong style="font-size: 1.1em;">{{ coach.ownedTeams|length }}</strong>
+                                </div>
+                            </div>
+                            <div class="col-4">
+                                <div style="padding: 8px; border-radius: 8px; background: rgba(74, 172, 254, 0.1);">
+                                    <i class="bi bi-calendar-check" style="font-size: 20px; color: #4facfe;"></i>
+                                    <small class="text-muted d-block mt-1" style="font-size: 0.75rem;">Since</small>
+                                    <strong style="font-size: 1.1em;">{{ coach.createdAt|date('m/Y') }}</strong>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        {# Action Buttons #}
+                        <div class="d-grid gap-2">
+                            <a href="{{ path('admin_users_show', {id: coach.id}) }}" class="btn btn-sm btn-primary">
+                                <i class="bi bi-eye me-2"></i>View Profile
+                            </a>
+                            <a href="mailto:{{ coach.email }}" class="btn btn-sm btn-outline-secondary">
+                                <i class="bi bi-envelope me-2"></i>Contact
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+    
+    {# Summary Stats #}
+    <div class="row g-3 mt-4 fade-in" style="animation-delay: 0.5s;">
+        <div class="col-md-4">
+            <div class="stat-card">
+                <div class="stat-card-icon" style="background: linear-gradient(135deg, #667eea, #764ba2);">
+                    <i class="bi bi-award text-white"></i>
+                </div>
+                <div class="stat-card-title">Total Coaches</div>
+                <div class="stat-card-value">{{ coaches|length }}</div>
+            </div>
+        </div>
+        
+        <div class="col-md-4">
+            <div class="stat-card">
+                <div class="stat-card-icon" style="background: linear-gradient(135deg, #43e97b, #38f9d7);">
+                    <i class="bi bi-check-circle text-white"></i>
+                </div>
+                <div class="stat-card-title">Active</div>
+                <div class="stat-card-value">
+                    {{ coaches|filter(c => c.accountStatus.value == 'ACTIVE')|length }}
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-4">
+            <div class="stat-card">
+                <div class="stat-card-icon" style="background: linear-gradient(135deg, #4facfe, #00f2fe);">
+                    <i class="bi bi-grid-3x3 text-white"></i>
+                </div>
+                <div class="stat-card-title">Total Teams</div>
+                <div class="stat-card-value">
+                    {{ coaches|reduce((sum, coach) => sum + coach.teamMemberships|length, 0) }}
+                </div>
+            </div>
+        </div>
+    </div>
+{% else %}
+    {# Empty State #}
+    <div class="table-card text-center py-5 fade-in" style="animation-delay: 0.2s;">
+        <div class="empty-state">
+            <i class="bi bi-award" style="font-size: 64px; opacity: 0.2;"></i>
+            <h4 class="mt-3 mb-2">No Coaches Found</h4>
+            <p class="text-muted mb-4">Approved coaches will appear here</p>
+            <a href="{{ path('admin_coach_applications_index') }}" class="btn btn-primary">
+                <i class="bi bi-clipboard-check me-2"></i>View Applications
+            </a>
+        </div>
+    </div>
+{% endif %}
+{% endblock %}
+
+{% block javascripts %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Enhanced hover effects for coach cards
+    document.querySelectorAll('.table-card.h-100').forEach((card, index) => {
+        card.addEventListener('mouseenter', function() {
+            this.style.transform = 'translateY(-8px)';
+            this.style.boxShadow = '0 12px 32px rgba(0,0,0,0.15)';
+        });
+        
+        card.addEventListener('mouseleave', function() {
+            this.style.transform = 'translateY(0)';
+            this.style.boxShadow = '';
+        });
+    });
+});
+</script>
+{% endblock %}

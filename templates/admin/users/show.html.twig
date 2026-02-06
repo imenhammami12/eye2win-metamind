@@ -1,0 +1,353 @@
+{% extends 'admin_layout.html.twig' %}
+
+{% block title %}{{ user.username }} - User Details{% endblock %}
+{% block page_title %}User Details{% endblock %}
+
+{% block body %}
+<div class="mb-3 fade-in">
+    <a href="{{ path('admin_users_index') }}" class="btn btn-outline-secondary">
+        <i class="bi bi-arrow-left me-2"></i>Back to List
+    </a>
+</div>
+
+<div class="row g-4">
+    {# User Profile Card #}
+    <div class="col-lg-4">
+        <div class="table-card text-center fade-in" style="animation-delay: 0.1s;">
+            <div class="mb-4 position-relative">
+                {% if user.profilePicture %}
+                    <img src="{{ asset('uploads/profiles/' ~ user.profilePicture) }}" 
+                         alt="{{ user.username }}" 
+                         style="width: 150px; height: 150px; border-radius: 50%; object-fit: cover; border: 5px solid rgba(102, 126, 234, 0.3); box-shadow: 0 8px 24px rgba(0,0,0,0.2);"
+                         loading="lazy">
+                {% else %}
+                    <div style="width: 150px; height: 150px; margin: 0 auto; border-radius: 50%; background: linear-gradient(135deg, #667eea, #764ba2); display: flex; align-items: center; justify-content: center; color: white; font-size: 48px; font-weight: bold; box-shadow: 0 8px 24px rgba(0,0,0,0.2);">
+                        {{ user.username|slice(0, 2)|upper }}
+                    </div>
+                {% endif %}
+                
+                {# Online status indicator #}
+                <div style="position: absolute; bottom: 10px; right: calc(50% - 65px); width: 20px; height: 20px; background: #43e97b; border: 3px solid var(--dark-bg); border-radius: 50%; box-shadow: 0 0 12px rgba(67, 233, 123, 0.6);"></div>
+            </div>
+            
+            <h4 class="mb-1">{{ user.fullName ?? user.username }}</h4>
+            <p class="text-muted mb-3">@{{ user.username }}</p>
+            
+            <div class="mb-3 d-flex gap-2 justify-content-center flex-wrap">
+                {% if 'ROLE_ADMIN' in user.roles %}
+                    <span class="badge bg-danger">
+                        <i class="bi bi-shield-fill me-1"></i>Administrator
+                    </span>
+                {% elseif 'ROLE_COACH' in user.roles %}
+                    <span class="badge bg-warning">
+                        <i class="bi bi-award-fill me-1"></i>Coach
+                    </span>
+                {% else %}
+                    <span class="badge bg-info">
+                        <i class="bi bi-person-fill me-1"></i>User
+                    </span>
+                {% endif %}
+                
+                <span class="badge bg-{{ user.accountStatus.badgeClass }}">
+                    <i class="bi bi-{{ user.accountStatus.value == 'ACTIVE' ? 'check-circle' : (user.accountStatus.value == 'SUSPENDED' ? 'exclamation-triangle' : 'x-circle') }} me-1"></i>
+                    {{ user.accountStatus.label }}
+                </span>
+            </div>
+            
+            {% if user.bio %}
+                <div class="mb-3 text-start p-3" style="background: rgba(255,255,255,0.03); border-radius: 12px;">
+                    <h6 class="mb-2"><i class="bi bi-chat-quote me-2"></i>Biography</h6>
+                    <p class="text-muted mb-0" style="font-size: 0.9rem;">{{ user.bio }}</p>
+                </div>
+            {% endif %}
+            
+            <hr>
+            
+            {# Role Editor #}
+            <div class="mb-3">
+                <form method="post" action="{{ path('admin_users_edit_role', {id: user.id}) }}">
+                    <input type="hidden" name="_token" value="{{ csrf_token('edit-role-' ~ user.id) }}">
+                    
+                    <label class="form-label fw-bold">
+                        <i class="bi bi-shield-check me-2"></i>Change Role
+                    </label>
+                    <select name="role" class="form-select mb-3" {% if user.id == app.user.id %}disabled{% endif %}>
+                        <option value="ROLE_USER" {% if 'ROLE_ADMIN' not in user.roles and 'ROLE_COACH' not in user.roles %}selected{% endif %}>User</option>
+                        <option value="ROLE_COACH" {% if 'ROLE_COACH' in user.roles and 'ROLE_ADMIN' not in user.roles %}selected{% endif %}>Coach</option>
+                        <option value="ROLE_ADMIN" {% if 'ROLE_ADMIN' in user.roles %}selected{% endif %}>Administrator</option>
+                    </select>
+                    
+                    <button type="submit" class="btn btn-primary btn-sm w-100" {% if user.id == app.user.id %}disabled{% endif %}>
+                        <i class="bi bi-save me-2"></i>Update Role
+                    </button>
+                    
+                    {% if user.id == app.user.id %}
+                        <small class="text-muted d-block mt-2">
+                            <i class="bi bi-info-circle me-1"></i>You cannot modify your own role
+                        </small>
+                    {% endif %}
+                </form>
+            </div>
+            
+            <hr>
+            
+            {# Action Buttons #}
+            <div class="d-grid gap-2">
+                {% if user.accountStatus.value == 'ACTIVE' %}
+                    <button type="button" 
+                            class="btn btn-warning"
+                            onclick="confirmAction('{{ path('admin_users_suspend', {id: user.id}) }}', '{{ csrf_token('suspend-' ~ user.id) }}', 'Suspend this user?')"
+                            {% if user.id == app.user.id %}disabled{% endif %}>
+                        <i class="bi bi-exclamation-triangle me-2"></i>Suspend User
+                    </button>
+                    
+                    <button type="button" 
+                            class="btn btn-danger"
+                            onclick="confirmAction('{{ path('admin_users_ban', {id: user.id}) }}', '{{ csrf_token('ban-' ~ user.id) }}', 'Ban this user?')"
+                            {% if user.id == app.user.id %}disabled{% endif %}>
+                        <i class="bi bi-x-circle me-2"></i>Ban User
+                    </button>
+                {% else %}
+                    <button type="button" 
+                            class="btn btn-success"
+                            onclick="confirmAction('{{ path('admin_users_activate', {id: user.id}) }}', '{{ csrf_token('activate-' ~ user.id) }}', 'Reactivate this user?')">
+                        <i class="bi bi-check-circle me-2"></i>Reactivate User
+                    </button>
+                {% endif %}
+                
+                <button type="button" 
+                        class="btn btn-danger"
+                        onclick="confirmAction('{{ path('admin_users_delete', {id: user.id}) }}', '{{ csrf_token('delete-' ~ user.id) }}', 'Permanently delete this user? This action cannot be undone!')"
+                        {% if user.id == app.user.id %}disabled{% endif %}>
+                    <i class="bi bi-trash me-2"></i>Delete User
+                </button>
+                
+                {% if user.id == app.user.id %}
+                    <small class="text-muted">
+                        <i class="bi bi-shield-lock me-1"></i>Self-modification restricted
+                    </small>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    
+    {# User Information #}
+    <div class="col-lg-8">
+        {# Stats Cards
+        <div class="row g-3 mb-4 fade-in" style="animation-delay: 0.2s;">
+            <div class="col-md-3">
+                <div class="stat-card">
+                    <div class="stat-card-icon" style="background: linear-gradient(135deg, #667eea, #764ba2); font-size: 20px;">
+                        <i class="bi bi-plug text-white"></i>
+                    </div>
+                    <div class="stat-card-title">Connections</div>
+                    <div class="stat-card-value">{{ stats.totalConnections }}</div>
+                </div>
+            </div>
+            
+            <div class="col-md-3">
+                <div class="stat-card">
+                    <div class="stat-card-icon" style="background: linear-gradient(135deg, #4facfe, #00f2fe); font-size: 20px;">
+                        <i class="bi bi-grid-3x3 text-white"></i>
+                    </div>
+                    <div class="stat-card-title">Teams</div>
+                    <div class="stat-card-value">{{ stats.teamsCount }}</div>
+                </div>
+            </div>
+            
+            <div class="col-md-3">
+                <div class="stat-card">
+                    <div class="stat-card-icon" style="background: linear-gradient(135deg, #43e97b, #38f9d7); font-size: 20px;">
+                        <i class="bi bi-people text-white"></i>
+                    </div>
+                    <div class="stat-card-title">Teams Created</div>
+                    <div class="stat-card-value">{{ stats.ownedTeamsCount }}</div>
+                </div>
+            </div>
+            
+            <div class="col-md-3">
+                <div class="stat-card">
+                    <div class="stat-card-icon" style="background: linear-gradient(135deg, #fa709a, #fee140); font-size: 20px;">
+                        <i class="bi bi-bell text-white"></i>
+                    </div>
+                    <div class="stat-card-title">Notifications</div>
+                    <div class="stat-card-value">{{ stats.unreadNotifications }}</div>
+                </div>
+            </div>
+        </div>
+         #}
+        {# Personal Information #}
+        <div class="table-card mb-4 fade-in" style="animation-delay: 0.3s;">
+            <div class="table-header">
+                <h5><i class="bi bi-info-circle me-2"></i>Personal Information</h5>
+            </div>
+            
+            <table class="table table-borderless">
+                <tbody>
+                    <tr>
+                        <th style="width: 200px;"><i class="bi bi-envelope me-2"></i>Email</th>
+                        <td>
+                            <a href="mailto:{{ user.email }}" class="text-decoration-none">
+                                {{ user.email }}
+                            </a>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th><i class="bi bi-at me-2"></i>Username</th>
+                        <td>@{{ user.username }}</td>
+                    </tr>
+                    <tr>
+                        <th><i class="bi bi-person me-2"></i>Full Name</th>
+                        <td>{{ user.fullName ?? 'Not provided' }}</td>
+                    </tr>
+                   
+                    <tr>
+    <th><i class="bi bi-calendar-plus me-2"></i>Registration Date</th>
+    <td>
+        <i class="bi bi-calendar3 me-2"></i>
+        {{ user.createdAt|date('F d, Y \\a\\t h:i A') }}
+        <small class="text-muted ms-2">({{ (('now'|date('U') - user.createdAt|date('U')) / 86400)|round }} days ago)</small>
+    </td>
+</tr>
+<tr>
+    <th><i class="bi bi-clock-history me-2"></i>Last Login</th>
+    <td>
+        <i class="bi bi-clock me-2"></i>
+        {{ user.lastLogin|date('F d, Y \\a\\t h:i A') }}
+        <small class="text-muted ms-2">({{ (('now'|date('U') - user.lastLogin|date('U')) / 86400)|round }} days ago)</small>
+    </td>
+</tr>
+                    <tr>
+                        <th><i class="bi bi-toggle-on me-2"></i>Account Status</th>
+                        <td>
+                            <span class="badge bg-{{ user.accountStatus.badgeClass }}">
+                                {{ user.accountStatus.label }}
+                            </span>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        
+        {# Teams #}
+        <div class="table-card mb-4 fade-in" style="animation-delay: 0.4s;">
+            <div class="table-header">
+                <h5><i class="bi bi-grid-3x3 me-2"></i>Teams <span class="badge bg-primary ms-2">{{ user.teamMemberships|length }}</span></h5>
+            </div>
+            
+            {% if user.teamMemberships|length > 0 %}
+                <div class="table-responsive">
+                    <table class="custom-table table">
+                        <thead>
+                            <tr>
+                                <th>Team</th>
+                                <th>Role</th>
+                                <th>Status</th>
+                                <th>Joined On</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for membership in user.teamMemberships %}
+                                <tr>
+                                    <td>
+                                        <strong><i class="bi bi-trophy me-2"></i>{{ membership.team.name }}</strong>
+                                    </td>
+                                    <td>
+                                        <span class="badge bg-primary">{{ membership.role.label }}</span>
+                                    </td>
+                                    <td>
+                                        <span class="badge bg-{{ membership.status.value == 'ACTIVE' ? 'success' : 'secondary' }}">
+                                            {{ membership.status.label }}
+                                        </span>
+                                    </td>
+                                    <td>
+                                        <small><i class="bi bi-calendar me-1"></i>{{ membership.joinedAt ? membership.joinedAt|date('M d, Y') : 'N/A' }}</small>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            {% else %}
+                <div class="text-center py-5">
+                    <i class="bi bi-grid-3x3" style="font-size: 48px; opacity: 0.2;"></i>
+                    <p class="text-muted mt-3 mb-0">No teams yet</p>
+                    <small class="text-muted">This user hasn't joined any teams</small>
+                </div>
+            {% endif %}
+        </div>
+        
+        {# Coach Applications #}
+        {% if user.coachApplications|length > 0 %}
+            <div class="table-card fade-in" style="animation-delay: 0.5s;">
+                <div class="table-header">
+                    <h5><i class="bi bi-clipboard-check me-2"></i>Coach Applications <span class="badge bg-warning ms-2">{{ user.coachApplications|length }}</span></h5>
+                </div>
+                
+                <div class="table-responsive">
+                    <table class="custom-table table">
+                        <thead>
+                            <tr>
+                                <th>Submission Date</th>
+                                <th>Status</th>
+                                <th>Reviewed On</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for application in user.coachApplications %}
+                                <tr>
+                                    <td>
+                                        <small><i class="bi bi-calendar-check me-1"></i>{{ application.submittedAt|date('M d, Y h:i A') }}</small>
+                                    </td>
+                                    <td>
+                                        <span class="badge bg-{{ application.status.badgeClass }}">
+                                            {{ application.status.label }}
+                                        </span>
+                                    </td>
+                                    <td>
+                                        <small>
+                                            {% if application.reviewedAt %}
+                                                <i class="bi bi-clock-history me-1"></i>{{ application.reviewedAt|date('M d, Y h:i A') }}
+                                            {% else %}
+                                                <span class="text-muted">Not reviewed</span>
+                                            {% endif %}
+                                        </small>
+                                    </td>
+                                    <td>
+                                        <a href="{{ path('admin_coach_applications_show', {id: application.id}) }}" class="btn btn-sm btn-info">
+                                            <i class="bi bi-eye me-1"></i>View
+                                        </a>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
+
+{% block javascripts %}
+<script>
+// Enhanced hover effects for stat cards
+document.querySelectorAll('.stat-card').forEach((card, index) => {
+    card.style.animationDelay = `${index * 0.1}s`;
+    
+    card.addEventListener('mouseenter', function() {
+        this.style.transform = 'translateY(-8px) scale(1.02)';
+    });
+    
+    card.addEventListener('mouseleave', function() {
+        this.style.transform = 'translateY(0) scale(1)';
+    });
+});
+
+// Table row animations
+document.querySelectorAll('.custom-table tbody tr').forEach((row, index) => {
+    row.style.animationDelay = `${index * 0.05}s`;
+});
+</script>
+{% endblock %}
