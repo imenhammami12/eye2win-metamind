@@ -1,0 +1,179 @@
+{% extends 'admin_layout.html.twig' %}
+
+{% block title %}Edit Training Session{% endblock %}
+{% block page_title %}Edit Session{% endblock %}
+
+{% block body %}
+<div class="mb-3 fade-in">
+    <a href="{{ path('admin_planning_sessions', {id: session.planning.id}) }}" class="btn btn-outline-secondary">
+        <i class="bi bi-arrow-left me-2"></i>Back to Sessions
+    </a>
+</div>
+
+<div class="row justify-content-center fade-in" style="animation-delay: 0.1s;">
+    <div class="col-lg-8">
+        <div class="table-card">
+            {# Header Gradient matching Planning Edit (Blue) #}
+            <div class="card-header-gradient" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 1.5rem; border-radius: 16px 16px 0 0;">
+                <h5 class="mb-0 text-white"><i class="bi bi-pencil-square me-2"></i>Edit Session Status</h5>
+            </div>
+            
+            <form method="post" class="p-4" id="editSessionForm" novalidate>
+                
+                <div class="row g-4">
+                    {# Participant Info #}
+                    <div class="col-md-6 form-group-enhanced">
+                        <label class="form-label fw-bold">
+                            <i class="bi bi-person-circle me-1"></i>Participant
+                        </label>
+                        <div class="info-display p-3 rounded border">
+                            <div class="d-flex align-items-center">
+                                <div class="avatar-circle me-3">
+                                    {{ session.user.username|slice(0, 1)|upper }}
+                                </div>
+                                <div>
+                                    <div class="fw-bold">{{ session.user.username }}</div>
+                                    <small class="text-muted">{{ session.user.email }}</small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    {# Joined Date #}
+                    <div class="col-md-6 form-group-enhanced">
+                        <label class="form-label fw-bold">
+                            <i class="bi bi-clock-history me-1"></i>Registration Date
+                        </label>
+                        <div class="info-display p-3 rounded border">
+                            <div class="fw-bold">{{ session.joinedAt|date('F d, Y') }}</div>
+                            <small class="text-muted">{{ session.joinedAt|date('H:i') }}</small>
+                        </div>
+                    </div>
+
+                    {# Planning Info #}
+                    <div class="col-12 form-group-enhanced">
+                        <label class="form-label fw-bold">
+                            <i class="bi bi-calendar-event me-1"></i>Planning Session
+                        </label>
+                        <div class="info-display p-3 rounded border">
+                            <div class="row align-items-center">
+                                <div class="col-md-8">
+                                    <div class="fw-bold mb-2">{{ session.planning.description }}</div>
+                                    <div class="d-flex gap-2 flex-wrap">
+                                        <span class="badge bg-primary">{{ session.planning.type.value }}</span>
+                                        <span class="badge bg-info">{{ session.planning.level.value }}</span>
+                                    </div>
+                                </div>
+                                <div class="col-md-4 text-md-end mt-2 mt-md-0">
+                                    <div class="text-muted small">
+                                        <i class="bi bi-calendar3 me-1"></i>{{ session.planning.date|date('M d, Y') }}
+                                    </div>
+                                    <div class="text-muted small">
+                                        <i class="bi bi-clock me-1"></i>{{ session.planning.time|date('H:i') }}
+                                    </div>
+                                    <div class="text-muted small">
+                                        <i class="bi bi-geo-alt me-1"></i>{{ session.planning.localisation }}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    {# Status Field #}
+                    <div class="col-12 form-group-enhanced">
+                        <label for="status" class="form-label fw-bold">
+                            <i class="bi bi-flag me-1"></i>Session Status 
+                            <span class="required-indicator" style="color: #fa709a;">*</span>
+                        </label>
+                        <select name="status" id="status" class="form-select form-control" required>
+                            <option value="en attente" {{ session.status == 'en attente' ? 'selected' : '' }}>⏳ Pending</option>
+                            <option value="confirmé" {{ session.status == 'confirmé' ? 'selected' : '' }}>✅ Confirmed</option>
+                            <option value="annulé" {{ session.status == 'annulé' ? 'selected' : '' }}>❌ Cancelled</option>
+                        </select>
+                        <small class="text-muted">Update the registration status for this training session</small>
+                    </div>
+                </div>
+
+                {# Action Buttons #}
+                <div class="mt-5 d-flex gap-2 border-top pt-4">
+                    <button type="submit" class="btn btn-success px-4" id="submitBtn">
+                        <i class="bi bi-check-lg me-2"></i>Update Session
+                    </button>
+                    <a href="{{ path('admin_planning_sessions', {id: session.planning.id}) }}" class="btn btn-outline-secondary px-4">
+                        <i class="bi bi-x-lg me-2"></i>Cancel
+                    </a>
+                </div>
+
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block javascripts %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const form = document.getElementById('editSessionForm');
+        
+        // Submit Button Loading State
+        form.addEventListener('submit', function(e) {
+            const btn = document.getElementById('submitBtn');
+            btn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Updating...';
+        });
+
+        // Real-time validation
+        form.querySelectorAll('.form-control, .form-select').forEach(input => {
+            input.addEventListener('blur', function() {
+                if (this.checkValidity()) {
+                    this.classList.add('is-valid');
+                    this.classList.remove('is-invalid');
+                } else {
+                    this.classList.add('is-invalid');
+                    this.classList.remove('is-valid');
+                }
+            });
+        });
+    });
+</script>
+
+<style>
+    /* Reuse styles from Planning Edit */
+    .form-group-enhanced { position: relative; }
+    .form-control.is-valid, .form-select.is-valid { border-color: #43e97b; }
+    .form-control.is-invalid, .form-select.is-invalid { border-color: #fa709a; }
+    
+    .info-display {
+        background: rgba(255, 255, 255, 0.05);
+        border-color: rgba(255, 255, 255, 0.1) !important;
+    }
+    
+    .avatar-circle {
+        width: 50px;
+        height: 50px;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-weight: 700;
+        font-size: 1.3rem;
+    }
+
+    /* Error Message Styling */
+    .invalid-feedback, .text-danger, ul li.text-danger {
+        color: #fa709a !important;
+        font-size: 0.875em;
+        margin-top: 0.25rem;
+        display: block;
+        list-style-type: none;
+        padding-left: 0;
+    }
+    .form-group-enhanced ul, .col-12 ul {
+        list-style: none;
+        padding: 0;
+        margin: 5px 0 0 0;
+        color: #fa709a;
+    }
+</style>
+{% endblock %}

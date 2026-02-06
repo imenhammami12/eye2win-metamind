@@ -1,0 +1,290 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Plannings - EyeTwin{% endblock %}
+
+{% block body %}
+    <!-- breadcrumb -->
+    <section class="breadcrumb breadcrumb_bg" style="position: relative; overflow: hidden; background: #0f172a;">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-12">
+                    <div class="breadcrumb_iner text-center">
+                        <div class="breadcrumb_iner_item">
+                            <h2 style="font-weight: 800; text-transform: uppercase; letter-spacing: 1px; color: #fff;">Our Sessions</h2>
+                            <p style="color: #94a3b8;"><a href="{{ path('app_home') }}" style="color: #cbd5e1;">Home</a> <span style="color: #64748b;">-</span> Planning</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    <!-- breadcrumb end -->
+
+    <!-- planning list -->
+    <section class="blog_part section_padding" style="background-color: #0b1120;">
+        <div class="container">
+            <div class="row justify-content-center">
+                {% for planning in plannings %}
+                    <div class="col-lg-4 col-md-6 mb-5">
+                        <div class="planning-card">
+                            <div class="planning-img-wrapper">
+                                {% if planning.image %}
+                                    <img src="{{ asset('uploads/planning/' ~ planning.image) }}" alt="planning image">
+                                {% else %}
+                                    <img src="https://via.placeholder.com/400x300?text=EyeTwin+Session" alt="placeholder">
+                                {% endif %}
+                                <div class="category-badge">
+                                    {{ planning.type.value }}
+                                </div>
+                                <div class="date-badge">
+                                    <span class="day">{{ planning.date|date('d') }}</span>
+                                    <span class="month">{{ planning.date|date('M') }}</span>
+                                </div>
+                            </div>
+                            
+                            <div class="planning-content">
+                                <div class="d-flex justify-content-between align-items-center mb-3">
+                                    <span class="level-tag"><i class="fas fa-signal me-1"></i> {{ planning.level.value }}</span>
+                                    {% if planning.needPartner %}
+                                        <span class="partner-tag"><i class="fas fa-users me-1"></i> Partner Needed</span>
+                                    {% endif %}
+                                </div>
+
+                                <h3 class="planning-title">{{ planning.description|length > 60 ? planning.description|slice(0, 60) ~ '...' : planning.description }}</h3>
+                                
+                                <div class="planning-details">
+                                    <div class="detail-item">
+                                        <i class="far fa-clock"></i>
+                                        <span>{{ planning.time|date('H:i') }}</span>
+                                    </div>
+                                    <div class="detail-item">
+                                        <i class="fas fa-map-marker-alt"></i>
+                                        <span>{{ planning.localisation }}</span>
+                                    </div>
+                                </div>
+
+                                <hr class="divider">
+
+                                <div class="text-center">
+                                    {% if app.user and planning.id in userSessionPlanningIds %}
+                                        <button class="btn-join" disabled style="opacity: 0.6; cursor: not-allowed;">
+                                            <i class="bi bi-check-circle me-2"></i>Already Joined
+                                        </button>
+                                    {% else %}
+                                        <a href="{{ path('app_planning_join', {id: planning.id}) }}" class="btn-join">Join Session</a>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                {% else %}
+                    <div class="col-lg-8">
+                        <div class="empty-state-card text-center p-5">
+                            <div class="icon-box mb-4">
+                                <i class="fas fa-calendar-times"></i>
+                            </div>
+                            <h3 class="text-white">No planning available</h3>
+                            <p class="text-muted">Come back later to discover our upcoming game sessions.</p>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+    </section>
+
+    <style>
+        /* Dark Theme Variables */
+        :root {
+            --dark-bg: #0b1120;
+            --card-bg: #1e293b;
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --primary-accent: #6366f1; /* Indigo */
+            --card-border: rgba(255,255,255,0.05);
+        }
+
+        /* Card Design */
+        .planning-card {
+            background: var(--card-bg);
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            transition: all 0.4s ease;
+            height: 100%;
+            position: relative;
+            border: 1px solid var(--card-border);
+        }
+
+        .planning-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.5);
+            border-color: rgba(99, 102, 241, 0.3);
+        }
+
+        /* Image Area */
+        .planning-img-wrapper {
+            position: relative;
+            height: 240px;
+            overflow: hidden;
+        }
+
+        .planning-img-wrapper img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.6s ease;
+            filter: brightness(0.9);
+        }
+
+        .planning-card:hover .planning-img-wrapper img {
+            transform: scale(1.05);
+            filter: brightness(1);
+        }
+
+        /* Badges */
+        .category-badge {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            background: rgba(15, 23, 42, 0.9); /* Dark bg */
+            padding: 8px 16px;
+            border-radius: 30px;
+            font-size: 0.85rem;
+            font-weight: 700;
+            color: #fff;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            border: 1px solid rgba(255,255,255,0.1);
+            backdrop-filter: blur(4px);
+        }
+
+        .date-badge {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: var(--primary-accent);
+            color: white;
+            width: 60px;
+            height: 60px;
+            border-radius: 12px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 15px rgba(99, 102, 241, 0.4);
+        }
+
+        .date-badge .day {
+            font-size: 1.4rem;
+            font-weight: 800;
+            line-height: 1;
+        }
+
+        .date-badge .month {
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            font-weight: 600;
+        }
+
+        /* Content Area */
+        .planning-content {
+            padding: 25px;
+        }
+
+        .level-tag {
+            font-size: 0.85rem;
+            color: #ccc;
+            background: rgba(255,255,255,0.05);
+            padding: 5px 12px;
+            border-radius: 8px;
+            font-weight: 600;
+            border: 1px solid rgba(255,255,255,0.05);
+        }
+
+        .partner-tag {
+            font-size: 0.75rem;
+            color: #34d399; /* Emerald 400 */
+            background: rgba(52, 211, 153, 0.1);
+            padding: 5px 12px;
+            border-radius: 8px;
+            font-weight: 700;
+            border: 1px solid rgba(52, 211, 153, 0.2);
+        }
+
+        .planning-title {
+            font-size: 1.25rem;
+            font-weight: 700;
+            margin-bottom: 20px;
+            line-height: 1.4;
+            color: var(--text-main);
+            min-height: 56px;
+        }
+
+        .planning-details {
+            display: flex;
+            gap: 20px;
+            color: var(--text-muted);
+            font-size: 0.95rem;
+            margin-bottom: 20px;
+        }
+
+        .detail-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .detail-item i {
+            color: var(--primary-accent);
+        }
+
+        .divider {
+            margin: 0 0 20px 0;
+            border-top: 1px solid rgba(255,255,255,0.1);
+        }
+
+        /* Button */
+        .btn-join {
+            background: linear-gradient(45deg, #6366f1, #4f46e5);
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 50px;
+            font-weight: 600;
+            width: 100%;
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 15px rgba(99, 102, 241, 0.3);
+            text-decoration: none;
+            display: block;
+            text-align: center;
+        }
+
+        .btn-join:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(99, 102, 241, 0.5);
+            color: white;
+            filter: brightness(1.1);
+        }
+
+        /* Empty State */
+        .empty-state-card {
+            background: var(--card-bg);
+            border-radius: 20px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+            border: 1px solid var(--card-border);
+        }
+        
+        .icon-box {
+            display: inline-flex;
+            width: 80px;
+            height: 80px;
+            background: rgba(255,255,255,0.05);
+            border-radius: 50%;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-muted);
+            font-size: 2rem;
+        }
+    </style>
+{% endblock %}

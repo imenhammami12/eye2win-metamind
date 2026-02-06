@@ -1,4 +1,5 @@
 <?php
+// src/Controller/UserController.php
 
 namespace App\Controller;
 
@@ -19,24 +20,37 @@ use Symfony\Component\HttpFoundation\File\Exception\FileException;
 class UserController extends AbstractController
 {
     #[Route('/', name: 'user_profile')]
-    public function profile(): Response
+    public function profile(EntityManagerInterface $em): Response
     {
         $this->denyAccessUnlessGranted('ROLE_USER');
         
         /** @var User $user */
         $user = $this->getUser();
         
-        // Récupérer la dernière demande de coach
-        $latestCoachApplication = null;
-        if (!$user->getCoachApplications()->isEmpty()) {
-            $applications = $user->getCoachApplications()->toArray();
-            usort($applications, fn($a, $b) => $b->getSubmittedAt() <=> $a->getSubmittedAt());
-            $latestCoachApplication = $applications[0];
+        // Récupérer toutes les demandes de coach de l'utilisateur
+        $coachApplications = $em->getRepository(CoachApplication::class)
+            ->findBy(['user' => $user], ['submittedAt' => 'DESC']);
+        
+        // Déterminer la dernière demande et son statut
+        $latestCoachApplication = !empty($coachApplications) ? $coachApplications[0] : null;
+        
+        // Vérifier s'il y a une demande en attente
+        $hasPendingApplication = false;
+        if ($latestCoachApplication && $latestCoachApplication->getStatus() === ApplicationStatus::PENDING) {
+            $hasPendingApplication = true;
         }
+        
+        // Statistiques basiques
+        $stats = [
+            'teams_count' => $user->getTeamMemberships()->count(),
+            'owned_teams_count' => $user->getOwnedTeams()->count(),
+        ];
         
         return $this->render('user/profile.html.twig', [
             'user' => $user,
             'latestCoachApplication' => $latestCoachApplication,
+            'hasPendingApplication' => $hasPendingApplication,
+            'stats' => $stats,
         ]);
     }
 
@@ -69,13 +83,13 @@ class UserController extends AbstractController
                     );
                     $user->setProfilePicture($newFilename);
                 } catch (FileException $e) {
-                    $this->addFlash('error', 'Erreur lors de l\'upload de l\'image.');
+                    $this->addFlash('error', 'Error uploading image.');
                 }
             }
 
             $em->flush();
             
-            $this->addFlash('success', 'Votre profil a été mis à jour avec succès !');
+            $this->addFlash('success', 'Your profile has been successfully updated!');
             return $this->redirectToRoute('user_profile');
         }
 
@@ -107,71 +121,70 @@ class UserController extends AbstractController
         ]);
     }
 
-   
     #[Route('/apply-coach', name: 'user_apply_coach')]
-public function applyCoach(
-    Request $request, 
-    EntityManagerInterface $em,
-    SluggerInterface $slugger
-): Response {
-    $this->denyAccessUnlessGranted('ROLE_USER');
-    
-    /** @var User $user */
-    $user = $this->getUser();
-    
-    // Vérifier si l'utilisateur a déjà une demande en cours
-    $existingApplication = $em->getRepository(CoachApplication::class)
-        ->findOneBy([
-            'user' => $user,
-            'status' => ApplicationStatus::PENDING
-        ]);
+    public function applyCoach(
+        Request $request, 
+        EntityManagerInterface $em,
+        SluggerInterface $slugger
+    ): Response {
+        $this->denyAccessUnlessGranted('ROLE_USER');
         
-    if ($existingApplication) {
-        $this->addFlash('warning', 'Vous avez déjà une demande en cours de traitement.');
-        return $this->redirectToRoute('user_profile');
-    }
-    
-    // Vérifier si l'utilisateur est déjà coach
-    if (in_array('ROLE_COACH', $user->getRoles())) {
-        $this->addFlash('info', 'Vous êtes déjà coach !');
-        return $this->redirectToRoute('user_profile');
-    }
-    
-    $application = new CoachApplication();
-    $application->setUser($user);
-    
-    $form = $this->createForm(CoachApplicationType::class, $application);
-    $form->handleRequest($request);
-
-    if ($form->isSubmitted() && $form->isValid()) {
-        // Gérer l'upload du CV
-        $cvFile = $form->get('cvFileUpload')->getData();
+        /** @var User $user */
+        $user = $this->getUser();
         
-        if ($cvFile) {
-            $originalFilename = pathinfo($cvFile->getClientOriginalName(), PATHINFO_FILENAME);
-            $safeFilename = $slugger->slug($originalFilename);
-            $newFilename = $safeFilename.'-'.uniqid().'.'.$cvFile->guessExtension();
-
-            try {
-                $cvFile->move(
-                    $this->getParameter('cv_directory'),
-                    $newFilename
-                );
-                $application->setCvFile($newFilename);
-            } catch (FileException $e) {
-                $this->addFlash('error', 'Erreur lors de l\'upload du CV.');
-            }
+        // Vérifier si l'utilisateur est déjà coach
+        if (in_array('ROLE_COACH', $user->getRoles())) {
+            $this->addFlash('info', 'You are already a coach!');
+            return $this->redirectToRoute('user_profile');
         }
         
-        $em->persist($application);
-        $em->flush();
+        // Vérifier si l'utilisateur a déjà une demande en cours
+        $existingApplication = $em->getRepository(CoachApplication::class)
+            ->findOneBy([
+                'user' => $user,
+                'status' => ApplicationStatus::PENDING
+            ]);
+            
+        if ($existingApplication) {
+            $this->addFlash('warning', 'You already have a pending application.');
+            return $this->redirectToRoute('user_profile');
+        }
         
-        $this->addFlash('success', 'Votre demande pour devenir coach a été soumise avec succès !');
-        return $this->redirectToRoute('user_profile');
-    }
+        $application = new CoachApplication();
+        $application->setUser($user);
+        
+        $form = $this->createForm(CoachApplicationType::class, $application);
+        $form->handleRequest($request);
 
-    return $this->render('coach/application.html.twig', [
-        'form' => $form->createView(),
-    ]);
-}
+        if ($form->isSubmitted() && $form->isValid()) {
+            // Gérer l'upload du CV
+            $cvFile = $form->get('cvFileUpload')->getData();
+            
+            if ($cvFile) {
+                $originalFilename = pathinfo($cvFile->getClientOriginalName(), PATHINFO_FILENAME);
+                $safeFilename = $slugger->slug($originalFilename);
+                $newFilename = $safeFilename.'-'.uniqid().'.'.$cvFile->guessExtension();
+
+                try {
+                    $cvFile->move(
+                        $this->getParameter('cv_directory'),
+                        $newFilename
+                    );
+                    $application->setCvFile($newFilename);
+                } catch (FileException $e) {
+                    $this->addFlash('error', 'Error uploading CV.');
+                }
+            }
+            
+            $em->persist($application);
+            $em->flush();
+            
+            $this->addFlash('success', 'Your coach application has been submitted successfully!');
+            return $this->redirectToRoute('user_profile');
+        }
+
+        return $this->render('coach/application.html.twig', [
+            'form' => $form->createView(),
+        ]);
+    }
 }
