@@ -65,7 +65,7 @@
                 <a href="{{ path('admin_coach_applications_index') }}" 
                    class="{{ app.request.attributes.get('_route') starts with 'admin_coach_applications' ? 'active' : '' }}">
                     <i class="bi bi-clipboard-check"></i>
-                    <span>Demandes Coach</span>
+                    <span> Coach Application </span>
                     {% if pendingApplicationsCount|default(0) > 0 %}
                         <span class="badge bg-danger">{{ pendingApplicationsCount }}</span>
                     {% endif %}

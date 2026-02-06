@@ -4,9 +4,14 @@
 {% block page_title %}Certified Coaches{% endblock %}
 
 {% block body %}
-<div class="mb-3 fade-in">
+<div class="mb-3 fade-in d-flex justify-content-between align-items-center">
     <a href="{{ path('admin_coach_applications_index') }}" class="btn btn-outline-secondary">
         <i class="bi bi-arrow-left me-2"></i>Back to Applications
+    </a>
+    
+    {# Export Button #}
+    <a href="{{ path('admin_coaches_export') }}" class="btn btn-success">
+        <i class="bi bi-file-earmark-excel me-2"></i>Export to Excel
     </a>
 </div>
 

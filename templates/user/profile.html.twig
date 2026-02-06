@@ -175,33 +175,7 @@
                     </div>
                 </div>
                 
-                <!-- My Teams -->
-                {% if user.teamMemberships|length > 0 %}
-                <div class="profile_card mt-4">
-                    <h4 class="card_title"><i class="fas fa-users"></i> My Teams</h4>
-                    <div class="teams_list">
-                        {% for membership in user.teamMemberships %}
-                        <a href="{{ path('team_show', {id: membership.team.id}) }}" class="team_item">
-                            <div class="team_header">
-                                <h5 class="team_name">{{ membership.team.name }}</h5>
-                                {% if membership.role.value == 'owner' %}
-                                    <span class="team_badge badge_owner">Owner</span>
-                                {% elseif membership.role.value == 'co_captain' %}
-                                    <span class="team_badge badge_captain">Co-Captain</span>
-                                {% else %}
-                                    <span class="team_badge badge_member">Member</span>
-                                {% endif %}
-                            </div>
-                            <p class="team_description">
-                                {{ membership.team.description|length > 100 ? membership.team.description|slice(0, 100) ~ '...' : membership.team.description }}
-                            </p>
-                            <small class="team_date">Member since {{ membership.joinedAt|date('m/d/Y') }}</small>
-                        </a>
-                        {% endfor %}
-                    </div>
-                </div>
-                {% endif %}
-                
+          
                 <!-- Coach Application Status (seulement si l'utilisateur n'est PAS coach) -->
                 {% if latestCoachApplication and not is_granted('ROLE_COACH') %}
                 <div class="profile_card mt-4">
