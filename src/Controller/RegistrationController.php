@@ -3,6 +3,7 @@
 namespace App\Controller;
 
 use App\Entity\User;
+use App\Entity\AccountStatus;
 use App\Form\RegistrationFormType;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -104,11 +105,26 @@ class RegistrationController extends AbstractController
                 ]);
             }
             
-            // 8. Email uniqueness check
+            // 8. Email uniqueness and account status check
             $existingUserByEmail = $entityManager->getRepository(User::class)
                 ->findOneBy(['email' => $user->getEmail()]);
             
             if ($existingUserByEmail) {
+                // Check if the existing account is banned or suspended
+                if ($existingUserByEmail->getAccountStatus() === AccountStatus::BANNED) {
+                    $this->addFlash('error', 'This email address is associated with a banned account. You cannot register with this email.');
+                    return $this->render('registration/register.html.twig', [
+                        'registrationForm' => $form->createView(),
+                    ]);
+                }
+                
+                if ($existingUserByEmail->getAccountStatus() === AccountStatus::SUSPENDED) {
+                    $this->addFlash('error', 'This email address is associated with a suspended account. Please contact support to resolve this issue.');
+                    return $this->render('registration/register.html.twig', [
+                        'registrationForm' => $form->createView(),
+                    ]);
+                }
+                
                 $this->addFlash('error', 'This email address is already registered.');
                 return $this->render('registration/register.html.twig', [
                     'registrationForm' => $form->createView(),

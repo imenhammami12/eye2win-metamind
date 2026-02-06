@@ -12,10 +12,10 @@ enum AccountStatus: string
     public function getLabel(): string
     {
         return match($this) {
-            self::ACTIVE => 'Actif',
-            self::SUSPENDED => 'Suspendu',
-            self::BANNED => 'Banni',
-            self::PENDING => 'En attente',
+            self::ACTIVE => 'Active',
+            self::SUSPENDED => 'Suspended',
+            self::BANNED => 'Banned',
+            self::PENDING => 'Pending',
         };
     }
 
@@ -26,6 +26,16 @@ enum AccountStatus: string
             self::SUSPENDED => 'warning',
             self::BANNED => 'danger',
             self::PENDING => 'info',
+        };
+    }
+
+    public function getDescription(): string
+    {
+        return match($this) {
+            self::ACTIVE => 'Account is active and can access the application',
+            self::SUSPENDED => 'Account is temporarily suspended. Access is restricted until reactivated.',
+            self::BANNED => 'Account is permanently banned. User cannot access the application.',
+            self::PENDING => 'Account is pending approval from an administrator',
         };
     }
 }

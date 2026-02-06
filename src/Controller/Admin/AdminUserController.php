@@ -28,19 +28,19 @@ class AdminUserController extends AbstractController
         $queryBuilder = $userRepository->createQueryBuilder('u')
             ->orderBy('u.createdAt', 'DESC');
         
-        // Recherche par nom, email ou username
+        // Search by name, email or username
         if ($search) {
             $queryBuilder->andWhere('u.username LIKE :search OR u.email LIKE :search OR u.fullName LIKE :search')
                 ->setParameter('search', '%' . $search . '%');
         }
         
-        // Filtre par rôle
+        // Filter by role
         if ($roleFilter) {
             $queryBuilder->andWhere('u.rolesJson LIKE :role')
                 ->setParameter('role', '%' . $roleFilter . '%');
         }
         
-        // Filtre par statut
+        // Filter by status
         if ($statusFilter) {
             $queryBuilder->andWhere('u.accountStatus = :status')
                 ->setParameter('status', $statusFilter);
@@ -60,10 +60,10 @@ class AdminUserController extends AbstractController
     #[Route('/{id}', name: 'admin_users_show', requirements: ['id' => '\d+'])]
     public function show(User $user): Response
     {
-        // Calculer les statistiques de l'utilisateur
+        // Calculate user statistics
         $stats = [
-            'totalConnections' => 0, // À implémenter avec un système de tracking
-            'totalTimeSpent' => 0,   // À implémenter
+            'totalConnections' => 0,
+            'totalTimeSpent' => 0,
             'teamsCount' => $user->getTeamMemberships()->count(),
             'ownedTeamsCount' => $user->getOwnedTeams()->count(),
             'notificationsCount' => $user->getNotifications()->count(),
@@ -83,18 +83,39 @@ class AdminUserController extends AbstractController
         EntityManagerInterface $em
     ): Response {
         if (!$this->isCsrfTokenValid('edit-role-' . $user->getId(), $request->request->get('_token'))) {
-            throw $this->createAccessDeniedException('Token CSRF invalide');
+            throw $this->createAccessDeniedException('Invalid CSRF token');
+        }
+        
+        /** @var User $currentUser */
+        $currentUser = $this->getUser();
+        
+        // Prevent modifying own role
+        if ($user->getId() === $currentUser->getId()) {
+            $this->addFlash('error', 'You cannot modify your own role');
+            return $this->redirectToRoute('admin_users_show', ['id' => $user->getId()]);
         }
         
         $newRole = $request->request->get('role');
         $validRoles = ['ROLE_USER', 'ROLE_COACH', 'ROLE_ADMIN'];
         
         if (!in_array($newRole, $validRoles)) {
-            $this->addFlash('error', 'Rôle invalide');
+            $this->addFlash('error', 'Invalid role');
             return $this->redirectToRoute('admin_users_show', ['id' => $user->getId()]);
         }
         
-        // Conserver ROLE_USER et ajouter le nouveau rôle
+        // Only SUPER_ADMIN can assign ROLE_ADMIN
+        if ($newRole === 'ROLE_ADMIN' && !$this->isGranted('ROLE_SUPER_ADMIN')) {
+            $this->addFlash('error', 'Only Super Administrators can assign the Admin role');
+            return $this->redirectToRoute('admin_users_show', ['id' => $user->getId()]);
+        }
+        
+        // Only SUPER_ADMIN can modify another admin's role
+        if (in_array('ROLE_ADMIN', $user->getRoles()) && !$this->isGranted('ROLE_SUPER_ADMIN')) {
+            $this->addFlash('error', 'Only Super Administrators can modify an Administrator\'s role');
+            return $this->redirectToRoute('admin_users_show', ['id' => $user->getId()]);
+        }
+        
+        // Keep ROLE_USER and add the new role
         $roles = ['ROLE_USER'];
         if ($newRole !== 'ROLE_USER') {
             $roles[] = $newRole;
@@ -102,18 +123,18 @@ class AdminUserController extends AbstractController
         
         $user->setRoles($roles);
         
-        // Créer un audit log
+        // Create audit log
         $this->createAuditLog(
             $em,
             'USER_ROLE_CHANGED',
             'User',
             $user->getId(),
-            "Rôle changé en : $newRole"
+            "Role changed to: $newRole"
         );
         
         $em->flush();
         
-        $this->addFlash('success', 'Rôle de l\'utilisateur modifié avec succès');
+        $this->addFlash('success', 'User role updated successfully');
         return $this->redirectToRoute('admin_users_show', ['id' => $user->getId()]);
     }
     
@@ -124,7 +145,22 @@ class AdminUserController extends AbstractController
         EntityManagerInterface $em
     ): Response {
         if (!$this->isCsrfTokenValid('suspend-' . $user->getId(), $request->request->get('_token'))) {
-            throw $this->createAccessDeniedException('Token CSRF invalide');
+            throw $this->createAccessDeniedException('Invalid CSRF token');
+        }
+        
+        /** @var User $currentUser */
+        $currentUser = $this->getUser();
+        
+        // Prevent self-suspension
+        if ($user->getId() === $currentUser->getId()) {
+            $this->addFlash('error', 'You cannot suspend your own account');
+            return $this->redirectToRoute('admin_users_show', ['id' => $user->getId()]);
+        }
+        
+        // Only SUPER_ADMIN can suspend admins
+        if (in_array('ROLE_ADMIN', $user->getRoles()) && !$this->isGranted('ROLE_SUPER_ADMIN')) {
+            $this->addFlash('error', 'Only Super Administrators can suspend Administrators');
+            return $this->redirectToRoute('admin_users_show', ['id' => $user->getId()]);
         }
         
         $user->setAccountStatus(AccountStatus::SUSPENDED);
@@ -134,12 +170,12 @@ class AdminUserController extends AbstractController
             'USER_SUSPENDED',
             'User',
             $user->getId(),
-            'Compte suspendu par un administrateur'
+            'Account suspended by administrator (temporary restriction)'
         );
         
         $em->flush();
         
-        $this->addFlash('warning', 'Utilisateur suspendu avec succès');
+        $this->addFlash('warning', 'User account suspended successfully. The user will not be able to log in until reactivated.');
         return $this->redirectToRoute('admin_users_show', ['id' => $user->getId()]);
     }
     
@@ -150,7 +186,22 @@ class AdminUserController extends AbstractController
         EntityManagerInterface $em
     ): Response {
         if (!$this->isCsrfTokenValid('ban-' . $user->getId(), $request->request->get('_token'))) {
-            throw $this->createAccessDeniedException('Token CSRF invalide');
+            throw $this->createAccessDeniedException('Invalid CSRF token');
+        }
+        
+        /** @var User $currentUser */
+        $currentUser = $this->getUser();
+        
+        // Prevent self-banning
+        if ($user->getId() === $currentUser->getId()) {
+            $this->addFlash('error', 'You cannot ban your own account');
+            return $this->redirectToRoute('admin_users_show', ['id' => $user->getId()]);
+        }
+        
+        // Only SUPER_ADMIN can ban admins
+        if (in_array('ROLE_ADMIN', $user->getRoles()) && !$this->isGranted('ROLE_SUPER_ADMIN')) {
+            $this->addFlash('error', 'Only Super Administrators can ban Administrators');
+            return $this->redirectToRoute('admin_users_show', ['id' => $user->getId()]);
         }
         
         $user->setAccountStatus(AccountStatus::BANNED);
@@ -160,12 +211,12 @@ class AdminUserController extends AbstractController
             'USER_BANNED',
             'User',
             $user->getId(),
-            'Compte banni par un administrateur'
+            'Account permanently banned by administrator'
         );
         
         $em->flush();
         
-        $this->addFlash('danger', 'Utilisateur banni avec succès');
+        $this->addFlash('danger', 'User account banned successfully. This is a permanent action - the user will not be able to log in or register with this email.');
         return $this->redirectToRoute('admin_users_show', ['id' => $user->getId()]);
     }
     
@@ -176,9 +227,18 @@ class AdminUserController extends AbstractController
         EntityManagerInterface $em
     ): Response {
         if (!$this->isCsrfTokenValid('activate-' . $user->getId(), $request->request->get('_token'))) {
-            throw $this->createAccessDeniedException('Token CSRF invalide');
+            throw $this->createAccessDeniedException('Invalid CSRF token');
         }
         
+        // Only SUPER_ADMIN can reactivate banned admins
+        if (in_array('ROLE_ADMIN', $user->getRoles()) && 
+            $user->getAccountStatus() === AccountStatus::BANNED && 
+            !$this->isGranted('ROLE_SUPER_ADMIN')) {
+            $this->addFlash('error', 'Only Super Administrators can reactivate banned Administrators');
+            return $this->redirectToRoute('admin_users_show', ['id' => $user->getId()]);
+        }
+        
+        $previousStatus = $user->getAccountStatus()->value;
         $user->setAccountStatus(AccountStatus::ACTIVE);
         
         $this->createAuditLog(
@@ -186,12 +246,12 @@ class AdminUserController extends AbstractController
             'USER_ACTIVATED',
             'User',
             $user->getId(),
-            'Compte réactivé par un administrateur'
+            "Account reactivated by administrator (was: $previousStatus)"
         );
         
         $em->flush();
         
-        $this->addFlash('success', 'Utilisateur réactivé avec succès');
+        $this->addFlash('success', 'User account reactivated successfully. The user can now log in normally.');
         return $this->redirectToRoute('admin_users_show', ['id' => $user->getId()]);
     }
     
@@ -202,7 +262,22 @@ class AdminUserController extends AbstractController
         EntityManagerInterface $em
     ): Response {
         if (!$this->isCsrfTokenValid('delete-' . $user->getId(), $request->request->get('_token'))) {
-            throw $this->createAccessDeniedException('Token CSRF invalide');
+            throw $this->createAccessDeniedException('Invalid CSRF token');
+        }
+        
+        /** @var User $currentUser */
+        $currentUser = $this->getUser();
+        
+        // Prevent self-deletion
+        if ($user->getId() === $currentUser->getId()) {
+            $this->addFlash('error', 'You cannot delete your own account');
+            return $this->redirectToRoute('admin_users_show', ['id' => $user->getId()]);
+        }
+        
+        // Only SUPER_ADMIN can delete admins
+        if (in_array('ROLE_ADMIN', $user->getRoles()) && !$this->isGranted('ROLE_SUPER_ADMIN')) {
+            $this->addFlash('error', 'Only Super Administrators can delete Administrators');
+            return $this->redirectToRoute('admin_users_show', ['id' => $user->getId()]);
         }
         
         $userId = $user->getId();
@@ -213,13 +288,13 @@ class AdminUserController extends AbstractController
             'USER_DELETED',
             'User',
             $userId,
-            "Utilisateur $username supprimé par un administrateur"
+            "User $username permanently deleted by administrator"
         );
         
         $em->remove($user);
         $em->flush();
         
-        $this->addFlash('success', 'Utilisateur supprimé avec succès');
+        $this->addFlash('success', 'User deleted successfully');
         return $this->redirectToRoute('admin_users_index');
     }
     
@@ -231,7 +306,7 @@ class AdminUserController extends AbstractController
     ): Response {
         if ($request->isMethod('POST')) {
             if (!$this->isCsrfTokenValid('create-user', $request->request->get('_token'))) {
-                throw $this->createAccessDeniedException('Token CSRF invalide');
+                throw $this->createAccessDeniedException('Invalid CSRF token');
             }
             
             $user = new User();
@@ -243,6 +318,13 @@ class AdminUserController extends AbstractController
             $user->setPassword($password);
             
             $role = $request->request->get('role', 'ROLE_USER');
+            
+            // Only SUPER_ADMIN can create admins
+            if ($role === 'ROLE_ADMIN' && !$this->isGranted('ROLE_SUPER_ADMIN')) {
+                $this->addFlash('error', 'Only Super Administrators can create Administrator accounts');
+                return $this->render('admin/users/create.html.twig');
+            }
+            
             $roles = ['ROLE_USER'];
             if ($role !== 'ROLE_USER') {
                 $roles[] = $role;
@@ -254,13 +336,13 @@ class AdminUserController extends AbstractController
                 'USER_CREATED',
                 'User',
                 null,
-                "Nouvel utilisateur créé : " . $user->getUsername()
+                "New user created: " . $user->getUsername() . " with role: $role"
             );
             
             $em->persist($user);
             $em->flush();
             
-            $this->addFlash('success', 'Utilisateur créé avec succès');
+            $this->addFlash('success', 'User created successfully');
             return $this->redirectToRoute('admin_users_show', ['id' => $user->getId()]);
         }
         
@@ -274,8 +356,11 @@ class AdminUserController extends AbstractController
         ?int $entityId,
         string $details
     ): void {
+        /** @var User $currentUser */
+        $currentUser = $this->getUser();
+        
         $auditLog = new AuditLog();
-        $auditLog->setUser($this->getUser());
+        $auditLog->setUser($currentUser);
         $auditLog->setAction($action);
         $auditLog->setEntityType($entityType);
         $auditLog->setEntityId($entityId);
