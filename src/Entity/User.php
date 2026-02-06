@@ -92,6 +92,9 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\OneToMany(mappedBy: 'user', targetEntity: AuditLog::class)]
     private Collection $auditLogs;
 
+    #[ORM\OneToMany(mappedBy: 'user', targetEntity: TrainingSession::class)]
+    private Collection $trainingSessions;
+
     public function __construct()
     {
         $this->ownedTeams = new ArrayCollection();
@@ -99,6 +102,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         $this->coachApplications = new ArrayCollection();
         $this->notifications = new ArrayCollection();
         $this->auditLogs = new ArrayCollection();
+        $this->trainingSessions = new ArrayCollection();
         $this->createdAt = new \DateTime();
         $this->lastLogin = new \DateTime();
         $this->accountStatus = AccountStatus::ACTIVE;
@@ -274,5 +278,13 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function isActive(): bool
     {
         return $this->accountStatus === AccountStatus::ACTIVE;
+    }
+
+    /**
+     * @return Collection<int, TrainingSession>
+     */
+    public function getTrainingSessions(): Collection
+    {
+        return $this->trainingSessions;
     }
 }
