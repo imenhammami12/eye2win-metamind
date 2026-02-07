@@ -8,6 +8,7 @@ use App\Form\ChannelType;
 use App\Form\MessageType;
 use App\Repository\ChannelRepository;
 use App\Repository\MessageRepository;
+use App\Repository\NotificationRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -18,12 +19,17 @@ use Symfony\Component\Security\Http\Attribute\IsGranted;
 class ChannelController extends AbstractController
 {
     #[Route('/channels', name: 'community_channels_index')]
-    public function index(ChannelRepository $repo): Response
+    public function index(ChannelRepository $repo, NotificationRepository $notificationRepo): Response
     {
         $channels = $repo->findVisibleForUser();
+        $channelNotifications = [];
+        if ($this->getUser()) {
+            $channelNotifications = $notificationRepo->findChannelNotificationsForUser($this->getUser());
+        }
 
         return $this->render('community/channel/index.html.twig', [
             'channels' => $channels,
+            'channelNotifications' => $channelNotifications,
         ]);
     }
 
@@ -72,14 +78,37 @@ class ChannelController extends AbstractController
             throw $this->createAccessDeniedException("Channel non accessible.");
         }
 
-        $messages = $messageRepo->findForChannelVisible($channel->getId());
+        //$messages = $messageRepo->findForChannelVisible($channel->getId());
+        $messages = $messageRepo->findForChannelAll($channel->getId());
+        $editId = $request->query->getInt('edit', 0);
+        $editFormView = null;
+
+        if ($editId > 0 && $this->isGranted('ROLE_USER')) {
+            $messageToEdit = $messageRepo->find($editId);
+
+            if (
+                $messageToEdit
+                && $messageToEdit->getChannel()->getId() === $channel->getId()
+                && $messageToEdit->getSenderEmail() === $this->getUser()->getUserIdentifier()
+                && !$messageToEdit->isDeleted()
+            ) {
+                $editForm = $this->createForm(MessageType::class, $messageToEdit, [
+                    'action' => $this->generateUrl('community_message_edit', ['id' => $messageToEdit->getId()]),
+                    'method' => 'POST',
+                ]);
+
+                $editFormView = $editForm->createView();
+            }
+        }
+
 
         // Message form only if logged in
         $message = new Message();
         $form = $this->createForm(MessageType::class, $message);
         $form->handleRequest($request);
 
-        if ($this->isGranted('ROLE_USER') && $form->isSubmitted() && $form->isValid()) {
+        if ($this->isGranted('ROLE_USER') && $form->isSubmitted() && $form->isValid())
+        {
             $now = new \DateTimeImmutable();
             $user = $this->getUser();
 
@@ -96,10 +125,13 @@ class ChannelController extends AbstractController
             return $this->redirectToRoute('community_channels_show', ['id' => $channel->getId()]);
         }
 
+
         return $this->render('community/channel/show.html.twig', [
             'channel' => $channel,
             'messages' => $messages,
-            'messageForm' => $form,
+            'messageForm' => $form->createView(),
+            'editId' => $editId,
+            'editForm' => $editFormView,
         ]);
     }
 

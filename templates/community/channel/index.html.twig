@@ -7,8 +7,41 @@
             {% if is_granted('ROLE_USER') %}
                 <a class="btn btn-danger" href="{{ path('community_channels_new') }}">+ Nouveau Channel</a>
             {% endif %}
-
         </div>
+
+        {# Notifications (channel approval / rejection by admin) #}
+        {% if is_granted('ROLE_USER') and channelNotifications|default([])|length > 0 %}
+            <div class="card mb-4 border-0 shadow-sm" style="background: rgba(255,255,255,0.05);">
+                <div class="card-header d-flex align-items-center" style="background: rgba(0,0,0,0.2); border-bottom: 1px solid rgba(255,255,255,0.08);">
+                    <i class="fas fa-bell me-2"></i>
+                    <strong>Channel notifications</strong>
+                </div>
+                <div class="card-body p-0">
+                    <ul class="list-group list-group-flush">
+                        {% for notif in channelNotifications %}
+                            <li class="list-group-item d-flex justify-content-between align-items-start flex-wrap gap-2 {{ notif.read ? '' : 'list-group-item-primary' }}" style="background: rgba(255,255,255,0.03); border-color: rgba(255,255,255,0.06);">
+                                <div class="flex-grow-1">
+                                    <span class="me-2">{{ notif.type.getIcon() }}</span>
+                                    <span class="{{ notif.read ? 'text-muted' : '' }}">{{ notif.message }}</span>
+                                    <small class="d-block text-muted mt-1">{{ notif.createdAt|date('d/m/Y H:i') }}</small>
+                                </div>
+                                <div class="d-flex gap-1 align-items-center">
+                                    {% if notif.link %}
+                                        <a href="{{ notif.link }}" class="btn btn-sm btn-outline-light">View</a>
+                                    {% endif %}
+                                    {% if not notif.read %}
+                                        <form method="post" action="{{ path('user_notification_read', { id: notif.id }) }}" class="d-inline">
+                                            <input type="hidden" name="_token" value="{{ csrf_token('notification_read_' ~ notif.id) }}">
+                                            <button type="submit" class="btn btn-sm btn-outline-secondary">Mark read</button>
+                                        </form>
+                                    {% endif %}
+                                </div>
+                            </li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            </div>
+        {% endif %}
 
         {% for c in channels %}
             <div class="card mb-2">

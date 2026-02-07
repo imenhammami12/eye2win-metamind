@@ -71,4 +71,43 @@ class ChannelRepository extends ServiceEntityRepository
             ->getQuery()->getResult();
     }
 
+    public function findAdminList(string $q, string $status, string $type, string $active): array
+    {
+        $qb = $this->createQueryBuilder('c');
+
+        // Search
+        if ($q !== '') {
+            $qb->andWhere('LOWER(c.name) LIKE :q OR LOWER(c.game) LIKE :q OR LOWER(c.createdBy) LIKE :q')
+                ->setParameter('q', '%'.mb_strtolower($q).'%');
+        }
+
+        // Status
+        if ($status !== 'all') {
+            $qb->andWhere('c.status = :status')->setParameter('status', $status);
+        }
+
+        // Type
+        if ($type !== 'all') {
+            $qb->andWhere('c.type = :type')->setParameter('type', $type);
+        }
+
+        // Active
+        if ($active !== 'all') {
+            $qb->andWhere('c.isActive = :active')->setParameter('active', $active === '1');
+        }
+
+        return $qb->orderBy('c.createdAt', 'DESC')->getQuery()->getResult();
+    }
+
+    public function countByStatus(string $status): int
+    {
+        return (int) $this->createQueryBuilder('c')
+            ->select('COUNT(c.id)')
+            ->andWhere('c.status = :s')
+            ->setParameter('s', $status)
+            ->getQuery()
+            ->getSingleScalarResult();
+    }
+
+
 }

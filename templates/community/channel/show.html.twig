@@ -11,26 +11,53 @@
             {% for m in messages %}
                 <div class="card mb-2">
                     <div class="card-body">
+
                         <div class="d-flex justify-content-between">
                             <strong>{{ m.senderName }}</strong>
                             <small>{{ m.sentAt|date('d/m/Y H:i') }}</small>
                         </div>
-                        <div class="mt-2">{{ m.content }}</div>
 
-                        {% if app.user and m.senderEmail == app.user.userIdentifier %}
+                        {# ✅ INLINE EDIT MODE #}
+                        {% if editId is defined and editId == m.id and editForm is not null %}
+                            {{ form_start(editForm) }}
+                            {{ form_row(editForm.content) }}
+                            <button class="btn btn-danger btn-sm mt-2">Sauver</button>
+                            <a class="btn btn-secondary btn-sm mt-2"
+                               href="{{ path('community_channels_show', {id: channel.id}) }}">
+                                Annuler
+                            </a>
+                            {{ form_end(editForm) }}
+
+                        {% else %}
+
                             <div class="mt-2">
-                                <a class="btn btn-sm btn-outline-warning" href="{{ path('community_message_edit', {id: m.id}) }}">Edit</a>
-                                <form method="post" action="{{ path('community_message_delete', {id: m.id}) }}" style="display:inline;">
-                                    <input type="hidden" name="_token" value="{{ csrf_token('delete_message_' ~ m.id) }}">
-                                    <button class="btn btn-sm btn-outline-danger">Delete</button>
-                                </form>
+                                {% if m.isDeleted %}
+                                    <em class="text-muted">Ce message a été supprimé.</em>
+                                {% else %}
+                                    {{ m.content }}
+                                {% endif %}
                             </div>
+
+                            {% if app.user and m.senderEmail == app.user.userIdentifier and not m.isDeleted %}
+                                <div class="mt-2">
+                                    <a class="btn btn-sm btn-outline-warning"
+                                       href="{{ path('community_channels_show', {id: channel.id, edit: m.id}) }}">
+                                        Edit
+                                    </a>
+
+                                    <form method="post" action="{{ path('community_message_delete', {id: m.id}) }}" style="display:inline;">
+                                        <input type="hidden" name="_token" value="{{ csrf_token('delete_message_' ~ m.id) }}">
+                                        <button class="btn btn-sm btn-outline-danger">Delete</button>
+                                    </form>
+                                </div>
+                            {% endif %}
+
                         {% endif %}
+
                     </div>
                 </div>
-            {% else %}
-                <p>Aucun message.</p>
             {% endfor %}
+
         </div>
 
         {% if is_granted('ROLE_USER') %}

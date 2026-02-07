@@ -3,8 +3,11 @@
 namespace App\Controller\Admin;
 
 use App\Entity\Channel;
+use App\Entity\Notification;
+use App\Entity\NotificationType;
 use App\Form\ChannelType;
 use App\Repository\ChannelRepository;
+use App\Repository\UserRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -17,23 +20,39 @@ use Symfony\Component\Security\Http\Attribute\IsGranted;
 class AdminChannelController extends AbstractController
 {
     #[Route('/', name: 'admin_channels_index')]
-    public function index(ChannelRepository $repo): Response
+    public function index(ChannelRepository $repo, Request $request): Response
     {
+        $q = trim((string) $request->query->get('q', ''));
+        $status = (string) $request->query->get('status', 'all'); // all|approved|pending|rejected
+        $type = (string) $request->query->get('type', 'all');     // all|public|private (selon ton enum)
+        $active = (string) $request->query->get('active', 'all'); // all|1|0
+
+        $channels = $repo->findAdminList($q, $status, $type, $active);
+
+        // stats pour cards
+        $pendingCount = $repo->countByStatus(Channel::STATUS_PENDING);
+
         return $this->render('admin/channel/index.html.twig', [
-            'channels' => $repo->findAllForAdmin(),
+            'channels' => $channels,
+            'q' => $q,
+            'status' => $status,
+            'type' => $type,
+            'active' => $active,
+            'pendingCount' => $pendingCount,
         ]);
     }
 
-    #[Route('/pending', name: 'admin_channels_pending')]
+
+    /*#[Route('/pending', name: 'admin_channels_pending')]
     public function pending(ChannelRepository $repo): Response
     {
         return $this->render('admin/channel/pending.html.twig', [
             'channels' => $repo->findPending(),
         ]);
-    }
+    }*/
 
     #[Route('/{id}/approve', name: 'admin_channels_approve', methods: ['POST'])]
-    public function approve(Channel $channel, Request $request, EntityManagerInterface $em): Response
+    public function approve(Channel $channel, Request $request, EntityManagerInterface $em, UserRepository $userRepo): Response
     {
         if ($this->isCsrfTokenValid('approve_'.$channel->getId(), $request->request->get('_token'))) {
             $channel->setStatus(Channel::STATUS_APPROVED);
@@ -42,13 +61,24 @@ class AdminChannelController extends AbstractController
             $channel->setApprovedAt(new \DateTimeImmutable());
             $channel->setRejectionReason(null);
             $em->flush();
+
+            $creator = $userRepo->findOneBy(['email' => $channel->getCreatedBy()]);
+            if ($creator) {
+                $notification = new Notification();
+                $notification->setUser($creator);
+                $notification->setType(NotificationType::CHANNEL_APPROVED);
+                $notification->setMessage(sprintf('Your channel "%s" has been approved by an admin. It is now visible in the community.', $channel->getName()));
+                $notification->setLink($this->generateUrl('community_channels_show', ['id' => $channel->getId()]));
+                $em->persist($notification);
+                $em->flush();
+            }
         }
 
-        return $this->redirectToRoute('admin_channels_pending');
+        return $this->redirectToRoute('admin_channels_index');
     }
 
     #[Route('/{id}/reject', name: 'admin_channels_reject', methods: ['POST'])]
-    public function reject(Channel $channel, Request $request, EntityManagerInterface $em): Response
+    public function reject(Channel $channel, Request $request, EntityManagerInterface $em, UserRepository $userRepo): Response
     {
         if ($this->isCsrfTokenValid('reject_'.$channel->getId(), $request->request->get('_token'))) {
             $reason = $request->request->get('reason');
@@ -58,9 +88,24 @@ class AdminChannelController extends AbstractController
             $channel->setApprovedAt(new \DateTimeImmutable());
             $channel->setRejectionReason($reason ?: 'Rejected by admin');
             $em->flush();
+
+            $creator = $userRepo->findOneBy(['email' => $channel->getCreatedBy()]);
+            if ($creator) {
+                $notification = new Notification();
+                $notification->setUser($creator);
+                $notification->setType(NotificationType::CHANNEL_REJECTED);
+                $message = sprintf('Your channel "%s" has been rejected by an admin.', $channel->getName());
+                if ($reason) {
+                    $message .= ' Reason: ' . $reason;
+                }
+                $notification->setMessage($message);
+                $notification->setLink($this->generateUrl('community_channels_index'));
+                $em->persist($notification);
+                $em->flush();
+            }
         }
 
-        return $this->redirectToRoute('admin_channels_pending');
+        return $this->redirectToRoute('admin_channels_index');
     }
 
     #[Route('/{id}/toggle-active', name: 'admin_channels_toggle', methods: ['POST'])]

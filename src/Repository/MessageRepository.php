@@ -52,4 +52,55 @@ class MessageRepository extends ServiceEntityRepository
             ->getQuery()->getResult();
     }
 
+    public function findForChannelAll(int $channelId): array
+    {
+        return $this->createQueryBuilder('m')
+            ->andWhere('m.channel = :cid')
+            ->setParameter('cid', $channelId)
+            ->orderBy('m.sentAt', 'ASC')
+            ->getQuery()
+            ->getResult();
+    }
+
+    public function findAdminList(string $q = '', string $status = 'active', string $sort = 'sentAt', string $dir = 'desc'): array
+    {
+        $qb = $this->createQueryBuilder('m')
+            ->leftJoin('m.channel', 'c')->addSelect('c');
+
+        // Status filter
+        if ($status === 'active') {
+            $qb->andWhere('m.isDeleted = false');
+        } elseif ($status === 'deleted') {
+            $qb->andWhere('m.isDeleted = true');
+        }
+
+        // Search
+        if ($q !== '') {
+            $qb->andWhere('LOWER(m.content) LIKE :q OR LOWER(m.senderName) LIKE :q OR LOWER(m.senderEmail) LIKE :q')
+                ->setParameter('q', '%'.mb_strtolower($q).'%');
+        }
+
+        // ✅ Sort whitelist
+        $map = [
+            'sentAt'  => 'm.sentAt',
+            'channel' => 'c.name',
+            'sender'  => 'm.senderName',
+            'status'  => 'm.isDeleted',
+            'id'      => 'm.id',
+        ];
+
+        $sortField = $map[$sort] ?? 'm.sentAt';
+        $dir = strtolower($dir) === 'asc' ? 'ASC' : 'DESC';
+
+        $qb->orderBy($sortField, $dir);
+
+        // stable sort (évite les résultats “qui bougent”)
+        if ($sortField !== 'm.id') {
+            $qb->addOrderBy('m.id', 'DESC');
+        }
+
+        return $qb->getQuery()->getResult();
+    }
+
+
 }

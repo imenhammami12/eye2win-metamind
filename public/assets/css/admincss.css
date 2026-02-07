@@ -2132,6 +2132,26 @@ select:-webkit-autofill:focus {
 .custom-table tbody td {
     vertical-align: middle !important;
 }
+
+/* ✅ Bootstrap modal must be above any custom overlays */
+.modal { z-index: 20000 !important; }
+.modal-backdrop { z-index: 19900 !important; }
+
+/* ✅ When modal is open, main content (which contains the modal) must sit above the backdrop.
+    Otherwise the backdrop (body child, z 19900) paints above .container (z 1) and blocks the modal. */
+body.modal-open .main-content {
+    position: relative;
+    z-index: 20001 !important;
+}
+
+/* ✅ Sidebar overlay must stay below modal */
+.sidebar-overlay { z-index: 1000 !important; }
+.sidebar { z-index: 1100 !important; }
+
+body.modal-open .sidebar-overlay {
+    display: none !important;
+    pointer-events: none !important;
+}
 /* ============================================================================
    END OF STYLESHEET
    ============================================================================ */
