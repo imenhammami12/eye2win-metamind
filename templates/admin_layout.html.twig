@@ -55,6 +55,12 @@
                     <span>Users</span>
                 </a>
 
+                <a href="{{ path('admin_tournoi_index') }}" 
+                   class="{{ app.request.attributes.get('_route') starts with 'admin_tournoi' ? 'active' : '' }}">
+                    <i class="bi bi-trophy"></i>
+                    <span>Tournois</span>
+                </a>
+
                 <a href="{{ path('admin_planning_index') }}" 
                    class="{{ app.request.attributes.get('_route') starts with 'admin_planning' ? 'active' : '' }}">
                     <i class="bi bi-calendar-event"></i>

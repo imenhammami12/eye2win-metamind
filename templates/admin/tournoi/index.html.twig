@@ -1,0 +1,107 @@
+{% extends 'admin_layout.html.twig' %}
+
+{% block title %}Tournoi Management{% endblock %}
+{% block page_title %}Tournoi Management{% endblock %}
+
+{% block body %}
+
+{# Results Summary #}
+<div class="mb-3 fade-in" style="animation-delay: 0.1s;">
+    <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
+        <h6 class="text-muted mb-0">
+            <i class="bi bi-info-circle me-2"></i>
+            Found <strong>{{ tournois|length }}</strong> tournoi{{ tournois|length != 1 ? 's' : '' }}
+        </h6>
+        {# Placeholder for create button #}
+        <button class="btn btn-success" disabled>
+            <i class="bi bi-plus-circle me-2"></i>New Tournoi
+        </button>
+    </div>
+</div>
+
+{# Tournois Table #}
+<div class="table-card fade-in" style="animation-delay: 0.2s;">
+    <div class="table-header">
+        <h5><i class="bi bi-trophy me-2"></i>Tournois List</h5>
+    </div>
+    
+    <div class="table-responsive">
+        <table class="custom-table table">
+            <thead>
+                <tr>
+                    <th style="width: 70px; text-align: center;">Image</th>
+                    <th>Nom</th>
+                    <th>Type</th>
+                    <th>Dates</th>
+                    <th>Statut</th>
+                    <th>Matchs</th>
+                    <th style="width: 180px;">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for tournoi in tournois %}
+                    <tr class="fade-in" style="animation-delay: {{ loop.index * 0.05 }}s;">
+                        <td style="width: 70px; text-align: center;">
+                            {% if tournoi.image %}
+                                <img src="{{ asset('uploads/tournois/' ~ tournoi.image) }}" 
+                                     alt="{{ tournoi.nom }}" 
+                                     class="user-avatar-table"
+                                     style="border-radius: 4px;"
+                                     loading="lazy">
+                            {% else %}
+                                <div class="user-avatar-placeholder mx-auto" style="border-radius: 4px;">
+                                    <i class="bi bi-trophy"></i>
+                                </div>
+                            {% endif %}
+                        </td>
+                        <td>
+                            <strong>{{ tournoi.nom }}</strong>
+                        </td>
+                        <td>
+                            <span class="badge bg-secondary">
+                                {{ tournoi.typeTournoi ? tournoi.typeTournoi.name : 'N/A' }}
+                            </span>
+                        </td>
+                        <td>
+                            <div><small class="text-muted">Start:</small> {{ tournoi.dateDebut ? tournoi.dateDebut|date('M d, Y') : 'N/A' }}</div>
+                            <div><small class="text-muted">End:</small> {{ tournoi.dateFin ? tournoi.dateFin|date('M d, Y') : 'N/A' }}</div>
+                        </td>
+                        <td>
+                            <span class="badge bg-info">{{ tournoi.statut }}</span>
+                        </td>
+                        <td>
+                            <span class="badge bg-light text-dark border">
+                                {{ tournoi.matchs|length }} matchs
+                            </span>
+                        </td>
+                        <td>
+                            <div class="btn-group" role="group">
+                                <button class="btn btn-sm btn-info" title="View Details" disabled>
+                                    <i class="bi bi-eye"></i>
+                                </button>
+                                <button class="btn btn-sm btn-warning" title="Edit" disabled>
+                                    <i class="bi bi-pencil"></i>
+                                </button>
+                                <button class="btn btn-sm btn-danger" title="Delete" disabled>
+                                    <i class="bi bi-trash"></i>
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                {% else %}
+                    <tr>
+                        <td colspan="7" class="text-center text-muted py-5">
+                            <div class="empty-state">
+                                <i class="bi bi-trophy" style="font-size: 64px; opacity: 0.2;"></i>
+                                <h4 class="mt-3 mb-2">No Tournois Found</h4>
+                                <p class="text-muted">Create a new tournoi to get started</p>
+                            </div>
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+{% endblock %}
