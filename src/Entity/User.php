@@ -92,8 +92,16 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\OneToMany(mappedBy: 'user', targetEntity: AuditLog::class)]
     private Collection $auditLogs;
 
+<<<<<<< HEAD
     #[ORM\OneToMany(mappedBy: 'user', targetEntity: TrainingSession::class)]
     private Collection $trainingSessions;
+=======
+    /**
+     * @var Collection<int, Video>
+     */
+    #[ORM\OneToMany(targetEntity: Video::class, mappedBy: 'uploadedBy', orphanRemoval: true)]
+    private Collection $videos;
+>>>>>>> computer-vision
 
     public function __construct()
     {
@@ -107,8 +115,8 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         $this->lastLogin = new \DateTime();
         $this->accountStatus = AccountStatus::ACTIVE;
         $this->rolesJson = json_encode(['ROLE_USER']);
+        $this->videos = new ArrayCollection();
     }
-
     public function getId(): ?int
     {
         return $this->id;
@@ -279,6 +287,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     {
         return $this->accountStatus === AccountStatus::ACTIVE;
     }
+<<<<<<< HEAD
 
     /**
      * @return Collection<int, TrainingSession>
@@ -287,4 +296,36 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     {
         return $this->trainingSessions;
     }
+=======
+    /**
+     * @return Collection<int, Video>
+     */
+    public function getVideos(): Collection
+    {
+        return $this->videos;
+    }
+
+    public function addVideo(Video $video): static
+    {
+        if (!$this->videos->contains($video)) {
+            $this->videos->add($video);
+            $video->setUploadedBy($this);
+        }
+
+        return $this;
+    }
+
+    public function removeVideo(Video $video): static
+    {
+        if ($this->videos->removeElement($video)) {
+            // set the owning side to null (unless already changed)
+            if ($video->getUploadedBy() === $this) {
+                $video->setUploadedBy(null);
+            }
+        }
+
+        return $this;
+    }
+
+>>>>>>> computer-vision
 }
