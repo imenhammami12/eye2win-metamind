@@ -86,7 +86,7 @@ class Matches
         return $this->equipe1;
     }
 
-    public function setEquipe1(string $equipe1): static
+    public function setEquipe1(?string $equipe1): static
     {
         $this->equipe1 = $equipe1;
 
@@ -98,7 +98,7 @@ class Matches
         return $this->equipe2;
     }
 
-    public function setEquipe2(string $equipe2): static
+    public function setEquipe2(?string $equipe2): static
     {
         $this->equipe2 = $equipe2;
 
@@ -110,7 +110,7 @@ class Matches
         return $this->score;
     }
 
-    public function setScore(int $score): static
+    public function setScore(?int $score): static
     {
         $this->score = $score;
 
@@ -122,7 +122,7 @@ class Matches
         return $this->dateMatch;
     }
 
-    public function setDateMatch(\DateTimeInterface $dateMatch): static
+    public function setDateMatch(?\DateTimeInterface $dateMatch): static
     {
         $this->dateMatch = $dateMatch;
 
