@@ -72,9 +72,11 @@
                             </small>
                         </td>
                         <td>
-                            <span class="badge bg-light text-dark border">
-                                {{ tournoi.matchs|length }} matchs
-                            </span>
+                            <a href="{{ path('admin_tournoi_matches_index', {'id': tournoi.id}) }}" class="text-decoration-none">
+                                <span class="badge bg-light text-dark border hover-effect">
+                                    {{ tournoi.matchs|length }} matchs
+                                </span>
+                            </a>
                         </td>
                         <td>
                             <div class="btn-group" role="group">

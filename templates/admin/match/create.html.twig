@@ -1,0 +1,102 @@
+{% extends 'admin_layout.html.twig' %}
+
+{% block title %}Create Match - {{ tournoi.nom }}{% endblock %}
+{% block page_title %}Add Match to {{ tournoi.nom }}{% endblock %}
+
+{% block body %}
+<div class="mb-3 fade-in">
+    <a href="{{ path('admin_tournoi_matches_index', {id: tournoi.id}) }}" class="btn btn-outline-secondary">
+        <i class="bi bi-arrow-left me-2"></i>Back to Matches
+    </a>
+</div>
+
+<div class="row justify-content-center fade-in" style="animation-delay: 0.1s;">
+    <div class="col-lg-8">
+        <div class="table-card">
+            <div class="card-header-gradient" style="background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%); padding: 1.5rem; border-radius: 16px 16px 0 0;">
+                <h5 class="mb-0 text-white"><i class="bi bi-controller me-2"></i>Match Information</h5>
+            </div>
+            
+            {{ form_start(form, {'attr': {'class': 'p-4', 'id': 'createMatchForm', 'novalidate': 'novalidate'}}) }}
+                
+                <div class="row g-4">
+                    {# Teams #}
+                    <div class="col-md-6 form-group-enhanced">
+                        <label class="form-label fw-bold">
+                            <i class="bi bi-people me-1"></i>
+                            Equipe 1
+                            <span class="required-indicator" style="color: #fa709a;">*</span>
+                        </label>
+                        {{ form_widget(form.equipe1, {'attr': {'class': 'form-control', 'placeholder': 'Enter Team 1 Name'}}) }}
+                        <div class="custom-error-message">{{ form_errors(form.equipe1) }}</div>
+                    </div>
+
+                    <div class="col-md-6 form-group-enhanced">
+                        <label class="form-label fw-bold">
+                            <i class="bi bi-people me-1"></i>
+                            Equipe 2
+                            <span class="required-indicator" style="color: #fa709a;">*</span>
+                        </label>
+                        {{ form_widget(form.equipe2, {'attr': {'class': 'form-control', 'placeholder': 'Enter Team 2 Name'}}) }}
+                        <div class="custom-error-message">{{ form_errors(form.equipe2) }}</div>
+                    </div>
+
+                    {# Score #}
+                    <div class="col-md-6 form-group-enhanced">
+                        <label class="form-label fw-bold">
+                            <i class="bi bi-123 me-1"></i>
+                            Score
+                            <span class="required-indicator" style="color: #fa709a;">*</span>
+                        </label>
+                        {{ form_widget(form.score, {'attr': {'class': 'form-control', 'placeholder': '0'}}) }}
+                        <div class="custom-error-message">{{ form_errors(form.score) }}</div>
+                        <small class="text-muted">Enter total score or specific format if handled</small>
+                    </div>
+
+                    {# Date #}
+                    <div class="col-md-6 form-group-enhanced">
+                        <label class="form-label fw-bold">
+                            <i class="bi bi-calendar-event me-1"></i>
+                            Date du Match
+                            <span class="required-indicator" style="color: #fa709a;">*</span>
+                        </label>
+                        {{ form_widget(form.dateMatch, {'attr': {'class': 'form-control'}}) }}
+                        <div class="custom-error-message">{{ form_errors(form.dateMatch) }}</div>
+                    </div>
+
+                    {# Prix #}
+                    <div class="col-md-6 form-group-enhanced">
+                        <label class="form-label fw-bold">
+                            <i class="bi bi-award me-1"></i>
+                            Prix
+                        </label>
+                        {{ form_widget(form.prix, {'attr': {'class': 'form-select'}}) }}
+                        <div class="custom-error-message">{{ form_errors(form.prix) }}</div>
+                    </div>
+                </div>
+                
+                {# Action Buttons #}
+                <div class="mt-4 d-flex gap-2">
+                    <button type="submit" class="btn btn-success" id="submitBtn">
+                        <i class="bi bi-save me-2"></i>Save Match
+                    </button>
+                    <a href="{{ path('admin_tournoi_matches_index', {id: tournoi.id}) }}" class="btn btn-outline-secondary">
+                        <i class="bi bi-x-circle me-2"></i>Cancel
+                    </a>
+                </div>
+
+            {{ form_end(form) }}
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block javascripts %}
+<script>
+    // Include same validation scripts as Tournoi
+    document.addEventListener('DOMContentLoaded', function() {
+        const form = document.getElementById('createMatchForm');
+        // ... (Reuse validation JS logic if desired or abstract it)
+    });
+</script>
+{% endblock %}
