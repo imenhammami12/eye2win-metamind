@@ -1,0 +1,247 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Enable 2FA - EyeTwin{% endblock %}
+
+{% block stylesheets %}
+    {{ parent() }}
+
+{% endblock %}
+
+{% block body %}
+<!-- Breadcrumb -->
+<section class="breadcrumb breadcrumb_bg">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-12">
+                <div class="breadcrumb_iner text-center">
+                    <div class="breadcrumb_iner_item">
+                        <h2>Enable Two-Factor Authentication</h2>
+                         <p>Secure your account with an extra layer of protection</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+<!-- Main Content -->
+<section class="section_padding">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-11">
+                
+                <!-- Setup Instructions -->
+                <div class="card card-enhanced mb-4">
+                    <div class="card-header-enhanced">
+                        <i class="fas fa-info-circle"></i> Setup Instructions
+                    </div>
+                    <div class="card-body p-4">
+                        <div class="row g-3">
+                            <div class="col-md-4">
+                                <div class="setup-step text-center">
+                                    <div class="step-number">1</div>
+                                    <h5 class="mb-3">Download Authenticator App</h5>
+                                    <p class="mb-0 small">Install Google Authenticator, Authy, or Microsoft Authenticator on your smartphone</p>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="setup-step text-center">
+                                    <div class="step-number">2</div>
+                                    <h5 class="mb-3">Scan QR Code</h5>
+                                    <p class="mb-0 small">Open your authenticator app and scan the QR code displayed below</p>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="setup-step text-center">
+                                    <div class="step-number">3</div>
+                                    <h5 class="mb-3">Enter Verification Code</h5>
+                                    <p class="mb-0 small">Type the 6-digit code from your app to complete the setup</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- QR Code Section -->
+                <div class="card card-enhanced mb-4">
+                    <div class="card-header-enhanced">
+                        <i class="fas fa-qrcode"></i> Step 2: Scan This QR Code
+                    </div>
+                    <div class="card-body p-5 text-center">
+                        
+                        <div class="qr-code-wrapper mb-4">
+                            <div class="qr-code-inner">
+                                <img 
+                                    src="{{ path('app_2fa_qr_code') }}?v={{ random() }}" 
+                                    alt="2FA QR Code"
+                                    id="qr-image"
+                                    onerror="handleQRError(this)"
+                                >
+                            </div>
+                        </div>
+
+                        <div class="alert alert-info d-inline-block text-start" style="max-width: 600px;">
+                            <h6 class="mb-3"><i class="fas fa-mobile-alt"></i> Can't scan the QR code?</h6>
+                            <p class="mb-2">Enter this secret key manually in your authenticator app:</p>
+                            
+                            <div class="secret-code-box">
+                                <div class="secret-code" id="secret-code">{{ secret }}</div>
+                            </div>
+                            
+                            <button 
+                                class="btn btn-primary btn-copy w-100" 
+                                onclick="copySecret()"
+                            >
+                                <i class="fas fa-copy"></i> Copy Secret Key
+                            </button>
+                        </div>
+                        
+                        <button 
+                            class="btn btn-outline-secondary btn-sm mt-3" 
+                            onclick="refreshQR()"
+                        >
+                            <i class="fas fa-sync-alt"></i> Refresh QR Code
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Verification Section -->
+                <div class="card card-enhanced mb-4">
+                    <div class="card-header-enhanced">
+                        <i class="fas fa-shield-alt"></i> Step 3: Verify Your Code
+                    </div>
+                    <div class="card-body p-5">
+                        
+                        {% for message in app.flashes('error') %}
+                            <div class="alert alert-danger alert-dismissible fade show">
+                                <i class="fas fa-exclamation-triangle"></i> {{ message }}
+                                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                            </div>
+                        {% endfor %}
+
+                        <form method="post" action="{{ path('app_2fa_verify') }}">
+                            <div class="row justify-content-center">
+                                <div class="col-lg-8">
+                                    <div class="mb-4 text-center">
+                                        <label for="code" class="form-label h5 mb-3">
+                                            Enter the 6-digit code from your authenticator app:
+                                        </label>
+                                        <input 
+                                            type="text" 
+                                            class="form-control verification-input" 
+                                            id="code" 
+                                            name="code"
+                                            placeholder="000000"
+                                            maxlength="6"
+                                            pattern="[0-9]{6}"
+                                            autocomplete="off"
+                                            inputmode="numeric"
+                                            required
+                                            autofocus
+                                        >
+                                        <small class="form-text text-muted mt-3 d-block">
+                                            <i class="fas fa-clock"></i> Code expires in 30 seconds
+                                        </small>
+                                    </div>
+
+                                    <div class="d-grid gap-3">
+                                        <button type="submit" class="btn btn-success btn-lg" style="height: 60px; font-size: 1.2rem;">
+                                            <i class="fas fa-check-circle"></i> Verify and Enable 2FA
+                                        </button>
+                                        <a href="{{ path('app_2fa_settings') }}" class="btn btn-outline-secondary btn-lg">
+                                            <i class="fas fa-times"></i> Cancel
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- Important Notice -->
+                <div class="alert alert-warning shadow" style="border-left: 5px solid #ffc107;">
+                    <h5><i class="fas fa-exclamation-triangle"></i> Important Information</h5>
+                    <p class="mb-0">
+                        After successful verification, you will receive <strong>backup codes</strong>. 
+                        Please save them in a secure location - they are your only way to access your account if you lose your authenticator device.
+                    </p>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</section>
+
+<script>
+// Copy secret key
+function copySecret() {
+    const secretText = document.getElementById('secret-code').textContent;
+    
+    navigator.clipboard.writeText(secretText).then(() => {
+        const btn = event.target;
+        const originalHTML = btn.innerHTML;
+        
+        btn.innerHTML = '<i class="fas fa-check"></i> Copied!';
+        btn.classList.add('btn-success');
+        btn.classList.remove('btn-primary');
+        
+        setTimeout(() => {
+            btn.innerHTML = originalHTML;
+            btn.classList.remove('btn-success');
+            btn.classList.add('btn-primary');
+        }, 2000);
+    }).catch(err => {
+        alert('Failed to copy: ' + err);
+    });
+}
+
+// Refresh QR code
+function refreshQR() {
+    const img = document.getElementById('qr-image');
+    const btn = event.target;
+    const originalHTML = btn.innerHTML;
+    
+    btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Refreshing...';
+    btn.disabled = true;
+    
+    img.src = "{{ path('app_2fa_qr_code') }}?v=" + Date.now();
+    
+    setTimeout(() => {
+        btn.innerHTML = originalHTML;
+        btn.disabled = false;
+    }, 1000);
+}
+
+// Handle QR error
+function handleQRError(img) {
+    console.error('QR Code failed to load');
+    img.style.display = 'none';
+    
+    const parent = img.parentElement;
+    if (!parent.querySelector('.qr-error-message')) {
+        const errorDiv = document.createElement('div');
+        errorDiv.className = 'qr-error-message alert alert-danger';
+        errorDiv.innerHTML = `
+            <i class="fas fa-exclamation-triangle"></i>
+            <strong>QR Code could not be loaded</strong>
+            <p class="mb-0 mt-2">Please use the manual secret key below instead.</p>
+        `;
+        parent.appendChild(errorDiv);
+    }
+}
+
+// Auto-format input
+const codeInput = document.getElementById('code');
+codeInput.addEventListener('input', function(e) {
+    // Remove non-numeric
+    e.target.value = e.target.value.replace(/\D/g, '').substring(0, 6);
+});
+
+// Auto-submit on 6 digits (optional)
+codeInput.addEventListener('input', function(e) {
+    if (e.target.value.length === 6) {
+        // Optional: uncomment to auto-submit
+        // setTimeout(() => e.target.form.submit(), 500);
+    }
+});
+</script>
+{% endblock %}

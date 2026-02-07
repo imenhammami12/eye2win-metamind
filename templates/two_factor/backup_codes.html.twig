@@ -1,0 +1,243 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Backup Codes - Two-Factor Authentication{% endblock %}
+
+{% block body %}
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card shadow">
+                <div class="card-header bg-warning text-dark">
+                    <h3 class="mb-0">
+                        <i class="fas fa-key"></i> Your Backup Codes
+                    </h3>
+                </div>
+                <div class="card-body p-5">
+                    {% if is_new %}
+                        <div class="alert alert-success">
+                            <i class="fas fa-check-circle"></i>
+                            <strong>Success!</strong> Two-factor authentication is now enabled on your account.
+                        </div>
+                    {% endif %}
+
+                    <div class="alert alert-danger">
+                        <i class="fas fa-exclamation-triangle"></i>
+                        <strong>Important:</strong> Save these backup codes in a secure place. Each code can only be used once.
+                    </div>
+
+                    <div class="card bg-light mb-4">
+                        <div class="card-body">
+                            <h5 class="mb-3">What are backup codes?</h5>
+                            <p class="mb-2">Backup codes allow you to access your account if you:</p>
+                            <ul>
+                                <li>Lose your phone or authenticator device</li>
+                                <li>Can't access your authenticator app</li>
+                                <li>Get a new phone and haven't transferred your authenticator</li>
+                            </ul>
+                            <p class="mb-0 text-danger">
+                                <strong>Store these codes securely</strong> - treat them like passwords!
+                            </p>
+                        </div>
+                    </div>
+
+                    {# Backup Codes Display #}
+                    <div class="card border-primary mb-4">
+                        <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+                            <span><i class="fas fa-lock"></i> Your Backup Codes</span>
+                            <button 
+                                type="button" 
+                                class="btn btn-sm btn-light"
+                                onclick="copyAllCodes()"
+                            >
+                                <i class="fas fa-copy"></i> Copy All
+                            </button>
+                        </div>
+                        <div class="card-body bg-light">
+                            <div id="backup-codes-container" class="row g-3">
+                                {% for code in backup_codes %}
+                                    <div class="col-md-6">
+                                        <div class="input-group">
+                                            <input 
+                                                type="text" 
+                                                class="form-control font-monospace text-center backup-code" 
+                                                value="{{ code }}" 
+                                                readonly
+                                                style="font-size: 1.1rem; letter-spacing: 0.1em;"
+                                            >
+                                            <button 
+                                                class="btn btn-outline-secondary" 
+                                                type="button"
+                                                onclick="copySingleCode(this)"
+                                                title="Copy"
+                                            >
+                                                <i class="fas fa-copy"></i>
+                                            </button>
+                                        </div>
+                                    </div>
+                                {% endfor %}
+                            </div>
+                        </div>
+                    </div>
+
+                    {# Actions #}
+                    <div class="row g-3 mb-4">
+                        <div class="col-md-6">
+                            <button 
+                                type="button" 
+                                class="btn btn-outline-primary w-100"
+                                onclick="printCodes()"
+                            >
+                                <i class="fas fa-print"></i> Print Codes
+                            </button>
+                        </div>
+                        <div class="col-md-6">
+                            <button 
+                                type="button" 
+                                class="btn btn-outline-primary w-100"
+                                onclick="downloadCodes()"
+                            >
+                                <i class="fas fa-download"></i> Download as Text
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="alert alert-info">
+                        <i class="fas fa-info-circle"></i>
+                        <strong>Tips for storing backup codes:</strong>
+                        <ul class="mb-0 mt-2">
+                            <li>Save them in a password manager</li>
+                            <li>Print them and store in a safe place</li>
+                            <li>Take a screenshot and store it securely (encrypted)</li>
+                            <li>Never share them with anyone</li>
+                        </ul>
+                    </div>
+
+                    <div class="d-grid gap-2">
+                        <a href="{{ path('app_2fa_settings') }}" class="btn btn-success btn-lg">
+                            <i class="fas fa-check"></i> I've Saved My Backup Codes
+                        </a>
+                        <a href="{{ path('app_dashboard') }}" class="btn btn-outline-secondary">
+                            Go to Dashboard
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{# Hidden print template #}
+<div id="print-template" style="display: none;">
+    <h2>Two-Factor Authentication Backup Codes</h2>
+    <p><strong>Account:</strong> {{ app.user.email }}</p>
+    <p><strong>Generated:</strong> {{ "now"|date("Y-m-d H:i:s") }}</p>
+    <hr>
+    <p><strong>⚠️ IMPORTANT: Keep these codes secure and confidential!</strong></p>
+    <ul style="list-style: none; font-family: monospace; font-size: 14pt;">
+        {% for code in backup_codes %}
+            <li style="margin: 10px 0;">{{ code }}</li>
+        {% endfor %}
+    </ul>
+    <hr>
+    <p style="font-size: 10pt;">
+        Each code can only be used once. Use these codes if you lose access to your authenticator app.
+    </p>
+</div>
+
+<script>
+    function copyAllCodes() {
+        const codes = {{ backup_codes|json_encode|raw }};
+        const codesText = codes.join('\n');
+        
+        navigator.clipboard.writeText(codesText).then(() => {
+            showCopyFeedback('All codes copied to clipboard!');
+        });
+    }
+
+    function copySingleCode(button) {
+        const input = button.previousElementSibling;
+        const code = input.value;
+        
+        navigator.clipboard.writeText(code).then(() => {
+            const originalHTML = button.innerHTML;
+            button.innerHTML = '<i class="fas fa-check"></i>';
+            button.classList.remove('btn-outline-secondary');
+            button.classList.add('btn-success');
+            
+            setTimeout(() => {
+                button.innerHTML = originalHTML;
+                button.classList.remove('btn-success');
+                button.classList.add('btn-outline-secondary');
+            }, 2000);
+        });
+    }
+
+    function showCopyFeedback(message) {
+        const alert = document.createElement('div');
+        alert.className = 'alert alert-success alert-dismissible fade show position-fixed top-0 start-50 translate-middle-x mt-3';
+        alert.style.zIndex = '9999';
+        alert.innerHTML = `
+            <i class="fas fa-check-circle"></i> ${message}
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        `;
+        document.body.appendChild(alert);
+        
+        setTimeout(() => {
+            alert.remove();
+        }, 3000);
+    }
+
+    function printCodes() {
+        const printContent = document.getElementById('print-template').innerHTML;
+        const originalContent = document.body.innerHTML;
+        
+        document.body.innerHTML = printContent;
+        window.print();
+        document.body.innerHTML = originalContent;
+        location.reload();
+    }
+
+    function downloadCodes() {
+        const codes = {{ backup_codes|json_encode|raw }};
+        const content = `Two-Factor Authentication Backup Codes
+Account: {{ app.user.email }}
+Generated: {{ "now"|date("Y-m-d H:i:s") }}
+
+⚠️ IMPORTANT: Keep these codes secure and confidential!
+
+${codes.join('\n')}
+
+Each code can only be used once.
+Use these codes if you lose access to your authenticator app.`;
+        
+        const blob = new Blob([content], { type: 'text/plain' });
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = '2fa-backup-codes.txt';
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        window.URL.revokeObjectURL(url);
+        
+        showCopyFeedback('Backup codes downloaded!');
+    }
+</script>
+
+<style>
+    @media print {
+        body * {
+            visibility: hidden;
+        }
+        #print-template, #print-template * {
+            visibility: visible;
+        }
+        #print-template {
+            position: absolute;
+            left: 0;
+            top: 0;
+            display: block !important;
+        }
+    }
+</style>
+{% endblock %}
