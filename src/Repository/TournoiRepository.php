@@ -20,4 +20,23 @@ class TournoiRepository extends ServiceEntityRepository
     {
         parent::__construct($registry, Tournoi::class);
     }
+    public function findBySearchAndFilter(?string $search, ?string $type, string $sort, string $direction): array
+    {
+        $qb = $this->createQueryBuilder('t');
+
+        if ($search) {
+            $qb->andWhere('t.nom LIKE :search OR t.description LIKE :search')
+               ->setParameter('search', '%' . $search . '%');
+        }
+
+        if ($type) {
+            // Assuming the database stores the backed value of the enum
+            $qb->andWhere('t.typeTournoi = :type')
+               ->setParameter('type', $type);
+        }
+
+        $qb->orderBy('t.' . $sort, $direction);
+
+        return $qb->getQuery()->getResult();
+    }
 }

@@ -5,34 +5,125 @@
 
 {% block body %}
 
-{# Results Summary #}
-<div class="mb-3 fade-in" style="animation-delay: 0.1s;">
-    <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
-        <h6 class="text-muted mb-0">
-            <i class="bi bi-info-circle me-2"></i>
-            Found <strong>{{ tournois|length }}</strong> tournoi{{ tournois|length != 1 ? 's' : '' }}
-        </h6>
-        {# Create button #}
-        <a href="{{ path('admin_tournoi_create') }}" class="btn btn-success">
-            <i class="bi bi-plus-circle me-2"></i>New Tournoi
-        </a>
+{# Filters and Search #}
+<div class="table-card mb-4 fade-in">
+    <div class="table-header">
+        <h5><i class="bi bi-funnel me-2"></i>Filters & Search</h5>
     </div>
+    
+    <form method="get" action="{{ path('admin_tournoi_index') }}" class="p-3">
+        <div class="row g-3">
+            <div class="col-md-5">
+                <label class="form-label">
+                    <i class="bi bi-search me-1"></i>Search
+                </label>
+                <div class="search-bar">
+                    <i class="search-icon bi bi-search"></i>
+                    <input type="text" 
+                           name="search" 
+                           class="form-control" 
+                           placeholder="Name, description..." 
+                           value="{{ search }}"
+                           autocomplete="off">
+                </div>
+            </div>
+            
+            <div class="col-md-4">
+                <label class="form-label">
+                    <i class="bi bi-trophy me-1"></i>Type
+                </label>
+                <select name="type" class="form-select">
+                    <option value="">All Types</option>
+                    {% for typeOption in types %}
+                        <option value="{{ typeOption.value }}" {{ typeFilter == typeOption.value ? 'selected' : '' }}>
+                            {{ typeOption.name }}
+                        </option>
+                    {% endfor %}
+                </select>
+            </div>
+            
+            <div class="col-md-3 d-flex align-items-end gap-2">
+                <button type="submit" class="btn btn-primary flex-grow-1">
+                    <i class="bi bi-search me-1"></i>Filter
+                </button>
+                {% if search or typeFilter %}
+                    <a href="{{ path('admin_tournoi_index') }}" class="btn btn-outline-secondary" title="Clear filters">
+                        <i class="bi bi-x-lg"></i>
+                    </a>
+                {% endif %}
+            </div>
+            
+            {# Preserve Sort params #}
+            <input type="hidden" name="sort" value="{{ sort }}">
+            <input type="hidden" name="direction" value="{{ direction }}">
+        </div>
+    </form>
 </div>
 
 {# Tournois Table #}
 <div class="table-card fade-in" style="animation-delay: 0.2s;">
-    <div class="table-header">
-        <h5><i class="bi bi-trophy me-2"></i>Tournois List</h5>
+    <div class="table-header d-flex justify-content-between align-items-center">
+        <h5 class="mb-0"><i class="bi bi-trophy me-2"></i>Tournois List</h5>
+        <span class="badge bg-light text-dark">
+            {{ tournois|length }} found
+        </span>
     </div>
     
     <div class="table-responsive">
-        <table class="custom-table table">
+        <table class="custom-table table table-hover">
             <thead>
                 <tr>
                     <th style="width: 70px; text-align: center;">Image</th>
-                    <th>Nom</th>
-                    <th>Type</th>
-                    <th>Dates</th>
+                    
+                    {# Sortable Header Macro or Manual #}
+                    <th>
+                        <a href="{{ path('admin_tournoi_index', {
+                            search: search, 
+                            type: typeFilter, 
+                            sort: 'nom', 
+                            direction: sort == 'nom' and direction == 'ASC' ? 'DESC' : 'ASC'
+                        }) }}" class="text-decoration-none text-dark d-flex align-items-center">
+                            Nom
+                            {% if sort == 'nom' %}
+                                <i class="bi bi-sort-{{ direction == 'ASC' ? 'alpha-down' : 'alpha-down-alt' }} ms-1 text-primary"></i>
+                            {% else %}
+                                <i class="bi bi-arrow-down-up ms-1 text-muted small opacity-50"></i>
+                            {% endif %}
+                        </a>
+                    </th>
+
+                    <th>
+                        <a href="{{ path('admin_tournoi_index', {
+                            search: search, 
+                            type: typeFilter, 
+                            sort: 'typeTournoi', 
+                            direction: sort == 'typeTournoi' and direction == 'ASC' ? 'DESC' : 'ASC'
+                        }) }}" class="text-decoration-none text-dark d-flex align-items-center">
+                            Type
+                            {% if sort == 'typeTournoi' %}
+                                <i class="bi bi-sort-{{ direction == 'ASC' ? 'down' : 'up' }} ms-1 text-primary"></i>
+                            {% else %}
+                                <i class="bi bi-arrow-down-up ms-1 text-muted small opacity-50"></i>
+                            {% endif %}
+                        </a>
+                    </th>
+
+                    <th>
+                        <a href="{{ path('admin_tournoi_index', {
+                            search: search, 
+                            type: typeFilter, 
+                            sort: 'dateDebut', 
+                            direction: sort == 'dateDebut' and direction == 'ASC' ? 'DESC' : 'ASC'
+                        }) }}" class="text-decoration-none text-dark d-flex align-items-center">
+                            Dates
+                            {% if sort == 'dateDebut' %}
+                                <i class="bi bi-sort-{{ direction == 'ASC' ? 'numeric-down' : 'numeric-down-alt' }} ms-1 text-primary"></i>
+                            {% else %}
+                                <i class="bi bi-arrow-down-up ms-1 text-muted small opacity-50"></i>
+                            {% endif %}
+                        </a>
+                    </th>
+
                     <th>Description</th>
                     <th>Matchs</th>
                     <th style="width: 180px;">Actions</th>

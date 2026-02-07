@@ -15,17 +15,37 @@ use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 use Symfony\Component\String\Slugger\SluggerInterface;
 
+use App\Entity\TypeTournoi;
+
 #[Route('/admin/tournoi')]
 #[IsGranted('ROLE_ADMIN')]
 class AdminTournoiController extends AbstractController
 {
     #[Route('/', name: 'admin_tournoi_index')]
-    public function index(TournoiRepository $tournoiRepository): Response
+    public function index(Request $request, TournoiRepository $tournoiRepository): Response
     {
-        $tournois = $tournoiRepository->findAll();
+        $search = $request->query->get('search');
+        $type = $request->query->get('type');
+        $sort = $request->query->get('sort', 'dateDebut');
+        $direction = $request->query->get('direction', 'DESC');
+
+        // Allow sorting by these fields
+        $allowedSorts = ['nom', 'dateDebut', 'dateFin', 'typeTournoi'];
+        if (!in_array($sort, $allowedSorts)) {
+            $sort = 'dateDebut';
+        }
+
+        $direction = strtoupper($direction) === 'ASC' ? 'ASC' : 'DESC';
+
+        $tournois = $tournoiRepository->findBySearchAndFilter($search, $type, $sort, $direction);
 
         return $this->render('admin/tournoi/index.html.twig', [
             'tournois' => $tournois,
+            'search' => $search,
+            'typeFilter' => $type,
+            'sort' => $sort,
+            'direction' => $direction,
+            'types' => TypeTournoi::cases(),
         ]);
     }
 
