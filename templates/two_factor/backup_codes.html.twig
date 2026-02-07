@@ -1,147 +1,733 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Backup Codes - Two-Factor Authentication{% endblock %}
+{% block title %}Backup Codes - EyeTwin{% endblock %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    <style>
+        /* Backup Codes Page Specific Styles */
+        .backup-section {
+            background-color: #0b111f;
+            min-height: 100vh;
+            padding: 80px 0;
+        }
+
+        /* Hero Card */
+        .backup-hero-card {
+            background: linear-gradient(135deg, #f4e700 0%, #fbc02d 100%);
+            border-radius: 20px;
+            padding: 40px;
+            margin-bottom: 40px;
+            box-shadow: 0 15px 40px rgba(244, 231, 0, 0.4);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .backup-hero-card::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+            animation: rotate 20s linear infinite;
+        }
+
+        @keyframes rotate {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .backup-hero-content {
+            position: relative;
+            z-index: 1;
+            display: flex;
+            align-items: center;
+            gap: 30px;
+        }
+
+        .hero-icon {
+            width: 90px;
+            height: 90px;
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+        }
+
+        .hero-icon i {
+            font-size: 45px;
+            color: #fff;
+        }
+
+        .backup-hero-content h2 {
+            color: #1a1f2e;
+            font-size: 32px;
+            margin-bottom: 10px;
+            font-weight: 800;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .backup-hero-content p {
+            color: rgba(0, 0, 0, 0.8);
+            margin: 0;
+            font-size: 16px;
+            font-weight: 600;
+        }
+
+        /* Success Banner */
+        .success-banner {
+            background: linear-gradient(135deg, rgba(76, 211, 227, 0.2), rgba(76, 211, 227, 0.05));
+            border-left: 5px solid #4cd3e3;
+            border-radius: 12px;
+            padding: 20px 25px;
+            margin-bottom: 30px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .success-banner i {
+            font-size: 28px;
+            color: #4cd3e3;
+        }
+
+        .success-banner strong {
+            color: #4cd3e3;
+            font-size: 18px;
+        }
+
+        .success-banner p {
+            color: #fff;
+            margin: 0;
+        }
+
+        /* Warning Card */
+        .warning-card-backup {
+            background: linear-gradient(135deg, rgba(244, 74, 64, 0.15), rgba(244, 74, 64, 0.05));
+            border-left: 5px solid #f44a40;
+            border-radius: 12px;
+            padding: 25px;
+            margin-bottom: 30px;
+            display: flex;
+            align-items: start;
+            gap: 20px;
+        }
+
+        .warning-icon {
+            width: 50px;
+            height: 50px;
+            background: rgba(244, 74, 64, 0.2);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+
+        .warning-icon i {
+            font-size: 24px;
+            color: #f44a40;
+        }
+
+        .warning-content strong {
+            color: #f44a40;
+            font-size: 18px;
+            display: block;
+            margin-bottom: 8px;
+        }
+
+        .warning-content p {
+            color: rgba(255, 255, 255, 0.9);
+            margin: 0;
+        }
+
+        /* Info Card */
+        .info-card-backup {
+            background: linear-gradient(135deg, #1a1f2e, #0b111f);
+            border-radius: 15px;
+            padding: 30px;
+            margin-bottom: 30px;
+            border: 1px solid rgba(255, 0, 0, 0.2);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+        }
+
+        .info-card-backup h5 {
+            color: #fff;
+            font-size: 18px;
+            font-weight: 700;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .info-card-backup h5 i {
+            color: #38a4ff;
+        }
+
+        .info-card-backup p {
+            color: rgba(255, 255, 255, 0.9);
+            margin-bottom: 15px;
+        }
+
+        .info-card-backup ul {
+            list-style: none;
+            padding-left: 0;
+            margin-bottom: 15px;
+        }
+
+        .info-card-backup ul li {
+            color: rgba(255, 255, 255, 0.9);
+            padding: 10px 0;
+            display: flex;
+            align-items: start;
+            gap: 12px;
+        }
+
+        .info-card-backup ul li i {
+            color: #ff0000;
+            margin-top: 3px;
+        }
+
+        /* Codes Container */
+        .codes-container-card {
+            background: linear-gradient(135deg, #1a1f2e, #0b111f);
+            border-radius: 20px;
+            overflow: hidden;
+            margin-bottom: 30px;
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.5);
+            border: 2px solid rgba(255, 0, 0, 0.3);
+        }
+
+        .codes-header {
+            background: linear-gradient(135deg, #ff0000, #c6019a);
+            padding: 25px 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 3px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .codes-header h5 {
+            color: #fff;
+            margin: 0;
+            font-size: 18px;
+            font-weight: 700;
+            text-transform: uppercase;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .btn-copy-all {
+            background: rgba(255, 255, 255, 0.2);
+            border: 2px solid rgba(255, 255, 255, 0.4);
+            color: #fff;
+            padding: 10px 20px;
+            border-radius: 8px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .btn-copy-all:hover {
+            background: rgba(255, 255, 255, 0.3);
+            border-color: rgba(255, 255, 255, 0.6);
+            transform: translateY(-2px);
+        }
+
+        .codes-body {
+            padding: 40px 30px;
+            background: #0b111f;
+        }
+
+        /* Individual Code Box */
+        .code-box {
+            background: linear-gradient(135deg, #1a1f2e, #0b111f);
+            border: 2px solid rgba(255, 0, 0, 0.2);
+            border-radius: 12px;
+            padding: 15px;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .code-box::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 0, 0, 0.1), transparent);
+            transition: left 0.5s;
+        }
+
+        .code-box:hover::before {
+            left: 100%;
+        }
+
+        .code-box:hover {
+            border-color: #ff0000;
+            box-shadow: 0 5px 20px rgba(255, 0, 0, 0.3);
+            transform: translateX(5px);
+        }
+
+        .backup-code-input {
+            flex: 1;
+            background: transparent;
+            border: none;
+            color: #fff;
+            font-family: 'Courier New', monospace;
+            font-size: 1.3rem;
+            letter-spacing: 0.15em;
+            text-align: center;
+            font-weight: bold;
+            padding: 12px;
+            text-shadow: 0 0 10px rgba(255, 0, 0, 0.3);
+        }
+
+        .backup-code-input:focus {
+            outline: none;
+        }
+
+        .btn-copy-single {
+            background: linear-gradient(135deg, #ff0000, #c6019a);
+            border: none;
+            color: #fff;
+            padding: 10px 15px;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .btn-copy-single:hover {
+            transform: scale(1.1);
+            box-shadow: 0 5px 15px rgba(255, 0, 0, 0.5);
+        }
+
+        /* Action Buttons */
+        .action-buttons {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .btn-action {
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.05), rgba(255, 255, 255, 0.02));
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            color: #fff;
+            padding: 16px 25px;
+            border-radius: 12px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            text-decoration: none;
+        }
+
+        .btn-action:hover {
+            background: linear-gradient(135deg, rgba(255, 0, 0, 0.2), rgba(198, 1, 154, 0.2));
+            border-color: #ff0000;
+            color: #fff;
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(255, 0, 0, 0.3);
+        }
+
+        .btn-action i {
+            font-size: 20px;
+        }
+
+        /* Tips Card */
+        .tips-card {
+            background: linear-gradient(135deg, rgba(56, 164, 255, 0.15), rgba(56, 164, 255, 0.05));
+            border-left: 5px solid #38a4ff;
+            border-radius: 12px;
+            padding: 25px;
+            margin-bottom: 30px;
+        }
+
+        .tips-card h5 {
+            color: #38a4ff;
+            font-size: 18px;
+            font-weight: 700;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .tips-card ul {
+            list-style: none;
+            padding-left: 0;
+            margin: 0;
+        }
+
+        .tips-card ul li {
+            color: rgba(255, 255, 255, 0.9);
+            padding: 10px 0;
+            display: flex;
+            align-items: start;
+            gap: 12px;
+        }
+
+        .tips-card ul li i {
+            color: #4cd3e3;
+            margin-top: 3px;
+        }
+
+        /* Final Actions */
+        .final-actions {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .btn-primary-action {
+            background: linear-gradient(135deg, #4cd3e3, #00bcd4);
+            border: none;
+            color: #fff;
+            padding: 18px 35px;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 700;
+            text-transform: uppercase;
+            transition: all 0.3s ease;
+            box-shadow: 0 8px 25px rgba(76, 211, 227, 0.3);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            text-decoration: none;
+        }
+
+        .btn-primary-action:hover {
+            background: linear-gradient(135deg, #00bcd4, #4cd3e3);
+            transform: translateY(-3px);
+            box-shadow: 0 12px 35px rgba(76, 211, 227, 0.5);
+            color: #fff;
+        }
+
+        .btn-secondary-action {
+            background: transparent;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            color: #fff;
+            padding: 14px 30px;
+            border-radius: 12px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            text-align: center;
+        }
+
+        .btn-secondary-action:hover {
+            background: rgba(255, 255, 255, 0.1);
+            border-color: rgba(255, 255, 255, 0.5);
+            color: #fff;
+        }
+
+        /* Toast Notification */
+        .toast-notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: linear-gradient(135deg, #4cd3e3, #00bcd4);
+            color: #fff;
+            padding: 20px 30px;
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(76, 211, 227, 0.5);
+            z-index: 9999;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            animation: slideIn 0.3s ease-out;
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateX(400px);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .backup-hero-content {
+                flex-direction: column;
+                text-align: center;
+            }
+
+            .action-buttons {
+                grid-template-columns: 1fr;
+            }
+
+            .codes-header {
+                flex-direction: column;
+                gap: 15px;
+            }
+
+            .btn-copy-all {
+                width: 100%;
+            }
+
+            .backup-code-input {
+                font-size: 1.1rem;
+            }
+        }
+
+        @media (max-width: 576px) {
+            .backup-section {
+                padding: 40px 0;
+            }
+
+            .backup-hero-card {
+                padding: 25px;
+            }
+
+            .backup-hero-content h2 {
+                font-size: 24px;
+            }
+
+            .hero-icon {
+                width: 70px;
+                height: 70px;
+            }
+
+            .hero-icon i {
+                font-size: 35px;
+            }
+
+            .codes-body {
+                padding: 25px 15px;
+            }
+        }
+    </style>
+{% endblock %}
 
 {% block body %}
-<div class="container mt-5">
-    <div class="row justify-content-center">
-        <div class="col-lg-8">
-            <div class="card shadow">
-                <div class="card-header bg-warning text-dark">
-                    <h3 class="mb-0">
-                        <i class="fas fa-key"></i> Your Backup Codes
-                    </h3>
-                </div>
-                <div class="card-body p-5">
-                    {% if is_new %}
-                        <div class="alert alert-success">
-                            <i class="fas fa-check-circle"></i>
-                            <strong>Success!</strong> Two-factor authentication is now enabled on your account.
+<section class="backup-section">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-10">
+                
+                <!-- Hero Card -->
+                <div class="backup-hero-card">
+                    <div class="backup-hero-content">
+                        <div class="hero-icon">
+                            <i class="fas fa-shield-alt"></i>
                         </div>
-                    {% endif %}
+                        <div>
+                            <h2>Backup Codes Secured!</h2>
+                            <p>Your emergency access codes are ready. Keep them safe!</p>
+                        </div>
+                    </div>
+                </div>
 
-                    <div class="alert alert-danger">
+                <!-- Success Banner -->
+                {% if is_new %}
+                    <div class="success-banner">
+                        <i class="fas fa-check-circle"></i>
+                        <div>
+                            <strong>Success!</strong>
+                            <p>Two-factor authentication is now active on your account.</p>
+                        </div>
+                    </div>
+                {% endif %}
+
+                <!-- Warning Card -->
+                <div class="warning-card-backup">
+                    <div class="warning-icon">
                         <i class="fas fa-exclamation-triangle"></i>
-                        <strong>Important:</strong> Save these backup codes in a secure place. Each code can only be used once.
                     </div>
-
-                    <div class="card bg-light mb-4">
-                        <div class="card-body">
-                            <h5 class="mb-3">What are backup codes?</h5>
-                            <p class="mb-2">Backup codes allow you to access your account if you:</p>
-                            <ul>
-                                <li>Lose your phone or authenticator device</li>
-                                <li>Can't access your authenticator app</li>
-                                <li>Get a new phone and haven't transferred your authenticator</li>
-                            </ul>
-                            <p class="mb-0 text-danger">
-                                <strong>Store these codes securely</strong> - treat them like passwords!
-                            </p>
-                        </div>
-                    </div>
-
-                    {# Backup Codes Display #}
-                    <div class="card border-primary mb-4">
-                        <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
-                            <span><i class="fas fa-lock"></i> Your Backup Codes</span>
-                            <button 
-                                type="button" 
-                                class="btn btn-sm btn-light"
-                                onclick="copyAllCodes()"
-                            >
-                                <i class="fas fa-copy"></i> Copy All
-                            </button>
-                        </div>
-                        <div class="card-body bg-light">
-                            <div id="backup-codes-container" class="row g-3">
-                                {% for code in backup_codes %}
-                                    <div class="col-md-6">
-                                        <div class="input-group">
-                                            <input 
-                                                type="text" 
-                                                class="form-control font-monospace text-center backup-code" 
-                                                value="{{ code }}" 
-                                                readonly
-                                                style="font-size: 1.1rem; letter-spacing: 0.1em;"
-                                            >
-                                            <button 
-                                                class="btn btn-outline-secondary" 
-                                                type="button"
-                                                onclick="copySingleCode(this)"
-                                                title="Copy"
-                                            >
-                                                <i class="fas fa-copy"></i>
-                                            </button>
-                                        </div>
-                                    </div>
-                                {% endfor %}
-                            </div>
-                        </div>
-                    </div>
-
-                    {# Actions #}
-                    <div class="row g-3 mb-4">
-                        <div class="col-md-6">
-                            <button 
-                                type="button" 
-                                class="btn btn-outline-primary w-100"
-                                onclick="printCodes()"
-                            >
-                                <i class="fas fa-print"></i> Print Codes
-                            </button>
-                        </div>
-                        <div class="col-md-6">
-                            <button 
-                                type="button" 
-                                class="btn btn-outline-primary w-100"
-                                onclick="downloadCodes()"
-                            >
-                                <i class="fas fa-download"></i> Download as Text
-                            </button>
-                        </div>
-                    </div>
-
-                    <div class="alert alert-info">
-                        <i class="fas fa-info-circle"></i>
-                        <strong>Tips for storing backup codes:</strong>
-                        <ul class="mb-0 mt-2">
-                            <li>Save them in a password manager</li>
-                            <li>Print them and store in a safe place</li>
-                            <li>Take a screenshot and store it securely (encrypted)</li>
-                            <li>Never share them with anyone</li>
-                        </ul>
-                    </div>
-
-                    <div class="d-grid gap-2">
-                        <a href="{{ path('app_2fa_settings') }}" class="btn btn-success btn-lg">
-                            <i class="fas fa-check"></i> I've Saved My Backup Codes
-                        </a>
-                        <a href="{{ path('app_dashboard') }}" class="btn btn-outline-secondary">
-                            Go to Dashboard
-                        </a>
+                    <div class="warning-content">
+                        <strong>Critical Security Notice</strong>
+                        <p>Save these backup codes in a secure location immediately. Each code can only be used once and they are your only way to recover account access if you lose your authenticator device.</p>
                     </div>
                 </div>
+
+                <!-- Info Card -->
+                <div class="info-card-backup">
+                    <h5>
+                        <i class="fas fa-info-circle"></i>
+                        What are backup codes?
+                    </h5>
+                    <p>Backup codes are your emergency access method when you can't use your authenticator app. You'll need them if:</p>
+                    <ul>
+                        <li>
+                            <i class="fas fa-mobile-alt"></i>
+                            <span>You lose your phone or authenticator device</span>
+                        </li>
+                        <li>
+                            <i class="fas fa-ban"></i>
+                            <span>You can't access your authenticator app</span>
+                        </li>
+                        <li>
+                            <i class="fas fa-sync-alt"></i>
+                            <span>You get a new phone and haven't transferred your authenticator</span>
+                        </li>
+                        <li>
+                            <i class="fas fa-wrench"></i>
+                            <span>Your authenticator app is malfunctioning</span>
+                        </li>
+                    </ul>
+                    <p class="mb-0" style="color: #f44a40; font-weight: 600;">
+                        <i class="fas fa-lock"></i> Store these codes as securely as you would store your password!
+                    </p>
+                </div>
+
+                <!-- Codes Container -->
+                <div class="codes-container-card">
+                    <div class="codes-header">
+                        <h5>
+                            <i class="fas fa-key"></i>
+                            Your Backup Codes ({{ backup_codes|length }})
+                        </h5>
+                        <button 
+                            type="button" 
+                            class="btn-copy-all"
+                            onclick="copyAllCodes()"
+                        >
+                            <i class="fas fa-copy"></i> Copy All Codes
+                        </button>
+                    </div>
+                    <div class="codes-body">
+                        <div id="backup-codes-container">
+                            {% for code in backup_codes %}
+                                <div class="code-box">
+                                    <input 
+                                        type="text" 
+                                        class="backup-code-input" 
+                                        value="{{ code }}" 
+                                        readonly
+                                    >
+                                    <button 
+                                        class="btn-copy-single" 
+                                        type="button"
+                                        onclick="copySingleCode(this)"
+                                        title="Copy this code"
+                                    >
+                                        <i class="fas fa-copy"></i>
+                                    </button>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Action Buttons -->
+                <div class="action-buttons">
+                    <button 
+                        type="button" 
+                        class="btn-action"
+                        onclick="printCodes()"
+                    >
+                        <i class="fas fa-print"></i>
+                        <span>Print Codes</span>
+                    </button>
+                    <button 
+                        type="button" 
+                        class="btn-action"
+                        onclick="downloadCodes()"
+                    >
+                        <i class="fas fa-download"></i>
+                        <span>Download as Text</span>
+                    </button>
+                </div>
+
+                <!-- Tips Card -->
+                <div class="tips-card">
+                    <h5>
+                        <i class="fas fa-lightbulb"></i>
+                        Tips for storing backup codes
+                    </h5>
+                    <ul>
+                        <li>
+                            <i class="fas fa-check-circle"></i>
+                            <span>Save them in a password manager (recommended)</span>
+                        </li>
+                        <li>
+                            <i class="fas fa-check-circle"></i>
+                            <span>Print them and store in a safe or secure location</span>
+                        </li>
+                        <li>
+                            <i class="fas fa-check-circle"></i>
+                            <span>Take a screenshot and store it in an encrypted folder</span>
+                        </li>
+                        <li>
+                            <i class="fas fa-times-circle"></i>
+                            <span>Never share them with anyone, even support staff</span>
+                        </li>
+                        <li>
+                            <i class="fas fa-times-circle"></i>
+                            <span>Don't store them in plain text on your computer</span>
+                        </li>
+                    </ul>
+                </div>
+
+                <!-- Final Actions -->
+                <div class="final-actions">
+                    <a href="{{ path('app_2fa_settings') }}" class="btn-primary-action">
+                        <i class="fas fa-check-double"></i>
+                        I've Saved My Backup Codes
+                    </a>
+                    <a href="{{ path('app_dashboard') }}" class="btn-secondary-action">
+                        <i class="fas fa-arrow-left"></i> Go to Dashboard
+                    </a>
+                </div>
+
             </div>
         </div>
     </div>
-</div>
+</section>
 
 {# Hidden print template #}
 <div id="print-template" style="display: none;">
-    <h2>Two-Factor Authentication Backup Codes</h2>
-    <p><strong>Account:</strong> {{ app.user.email }}</p>
-    <p><strong>Generated:</strong> {{ "now"|date("Y-m-d H:i:s") }}</p>
-    <hr>
-    <p><strong>⚠️ IMPORTANT: Keep these codes secure and confidential!</strong></p>
-    <ul style="list-style: none; font-family: monospace; font-size: 14pt;">
-        {% for code in backup_codes %}
-            <li style="margin: 10px 0;">{{ code }}</li>
-        {% endfor %}
-    </ul>
-    <hr>
-    <p style="font-size: 10pt;">
-        Each code can only be used once. Use these codes if you lose access to your authenticator app.
-    </p>
+    <div style="padding: 40px; font-family: Arial, sans-serif;">
+        <h1 style="color: #000; border-bottom: 3px solid #ff0000; padding-bottom: 15px;">
+            Two-Factor Authentication Backup Codes
+        </h1>
+        <p><strong>Account:</strong> {{ app.user.email }}</p>
+        <p><strong>Generated:</strong> {{ "now"|date("Y-m-d H:i:s") }}</p>
+        <div style="background: #fff3cd; border-left: 5px solid #ffc107; padding: 15px; margin: 20px 0;">
+            <p style="margin: 0; color: #856404;">
+                <strong>⚠️ SECURITY WARNING:</strong> Keep these codes secure and confidential! Treat them like passwords.
+            </p>
+        </div>
+        <div style="background: #f8f9fa; padding: 20px; border-radius: 8px; margin: 20px 0;">
+            <h3 style="color: #000; margin-top: 0;">Your Backup Codes:</h3>
+            <ul style="list-style: none; padding: 0; font-family: 'Courier New', monospace; font-size: 16pt;">
+                {% for code in backup_codes %}
+                    <li style="margin: 15px 0; padding: 10px; background: #fff; border: 1px solid #dee2e6; border-radius: 4px;">
+                        {{ loop.index }}. {{ code }}
+                    </li>
+                {% endfor %}
+            </ul>
+        </div>
+        <div style="border-top: 2px solid #dee2e6; padding-top: 15px; margin-top: 30px;">
+            <p style="font-size: 10pt; color: #6c757d;">
+                <strong>Important Notes:</strong><br>
+                • Each code can only be used once<br>
+                • Use these codes if you lose access to your authenticator app<br>
+                • Store this document in a secure location<br>
+                • Never share these codes with anyone
+            </p>
+        </div>
+    </div>
 </div>
 
 <script>
@@ -150,7 +736,9 @@
         const codesText = codes.join('\n');
         
         navigator.clipboard.writeText(codesText).then(() => {
-            showCopyFeedback('All codes copied to clipboard!');
+            showNotification('All backup codes copied to clipboard!', 'success');
+        }).catch(err => {
+            showNotification('Failed to copy codes', 'error');
         });
     }
 
@@ -161,29 +749,35 @@
         navigator.clipboard.writeText(code).then(() => {
             const originalHTML = button.innerHTML;
             button.innerHTML = '<i class="fas fa-check"></i>';
-            button.classList.remove('btn-outline-secondary');
-            button.classList.add('btn-success');
+            button.style.background = 'linear-gradient(135deg, #4cd3e3, #00bcd4)';
             
             setTimeout(() => {
                 button.innerHTML = originalHTML;
-                button.classList.remove('btn-success');
-                button.classList.add('btn-outline-secondary');
+                button.style.background = 'linear-gradient(135deg, #ff0000, #c6019a)';
             }, 2000);
         });
     }
 
-    function showCopyFeedback(message) {
-        const alert = document.createElement('div');
-        alert.className = 'alert alert-success alert-dismissible fade show position-fixed top-0 start-50 translate-middle-x mt-3';
-        alert.style.zIndex = '9999';
-        alert.innerHTML = `
-            <i class="fas fa-check-circle"></i> ${message}
-            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    function showNotification(message, type = 'success') {
+        const notification = document.createElement('div');
+        notification.className = 'toast-notification';
+        
+        const icon = type === 'success' ? 'fa-check-circle' : 'fa-exclamation-circle';
+        const bgColor = type === 'success' 
+            ? 'linear-gradient(135deg, #4cd3e3, #00bcd4)' 
+            : 'linear-gradient(135deg, #f44a40, #ff0000)';
+        
+        notification.style.background = bgColor;
+        notification.innerHTML = `
+            <i class="fas ${icon}" style="font-size: 24px;"></i>
+            <span style="font-weight: 600;">${message}</span>
         `;
-        document.body.appendChild(alert);
+        
+        document.body.appendChild(notification);
         
         setTimeout(() => {
-            alert.remove();
+            notification.style.animation = 'slideOut 0.3s ease-out';
+            setTimeout(() => notification.remove(), 300);
         }, 3000);
     }
 
@@ -199,29 +793,65 @@
 
     function downloadCodes() {
         const codes = {{ backup_codes|json_encode|raw }};
-        const content = `Two-Factor Authentication Backup Codes
+        const content = `===================================================
+   TWO-FACTOR AUTHENTICATION BACKUP CODES
+===================================================
+
 Account: {{ app.user.email }}
 Generated: {{ "now"|date("Y-m-d H:i:s") }}
 
-⚠️ IMPORTANT: Keep these codes secure and confidential!
+⚠️  CRITICAL SECURITY NOTICE  ⚠️
+Keep these codes secure and confidential!
+Treat them like passwords!
 
-${codes.join('\n')}
+---------------------------------------------------
+YOUR BACKUP CODES:
+---------------------------------------------------
 
-Each code can only be used once.
-Use these codes if you lose access to your authenticator app.`;
+${codes.map((code, index) => `${index + 1}. ${code}`).join('\n')}
+
+---------------------------------------------------
+IMPORTANT INFORMATION:
+---------------------------------------------------
+
+• Each code can only be used once
+• Use these codes if you lose access to your authenticator app
+• Store this file in a secure, encrypted location
+• Never share these codes with anyone
+• These codes are as sensitive as your password
+
+===================================================
+           Keep this document safe!
+===================================================`;
         
-        const blob = new Blob([content], { type: 'text/plain' });
+        const blob = new Blob([content], { type: 'text/plain;charset=utf-8' });
         const url = window.URL.createObjectURL(blob);
         const a = document.createElement('a');
         a.href = url;
-        a.download = '2fa-backup-codes.txt';
+        a.download = 'eyetwin-2fa-backup-codes-' + new Date().toISOString().split('T')[0] + '.txt';
         document.body.appendChild(a);
         a.click();
         document.body.removeChild(a);
         window.URL.revokeObjectURL(url);
         
-        showCopyFeedback('Backup codes downloaded!');
+        showNotification('Backup codes downloaded successfully!', 'success');
     }
+
+    // Add animation for slide out
+    const style = document.createElement('style');
+    style.textContent = `
+        @keyframes slideOut {
+            from {
+                transform: translateX(0);
+                opacity: 1;
+            }
+            to {
+                transform: translateX(400px);
+                opacity: 0;
+            }
+        }
+    `;
+    document.head.appendChild(style);
 </script>
 
 <style>
