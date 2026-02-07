@@ -50,6 +50,14 @@ class AdminMatchController extends AbstractController
         ]);
     }
 
+    #[Route('/matches/{id}', name: 'admin_matches_show', methods: ['GET'])]
+    public function show(Matches $match): Response
+    {
+        return $this->render('admin/match/show.html.twig', [
+            'match' => $match,
+        ]);
+    }
+
     #[Route('/matches/{id}/edit', name: 'admin_matches_edit', methods: ['GET', 'POST'])]
     public function edit(Request $request, Matches $match, EntityManagerInterface $entityManager): Response
     {

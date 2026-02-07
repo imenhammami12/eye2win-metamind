@@ -88,14 +88,26 @@
                 <table class="custom-table table">
                     <thead>
                         <tr>
-                            <th>Matches</th>
-                            {# Add more match details columns if needed #}
+                            <th>Match Title</th>
+                            <th>Date</th>
+                            <th class="text-end">Actions</th>
                         </tr>
                     </thead>
                     <tbody>
                         {% for match in tournoi.matchs %}
                             <tr>
-                                <td>Match details here...</td>
+                                <td>
+                                    <a href="{{ path('admin_matches_show', {id: match.id}) }}" class="text-white text-decoration-none hover-effect fw-bold">
+                                        {{ match.equipe1 }} <span class="text-muted mx-1">vs</span> {{ match.equipe2 }}
+                                        <i class="bi bi-box-arrow-up-right ms-2 small opacity-50"></i>
+                                    </a>
+                                </td>
+                                <td>{{ match.dateMatch ? match.dateMatch|date('M d, Y') : 'N/A' }}</td>
+                                <td class="text-end">
+                                    <a href="{{ path('admin_matches_show', {id: match.id}) }}" class="btn btn-sm btn-outline-info">
+                                        <i class="bi bi-eye"></i> Details
+                                    </a>
+                                </td>
                             </tr>
                         {% else %}
                             <tr>
