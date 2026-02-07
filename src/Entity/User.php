@@ -114,6 +114,11 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, TwoFact
 
     #[ORM\OneToMany(mappedBy: 'user', targetEntity: TrainingSession::class)]
     private Collection $trainingSessions;
+    /**
+     * @var Collection<int, Video>
+     */
+    #[ORM\OneToMany(targetEntity: Video::class, mappedBy: 'uploadedBy', orphanRemoval: true)]
+    private Collection $videos;
 
     public function __construct()
     {
@@ -129,7 +134,6 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, TwoFact
         $this->rolesJson = json_encode(['ROLE_USER']);
         $this->isTotpEnabled = false;
     }
-
     public function getId(): ?int
     {
         return $this->id;

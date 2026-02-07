@@ -1,0 +1,86 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}{{ video.title }}{% endblock %}
+
+{% block body %}
+<section class="breadcrumb breadcrumb_bg">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-12">
+                <div class="breadcrumb_iner text-center">
+                    <div class="breadcrumb_iner_item">
+                        <h2>{{ video.title }}</h2>
+                        <p><a href="{{ path('app_home') }}">Accueil</a> <span>-</span> Vidéo</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="blog_part section_padding">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8">
+                <div class="card mb-4">
+                    <div class="card-body">
+                        <p class="text-muted mb-2">{{ video.gameType }}</p>
+                        <video class="w-100" controls preload="metadata">
+                            <source src="{{ video.videoUrl }}" type="video/mp4">
+                        </video>
+                        <div class="mt-3">
+                            <span class="badge badge-info">{{ video.status }}</span>
+                            {% if video.duration %}
+                                <span class="badge badge-light">Durée: {{ video.duration|number_format(1) }}s</span>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-4">
+                <div class="card">
+                    <div class="card-body">
+                        <h5>Infos</h5>
+                        <p class="mb-1"><strong>Uploadé le :</strong> {{ video.createdAt ? video.createdAt|date('d/m/Y H:i') : '—' }}</p>
+                        <p class="mb-0"><strong>Uploader :</strong> {{ video.uploadedBy ? video.uploadedBy.username : '—' }}</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-lg-12">
+                <div class="card">
+                    <div class="card-body">
+                        <h4 class="mb-3">Player Stats</h4>
+                        {% if playerStats is empty %}
+                            <div class="alert alert-info">Aucune statistique disponible.</div>
+                        {% else %}
+                            <div class="table-responsive">
+                                <table class="table table-striped">
+                                    <thead>
+                                        <tr>
+                                            <th>Score</th>
+                                            <th>Accuracy</th>
+                                            <th>Actions</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% for stat in playerStats %}
+                                            <tr>
+                                                <td>{{ stat.score }}</td>
+                                                <td>{{ stat.accuracy }}%</td>
+                                                <td>{{ stat.actionsCount }}</td>
+                                            </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

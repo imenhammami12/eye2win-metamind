@@ -24,6 +24,13 @@ services:
             - '../src/Entity/'
             - '../src/Kernel.php'
 
+    App\Service\CloudinaryUploader:
+        arguments:
+            $cloudName: '%env(CLOUDINARY_CLOUD_NAME)%'
+            $apiKey: '%env(CLOUDINARY_API_KEY)%'
+            $apiSecret: '%env(CLOUDINARY_API_SECRET)%'
+            $defaultFolder: '%env(default::CLOUDINARY_DEFAULT_FOLDER)%'
+
     # add more service definitions when explicit configuration is needed
     # please note that last definitions always *replace* previous ones
     
