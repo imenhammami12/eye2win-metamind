@@ -1,0 +1,39 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Uploader une vidéo{% endblock %}
+
+{% block body %}
+<section class="breadcrumb breadcrumb_bg">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-12">
+                <div class="breadcrumb_iner text-center">
+                    <div class="breadcrumb_iner_item">
+                        <h2>Upload vidéo</h2>
+                        <p><a href="{{ path('app_home') }}">Accueil</a> <span>-</span> Upload</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="blog_part section_padding">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8 mx-auto">
+                <div class="card">
+                    <div class="card-body">
+                        {{ form_start(form) }}
+                            {{ form_row(form.title) }}
+                            {{ form_row(form.gameType) }}
+                            {{ form_row(form.videoFile) }}
+                            <button class="btn btn-primary">Uploader</button>
+                        {{ form_end(form) }}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

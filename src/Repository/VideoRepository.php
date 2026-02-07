@@ -3,6 +3,7 @@
 namespace App\Repository;
 
 use App\Entity\Video;
+use App\Entity\User;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
@@ -14,6 +15,31 @@ class VideoRepository extends ServiceEntityRepository
     public function __construct(ManagerRegistry $registry)
     {
         parent::__construct($registry, Video::class);
+    }
+
+    /**
+     * @return Video[]
+     */
+    public function findByUser(User $user): array
+    {
+        return $this->createQueryBuilder('v')
+            ->andWhere('v.uploadedBy = :user')
+            ->setParameter('user', $user)
+            ->orderBy('v.uploadedAt', 'DESC')
+            ->getQuery()
+            ->getResult();
+    }
+
+    /**
+     * @return Video[]
+     */
+    public function findLatest(int $limit): array
+    {
+        return $this->createQueryBuilder('v')
+            ->orderBy('v.uploadedAt', 'DESC')
+            ->setMaxResults($limit)
+            ->getQuery()
+            ->getResult();
     }
 
 //    /**
