@@ -72,4 +72,65 @@ class AdminTournoiController extends AbstractController
             'form' => $form->createView(),
         ]);
     }
+
+    #[Route('/{id}', name: 'admin_tournoi_show', methods: ['GET'])]
+    public function show(Tournoi $tournoi): Response
+    {
+        return $this->render('admin/tournoi/show.html.twig', [
+            'tournoi' => $tournoi,
+        ]);
+    }
+
+    #[Route('/{id}/edit', name: 'admin_tournoi_edit', methods: ['GET', 'POST'])]
+    public function edit(Request $request, Tournoi $tournoi, EntityManagerInterface $entityManager, SluggerInterface $slugger): Response
+    {
+        $form = $this->createForm(TournoiType::class, $tournoi);
+        $form->handleRequest($request);
+
+        if ($form->isSubmitted() && $form->isValid()) {
+            // Handle image upload
+            /** @var UploadedFile $imageFile */
+            $imageFile = $form->get('image')->getData();
+
+            if ($imageFile) {
+                $originalFilename = pathinfo($imageFile->getClientOriginalName(), PATHINFO_FILENAME);
+                $safeFilename = $slugger->slug($originalFilename);
+                $newFilename = $safeFilename.'-'.uniqid().'.'.$imageFile->guessExtension();
+
+                try {
+                    $imageFile->move(
+                        $this->getParameter('tournois_directory'),
+                        $newFilename
+                    );
+                } catch (FileException $e) {
+                    $this->addFlash('error', 'Error uploading image');
+                }
+
+                $tournoi->setImage($newFilename);
+            }
+
+            $entityManager->flush();
+
+            $this->addFlash('success', 'Tournoi updated successfully');
+
+            return $this->redirectToRoute('admin_tournoi_index');
+        }
+
+        return $this->render('admin/tournoi/edit.html.twig', [
+            'tournoi' => $tournoi,
+            'form' => $form->createView(),
+        ]);
+    }
+
+    #[Route('/{id}', name: 'admin_tournoi_delete', methods: ['POST'])]
+    public function delete(Request $request, Tournoi $tournoi, EntityManagerInterface $entityManager): Response
+    {
+        if ($this->isCsrfTokenValid('delete-'.$tournoi->getId(), $request->request->get('_token'))) {
+            $entityManager->remove($tournoi);
+            $entityManager->flush();
+            $this->addFlash('success', 'Tournoi deleted successfully');
+        }
+
+        return $this->redirectToRoute('admin_tournoi_index');
+    }
 }
