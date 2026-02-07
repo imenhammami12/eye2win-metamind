@@ -6,6 +6,9 @@ use App\Repository\MatchesRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
+use Symfony\Component\Validator\Constraints as Assert;
+use Symfony\Component\Validator\Context\ExecutionContextInterface;
+
 #[ORM\Entity(repositoryClass: MatchesRepository::class)]
 #[ORM\Table(name: 'matches')]
 class Matches
@@ -20,16 +23,43 @@ class Matches
     private ?Tournoi $tournoi = null;
 
     #[ORM\Column(length: 255)]
+    #[Assert\NotBlank(message: "Team 1 name is required.")]
     private ?string $equipe1 = null;
 
     #[ORM\Column(length: 255)]
+    #[Assert\NotBlank(message: "Team 2 name is required.")]
     private ?string $equipe2 = null;
 
     #[ORM\Column]
+    #[Assert\NotBlank(message: "Score is required.")]
     private ?int $score = null;
 
     #[ORM\Column(type: Types::DATE_MUTABLE)]
+    #[Assert\NotBlank(message: "Match date is required.")]
     private ?\DateTimeInterface $dateMatch = null;
+
+    #[Assert\Callback]
+    public function validateDate(ExecutionContextInterface $context, mixed $payload): void
+    {
+        if ($this->tournoi && $this->dateMatch) {
+            $dateDebut = $this->tournoi->getDateDebut();
+            $dateFin = $this->tournoi->getDateFin();
+
+            if ($dateDebut && $this->dateMatch < $dateDebut) {
+                $context->buildViolation('The match date cannot be before the tournament start date ({{ date }}).')
+                    ->setParameter('{{ date }}', $dateDebut->format('Y-m-d'))
+                    ->atPath('dateMatch')
+                    ->addViolation();
+            }
+
+            if ($dateFin && $this->dateMatch > $dateFin) {
+                $context->buildViolation('The match date cannot be after the tournament end date ({{ date }}).')
+                    ->setParameter('{{ date }}', $dateFin->format('Y-m-d'))
+                    ->atPath('dateMatch')
+                    ->addViolation();
+            }
+        }
+    }
 
     #[ORM\Column(enumType: Prix::class)]
     private ?Prix $prix = null;
