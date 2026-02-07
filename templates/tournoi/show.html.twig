@@ -1,0 +1,133 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}{{ tournament.nom }} - EyeTwin{% endblock %}
+
+{% block body %}
+    <!-- Breadcrumb -->
+    <section class="breadcrumb breadcrumb_bg">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-12">
+                    <div class="breadcrumb_iner text-center">
+                        <div class="breadcrumb_iner_item">
+                            <h2>{{ tournament.nom }}</h2>
+                            <p><a href="{{ path('app_tournoi_index') }}">Tournaments</a> <span>-</span> Details</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Tournament Details -->
+    <section class="tournament_details section_padding">
+        <div class="container">
+            <div class="row">
+                <!-- Sidebar / Image -->
+                <div class="col-lg-4">
+                    <div class="card border-0 shadow-sm mb-4">
+                        {% if tournament.image %}
+                            <img src="{{ asset('uploads/tournois/' ~ tournament.image) }}" 
+                                 class="card-img-top rounded" 
+                                 alt="{{ tournament.nom }}">
+                        {% else %}
+                            <div class="bg-dark d-flex align-items-center justify-content-center rounded" style="height: 300px;">
+                                <i class="fas fa-trophy fa-5x text-white-50"></i>
+                            </div>
+                        {% endif %}
+                        <div class="card-body">
+                            <h4 class="mb-3">Tournament Info</h4>
+                            <ul class="list-group list-group-flush">
+                                <li class="list-group-item d-flex justify-content-between align-items-center">
+                                    Type
+                                    <span class="badge bg-primary rounded-pill">{{ tournament.typeTournoi ? tournament.typeTournoi.name : 'N/A' }}</span>
+                                </li>
+                                <li class="list-group-item d-flex justify-content-between align-items-center">
+                                    Start Date
+                                    <span>{{ tournament.dateDebut ? tournament.dateDebut|date('M d, Y') : 'TBA' }}</span>
+                                </li>
+                                <li class="list-group-item d-flex justify-content-between align-items-center">
+                                    End Date
+                                    <span>{{ tournament.dateFin ? tournament.dateFin|date('M d, Y') : 'TBA' }}</span>
+                                </li>
+                                <li class="list-group-item d-flex justify-content-between align-items-center">
+                                    Total Matches
+                                    <span class="badge bg-secondary rounded-pill">{{ matches|length }}</span>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Main Content -->
+                <div class="col-lg-8">
+                    <div class="content_wrapper">
+                        <h3 class="mb-3">Description</h3>
+                        <p class="text-muted mb-5">
+                            {{ tournament.description|default('No description available for this tournament.')|nl2br }}
+                        </p>
+                        
+                        <h3 class="mb-4">Match Schedule</h3>
+                        
+                        {% if matches|length > 0 %}
+                            <div class="table-responsive">
+                                <table class="table table-hover align-middle custom-table">
+                                    <thead class="table-light">
+                                        <tr>
+                                            <th>Date</th>
+                                            <th class="text-center">Team 1</th>
+                                            <th class="text-center">Score</th>
+                                            <th class="text-center">Team 2</th>
+                                            <th>Status</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% for match in matches %}
+                                            <tr>
+                                                <td>
+                                                    <i class="far fa-clock text-primary me-2"></i>
+                                                    {{ match.dateMatch ? match.dateMatch|date('M d, Y H:i') : 'TBA' }}
+                                                </td>
+                                                <td class="text-center fw-bold">
+                                                    {{ match.equipe1 }}
+                                                </td>
+                                                <td class="text-center">
+                                                    {% if match.score is not null %}
+                                                        <span class="badge bg-dark px-3 py-2">{{ match.score }}</span>
+                                                    {% else %}
+                                                        <span class="text-muted">- vs -</span>
+                                                    {% endif %}
+                                                </td>
+                                                <td class="text-center fw-bold">
+                                                    {{ match.equipe2 }}
+                                                </td>
+                                                <td>
+                                                    {% if match.dateMatch and match.dateMatch < date() %}
+                                                        <span class="badge bg-success">Finished</span>
+                                                    {% else %}
+                                                        <span class="badge bg-warning text-dark">Upcoming</span>
+                                                    {% endif %}
+                                                </td>
+                                            </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                        {% else %}
+                            <div class="alert alert-warning">
+                                <i class="fas fa-exclamation-triangle me-2"></i>
+                                No matches have been scheduled for this tournament yet.
+                            </div>
+                        {% endif %}
+                        
+                        <div class="mt-5">
+                            <a href="{{ path('app_tournoi_index') }}" class="btn btn-outline-primary">
+                                <i class="fas fa-arrow-left me-2"></i> Back to Tournaments
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+{% endblock %}
