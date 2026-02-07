@@ -1,0 +1,185 @@
+{% extends 'admin_layout.html.twig' %}
+
+{% block title %}Create Tournoi{% endblock %}
+{% block page_title %}Create New Tournoi{% endblock %}
+
+{% block body %}
+<div class="mb-3 fade-in">
+    <a href="{{ path('admin_tournoi_index') }}" class="btn btn-outline-secondary">
+        <i class="bi bi-arrow-left me-2"></i>Back to List
+    </a>
+</div>
+
+<div class="row justify-content-center fade-in" style="animation-delay: 0.1s;">
+    <div class="col-lg-8">
+        <div class="table-card">
+            <div class="card-header-gradient" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 1.5rem; border-radius: 16px 16px 0 0;">
+                <h5 class="mb-0 text-white"><i class="bi bi-trophy me-2"></i>Tournoi Information</h5>
+            </div>
+            
+            {{ form_start(form, {'attr': {'class': 'p-4', 'id': 'createTournoiForm'}}) }}
+                
+                <div class="row g-4">
+                    {# Nom #}
+                    <div class="col-md-12 form-group-enhanced">
+                        <label class="form-label fw-bold">
+                            <i class="bi bi-tag me-1"></i>
+                            Nom du Tournoi
+                            <span class="required-indicator" style="color: #fa709a;">*</span>
+                        </label>
+                        {{ form_widget(form.nom) }}
+                        {{ form_errors(form.nom) }}
+                        <small class="form-help-text text-muted">
+                            <i class="bi bi-info-circle me-1"></i>Enter the tournament name
+                        </small>
+                    </div>
+
+                    {# Dates #}
+                    <div class="col-md-6 form-group-enhanced">
+                        <label class="form-label fw-bold">
+                            <i class="bi bi-calendar-event me-1"></i>
+                            Date de Début
+                            <span class="required-indicator" style="color: #fa709a;">*</span>
+                        </label>
+                        {{ form_widget(form.dateDebut) }}
+                        {{ form_errors(form.dateDebut) }}
+                    </div>
+
+                    <div class="col-md-6 form-group-enhanced">
+                        <label class="form-label fw-bold">
+                            <i class="bi bi-calendar-check me-1"></i>
+                            Date de Fin
+                            <span class="required-indicator" style="color: #fa709a;">*</span>
+                        </label>
+                        {{ form_widget(form.dateFin) }}
+                        {{ form_errors(form.dateFin) }}
+                    </div>
+                    
+                    {# Type #}
+                    <div class="col-md-6 form-group-enhanced">
+                        <label class="form-label fw-bold">
+                            <i class="bi bi-list-task me-1"></i>
+                            Type
+                        </label>
+                        {{ form_widget(form.typeTournoi) }}
+                        {{ form_errors(form.typeTournoi) }}
+                    </div>
+
+                    {# Statut #}
+                    <div class="col-md-6 form-group-enhanced">
+                        <label class="form-label fw-bold">
+                            <i class="bi bi-flag me-1"></i>
+                            Statut
+                        </label>
+                        {{ form_widget(form.statut) }}
+                        {{ form_errors(form.statut) }}
+                    </div>
+
+                    {# Image #}
+                    <div class="col-md-12 form-group-enhanced">
+                        <label class="form-label fw-bold">
+                            <i class="bi bi-image me-1"></i>
+                            Logo (Image)
+                        </label>
+                        {{ form_widget(form.image) }}
+                        {{ form_errors(form.image) }}
+                        <small class="form-help-text text-muted">
+                            <i class="bi bi-info-circle me-1"></i>Upload a logo for the tournament (JPEG, PNG, WEBP)
+                        </small>
+                    </div>
+                </div>
+                
+                {# Action Buttons #}
+                <div class="mt-4 d-flex gap-2">
+                    <button type="submit" class="btn btn-success" id="submitBtn">
+                        <i class="bi bi-save me-2"></i>Create Tournoi
+                    </button>
+                    <a href="{{ path('admin_tournoi_index') }}" class="btn btn-outline-secondary">
+                        <i class="bi bi-x-circle me-2"></i>Cancel
+                    </a>
+                </div>
+
+            {{ form_end(form) }}
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block javascripts %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Form validation with enhanced feedback
+    const form = document.getElementById('createTournoiForm');
+    const submitBtn = document.getElementById('submitBtn');
+    
+    if (form) {
+        form.addEventListener('submit', function(e) {
+            if (!form.checkValidity()) {
+                e.preventDefault();
+                e.stopPropagation();
+                
+                form.classList.add('was-validated');
+                
+                // Focus on first invalid field
+                const firstInvalid = form.querySelector(':invalid');
+                if (firstInvalid) {
+                    firstInvalid.focus();
+                    firstInvalid.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                }
+                
+                // Shake animation
+                submitBtn.style.animation = 'shake 0.5s';
+                setTimeout(() => {
+                    submitBtn.style.animation = '';
+                }, 500);
+            } else {
+                // Show floating loading state but let form submit
+                submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Creating...';
+                submitBtn.style.opacity = '0.8';
+            }
+        });
+        
+        // Real-time validation feedback
+        form.querySelectorAll('input, select').forEach(input => {
+            input.addEventListener('blur', function() {
+                if (this.checkValidity()) {
+                    this.classList.add('is-valid');
+                    this.classList.remove('is-invalid');
+                } else {
+                    this.classList.add('is-invalid');
+                    this.classList.remove('is-valid');
+                }
+            });
+            
+            input.addEventListener('input', function() {
+                if (this.classList.contains('is-invalid') && this.checkValidity()) {
+                    this.classList.remove('is-invalid');
+                    this.classList.add('is-valid');
+                }
+            });
+        });
+    }
+});
+
+// Shake animation style
+const style = document.createElement('style');
+style.textContent = `
+    @keyframes shake {
+        0%, 100% { transform: translateX(0); }
+        25% { transform: translateX(-10px); }
+        75% { transform: translateX(10px); }
+    }
+    
+    .form-control.is-valid {
+        border-color: #43e97b;
+        box-shadow: 0 0 0 0.15rem rgba(67, 233, 123, 0.25);
+    }
+    
+    .form-control.is-invalid {
+        border-color: #fa709a;
+        box-shadow: 0 0 0 0.15rem rgba(250, 112, 154, 0.25);
+    }
+`;
+document.head.appendChild(style);
+</script>
+{% endblock %}
