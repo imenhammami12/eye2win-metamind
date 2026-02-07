@@ -58,14 +58,14 @@ class TournoiType extends AbstractType
                     ]),
                 ],
             ])
-            ->add('statut', TextType::class, [
-                'label' => 'Statut',
+            ->add('description', \Symfony\Component\Form\Extension\Core\Type\TextareaType::class, [
+                'label' => 'Description',
                 'required' => false,
                 'attr' => [
-                    'placeholder' => 'ex: En cours, Terminé, À venir',
+                    'placeholder' => 'Description du tournoi...',
                     'class' => 'form-control',
+                    'rows' => 4,
                 ],
-                'empty_data' => 'À venir', 
             ])
             ->add('image', FileType::class, [
                 'label' => 'Logo du Tournoi (Image file)',

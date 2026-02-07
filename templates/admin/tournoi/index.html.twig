@@ -33,7 +33,7 @@
                     <th>Nom</th>
                     <th>Type</th>
                     <th>Dates</th>
-                    <th>Statut</th>
+                    <th>Description</th>
                     <th>Matchs</th>
                     <th style="width: 180px;">Actions</th>
                 </tr>
@@ -67,7 +67,9 @@
                             <div><small class="text-muted">End:</small> {{ tournoi.dateFin ? tournoi.dateFin|date('M d, Y') : 'N/A' }}</div>
                         </td>
                         <td>
-                            <span class="badge bg-info">{{ tournoi.statut }}</span>
+                            <small class="text-muted d-block text-truncate" style="max-width: 150px;">
+                                {{ tournoi.description|default('No description') }}
+                            </small>
                         </td>
                         <td>
                             <span class="badge bg-light text-dark border">

@@ -25,8 +25,8 @@ class Tournoi
     #[ORM\Column(type: Types::DATE_MUTABLE)]
     private ?\DateTimeInterface $dateFin = null;
 
-    #[ORM\Column(length: 255)]
-    private ?string $statut = null;
+    #[ORM\Column(type: Types::TEXT, nullable: true)]
+    private ?string $description = null;
 
     #[ORM\Column(length: 255)]
     private ?string $image = null;
@@ -83,14 +83,14 @@ class Tournoi
         return $this;
     }
 
-    public function getStatut(): ?string
+    public function getDescription(): ?string
     {
-        return $this->statut;
+        return $this->description;
     }
 
-    public function setStatut(string $statut): static
+    public function setDescription(?string $description): static
     {
-        $this->statut = $statut;
+        $this->description = $description;
 
         return $this;
     }
