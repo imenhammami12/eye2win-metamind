@@ -7,6 +7,7 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: TournoiRepository::class)]
 class Tournoi
@@ -17,21 +18,28 @@ class Tournoi
     private ?int $id = null;
 
     #[ORM\Column(length: 255)]
+    #[Assert\NotBlank(message: "Le nom du tournoi est obligatoire.")]
     private ?string $nom = null;
 
     #[ORM\Column(type: Types::DATE_MUTABLE)]
+    #[Assert\NotBlank(message: "La date de début est obligatoire.")]
+    #[Assert\GreaterThanOrEqual("today", message: "La date de début doit être aujourd'hui ou dans le futur.")]
     private ?\DateTimeInterface $dateDebut = null;
 
     #[ORM\Column(type: Types::DATE_MUTABLE)]
+    #[Assert\NotBlank(message: "La date de fin est obligatoire.")]
+    #[Assert\GreaterThanOrEqual(propertyPath: "dateDebut", message: "La date de fin doit être postérieure ou égale à la date de début.")]
     private ?\DateTimeInterface $dateFin = null;
 
     #[ORM\Column(type: Types::TEXT, nullable: true)]
+    #[Assert\NotBlank(message: "La description est obligatoire.")]
     private ?string $description = null;
 
     #[ORM\Column(length: 255)]
     private ?string $image = null;
 
     #[ORM\Column(enumType: TypeTournoi::class)]
+    #[Assert\NotBlank(message: "Le type de tournoi est obligatoire.")]
     private ?TypeTournoi $typeTournoi = null;
 
     #[ORM\OneToMany(mappedBy: 'tournoi', targetEntity: Matches::class, orphanRemoval: true)]
@@ -52,7 +60,7 @@ class Tournoi
         return $this->nom;
     }
 
-    public function setNom(string $nom): static
+    public function setNom(?string $nom): static
     {
         $this->nom = $nom;
 
@@ -64,7 +72,7 @@ class Tournoi
         return $this->dateDebut;
     }
 
-    public function setDateDebut(\DateTimeInterface $dateDebut): static
+    public function setDateDebut(?\DateTimeInterface $dateDebut): static
     {
         $this->dateDebut = $dateDebut;
 
@@ -76,7 +84,7 @@ class Tournoi
         return $this->dateFin;
     }
 
-    public function setDateFin(\DateTimeInterface $dateFin): static
+    public function setDateFin(?\DateTimeInterface $dateFin): static
     {
         $this->dateFin = $dateFin;
 
@@ -100,7 +108,7 @@ class Tournoi
         return $this->image;
     }
 
-    public function setImage(string $image): static
+    public function setImage(?string $image): static
     {
         $this->image = $image;
 
@@ -112,7 +120,7 @@ class Tournoi
         return $this->typeTournoi;
     }
 
-    public function setTypeTournoi(TypeTournoi $typeTournoi): static
+    public function setTypeTournoi(?TypeTournoi $typeTournoi): static
     {
         $this->typeTournoi = $typeTournoi;
 

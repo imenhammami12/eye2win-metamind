@@ -26,11 +26,6 @@ class TournoiType extends AbstractType
                     'placeholder' => 'ex: Championnat d\'été 2024',
                     'class' => 'form-control',
                 ],
-                'constraints' => [
-                    new NotBlank([
-                        'message' => 'Please enter a name',
-                    ]),
-                ],
             ])
             ->add('typeTournoi', EnumType::class, [
                 'class' => TypeTournoi::class,
@@ -42,25 +37,15 @@ class TournoiType extends AbstractType
                 'widget' => 'single_text',
                 'label' => 'Date de Début',
                 'attr' => ['class' => 'form-control'],
-                'constraints' => [
-                    new NotBlank([
-                        'message' => 'Please select a start date',
-                    ]),
-                ],
             ])
             ->add('dateFin', DateType::class, [
                 'widget' => 'single_text',
                 'label' => 'Date de Fin',
                 'attr' => ['class' => 'form-control'],
-                'constraints' => [
-                    new NotBlank([
-                        'message' => 'Please select an end date',
-                    ]),
-                ],
             ])
             ->add('description', \Symfony\Component\Form\Extension\Core\Type\TextareaType::class, [
                 'label' => 'Description',
-                'required' => false,
+                'required' => true,
                 'attr' => [
                     'placeholder' => 'Description du tournoi...',
                     'class' => 'form-control',
@@ -70,8 +55,11 @@ class TournoiType extends AbstractType
             ->add('image', FileType::class, [
                 'label' => 'Logo du Tournoi (Image file)',
                 'mapped' => false,
-                'required' => false,
+                'required' => true,
                 'constraints' => [
+                    new NotBlank([
+                        'message' => 'Veuillez télécharger une image pour le logo.',
+                    ]),
                     new File([
                         'maxSize' => '5M',
                         'mimeTypes' => [

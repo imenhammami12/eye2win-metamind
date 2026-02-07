@@ -17,7 +17,7 @@
                 <h5 class="mb-0 text-white"><i class="bi bi-trophy me-2"></i>Tournoi Information</h5>
             </div>
             
-            {{ form_start(form, {'attr': {'class': 'p-4', 'id': 'createTournoiForm'}}) }}
+            {{ form_start(form, {'attr': {'class': 'p-4', 'id': 'createTournoiForm', 'novalidate': 'novalidate'}}) }}
                 
                 <div class="row g-4">
                     {# Nom #}
@@ -28,7 +28,7 @@
                             <span class="required-indicator" style="color: #fa709a;">*</span>
                         </label>
                         {{ form_widget(form.nom) }}
-                        {{ form_errors(form.nom) }}
+                        <div class="custom-error-message">{{ form_errors(form.nom) }}</div>
                         <small class="form-help-text text-muted">
                             <i class="bi bi-info-circle me-1"></i>Enter the tournament name
                         </small>
@@ -42,7 +42,7 @@
                             <span class="required-indicator" style="color: #fa709a;">*</span>
                         </label>
                         {{ form_widget(form.dateDebut) }}
-                        {{ form_errors(form.dateDebut) }}
+                        <div class="custom-error-message">{{ form_errors(form.dateDebut) }}</div>
                     </div>
 
                     <div class="col-md-6 form-group-enhanced">
@@ -52,7 +52,7 @@
                             <span class="required-indicator" style="color: #fa709a;">*</span>
                         </label>
                         {{ form_widget(form.dateFin) }}
-                        {{ form_errors(form.dateFin) }}
+                        <div class="custom-error-message">{{ form_errors(form.dateFin) }}</div>
                     </div>
                     
                     {# Type #}
@@ -62,7 +62,7 @@
                             Type
                         </label>
                         {{ form_widget(form.typeTournoi) }}
-                        {{ form_errors(form.typeTournoi) }}
+                        <div class="custom-error-message">{{ form_errors(form.typeTournoi) }}</div>
                     </div>
 
                     {# Description #}
@@ -72,7 +72,7 @@
                             Description
                         </label>
                         {{ form_widget(form.description) }}
-                        {{ form_errors(form.description) }}
+                        <div class="custom-error-message">{{ form_errors(form.description) }}</div>
                     </div>
 
                     {# Image #}
@@ -82,7 +82,7 @@
                             Logo (Image)
                         </label>
                         {{ form_widget(form.image) }}
-                        {{ form_errors(form.image) }}
+                        <div class="custom-error-message">{{ form_errors(form.image) }}</div>
                         <small class="form-help-text text-muted">
                             <i class="bi bi-info-circle me-1"></i>Upload a logo for the tournament (JPEG, PNG, WEBP)
                         </small>
@@ -114,32 +114,12 @@ document.addEventListener('DOMContentLoaded', function() {
     
     if (form) {
         form.addEventListener('submit', function(e) {
-            if (!form.checkValidity()) {
-                e.preventDefault();
-                e.stopPropagation();
-                
-                form.classList.add('was-validated');
-                
-                // Focus on first invalid field
-                const firstInvalid = form.querySelector(':invalid');
-                if (firstInvalid) {
-                    firstInvalid.focus();
-                    firstInvalid.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                }
-                
-                // Shake animation
-                submitBtn.style.animation = 'shake 0.5s';
-                setTimeout(() => {
-                    submitBtn.style.animation = '';
-                }, 500);
-            } else {
-                // Show floating loading state but let form submit
-                submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Creating...';
-                submitBtn.style.opacity = '0.8';
-            }
+            // Allow form submission to handle server-side validation
+            submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Creating...';
+            submitBtn.style.opacity = '0.8';
         });
         
-        // Real-time validation feedback
+                // Real-time validation feedback
         form.querySelectorAll('input, select').forEach(input => {
             input.addEventListener('blur', function() {
                 if (this.checkValidity()) {
@@ -176,8 +156,20 @@ style.textContent = `
     }
     
     .form-control.is-invalid {
-        border-color: #fa709a;
-        box-shadow: 0 0 0 0.15rem rgba(250, 112, 154, 0.25);
+        border-color: #dc3545;
+        box-shadow: 0 0 0 0.15rem rgba(220, 53, 69, 0.25);
+    }
+
+    .custom-error-message, 
+    .custom-error-message ul, 
+    .custom-error-message li, 
+    .custom-error-message span {
+        color: #ff0000 !important; /* Bright Red */
+        font-weight: bold;
+        list-style-type: none;
+        padding-left: 0;
+        margin-top: 5px;
+        display: block;
     }
 `;
 document.head.appendChild(style);
