@@ -1,0 +1,375 @@
+{% extends 'admin_layout.html.twig' %}
+
+{% block title %}Create User{% endblock %}
+{% block page_title %}Create New User{% endblock %}
+
+{% block body %}
+<div class="mb-3 fade-in">
+    <a href="{{ path('admin_users_index') }}" class="btn btn-outline-secondary">
+        <i class="bi bi-arrow-left me-2"></i>Back to List
+    </a>
+</div>
+
+<div class="row justify-content-center fade-in" style="animation-delay: 0.1s;">
+    <div class="col-lg-8">
+        <div class="table-card">
+            <div class="card-header-gradient" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 1.5rem; border-radius: 16px 16px 0 0;">
+                <h5 class="mb-0 text-white"><i class="bi bi-person-plus me-2"></i>User Information</h5>
+            </div>
+            
+            <form method="post" class="p-4" id="createUserForm">
+                <input type="hidden" name="_token" value="{{ csrf_token('create-user') }}">
+                
+                <div class="row g-4">
+                    {# Full Name #}
+                    <div class="col-md-6 form-group-enhanced">
+                        <label class="form-label fw-bold">
+                            <i class="bi bi-person me-1"></i>
+                            First & Last Name 
+                            <span class="required-indicator" style="color: #fa709a;">*</span>
+                        </label>
+                        <input type="text" 
+                               name="fullName" 
+                               class="form-control" 
+                               required
+                               placeholder="e.g., John Doe"
+                               autocomplete="name">
+                        <small class="form-help-text text-muted">
+                            <i class="bi bi-info-circle me-1"></i>Enter the user's full name
+                        </small>
+                    </div>
+                    
+                    {# Username #}
+                    <div class="col-md-6 form-group-enhanced">
+                        <label class="form-label fw-bold">
+                            <i class="bi bi-at me-1"></i>
+                            Username 
+                            <span class="required-indicator" style="color: #fa709a;">*</span>
+                        </label>
+                        <div class="input-group">
+                            <span class="input-group-text">@</span>
+                            <input type="text" 
+                                   name="username" 
+                                   class="form-control" 
+                                   required
+                                   placeholder="e.g., johndoe"
+                                   pattern="[a-zA-Z0-9_-]{3,50}"
+                                   autocomplete="username">
+                        </div>
+                        <small class="form-help-text text-muted">
+                            <i class="bi bi-info-circle me-1"></i>3-50 characters: letters, numbers, - and _ only
+                        </small>
+                    </div>
+                    
+                    {# Email #}
+                    <div class="col-md-6 form-group-enhanced">
+                        <label class="form-label fw-bold">
+                            <i class="bi bi-envelope me-1"></i>
+                            Email Address 
+                            <span class="required-indicator" style="color: #fa709a;">*</span>
+                        </label>
+                        <input type="email" 
+                               name="email" 
+                               class="form-control" 
+                               required
+                               placeholder="e.g., john.doe@example.com"
+                               autocomplete="email">
+                        <small class="form-help-text text-muted">
+                            <i class="bi bi-info-circle me-1"></i>Must be unique
+                        </small>
+                    </div>
+                    
+                    {# Password #}
+                    <div class="col-md-6 form-group-enhanced">
+                        <label class="form-label fw-bold">
+                            <i class="bi bi-lock me-1"></i>
+                            Password 
+                            <span class="required-indicator" style="color: #fa709a;">*</span>
+                        </label>
+                        <div class="position-relative">
+                            <input type="password" 
+                                   name="password" 
+                                   id="password"
+                                   class="form-control" 
+                                   required
+                                   minlength="6"
+                                   placeholder="Minimum 6 characters"
+                                   autocomplete="new-password">
+                            <button type="button" 
+                                    class="btn btn-sm position-absolute end-0 top-50 translate-middle-y me-2"
+                                    id="togglePassword"
+                                    style="background: none; border: none; color: var(--text-muted);">
+                                <i class="bi bi-eye"></i>
+                            </button>
+                            <div class="password-strength mt-2" id="passwordStrength"></div>
+                        </div>
+                        <small class="form-help-text text-muted">
+                            <i class="bi bi-shield-check me-1"></i>Minimum 6 characters recommended
+                        </small>
+                    </div>
+                    
+                    {# Role #}
+                    <div class="col-md-12 form-group-enhanced">
+                        <label class="form-label fw-bold">
+                            <i class="bi bi-shield-check me-1"></i>
+                            User Role 
+                            <span class="required-indicator" style="color: #fa709a;">*</span>
+                        </label>
+                        <select name="role" class="form-select" required id="roleSelect">
+                            <option value="ROLE_USER" selected>
+                                👤 User - Standard Access
+                            </option>
+                            <option value="ROLE_COACH">
+                                🏆 Coach - Can Manage Teams
+                            </option>
+                            <option value="ROLE_ADMIN">
+                                🛡️ Administrator - Full Access
+                            </option>
+                        </select>
+                        <small class="form-help-text text-muted">
+                            <i class="bi bi-info-circle me-1"></i>Defines user permissions in the system
+                        </small>
+                        
+                        {# Role Description #}
+                        <div class="alert alert-info mt-3" id="roleDescription" style="display: none; border-radius: 12px; border-left: 4px solid #4facfe;">
+                            <strong id="roleTitle"></strong>
+                            <p class="mb-0 mt-1" id="roleText"></p>
+                        </div>
+                    </div>
+                </div>
+                
+                {# Info Alert #}
+                <div class="alert mt-4" style="background: linear-gradient(135deg, rgba(102, 126, 234, 0.1), rgba(118, 75, 162, 0.1)); border: 1px solid rgba(102, 126, 234, 0.3); border-radius: 12px;">
+                    <div class="d-flex align-items-start">
+                        <i class="bi bi-info-circle me-3" style="font-size: 24px; color: #667eea;"></i>
+                        <div>
+                            <strong style="color: #667eea;">Welcome Email</strong>
+                            <p class="mb-0 mt-1 text-muted">A welcome email will be automatically sent to the user with their login credentials.</p>
+                        </div>
+                    </div>
+                </div>
+                
+                {# Action Buttons #}
+                <div class="mt-4 d-flex gap-2">
+                    <button type="submit" class="btn btn-success" id="submitBtn">
+                        <i class="bi bi-save me-2"></i>Create User
+                    </button>
+                    <a href="{{ path('admin_users_index') }}" class="btn btn-outline-secondary">
+                        <i class="bi bi-x-circle me-2"></i>Cancel
+                    </a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block javascripts %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Password visibility toggle
+    const togglePassword = document.getElementById('togglePassword');
+    const passwordInput = document.getElementById('password');
+    
+    if (togglePassword && passwordInput) {
+        togglePassword.addEventListener('click', function() {
+            const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+            passwordInput.setAttribute('type', type);
+            
+            const icon = this.querySelector('i');
+            icon.classList.toggle('bi-eye');
+            icon.classList.toggle('bi-eye-slash');
+        });
+    }
+    
+    // Enhanced password strength indicator
+    passwordInput.addEventListener('input', function(e) {
+        const password = e.target.value;
+        const strengthBar = document.getElementById('passwordStrength');
+        
+        if (password.length === 0) {
+            strengthBar.style.width = '0%';
+            strengthBar.className = 'password-strength mt-2';
+            strengthBar.innerHTML = '';
+            return;
+        }
+        
+        let strength = 0;
+        let feedback = [];
+        
+        // Length checks
+        if (password.length >= 6) {
+            strength++;
+            feedback.push('✓ Minimum length');
+        } else {
+            feedback.push('✗ Too short');
+        }
+        
+        if (password.length >= 10) {
+            strength++;
+            feedback.push('✓ Good length');
+        }
+        
+        // Complexity checks
+        if (/[a-z]/.test(password) && /[A-Z]/.test(password)) {
+            strength++;
+            feedback.push('✓ Mixed case');
+        }
+        
+        if (/[0-9]/.test(password)) {
+            strength++;
+            feedback.push('✓ Contains numbers');
+        }
+        
+        if (/[^a-zA-Z0-9]/.test(password)) {
+            strength++;
+            feedback.push('✓ Special characters');
+        }
+        
+        // Apply strength class and styling
+        let className = 'password-strength mt-2 ';
+        let strengthText = '';
+        let color = '';
+        
+        if (strength <= 2) {
+            className += 'weak';
+            strengthText = 'Weak';
+            color = '#fa709a';
+            strengthBar.style.width = '33%';
+        } else if (strength <= 3) {
+            className += 'medium';
+            strengthText = 'Medium';
+            color = '#fee140';
+            strengthBar.style.width = '66%';
+        } else {
+            className += 'strong';
+            strengthText = 'Strong';
+            color = '#43e97b';
+            strengthBar.style.width = '100%';
+        }
+        
+        strengthBar.className = className;
+        strengthBar.style.background = color;
+        strengthBar.innerHTML = `<small style="color: white; padding: 2px 8px; font-weight: 600;">${strengthText}</small>`;
+    });
+    
+    // Role description
+    const roleSelect = document.getElementById('roleSelect');
+    const roleDescription = document.getElementById('roleDescription');
+    const roleTitle = document.getElementById('roleTitle');
+    const roleText = document.getElementById('roleText');
+    
+    const roleDescriptions = {
+        'ROLE_USER': {
+            title: '👤 Standard User',
+            text: 'Can join teams, participate in activities, and manage their own profile.'
+        },
+        'ROLE_COACH': {
+            title: '🏆 Coach',
+            text: 'All user permissions plus: create teams, manage team members, organize training sessions.'
+        },
+        'ROLE_ADMIN': {
+            title: '🛡️ Administrator',
+            text: 'Full system access: manage all users, teams, content, and system settings.'
+        }
+    };
+    
+    roleSelect.addEventListener('change', function() {
+        const selectedRole = this.value;
+        const desc = roleDescriptions[selectedRole];
+        
+        if (desc) {
+            roleTitle.textContent = desc.title;
+            roleText.textContent = desc.text;
+            roleDescription.style.display = 'block';
+            
+            // Animate in
+            roleDescription.style.animation = 'slideInUp 0.4s ease';
+        }
+    });
+    
+    // Trigger on load
+    roleSelect.dispatchEvent(new Event('change'));
+    
+    // Form validation with enhanced feedback
+    const form = document.getElementById('createUserForm');
+    const submitBtn = document.getElementById('submitBtn');
+    
+    form.addEventListener('submit', function(e) {
+        if (!form.checkValidity()) {
+            e.preventDefault();
+            e.stopPropagation();
+            
+            form.classList.add('was-validated');
+            
+            // Focus on first invalid field with smooth scroll
+            const firstInvalid = form.querySelector(':invalid');
+            if (firstInvalid) {
+                firstInvalid.focus();
+                firstInvalid.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }
+            
+            // Shake animation for submit button
+            submitBtn.style.animation = 'shake 0.5s';
+            setTimeout(() => {
+                submitBtn.style.animation = '';
+            }, 500);
+        } else {
+            // Show loading state
+            submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Creating...';
+            submitBtn.disabled = true;
+        }
+    });
+    
+    // Real-time validation feedback
+    form.querySelectorAll('input, select').forEach(input => {
+        input.addEventListener('blur', function() {
+            if (this.checkValidity()) {
+                this.classList.add('is-valid');
+                this.classList.remove('is-invalid');
+            } else {
+                this.classList.add('is-invalid');
+                this.classList.remove('is-valid');
+            }
+        });
+        
+        input.addEventListener('input', function() {
+            if (this.classList.contains('is-invalid') && this.checkValidity()) {
+                this.classList.remove('is-invalid');
+                this.classList.add('is-valid');
+            }
+        });
+    });
+});
+
+// Shake animation for errors
+const style = document.createElement('style');
+style.textContent = `
+    @keyframes shake {
+        0%, 100% { transform: translateX(0); }
+        25% { transform: translateX(-10px); }
+        75% { transform: translateX(10px); }
+    }
+    
+    .password-strength {
+        height: 4px;
+        border-radius: 2px;
+        transition: all 0.3s ease;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    
+    .form-control.is-valid {
+        border-color: #43e97b;
+        box-shadow: 0 0 0 0.15rem rgba(67, 233, 123, 0.25);
+    }
+    
+    .form-control.is-invalid {
+        border-color: #fa709a;
+        box-shadow: 0 0 0 0.15rem rgba(250, 112, 154, 0.25);
+    }
+`;
+document.head.appendChild(style);
+</script>
+{% endblock %}

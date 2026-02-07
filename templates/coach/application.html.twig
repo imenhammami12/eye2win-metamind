@@ -1,0 +1,246 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Become a Coach - EyeTwin{% endblock %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    <link rel="stylesheet" href="{{ asset('assets/css/profile.css') }}">
+{% endblock %}
+
+{% block body %}
+<!-- Breadcrumb -->
+
+
+
+<section class="coach_application_section section_padding">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-10">
+                <!-- Hero Section -->
+                <div class="coach_hero_card">
+                    <div class="coach_hero_content">
+                        <div class="hero_icon">
+                            <i class="fas fa-graduation-cap"></i>
+                        </div>
+                        <div>
+                            <h2>Join our coaching team</h2>
+                            <p>Share your passion and expertise with the gaming community!</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <!-- Sidebar Info -->
+                    <div class="col-lg-4">
+                  
+
+                        <div class="benefits_card">
+                            <h4><i class="fas fa-star"></i> Coach Benefits</h4>
+                            <ul class="benefits_list">
+                                <li><i class="fas fa-trophy"></i> Exclusive Coach badge</li>
+                                <li><i class="fas fa-users"></i> Premium team access</li>
+                                <li><i class="fas fa-chart-line"></i> Advanced analytics tools</li>
+                                <li><i class="fas fa-dollar-sign"></i> Revenue opportunities</li>
+                                <li><i class="fas fa-network-wired"></i> Coach network</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <!-- Application Form -->
+                    <div class="col-lg-8">
+                        <div class="application_form_card">
+                            <div class="form_header">
+                                <h3><i class="fas fa-file-alt"></i> APPLICATION FORM</h3>
+                            </div>
+                            
+                            <div class="form_body">
+                                {{ form_start(form, {'attr': {'id': 'coachApplicationForm', 'novalidate': 'novalidate'}}) }}
+                                
+                                <!-- Certifications Section -->
+                                <div class="form_section">
+                                    <h4 class="section_title">
+                                        <i class="fas fa-certificate"></i> Certifications and Qualifications
+                                    </h4>
+                                    <div class="form_group">
+                                        {{ form_label(form.certifications, null, {'label_attr': {'class': 'form_label'}}) }}
+                                        <div class="textarea_wrapper">
+                                            {{ form_widget(form.certifications, {'attr': {'class': 'form_textarea', 'placeholder': '• Rank achieved: Diamond/Master/Grand Master
+• Tournaments: ESL, DreamHack, etc.
+• Certifications: Riot Games Certified Coach
+• Achievements: Top 100 EU, Regional Champion...'}}) }}
+                                            <span class="char_counter">
+                                                <span id="certifCount">0</span> / 50 min
+                                            </span>
+                                        </div>
+                                        {{ form_errors(form.certifications) }}
+                                        <div class="input_hint">
+                                            <i class="fas fa-lightbulb"></i> 
+                                            Mention your ranks, official certifications, tournament participations, major achievements
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Experience Section -->
+                                <div class="form_section">
+                                    <h4 class="section_title">
+                                        <i class="fas fa-briefcase"></i> Coaching Experience
+                                    </h4>
+                                    <div class="form_group">
+                                        {{ form_label(form.experience, null, {'label_attr': {'class': 'form_label'}}) }}
+                                        <div class="textarea_wrapper">
+                                            {{ form_widget(form.experience, {'attr': {'class': 'form_textarea', 'placeholder': '• Years of experience: 3 years of esports coaching
+• Teams coached: Team X (2020-2022), solo players (50+)
+• Results: LEC qualification, average improvement +2 ranks
+• Methodology: VOD analysis, custom drills, mental coaching
+• Specialties: Mid lane, macro game, draft strategy...'}}) }}
+                                            <span class="char_counter">
+                                                <span id="expCount">0</span> / 100 min
+                                            </span>
+                                        </div>
+                                        {{ form_errors(form.experience) }}
+                                        <div class="input_hint">
+                                            <i class="fas fa-lightbulb"></i> 
+                                            Detail your background, methodology, concrete results, gaming specialties
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- CV Upload Section -->
+                                <div class="form_section">
+                                    <h4 class="section_title">
+                                        <i class="fas fa-file-upload"></i> CV / Portfolio (Optional)
+                                    </h4>
+                                    <div class="form_group">
+                                        <div class="cv_upload_area">
+                                            {{ form_widget(form.cvFileUpload, {'attr': {'class': 'file-input', 'id': 'cvFileInput'}}) }}
+                                            <label for="cvFileInput" class="cv_upload_label">
+                                                <div class="upload_icon">
+                                                    <i class="fas fa-cloud-upload-alt"></i>
+                                                </div>
+                                                <span class="upload_text">Click to select your CV</span>
+                                                <small class="upload_hint">or drag and drop your file here</small>
+                                                <div class="upload_formats">
+                                                    <i class="fas fa-file-pdf"></i> PDF
+                                                    <i class="fas fa-file-word"></i> DOC/DOCX
+                                                    <span class="file_size">• Max 5MB</span>
+                                                </div>
+                                            </label>
+                                            <div class="file_selected" id="fileSelected" style="display: none;">
+                                                <i class="fas fa-file-check"></i>
+                                                <span id="fileName"></span>
+                                                <button type="button" class="remove_file" id="removeFile">
+                                                    <i class="fas fa-times"></i>
+                                                </button>
+                                            </div>
+                                        </div>
+                                        {{ form_errors(form.cvFileUpload) }}
+                                        <div class="input_hint">
+                                            <i class="fas fa-info-circle"></i> 
+                                            Increase your chances by adding your CV with your gaming and coaching experience
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Warning Message -->
+                                <div class="warning_card">
+                                    <div class="warning_icon">
+                                        <i class="fas fa-exclamation-triangle"></i>
+                                    </div>
+                                    <div class="warning_content">
+                                        <strong>Warning</strong>
+                                        <p>Once submitted, you will not be able to modify your application. Please verify all information before submitting.</p>
+                                    </div>
+                                </div>
+
+                                <!-- Action Buttons -->
+                                <div class="form_actions">
+                                    <a href="{{ path('user_profile') }}" class="btn_cancel">
+                                        <i class="fas fa-times"></i> Cancel
+                                    </a>
+                                    <button type="submit" class="btn_submit">
+                                        <i class="fas fa-paper-plane"></i> Submit my application
+                                    </button>
+                                </div>
+                                
+                                {{ form_end(form) }}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    <script>
+        // Character counters
+        const certifTextarea = document.querySelector('textarea[name*="certifications"]');
+        const certifCount = document.getElementById('certifCount');
+        const expTextarea = document.querySelector('textarea[name*="experience"]');
+        const expCount = document.getElementById('expCount');
+        
+        if (certifTextarea && certifCount) {
+            certifTextarea.addEventListener('input', function() {
+                certifCount.textContent = this.value.length;
+                if (this.value.length < 50) {
+                    certifCount.parentElement.style.color = '#f44a40';
+                } else {
+                    certifCount.parentElement.style.color = '#4cd3e3';
+                }
+            });
+            certifCount.textContent = certifTextarea.value.length;
+        }
+        
+        if (expTextarea && expCount) {
+            expTextarea.addEventListener('input', function() {
+                expCount.textContent = this.value.length;
+                if (this.value.length < 100) {
+                    expCount.parentElement.style.color = '#f44a40';
+                } else {
+                    expCount.parentElement.style.color = '#4cd3e3';
+                }
+            });
+            expCount.textContent = expTextarea.value.length;
+        }
+        
+        // CV File upload handler
+        const fileInput = document.getElementById('cvFileInput');
+        const fileSelected = document.getElementById('fileSelected');
+        const fileName = document.getElementById('fileName');
+        const removeFile = document.getElementById('removeFile');
+        const uploadLabel = document.querySelector('.cv_upload_label');
+        
+        if (fileInput) {
+            fileInput.addEventListener('change', function(e) {
+                const file = e.target.files[0];
+                if (file) {
+                    fileName.textContent = file.name;
+                    fileSelected.style.display = 'flex';
+                    uploadLabel.style.display = 'none';
+                }
+            });
+            
+            if (removeFile) {
+                removeFile.addEventListener('click', function() {
+                    fileInput.value = '';
+                    fileSelected.style.display = 'none';
+                    uploadLabel.style.display = 'flex';
+                });
+            }
+        }
+        
+        // Form submission
+        const form = document.getElementById('coachApplicationForm');
+        if (form) {
+            form.addEventListener('submit', function(e) {
+                const submitBtn = form.querySelector('.btn_submit');
+                submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Sending...';
+                submitBtn.disabled = true;
+            });
+        }
+    </script>
+{% endblock %}

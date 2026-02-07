@@ -1,0 +1,133 @@
+{% extends 'admin_layout.html.twig' %}
+
+{% block title %}Training Session Details{% endblock %}
+{% block page_title %}Training Session Details{% endblock %}
+
+{% block body %}
+<div class="row">
+    <div class="col-lg-8">
+        <div class="table-card fade-in">
+            <div class="table-header" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
+                <h5><i class="bi bi-info-circle me-2"></i>Session Information</h5>
+            </div>
+            <div class="card-body p-4">
+                <table class="table table-borderless">
+                    <tbody>
+                        <tr>
+                            <td width="30%" class="text-muted"><strong>Session ID</strong></td>
+                            <td><strong>#{{ session.id }}</strong></td>
+                        </tr>
+                        <tr>
+                            <td class="text-muted"><strong>Participant</strong></td>
+                            <td>
+                                <div class="d-flex align-items-center">
+                                    <div class="avatar-circle me-2">
+                                        {{ session.user.username|slice(0, 1)|upper }}
+                                    </div>
+                                    <strong>{{ session.user.username }}</strong>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="text-muted"><strong>Email</strong></td>
+                            <td>{{ session.user.email }}</td>
+                        </tr>
+                        <tr>
+                            <td class="text-muted"><strong>Joined At</strong></td>
+                            <td>
+                                <i class="bi bi-clock text-primary me-2"></i>
+                                {{ session.joinedAt|date('F d, Y - H:i') }}
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="text-muted"><strong>Status</strong></td>
+                            <td>
+                                {% if session.status == 'en attente' %}
+                                    <span class="badge bg-warning text-dark">
+                                        <i class="bi bi-hourglass-split me-1"></i>Pending
+                                    </span>
+                                {% elseif session.status == 'confirmé' %}
+                                    <span class="badge bg-success">
+                                        <i class="bi bi-check-circle me-1"></i>Confirmed
+                                    </span>
+                                {% elseif session.status == 'annulé' %}
+                                    <span class="badge bg-danger">
+                                        <i class="bi bi-x-circle me-1"></i>Cancelled
+                                    </span>
+                                {% else %}
+                                    <span class="badge bg-secondary">{{ session.status }}</span>
+                                {% endif %}
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div class="table-card mt-4 fade-in" style="animation-delay: 0.1s;">
+            <div class="table-header">
+                <h5><i class="bi bi-calendar-event me-2"></i>Planning Details</h5>
+            </div>
+            <div class="card-body p-4">
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <small class="text-muted d-block">Type</small>
+                        <span class="badge bg-primary">{{ session.planning.type.value }}</span>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <small class="text-muted d-block">Level</small>
+                        <span class="badge bg-info">{{ session.planning.level.value }}</span>
+                    </div>
+                    <div class="col-md-12 mb-3">
+                        <small class="text-muted d-block">Description</small>
+                        <strong>{{ session.planning.description }}</strong>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <small class="text-muted d-block">Date</small>
+                        <strong>{{ session.planning.date|date('M d, Y') }}</strong>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <small class="text-muted d-block">Time</small>
+                        <strong>{{ session.planning.time|date('H:i') }}</strong>
+                    </div>
+                    <div class="col-md-12">
+                        <small class="text-muted d-block">Location</small>
+                        <strong>{{ session.planning.localisation }}</strong>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-lg-4">
+        <div class="table-card fade-in" style="animation-delay: 0.2s;">
+            <div class="table-header">
+                <h5><i class="bi bi-gear me-2"></i>Actions</h5>
+            </div>
+            <div class="card-body p-4">
+                <a href="{{ path('admin_session_edit', {id: session.id}) }}" class="btn btn-warning w-100 mb-3">
+                    <i class="bi bi-pencil me-2"></i>Edit Session
+                </a>
+                <a href="{{ path('admin_planning_sessions', {id: session.planning.id}) }}" class="btn btn-secondary w-100">
+                    <i class="bi bi-arrow-left me-2"></i>Back to Sessions
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .avatar-circle {
+        width: 50px;
+        height: 50px;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-weight: 700;
+        font-size: 1.3rem;
+    }
+</style>
+{% endblock %}

@@ -1,0 +1,99 @@
+{# templates/emails/coach_application_approved.html.twig #}
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+            border-radius: 10px 10px 0 0;
+        }
+        .content {
+            background: #f9f9f9;
+            padding: 30px;
+            border-radius: 0 0 10px 10px;
+        }
+        .badge {
+            display: inline-block;
+            background: #28a745;
+            color: white;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-weight: bold;
+            margin: 20px 0;
+        }
+        .button {
+            display: inline-block;
+            background: #667eea;
+            color: white;
+            padding: 12px 30px;
+            text-decoration: none;
+            border-radius: 5px;
+            margin: 20px 0;
+        }
+        .info-box {
+            background: white;
+            border-left: 4px solid #667eea;
+            padding: 15px;
+            margin: 20px 0;
+        }
+        .footer {
+            text-align: center;
+            margin-top: 30px;
+            color: #666;
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>🎉 Congratulations!</h1>
+    </div>
+    
+    <div class="content">
+        <p>Hello <strong>{{ user.username }}</strong>,</p>
+        
+        <p>We are pleased to inform you that your application to become a coach on Eye2Win has been <span class="badge">APPROVED</span>!</p>
+        
+        <p>You can now:</p>
+        <ul>
+            <li>✅ Create and offer coaching sessions</li>
+            <li>✅ Share your expertise with the community</li>
+            <li>✅ Help other players improve</li>
+            <li>✅ Access coach-exclusive tools</li>
+        </ul>
+        
+        {% if reviewComment %}
+        <div class="info-box">
+            <strong>📝 Comment from our team:</strong>
+            <p>{{ reviewComment }}</p>
+        </div>
+        {% endif %}
+        
+        <div style="text-align: center;">
+            <a href="{{ url('app_dashboard') }}" class="button">Access Dashboard</a>
+        </div>
+        
+        <p>We are excited to have you among our coaches and wish you great success in this new adventure!</p>
+        
+        <p>See you soon on the platform,<br>
+        <strong>The Eye2Win Team</strong></p>
+    </div>
+    
+    <div class="footer">
+        <p>This email was sent automatically, please do not reply.</p>
+        <p>&copy; {{ "now"|date("Y") }} Eye2Win Platform - All rights reserved</p>
+    </div>
+</body>
+</html>
