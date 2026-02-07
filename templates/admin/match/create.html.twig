@@ -98,5 +98,22 @@
         const form = document.getElementById('createMatchForm');
         // ... (Reuse validation JS logic if desired or abstract it)
     });
+
+    // Force red error messages
+    const style = document.createElement('style');
+    style.textContent = `
+        .custom-error-message, 
+        .custom-error-message ul, 
+        .custom-error-message li, 
+        .custom-error-message span {
+            color: #ff0000 !important; /* Bright Red */
+            font-weight: bold;
+            list-style-type: none;
+            padding-left: 0;
+            margin-top: 5px;
+            display: block;
+        }
+    `;
+    document.head.appendChild(style);
 </script>
 {% endblock %}

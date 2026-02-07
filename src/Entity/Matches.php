@@ -44,19 +44,30 @@ class Matches
         if ($this->tournoi && $this->dateMatch) {
             $dateDebut = $this->tournoi->getDateDebut();
             $dateFin = $this->tournoi->getDateFin();
+            
+            // Compare using 'Y-m-d' strings to strictly ignore time and handle Mutable/Immutable correctly
+            $matchDateStr = $this->dateMatch->format('Y-m-d');
 
-            if ($dateDebut && $this->dateMatch < $dateDebut) {
-                $context->buildViolation('The match date cannot be before the tournament start date ({{ date }}).')
-                    ->setParameter('{{ date }}', $dateDebut->format('Y-m-d'))
-                    ->atPath('dateMatch')
-                    ->addViolation();
+            if ($dateDebut) {
+                $startDateStr = $dateDebut->format('Y-m-d');
+                if ($matchDateStr < $startDateStr) {
+                    $context->buildViolation('The match date ({{ match_date }}) cannot be before the tournament start date ({{ start_date }}).')
+                        ->setParameter('{{ match_date }}', $matchDateStr)
+                        ->setParameter('{{ start_date }}', $startDateStr)
+                        ->atPath('dateMatch')
+                        ->addViolation();
+                }
             }
 
-            if ($dateFin && $this->dateMatch > $dateFin) {
-                $context->buildViolation('The match date cannot be after the tournament end date ({{ date }}).')
-                    ->setParameter('{{ date }}', $dateFin->format('Y-m-d'))
-                    ->atPath('dateMatch')
-                    ->addViolation();
+            if ($dateFin) {
+                $endDateStr = $dateFin->format('Y-m-d');
+                if ($matchDateStr > $endDateStr) {
+                    $context->buildViolation('The match date ({{ match_date }}) cannot be after the tournament end date ({{ end_date }}).')
+                        ->setParameter('{{ match_date }}', $matchDateStr)
+                        ->setParameter('{{ end_date }}', $endDateStr)
+                        ->atPath('dateMatch')
+                        ->addViolation();
+                }
             }
         }
     }
