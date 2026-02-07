@@ -92,16 +92,13 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\OneToMany(mappedBy: 'user', targetEntity: AuditLog::class)]
     private Collection $auditLogs;
 
-<<<<<<< HEAD
     #[ORM\OneToMany(mappedBy: 'user', targetEntity: TrainingSession::class)]
     private Collection $trainingSessions;
-=======
     /**
      * @var Collection<int, Video>
      */
     #[ORM\OneToMany(targetEntity: Video::class, mappedBy: 'uploadedBy', orphanRemoval: true)]
     private Collection $videos;
->>>>>>> computer-vision
 
     public function __construct()
     {
@@ -287,7 +284,6 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     {
         return $this->accountStatus === AccountStatus::ACTIVE;
     }
-<<<<<<< HEAD
 
     /**
      * @return Collection<int, TrainingSession>
@@ -296,7 +292,6 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     {
         return $this->trainingSessions;
     }
-=======
     /**
      * @return Collection<int, Video>
      */
@@ -326,6 +321,4 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
         return $this;
     }
-
->>>>>>> computer-vision
 }
