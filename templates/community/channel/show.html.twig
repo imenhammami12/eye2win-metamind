@@ -1,73 +1,464 @@
+{#{% extends 'base.html.twig' %}#}
+{#{% block body %}#}
+{#    <div class="container mt-4">#}
+{#        <h2>{{ channel.name }}</h2>#}
+{#        <p class="text-muted">{{ channel.description }}</p>#}
+
+{#        <hr>#}
+
+{#        <h5>Messages</h5>#}
+{#        <div class="mb-4">#}
+{#            {% for m in messages %}#}
+{#                <div class="card mb-2">#}
+{#                    <div class="card-body">#}
+
+{#                        <div class="d-flex justify-content-between">#}
+{#                            <strong>{{ m.senderName }}</strong>#}
+{#                            <small>{{ m.sentAt|date('d/m/Y H:i') }}</small>#}
+{#                        </div>#}
+
+{#                        #}{# ✅ INLINE EDIT MODE #}
+{#                        {% if editId is defined and editId == m.id and editForm is not null %}#}
+{#                            {{ form_start(editForm) }}#}
+{#                            {{ form_row(editForm.content) }}#}
+{#                            <button class="btn btn-danger btn-sm mt-2">Sauver</button>#}
+{#                            <a class="btn btn-secondary btn-sm mt-2"#}
+{#                               href="{{ path('community_channels_show', {id: channel.id}) }}">#}
+{#                                Annuler#}
+{#                            </a>#}
+{#                            {{ form_end(editForm) }}#}
+
+{#                        {% else %}#}
+
+{#                            <div class="mt-2">#}
+{#                                {% if m.isDeleted %}#}
+{#                                    <em class="text-muted">Ce message a été supprimé.</em>#}
+{#                                {% else %}#}
+{#                                    {{ m.content }}#}
+{#                                {% endif %}#}
+{#                            </div>#}
+
+{#                            {% if app.user and m.senderEmail == app.user.userIdentifier and not m.isDeleted %}#}
+{#                                <div class="mt-2">#}
+{#                                    <a class="btn btn-sm btn-outline-warning"#}
+{#                                       href="{{ path('community_channels_show', {id: channel.id, edit: m.id}) }}">#}
+{#                                        Edit#}
+{#                                    </a>#}
+
+{#                                    <form method="post" action="{{ path('community_message_delete', {id: m.id}) }}" style="display:inline;">#}
+{#                                        <input type="hidden" name="_token" value="{{ csrf_token('delete_message_' ~ m.id) }}">#}
+{#                                        <button class="btn btn-sm btn-outline-danger">Delete</button>#}
+{#                                    </form>#}
+{#                                </div>#}
+{#                            {% endif %}#}
+
+{#                        {% endif %}#}
+
+{#                    </div>#}
+{#                </div>#}
+{#            {% endfor %}#}
+
+{#        </div>#}
+
+{#        {% if is_granted('ROLE_USER') %}#}
+{#            <h5>Envoyer un message</h5>#}
+{#            {{ form_start(messageForm) }}#}
+{#            {{ form_row(messageForm.content) }}#}
+{#            <button class="btn btn-danger">Envoyer</button>#}
+{#            {{ form_end(messageForm) }}#}
+{#        {% else %}#}
+{#            <p class="text-muted">Connecte-toi pour envoyer un message.</p>#}
+{#        {% endif %}#}
+{#    </div>#}
+{#{% endblock %}#}
+{# templates/community/channel/show.html.twig #}
 {% extends 'base.html.twig' %}
+
 {% block body %}
-    <div class="container mt-4">
-        <h2>{{ channel.name }}</h2>
-        <p class="text-muted">{{ channel.description }}</p>
+    <style>
+        /* ======= eSport Chat UI (scoped) ======= */
+        .chat-wrap{
+            margin-top: 28px;
+            margin-bottom: 50px;
+        }
+        .chat-hero{
+            background: rgba(0,0,0,0.35);
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 18px;
+            padding: 22px 22px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.35);
+            position: relative;
+            overflow: hidden;
+        }
+        .chat-hero:before{
+            content:"";
+            position:absolute;
+            inset:-2px;
+            background: radial-gradient(circle at 20% 20%, rgba(255,0,80,0.20), transparent 40%),
+            radial-gradient(circle at 80% 30%, rgba(0,220,255,0.18), transparent 45%),
+            radial-gradient(circle at 40% 90%, rgba(120,0,255,0.12), transparent 55%);
+            filter: blur(10px);
+            z-index:0;
+        }
+        .chat-hero > *{ position:relative; z-index:1; }
 
-        <hr>
+        .chat-title{
+            font-size: 34px;
+            font-weight: 800;
+            color: #fff;
+            margin: 0;
+            letter-spacing: .3px;
+            text-shadow: 0 8px 18px rgba(0,0,0,0.45);
+        }
+        .chat-sub{
+            margin-top: 6px;
+            color: rgba(255,255,255,0.70);
+            font-size: 14px;
+            line-height: 1.4;
+        }
+        .chat-pill{
+            display:inline-flex;
+            align-items:center;
+            gap:8px;
+            padding: 6px 10px;
+            border-radius: 999px;
+            border: 1px solid rgba(255,255,255,0.10);
+            background: rgba(255,255,255,0.06);
+            color: rgba(255,255,255,0.85);
+            font-size: 12px;
+            margin-top: 10px;
+        }
 
-        <h5>Messages</h5>
-        <div class="mb-4">
-            {% for m in messages %}
-                <div class="card mb-2">
-                    <div class="card-body">
+        .chat-panel{
+            margin-top: 18px;
+            background: rgba(0,0,0,0.28);
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 18px;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.25);
+        }
 
-                        <div class="d-flex justify-content-between">
-                            <strong>{{ m.senderName }}</strong>
-                            <small>{{ m.sentAt|date('d/m/Y H:i') }}</small>
-                        </div>
+        /* Scrollable message area */
+        .chat-stream{
+            height: min(62vh, 560px);
+            overflow-y: auto;
+            padding: 18px 16px;
+        }
+        .chat-stream::-webkit-scrollbar{ width: 10px; }
+        .chat-stream::-webkit-scrollbar-thumb{
+            background: rgba(255,255,255,0.12);
+            border-radius: 999px;
+        }
 
-                        {# ✅ INLINE EDIT MODE #}
-                        {% if editId is defined and editId == m.id and editForm is not null %}
-                            {{ form_start(editForm) }}
-                            {{ form_row(editForm.content) }}
-                            <button class="btn btn-danger btn-sm mt-2">Sauver</button>
-                            <a class="btn btn-secondary btn-sm mt-2"
-                               href="{{ path('community_channels_show', {id: channel.id}) }}">
-                                Annuler
-                            </a>
-                            {{ form_end(editForm) }}
+        .msg-row{
+            display:flex;
+            margin-bottom: 14px;
+            gap: 10px;
+        }
+        .msg-row.me{ justify-content: flex-end; }
+        .msg-row.other{ justify-content: flex-start; }
 
-                        {% else %}
+        .avatar{
+            width: 36px;
+            height: 36px;
+            border-radius: 12px;
+            display:flex;
+            align-items:center;
+            justify-content:center;
+            background: rgba(255,255,255,0.07);
+            border: 1px solid rgba(255,255,255,0.10);
+            color: rgba(255,255,255,0.85);
+            font-weight: 700;
+            font-size: 13px;
+            flex: 0 0 auto;
+            user-select:none;
+        }
 
-                            <div class="mt-2">
-                                {% if m.isDeleted %}
-                                    <em class="text-muted">Ce message a été supprimé.</em>
-                                {% else %}
-                                    {{ m.content }}
+        .bubble{
+            max-width: 78%;
+            border-radius: 16px;
+            padding: 12px 12px 10px 12px;
+            border: 1px solid rgba(255,255,255,0.10);
+            background: rgba(255,255,255,0.06);
+            position: relative;
+        }
+        .me .bubble{
+            background: linear-gradient(135deg, rgba(255,0,80,0.18), rgba(0,220,255,0.12));
+            border-color: rgba(255,0,80,0.20);
+        }
+
+        .msg-top{
+            display:flex;
+            align-items:center;
+            justify-content: space-between;
+            gap: 10px;
+            margin-bottom: 6px;
+        }
+        .msg-name{
+            color: rgba(255,255,255,0.92);
+            font-weight: 700;
+            font-size: 13px;
+        }
+        .msg-time{
+            color: rgba(255,255,255,0.55);
+            font-size: 11px;
+            white-space: nowrap;
+        }
+        .msg-text{
+            color: rgba(255,255,255,0.86);
+            font-size: 14px;
+            line-height: 1.35;
+            white-space: pre-wrap;
+            word-break: break-word;
+        }
+        .msg-deleted{
+            color: rgba(255,255,255,0.55);
+            font-style: italic;
+            font-size: 13px;
+        }
+
+        /* 3 dots dropdown */
+        .msg-actions{
+            position: relative;
+            margin-left: auto;
+        }
+        .dots-btn{
+            border: 0;
+            background: transparent;
+            color: rgba(255,255,255,0.70);
+            width: 30px;
+            height: 30px;
+            border-radius: 10px;
+            display:flex;
+            align-items:center;
+            justify-content:center;
+            cursor: pointer;
+        }
+        .dots-btn:hover{
+            background: rgba(255,255,255,0.08);
+            color: rgba(255,255,255,0.95);
+        }
+        .dots-menu{
+            min-width: 150px;
+            background: rgba(15,18,25,0.98);
+            border: 1px solid rgba(255,255,255,0.10);
+            border-radius: 14px;
+            padding: 6px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.45);
+        }
+        .dots-item{
+            display:flex;
+            align-items:center;
+            gap:10px;
+            width:100%;
+            padding: 9px 10px;
+            border-radius: 10px;
+            color: rgba(255,255,255,0.85);
+            text-decoration:none;
+            font-size: 13px;
+            border:0;
+            background: transparent;
+            text-align:left;
+        }
+        .dots-item:hover{ background: rgba(255,255,255,0.08); }
+        .dots-danger{ color: #ff5a7a; }
+
+        /* Composer */
+        .chat-compose{
+            padding: 14px 16px;
+            border-top: 1px solid rgba(255,255,255,0.08);
+            background: rgba(0,0,0,0.18);
+        }
+        .compose-row{
+            display:flex;
+            gap: 10px;
+            align-items: flex-end;
+        }
+        .compose-row textarea{
+            background: rgba(255,255,255,0.06);
+            border: 1px solid rgba(255,255,255,0.10);
+            color: rgba(255,255,255,0.90);
+            border-radius: 14px;
+            padding: 12px 12px;
+            width: 100%;
+            min-height: 54px;
+            resize: vertical;
+        }
+        .compose-row textarea:focus{
+            outline: none;
+            border-color: rgba(0,220,255,0.35);
+            box-shadow: 0 0 0 3px rgba(0,220,255,0.12);
+        }
+        .btn-send{
+            border: 0;
+            border-radius: 14px;
+            padding: 12px 14px;
+            background: #ff2d55;
+            color: #fff;
+            font-weight: 700;
+            display:inline-flex;
+            align-items:center;
+            gap: 8px;
+            box-shadow: 0 10px 25px rgba(255,45,85,0.25);
+            white-space: nowrap;
+        }
+        .btn-send:hover{ filter: brightness(1.05); }
+
+        /* Inline edit panel */
+        .edit-panel{
+            background: rgba(0,0,0,0.22);
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 14px;
+            padding: 10px;
+        }
+        .edit-panel textarea{
+            background: rgba(255,255,255,0.06);
+            border: 1px solid rgba(255,255,255,0.10);
+            color: rgba(255,255,255,0.90);
+            border-radius: 12px;
+            padding: 10px;
+            width:100%;
+            min-height: 70px;
+        }
+        .edit-actions{
+            display:flex;
+            gap: 10px;
+            margin-top: 10px;
+        }
+    </style>
+
+    <div class="container chat-wrap">
+
+        <div class="chat-hero">
+            <div class="d-flex justify-content-between align-items-start flex-wrap" style="gap:12px;">
+                <div>
+                    <h2 class="chat-title">{{ channel.name }}</h2>
+                    <div class="chat-sub">{{ channel.description }}</div>
+                    <div class="chat-pill">
+                        <i class="fas fa-hashtag"></i> Channel • Chat Room
+                    </div>
+                </div>
+
+                <a class="btn btn-soft" href="{{ path('community_channels_index') }}" style="align-self:center;">
+                    <i class="fas fa-arrow-left"></i> Back
+                </a>
+            </div>
+        </div>
+
+        <div class="chat-panel">
+            <div class="chat-stream" id="chatStream">
+
+                {% for m in messages %}
+                    {% set isMe = app.user and (m.senderEmail == app.user.userIdentifier) %}
+
+                    <div class="msg-row {{ isMe ? 'me' : 'other' }}">
+
+                        {# avatar left for others, right hidden for me #}
+                        {% if not isMe %}
+                            <div class="avatar" title="{{ m.senderName }}">
+                                {{ m.senderName|slice(0,1)|upper }}
+                            </div>
+                        {% endif %}
+
+                        <div class="bubble">
+
+                            <div class="msg-top">
+                                <div class="d-flex align-items-center gap-2" style="gap:10px;">
+                                    <div class="msg-name">{{ m.senderName }}</div>
+                                    <div class="msg-time">{{ m.sentAt|date('d/m/Y H:i') }}</div>
+                                </div>
+
+                                {# 3 dots actions only for owner and not deleted and not in edit mode #}
+                                {% if isMe and not m.isDeleted and not (editId is defined and editId == m.id and editForm is not null) %}
+                                    <div class="msg-actions dropdown">
+                                        <button class="dots-btn" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                            <i class="fas fa-ellipsis-v"></i>
+                                        </button>
+
+                                        <div class="dropdown-menu dropdown-menu-right dots-menu">
+                                            <a class="dots-item"
+                                               href="{{ path('community_channels_show', {id: channel.id, edit: m.id}) }}">
+                                                <i class="fas fa-pen"></i> Edit
+                                            </a>
+
+                                            <form method="post"
+                                                  action="{{ path('community_message_delete', {id: m.id}) }}"
+                                                  style="margin:0;">
+                                                <input type="hidden" name="_token" value="{{ csrf_token('delete_message_' ~ m.id) }}">
+                                                <button class="dots-item dots-danger" type="submit">
+                                                    <i class="fas fa-trash"></i> Delete
+                                                </button>
+                                            </form>
+                                        </div>
+                                    </div>
                                 {% endif %}
                             </div>
 
-                            {% if app.user and m.senderEmail == app.user.userIdentifier and not m.isDeleted %}
-                                <div class="mt-2">
-                                    <a class="btn btn-sm btn-outline-warning"
-                                       href="{{ path('community_channels_show', {id: channel.id, edit: m.id}) }}">
-                                        Edit
-                                    </a>
+                            {# ✅ INLINE EDIT MODE #}
+                            {% if editId is defined and editId == m.id and editForm is not null %}
+                                <div class="edit-panel">
+                                    {{ form_start(editForm) }}
+                                    {{ form_widget(editForm.content) }}
 
-                                    <form method="post" action="{{ path('community_message_delete', {id: m.id}) }}" style="display:inline;">
-                                        <input type="hidden" name="_token" value="{{ csrf_token('delete_message_' ~ m.id) }}">
-                                        <button class="btn btn-sm btn-outline-danger">Delete</button>
-                                    </form>
+                                    <div class="edit-actions">
+                                        <button class="btn btn-danger btn-sm">
+                                            <i class="fas fa-save"></i> Sauver
+                                        </button>
+                                        <a class="btn btn-secondary btn-sm"
+                                           href="{{ path('community_channels_show', {id: channel.id}) }}">
+                                            Annuler
+                                        </a>
+                                    </div>
+
+                                    {{ form_end(editForm) }}
                                 </div>
+
+                            {% else %}
+                                {% if m.isDeleted %}
+                                    <div class="msg-deleted">Ce message a été supprimé.</div>
+                                {% else %}
+                                    <div class="msg-text">{{ m.content }}</div>
+                                {% endif %}
                             {% endif %}
 
+                        </div>
+
+                        {% if isMe %}
+                            <div class="avatar" title="You" style="background: rgba(255,45,85,0.18); border-color: rgba(255,45,85,0.20);">
+                                <i class="fas fa-user"></i>
+                            </div>
                         {% endif %}
-
                     </div>
-                </div>
-            {% endfor %}
+                {% else %}
+                    <div class="text-center" style="color: rgba(255,255,255,0.75); padding: 30px 10px;">
+                        Aucun message pour le moment. Lance la conversation 🔥
+                    </div>
+                {% endfor %}
+            </div>
 
+            <div class="chat-compose">
+                {% if is_granted('ROLE_USER') %}
+                    {{ form_start(messageForm) }}
+                    <div class="compose-row">
+                        {{ form_widget(messageForm.content, {'attr': {'placeholder': 'Écris ton message...', 'rows': 2}}) }}
+                        <button class="btn-send" type="submit">
+                            <i class="fas fa-paper-plane"></i> Envoyer
+                        </button>
+                    </div>
+                    {{ form_end(messageForm) }}
+                {% else %}
+                    <div class="text-muted">Connecte-toi pour envoyer un message.</div>
+                {% endif %}
+            </div>
         </div>
 
-        {% if is_granted('ROLE_USER') %}
-            <h5>Envoyer un message</h5>
-            {{ form_start(messageForm) }}
-            {{ form_row(messageForm.content) }}
-            <button class="btn btn-danger">Envoyer</button>
-            {{ form_end(messageForm) }}
-        {% else %}
-            <p class="text-muted">Connecte-toi pour envoyer un message.</p>
-        {% endif %}
     </div>
+
+    <script>
+        // Auto-scroll to bottom
+        (function () {
+            const el = document.getElementById('chatStream');
+            if (el) el.scrollTop = el.scrollHeight;
+        })();
+    </script>
 {% endblock %}

@@ -55,22 +55,6 @@ class ChannelRepository extends ServiceEntityRepository
 
     }
 
-    public function findPending(): array
-    {
-        return $this->createQueryBuilder('c')
-            ->andWhere('c.status = :pending')
-            ->setParameter('pending', \App\Entity\Channel::STATUS_PENDING)
-            ->orderBy('c.createdAt', 'DESC')
-            ->getQuery()->getResult();
-    }
-
-    public function findAllForAdmin(): array
-    {
-        return $this->createQueryBuilder('c')
-            ->orderBy('c.createdAt', 'DESC')
-            ->getQuery()->getResult();
-    }
-
     public function findAdminList(string $q, string $status, string $type, string $active): array
     {
         $qb = $this->createQueryBuilder('c');

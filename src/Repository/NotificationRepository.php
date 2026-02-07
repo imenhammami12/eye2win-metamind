@@ -21,18 +21,21 @@ class NotificationRepository extends ServiceEntityRepository
     /**
      * @return Notification[]
      */
-    public function findChannelNotificationsForUser(User $user, int $limit = 20): array
+    public function findChannelNotificationsForUser(User $user, int $limit = 10): array
     {
         return $this->createQueryBuilder('n')
             ->andWhere('n.user = :user')
             ->andWhere('n.type IN (:types)')
             ->setParameter('user', $user)
             ->setParameter('types', [NotificationType::CHANNEL_APPROVED, NotificationType::CHANNEL_REJECTED])
-            ->orderBy('n.createdAt', 'DESC')
+            // ✅ unread first, then newest
+            ->orderBy('n.read', 'ASC')
+            ->addOrderBy('n.createdAt', 'DESC')
             ->setMaxResults($limit)
             ->getQuery()
             ->getResult();
     }
+
 
     //    /**
     //     * @return Notification[] Returns an array of Notification objects
@@ -58,4 +61,19 @@ class NotificationRepository extends ServiceEntityRepository
     //            ->getOneOrNullResult()
     //        ;
     //    }
+
+//    public function countUnreadChannelNotifications(User $user): int
+//    {
+//        return (int) $this->createQueryBuilder('n')
+//            ->select('COUNT(n.id)')
+//            ->andWhere('n.user = :user')
+//            ->andWhere('n.read = :read')
+//            ->andWhere('n.type IN (:types)')
+//            ->setParameter('user', $user)
+//            ->setParameter('read', false)
+//            ->setParameter('types', [NotificationType::CHANNEL_APPROVED, NotificationType::CHANNEL_REJECTED])
+//            ->getQuery()
+//            ->getSingleScalarResult();
+//    }
+
 }

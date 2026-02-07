@@ -8,6 +8,7 @@ use Doctrine\ORM\Mapping as ORM;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use App\Entity\Message;
+use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: ChannelRepository::class)]
 class Channel
@@ -32,7 +33,8 @@ class Channel
     private ?string $game = null;
 
     #[ORM\Column(length: 20)]
-    private ?string $type = null;
+    #[Assert\Choice(choices: [self::TYPE_PUBLIC, self::TYPE_PRIVATE])]
+    private ?string $type = self::TYPE_PUBLIC;
 
     #[ORM\Column(length: 20)]
     private ?string $status = null;
