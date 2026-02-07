@@ -16,16 +16,12 @@ security:
             security: false
         
         # Firewall for administration - MUST BE BEFORE 'main'
+        # NO 2FA for admin
         admin:
             pattern: ^/admin
             lazy: true
             provider: app_user_provider
             user_checker: App\Security\AccountStatusChecker
-            
-            two_factor:
-                auth_form_path: 2fa_login
-                check_path: 2fa_login_check
-                enable_csrf: true
 
             # Admin login form
             form_login:
@@ -46,6 +42,7 @@ security:
                 path: /admin
         
         # Main firewall for regular users
+        # WITH 2FA for users
         main:
             lazy: true
             provider: app_user_provider
@@ -55,8 +52,8 @@ security:
                 auth_form_path: 2fa_login
                 check_path: 2fa_login_check
                 enable_csrf: true
-                prepare_on_login: true              # ✅ DOIT ÊTRE TRUE
-                prepare_on_access_denied: true      # ✅ DOIT ÊTRE TRUE
+                prepare_on_login: true
+                prepare_on_access_denied: true
 
             # User login form
             form_login:
@@ -83,18 +80,19 @@ security:
     
     # Access control
     access_control:
+        # 2FA routes - ONLY for regular users
         - { path: ^/2fa, roles: IS_AUTHENTICATED_2FA_IN_PROGRESS }
-
+        
         # Public routes
         - { path: ^/login, roles: PUBLIC_ACCESS }
         - { path: ^/register, roles: PUBLIC_ACCESS }
+        - { path: ^/admin/login, roles: PUBLIC_ACCESS }
         
-        # Admin routes
-        - { path: ^/admin/login, roles: PUBLIC_ACCESS }      # Admin login accessible to all
-        - { path: ^/admin/audit, roles: ROLE_SUPER_ADMIN }   # Audit logs = Super Admin only
-        - { path: ^/admin, roles: ROLE_ADMIN }                # Backoffice = Admin minimum
+        # Admin routes - NO 2FA required
+        - { path: ^/admin/audit, roles: ROLE_SUPER_ADMIN }
+        - { path: ^/admin, roles: ROLE_ADMIN }
         
-        # User routes
+        # User routes - 2FA required if enabled
         - { path: ^/profile, roles: ROLE_USER }
         - { path: ^/dashboard, roles: ROLE_USER }
 
