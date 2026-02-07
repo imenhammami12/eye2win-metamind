@@ -50,18 +50,18 @@
                 <h5><i class="bi bi-info-circle me-2"></i>General Information</h5>
             </div>
             
-            <table class="table table-borderless">
+            <table class="table table-borderless text-white">
                 <tbody>
                     <tr>
-                        <th style="width: 200px;"><i class="bi bi-calendar-event me-2"></i>Start Date</th>
+                        <th style="width: 200px;" class="text-white-50"><i class="bi bi-calendar-event me-2"></i>Start Date</th>
                         <td>{{ tournoi.dateDebut ? tournoi.dateDebut|date('F d, Y') : 'N/A' }}</td>
                     </tr>
                     <tr>
-                        <th><i class="bi bi-calendar-check me-2"></i>End Date</th>
+                        <th class="text-white-50"><i class="bi bi-calendar-check me-2"></i>End Date</th>
                         <td>{{ tournoi.dateFin ? tournoi.dateFin|date('F d, Y') : 'N/A' }}</td>
                     </tr>
                     <tr>
-                        <th><i class="bi bi-file-text me-2"></i>Description</th>
+                        <th class="text-white-50"><i class="bi bi-file-text me-2"></i>Description</th>
                         <td>{{ tournoi.description|nl2br }}</td>
                     </tr>
                 </tbody>
