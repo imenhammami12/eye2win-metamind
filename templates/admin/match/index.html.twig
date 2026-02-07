@@ -68,6 +68,9 @@
                         </td>
                         <td>
                             <div class="btn-group" role="group">
+                                <a href="{{ path('admin_matches_show', {'id': match.id}) }}" class="btn btn-sm btn-info" title="View Details">
+                                    <i class="bi bi-eye"></i>
+                                </a>
                                 <a href="{{ path('admin_matches_edit', {'id': match.id}) }}" class="btn btn-sm btn-warning" title="Edit">
                                     <i class="bi bi-pencil"></i>
                                 </a>
