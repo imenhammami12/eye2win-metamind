@@ -1,0 +1,17 @@
+scheb_two_factor:
+    security_tokens:
+        # Nouveau système (Authenticator Manager)
+        - Symfony\Component\Security\Http\Authenticator\Token\PostAuthenticationToken
+        # ANCIEN système (Guard / UsernamePasswordToken) ← AJOUT IMPORTANT
+        - Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken
+    
+    persister: scheb_two_factor.persister.doctrine
+    
+    totp:
+        enabled: true
+        server_name: 'EyeTwin eSport Platform'
+        issuer: 'EyeTwin'
+        leeway: 1
+        parameters:
+            image: null
+        template: 'two_factor/authenticate.html.twig'

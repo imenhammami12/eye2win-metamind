@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="fr">
+<html lang="en">
 <head>
     <!-- Required meta tags -->
     <meta charset="utf-8">
@@ -25,10 +25,14 @@
     <link rel="stylesheet" href="{{ asset('assets/css/slick.css') }}">
     <!-- style CSS -->
     <link rel="stylesheet" href="{{ asset('assets/css/style.css') }}">
-    <!-- CORRECTION NAVBAR -->
+    <link rel="stylesheet" href="{{ asset('assets/css/2fa-custom-styles.css') }}">
+
+    <!-- NAVBAR FIXES -->
     <link rel="stylesheet" href="{{ asset('assets/css/navbar-fixes.css') }}">
     <link rel="stylesheet" href="{{ asset('assets/css/profile.css') }}">
+    
     <!-- Font Awesome CDN -->
+    
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" 
           integrity="sha512-iecdLmaskl7CVkqkXNQ/ZH/XLlvWZOJyj7Yy7tcenmpD1ypASozpmT/E0iPtmFIB46ZmdtAc9eNBvH0H/ZpiBw==" 
           crossorigin="anonymous" referrerpolicy="no-referrer" />
@@ -55,50 +59,53 @@
                             <div class="collapse navbar-collapse main-menu-item" id="navbarSupportedContent">
                                 <ul class="navbar-nav">
                                     <li class="nav-item">
-                                        <a class="nav-link" href="{{ path('app_home') }}">Accueil</a>
+                                        <a class="nav-link" href="{{ path('app_home') }}">Home</a>
                                     </li>
                                     {% if app.user %}
-                                            <li class="nav-item">
-                                                <a class="nav-link" href="{{ path('app_dashboard') }}">Dashboard</a>
-                                            </li>
-                                            <li class="nav-item">
-                                                <a class="nav-link" href="{{ path('app_teams_index') }}">Équipes</a>
-                                            </li>
-                                            
+                                        <li class="nav-item">
+                                            <a class="nav-link" href="{{ path('app_dashboard') }}">Dashboard</a>
+                                        </li>
+                                        <li class="nav-item">
+                                            <a class="nav-link" href="{{ path('app_teams_index') }}">Teams</a>
+                                        </li>
                                         
-                                                                                    <li class="nav-item dropdown">
-    <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown"
-        role="button" data-toggle="dropdown" aria-haspopup="true"
-        aria-expanded="false">
-        <i class="fas fa-user-circle"></i> {{ app.user.username }}
-    </a>
-    <div class="dropdown-menu" aria-labelledby="navbarDropdown">
-        <a class="dropdown-item" href="{{ path('user_profile') }}">
-            <i class="fas fa-user"></i> Mon Profil
-        </a>
-        
-        {% if is_granted('ROLE_ADMIN') %}
-            <div class="dropdown-divider"></div>
-            <a class="dropdown-item admin-link" href="{{ path('admin_dashboard') }}">
-<i class="fas fa-user-shield"></i> Administration
-            </a>
-        {% endif %}
-        
-        <div class="dropdown-divider"></div>
-        <a class="dropdown-item" href="{{ path('app_logout') }}">
-            <i class="fas fa-sign-out-alt"></i> Déconnexion
-        </a>
-    </div>
-</li>
+                                        <li class="nav-item dropdown">
+                                            <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown"
+                                                role="button" data-toggle="dropdown" aria-haspopup="true"
+                                                aria-expanded="false">
+                                                <i class="fas fa-user-circle"></i> {{ app.user.username }}
+                                            </a>
+                                            <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+                                                <a class="dropdown-item" href="{{ path('user_profile') }}">
+                                                    <i class="fas fa-user"></i> My Profile
+                                                </a>
+                                                
+                                                <a class="dropdown-item" href="{{ path('app_2fa_settings') }}">
+                                                    <i class="fas fa-shield-alt"></i> Two-Factor Authentication
+                                                </a>
+                                                
+                                                {% if is_granted('ROLE_ADMIN') %}
+                                                    <div class="dropdown-divider"></div>
+                                                    <a class="dropdown-item admin-link" href="{{ path('admin_dashboard') }}">
+                                                        <i class="fas fa-user-shield"></i> Administration
+                                                    </a>
+                                                {% endif %}
+                                                
+                                                <div class="dropdown-divider"></div>
+                                                <a class="dropdown-item" href="{{ path('app_logout') }}">
+                                                    <i class="fas fa-sign-out-alt"></i> Logout
+                                                </a>
+                                            </div>
+                                        </li>
                                     {% else %}
                                         <li class="nav-item">
-                                            <a class="nav-link" href="{{ path('app_login') }}">Connexion</a>
+                                            <a class="nav-link" href="{{ path('app_login') }}">Login</a>
                                         </li>
                                     {% endif %}
                                 </ul>
                             </div>
                             {% if not app.user %}
-                                <a href="{{ path('app_register') }}" class="btn_1 d-none d-sm-block">S'inscrire</a>
+                                <a href="{{ path('app_register') }}" class="btn_1 d-none d-sm-block">Sign Up</a>
                             {% endif %}
                         </nav>
                     </div>
@@ -164,26 +171,26 @@
                                 <a href="{{ path('app_home') }}" class="footer_logo_iner"> 
                                     <img src="{{ asset('assets/img/eyetwin-logo.png') }}" alt="EyeTwin"> 
                                 </a>
-                                <p>La plateforme eSport de référence pour améliorer vos performances gaming avec analyse intelligente et coaching personnalisé.</p>
+                                <p>The leading eSport platform to improve your gaming performance with intelligent analysis and personalized coaching.</p>
                             </div>
                         </div>
                         <div class="col-sm-6 col-lg-3">
                             <div class="single_footer_part">
                                 <h4>Contact Info</h4>
-                                <p>Adresse : Tunis, Tunisie</p>
-                                <p>Email : contact@eyetwin.tn</p>
+                                <p>Address: Tunis, Tunisia</p>
+                                <p>Email: contact@eyetwin.tn</p>
                             </div>
                         </div>
                         <div class="col-sm-6 col-lg-3">
                             <div class="single_footer_part">
-                                <h4>Liens Importants</h4>
+                                <h4>Important Links</h4>
                                 <ul class="list-unstyled">
-                                    <li><a href="{{ path('app_home') }}">Accueil</a></li>
+                                    <li><a href="{{ path('app_home') }}">Home</a></li>
                                     {% if app.user %}
                                         <li><a href="{{ path('app_dashboard') }}">Dashboard</a></li>
                                     {% else %}
-                                        <li><a href="{{ path('app_register') }}">Créer un compte</a></li>
-                                        <li><a href="{{ path('app_login') }}">Connexion</a></li>
+                                        <li><a href="{{ path('app_register') }}">Create Account</a></li>
+                                        <li><a href="{{ path('app_login') }}">Login</a></li>
                                     {% endif %}
                                 </ul>
                             </div>
@@ -191,7 +198,7 @@
                         <div class="col-sm-6 col-lg-3">
                             <div class="single_footer_part">
                                 <h4>Newsletter</h4>
-                                <p>Restez informé des dernières actualités et tournois eSport.</p>
+                                <p>Stay updated with the latest eSport news and tournaments.</p>
                                 <div id="mc_embed_signup">
                                     <form class="subscribe_form relative mail_part">
                                         <input type="email" name="email" placeholder="Email Address" 
@@ -211,7 +218,7 @@
                     <div class="row align-items-center">
                         <div class="col-lg-8">
                             <div class="copyright_text">
-                                <p>Copyright &copy;<script>document.write(new Date().getFullYear());</script> EyeTwin eSport Platform - Tous droits réservés</p>
+                                <p>Copyright &copy;<script>document.write(new Date().getFullYear());</script> EyeTwin eSport Platform - All Rights Reserved</p>
                             </div>
                         </div>
                         <div class="col-lg-4">

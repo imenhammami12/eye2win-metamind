@@ -22,6 +22,11 @@ security:
             provider: app_user_provider
             user_checker: App\Security\AccountStatusChecker
             
+            two_factor:
+                auth_form_path: 2fa_login
+                check_path: 2fa_login_check
+                enable_csrf: true
+
             # Admin login form
             form_login:
                 login_path: admin_login
@@ -46,6 +51,13 @@ security:
             provider: app_user_provider
             user_checker: App\Security\AccountStatusChecker
             
+            two_factor:
+                auth_form_path: 2fa_login
+                check_path: 2fa_login_check
+                enable_csrf: true
+                prepare_on_login: true              # ✅ DOIT ÊTRE TRUE
+                prepare_on_access_denied: true      # ✅ DOIT ÊTRE TRUE
+
             # User login form
             form_login:
                 login_path: app_login
@@ -71,6 +83,8 @@ security:
     
     # Access control
     access_control:
+        - { path: ^/2fa, roles: IS_AUTHENTICATED_2FA_IN_PROGRESS }
+
         # Public routes
         - { path: ^/login, roles: PUBLIC_ACCESS }
         - { path: ^/register, roles: PUBLIC_ACCESS }
