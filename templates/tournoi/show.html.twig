@@ -70,51 +70,57 @@
                         <h3 class="mb-4">Match Schedule</h3>
                         
                         {% if matches|length > 0 %}
-                            <div class="table-responsive">
-                                <table class="table table-hover align-middle custom-table">
-                                    <thead class="table-light">
-                                        <tr>
-                                            <th>Date</th>
-                                            <th class="text-center">Team 1</th>
-                                            <th class="text-center">Score</th>
-                                            <th class="text-center">Team 2</th>
-                                            <th>Status</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        {% for match in matches %}
-                                            <tr>
-                                                <td>
-                                                    <i class="far fa-clock text-primary me-2"></i>
-                                                    {{ match.dateMatch ? match.dateMatch|date('M d, Y H:i') : 'TBA' }}
-                                                </td>
-                                                <td class="text-center fw-bold">
+                            <div class="matches-list">
+                                {% for match in matches %}
+                                    <div class="match-card mb-3 p-4 rounded shadow-sm d-flex flex-wrap align-items-center justify-content-between" 
+                                         style="background-color: #1a1a2e; border: 1px solid #16213e; transition: transform 0.2s;">
+                                        
+                                        {# Date Column #}
+                                        <div class="match-date mb-2 mb-md-0 me-md-4 text-center" style="min-width: 100px;">
+                                            <div style="color: #e94560; font-weight: bold; font-size: 1.1rem;">
+                                                {{ match.dateMatch ? match.dateMatch|date('M d') : 'TBA' }}
+                                            </div>
+                                            <div class="small text-muted">
+                                                {{ match.dateMatch ? match.dateMatch|date('H:i') : '--:--' }}
+                                            </div>
+                                        </div>
+
+                                        {# Teams Column #}
+                                        <div class="match-teams flex-grow-1 text-center mb-3 mb-md-0">
+                                            <div class="d-flex align-items-center justify-content-center gap-3">
+                                                <div class="team-name text-end fw-bold text-white fs-5" style="width: 45%;">
                                                     {{ match.equipe1 }}
-                                                </td>
-                                                <td class="text-center">
-                                                    {% if match.score is not null %}
-                                                        <span class="badge bg-dark px-3 py-2">{{ match.score }}</span>
-                                                    {% else %}
-                                                        <span class="text-muted">- vs -</span>
-                                                    {% endif %}
-                                                </td>
-                                                <td class="text-center fw-bold">
+                                                </div>
+                                                
+                                                <div class="vs-badge px-2 py-1 rounded small fw-bold" style="background-color: #0f3460; color: #aeb8c9;">VS</div>
+                                                
+                                                <div class="team-name text-start fw-bold text-white fs-5" style="width: 45%;">
                                                     {{ match.equipe2 }}
-                                                </td>
-                                                <td>
-                                                    {% if match.dateMatch and match.dateMatch < date() %}
-                                                        <span class="badge bg-success">Finished</span>
-                                                    {% else %}
-                                                        <span class="badge bg-warning text-dark">Upcoming</span>
-                                                    {% endif %}
-                                                </td>
-                                            </tr>
-                                        {% endfor %}
-                                    </tbody>
-                                </table>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        {# Status/Score Column #}
+                                        <div class="match-status text-center ms-md-4" style="min-width: 120px;">
+                                            {% if match.score is not null %}
+                                                <div class="score-display px-3 py-2 rounded fw-bold text-white mb-1" style="background-color: #e94560;">
+                                                    {{ match.score }}
+                                                </div>
+                                                <small class="text-muted">Final Score</small>
+                                            {% else %}
+                                                {% if match.dateMatch and match.dateMatch < date() %}
+                                                     <span class="badge bg-secondary">Finished</span>
+                                                {% else %}
+                                                     <span class="badge bg-warning text-dark">Upcoming</span>
+                                                {% endif %}
+                                            {% endif %}
+                                        </div>
+
+                                    </div>
+                                {% endfor %}
                             </div>
                         {% else %}
-                            <div class="alert alert-warning">
+                            <div class="alert alert-dark border-0" style="background-color: #1a1a2e; color: #fff;">
                                 <i class="fas fa-exclamation-triangle me-2"></i>
                                 No matches have been scheduled for this tournament yet.
                             </div>
