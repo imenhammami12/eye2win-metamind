@@ -1,0 +1,30 @@
+<div class="modal fade" id="rejectChannelModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content" style="background: rgba(15, 15, 20, 0.98); border: 1px solid rgba(255,255,255,0.08);">
+            <div class="modal-header" style="border-bottom: 1px solid rgba(255,255,255,0.08);">
+                <h5 class="modal-title text-white">
+                    <i class="bi bi-x-circle me-2 text-danger"></i> Reject channel
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+
+            <div class="modal-body text-white">
+                <p>Reject: <strong id="rejectChannelName"></strong></p>
+                <input class="form-control" id="rejectReasonInput" placeholder="Reason..." />
+                <small class="text-muted d-block mt-2" style="color: rgba(255,255,255,0.6)!important;">
+                    The creator will receive a notification with this reason.
+                </small>
+            </div>
+
+            <div class="modal-footer" style="border-top: 1px solid rgba(255,255,255,0.08);">
+                <button type="button" class="btn btn-outline-light" data-bs-dismiss="modal">Cancel</button>
+
+                <form method="post" id="rejectChannelForm" action="">
+                    <input type="hidden" name="_token" id="rejectToken" value="">
+                    <input type="hidden" name="reason" id="rejectReasonHidden" value="">
+                    <button type="submit" class="btn btn-danger">Reject</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>

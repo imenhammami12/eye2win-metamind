@@ -1,0 +1,186 @@
+{% extends 'admin_layout.html.twig' %}
+
+{% block title %}Messages Management{% endblock %}
+{% block page_title %}Messages Management{% endblock %}
+
+{% block body %}
+
+    {% macro sort_link(label, field, q, status, sort, dir) %}
+        {% set nextDir = (sort == field and dir == 'asc') ? 'desc' : 'asc' %}
+        <a class="text-decoration-none" style="color: inherit;"
+           href="{{ path('admin_messages_index', { q: q, status: status, sort: field, dir: nextDir }) }}">
+            {{ label }}
+            {% if sort == field %}
+                <i class="bi {{ dir == 'asc' ? 'bi-caret-up-fill' : 'bi-caret-down-fill' }} ms-1"></i>
+            {% else %}
+                <i class="bi bi-arrow-down-up ms-1" style="opacity: .4;"></i>
+            {% endif %}
+        </a>
+    {% endmacro %}
+
+    {% import _self as ui %}
+
+    {# Filters and Search (same style as users) #}
+    <div class="table-card mb-4 fade-in">
+        <div class="table-header">
+            <h5><i class="bi bi-funnel me-2"></i>Filters & Search</h5>
+        </div>
+
+        <form method="get" action="{{ path('admin_messages_index') }}" class="p-3">
+            <input type="hidden" name="sort" value="{{ sort }}">
+            <input type="hidden" name="dir" value="{{ dir }}">
+            <div class="row g-3">
+                <div class="col-md-5">
+                    <label class="form-label">
+                        <i class="bi bi-search me-1"></i>Search
+                    </label>
+                    <div class="search-bar">
+                        <i class="search-icon bi bi-search"></i>
+                        <input type="text"
+                               name="q"
+                               class="form-control"
+                               placeholder="Content, sender name, email..."
+                               value="{{ q }}"
+                               autocomplete="off">
+                    </div>
+                </div>
+
+                <div class="col-md-3">
+                    <label class="form-label">
+                        <i class="bi bi-toggle-on me-1"></i>Status
+                    </label>
+                    <select name="status" class="form-select">
+                        <option value="active" {{ status == 'active' ? 'selected' : '' }}>Active only</option>
+                        <option value="deleted" {{ status == 'deleted' ? 'selected' : '' }}>Deleted only</option>
+                        <option value="all" {{ status == 'all' ? 'selected' : '' }}>All</option>
+                    </select>
+                </div>
+
+                <div class="col-md-4 d-flex align-items-end gap-2">
+                    <button type="submit" class="btn btn-primary flex-grow-1">
+                        <i class="bi bi-search me-1"></i>Filter
+                    </button>
+
+                    {% if q or status != 'active' %}
+                        <a href="{{ path('admin_messages_index') }}" class="btn btn-outline-secondary" title="Clear filters">
+                            <i class="bi bi-x-lg"></i>
+                        </a>
+                    {% endif %}
+                </div>
+            </div>
+        </form>
+    </div>
+
+    {# Results Summary #}
+    <div class="mb-3 fade-in" style="animation-delay: 0.1s;">
+        <h6 class="text-muted mb-0">
+            <i class="bi bi-info-circle me-2"></i>
+            Found <strong>{{ messages|length }}</strong> message{{ messages|length != 1 ? 's' : '' }}
+        </h6>
+    </div>
+
+    {# Messages Table (same style as users) #}
+    <div class="table-card fade-in" style="animation-delay: 0.2s;">
+        <div class="table-header">
+            <h5><i class="bi bi-chat-dots me-2"></i>Messages List</h5>
+        </div>
+
+        <div class="table-responsive">
+            <table class="custom-table table">
+                <thead>
+                <tr>
+                    <th style="width: 70px;">{{ ui.sort_link('#', 'id', q, status, sort, dir) }}</th>
+                    <th style="width: 200px;">{{ ui.sort_link('Channel', 'channel', q, status, sort, dir) }}</th>
+                    <th style="width: 220px;">{{ ui.sort_link('Sender', 'sender', q, status, sort, dir) }}</th>
+                    <th>Content</th>
+                    <th style="width: 160px;">{{ ui.sort_link('Sent', 'sentAt', q, status, sort, dir) }}</th>
+                    <th style="width: 120px;">{{ ui.sort_link('Status', 'status', q, status, sort, dir) }}</th>
+                    <th style="width: 190px;">Actions</th>
+                </tr>
+                </thead>
+
+                <tbody>
+                {% for m in messages %}
+                    <tr class="fade-in" style="animation-delay: {{ loop.index * 0.03 }}s;">
+                        <td><strong>{{ m.id }}</strong></td>
+
+                        <td>
+                            <div><strong>{{ m.channel ? m.channel.name : 'N/A' }}</strong></div>
+                            {% if m.channel %}
+                                <small class="text-muted">#{{ m.channel.id }}</small>
+                            {% endif %}
+                        </td>
+
+                        <td>
+                            <div><strong>{{ m.senderName }}</strong></div>
+                            <small class="text-muted">{{ m.senderEmail }}</small>
+                        </td>
+
+                        <td style="max-width: 520px;">
+                            <span style="display:inline-block; max-width:520px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; vertical-align:middle; opacity: {{ m.isDeleted() ? '0.55' : '1' }};">
+                                {{ m.content }}
+                            </span>
+
+                            {% if m.isDeleted() %}
+                                <small class="text-muted ms-2"></small>
+                            {% endif %}
+                        </td>
+
+
+                        <td>
+                            <small class="text-muted">
+                                <i class="bi bi-calendar3 me-1"></i>
+                                {{ m.sentAt ? m.sentAt|date('d/m/Y H:i') : '-' }}
+                            </small>
+                        </td>
+
+                        <td>
+                            {% if m.isDeleted() %}
+                                <span class="badge bg-secondary">Deleted</span>
+                            {% else %}
+                                <span class="badge bg-success">Active</span>
+                            {% endif %}
+                        </td>
+
+                        <td>
+                            <div class="btn-group" role="group" aria-label="Message actions">
+                                {% if m.channel %}
+                                    <a href="{{ path('community_channels_show', {id: m.channel.id}) }}"
+                                       class="btn btn-sm btn-info"
+                                       title="View in channel"
+                                       data-bs-toggle="tooltip">
+                                        <i class="bi bi-eye"></i>
+                                    </a>
+                                {% endif %}
+
+                                <button type="button"
+                                        class="btn btn-sm {{ m.isDeleted() ? 'btn-success' : 'btn-danger' }}"
+                                        onclick="confirmAction(
+                                                '{{ path('admin_messages_toggle_delete', {id: m.id}) }}',
+                                                '{{ csrf_token('admin_toggle_delete_' ~ m.id) }}',
+                                                '{{ m.isDeleted() ? 'Restore this message?' : 'Delete this message?' }}'
+                                                )"
+                                        title="{{ m.isDeleted() ? 'Restore' : 'Delete' }}"
+                                        data-bs-toggle="tooltip">
+                                    <i class="bi {{ m.isDeleted() ? 'bi-arrow-counterclockwise' : 'bi-trash' }}"></i>
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                {% else %}
+                    <tr>
+                        <td colspan="7" class="text-center text-muted py-5">
+                            <div class="empty-state">
+                                <i class="bi bi-inbox" style="font-size: 64px; opacity: 0.2;"></i>
+                                <h4 class="mt-3 mb-2">No Messages Found</h4>
+                                <p class="text-muted">Try adjusting filters</p>
+                            </div>
+                        </td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+{% endblock %}

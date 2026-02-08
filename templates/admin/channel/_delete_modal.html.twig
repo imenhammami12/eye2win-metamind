@@ -1,0 +1,46 @@
+<div class="modal fade" id="deleteChannelModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content" style="background: rgba(15, 15, 20, 0.98); border: 1px solid rgba(255,255,255,0.08);">
+            <div class="modal-header" style="border-bottom: 1px solid rgba(255,255,255,0.08);">
+                <h5 class="modal-title text-white">
+                    <i class="bi bi-exclamation-triangle me-2 text-warning"></i>
+                    Confirm deletion
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+
+            <div class="modal-body text-white">
+                <p class="mb-2">
+                    You are about to delete the channel:
+                    <strong id="modalChannelName"></strong>
+                </p>
+
+                <div id="modalWarningEmpty" class="alert alert-secondary"
+                     style="background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.08); color: rgba(255,255,255,0.85); display:none;">
+                    <i class="bi bi-info-circle me-2"></i>
+                    This channel is empty.
+                </div>
+
+                <div id="modalWarningNotEmpty" class="alert alert-danger"
+                     style="background: rgba(255,0,0,0.10); border: 1px solid rgba(255,0,0,0.25); color: rgba(255,255,255,0.9); display:none;">
+                    <i class="bi bi-chat-left-text me-2"></i>
+                    This channel is not empty (<span id="modalMessagesCount"></span> message(s)).
+                    People are talking in it. Are you sure you want to delete it?
+                </div>
+
+                <p class="text-muted mb-0" style="color: rgba(255,255,255,0.6)!important;">
+                    This action is irreversible.
+                </p>
+            </div>
+
+            <div class="modal-footer" style="border-top: 1px solid rgba(255,255,255,0.08);">
+                <button type="button" class="btn btn-outline-light" data-bs-dismiss="modal">Cancel</button>
+
+                <form method="post" id="deleteChannelForm" action="">
+                    <input type="hidden" name="_token" id="deleteChannelToken" value="">
+                    <button type="submit" class="btn btn-danger">Delete</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="en">
+<html lang="fr">
 <head>
     <!-- Required meta tags -->
     <meta charset="utf-8">
@@ -30,9 +30,10 @@
     <!-- NAVBAR FIXES -->
     <link rel="stylesheet" href="{{ asset('assets/css/navbar-fixes.css') }}">
     <link rel="stylesheet" href="{{ asset('assets/css/profile.css') }}">
-    
-    <!-- Font Awesome CDN -->
-    
+    <!-- E-SPORT-UI & CHECKBOX FORM-->
+    <link rel="stylesheet" href="{{ asset('assets/css/esport-ui.css') }}">
+    <link rel="stylesheet" href="{{ asset('assets/css/community.css') }}">
+        <!-- Font Awesome CDN -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" 
           integrity="sha512-iecdLmaskl7CVkqkXNQ/ZH/XLlvWZOJyj7Yy7tcenmpD1ypASozpmT/E0iPtmFIB46ZmdtAc9eNBvH0H/ZpiBw==" 
           crossorigin="anonymous" referrerpolicy="no-referrer" />
@@ -59,55 +60,108 @@
                             <div class="collapse navbar-collapse main-menu-item" id="navbarSupportedContent">
                                 <ul class="navbar-nav">
                                     <li class="nav-item">
-                                        <a class="nav-link" href="{{ path('app_home') }}">Home</a>
+                                        <a class="nav-link" href="{{ path('app_home') }}">Accueil</a>
                                     </li>
                                     {% if app.user %}
                                         <li class="nav-item">
-                                            <a class="nav-link" href="{{ path('app_video_upload') }}">Uploader</a>
+                                            <a class="nav-link" href="{{ path('app_dashboard') }}">Dashboard</a>
                                         </li>
-                                        {% if is_granted('ROLE_ADMIN') %}
-                                            <li class="nav-item">
-                                                <a class="nav-link" href="{{ path('app_dashboard') }}">Dashboard</a>
-                                            </li>
-                                        {% endif %}
-                                        
-                                        <li class="nav-item dropdown">
-                                            <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown"
-                                                role="button" data-toggle="dropdown" aria-haspopup="true"
-                                                aria-expanded="false">
-                                                <i class="fas fa-user-circle"></i> {{ app.user.username }}
-                                            </a>
-                                            <div class="dropdown-menu" aria-labelledby="navbarDropdown">
-                                                <a class="dropdown-item" href="{{ path('user_profile') }}">
-                                                    <i class="fas fa-user"></i> My Profile
-                                                </a>
-                                                
-                                                <a class="dropdown-item" href="{{ path('app_2fa_settings') }}">
-                                                    <i class="fas fa-shield-alt"></i> Two-Factor Authentication
-                                                </a>
-                                                
-                                                {% if is_granted('ROLE_ADMIN') %}
-                                                    <div class="dropdown-divider"></div>
-                                                    <a class="dropdown-item admin-link" href="{{ path('admin_dashboard') }}">
-                                                        <i class="fas fa-user-shield"></i> Administration
-                                                    </a>
+                                        <li class="nav-item">
+                                            <a class="nav-link" href="{{ path('community_channels_index') }}">Community</a>
+                                        </li>
+
+                                        {# 🔔 Notifications bell dropdown #}
+                                        <li class="nav-item dropdown position-relative">
+                                            <a class="nav-link dropdown-toggle" href="#" id="notifDropdown"
+                                               role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"
+                                               style="position: relative;">
+                                                <i class="fas fa-bell"></i>
+
+                                                {% if navUnreadCount|default(0) > 0 %}
+                                                    <span class="badge badge-danger"
+                                                          style="position:absolute; top:0px; right:-6px; font-size:10px; border-radius:50%;">
+                {{ navUnreadCount }}
+            </span>
                                                 {% endif %}
-                                                
-                                                <div class="dropdown-divider"></div>
-                                                <a class="dropdown-item" href="{{ path('app_logout') }}">
-                                                    <i class="fas fa-sign-out-alt"></i> Logout
-                                                </a>
+                                            </a>
+
+                                            <div class="dropdown-menu dropdown-menu-right p-0 shadow"
+                                                 aria-labelledby="notifDropdown"
+                                                 style="width: 360px; border-radius: 12px; overflow: hidden;">
+
+                                                <div class="d-flex justify-content-between align-items-center px-3 py-2"
+                                                     style="border-bottom: 1px solid rgba(255,255,255,0.1); background: rgba(0,0,0,0.2);">
+                                                    <strong style="color:#fff;">Notifications</strong>
+                                                </div>
+
+                                                <div style="max-height: 420px; overflow:auto; background: rgba(15,15,20,0.98);">
+                                                    {% if navNotifications|default([])|length == 0 %}
+                                                        <div class="p-3 text-muted">No notifications ✅</div>
+                                                    {% else %}
+                                                        {% for notif in navNotifications %}
+                                                            <div class="px-3 py-2"
+                                                                 style="border-bottom: 1px solid rgba(255,255,255,0.08); color:#fff; {{ notif.read ? '' : 'background: rgba(255,255,255,0.06);' }}">
+                                                                <div style="font-size: 14px;">
+                                                                    <span class="me-2">{{ notif.type.getIcon() }}</span>
+                                                                    <span class="{{ notif.read ? 'text-muted' : '' }}">{{ notif.message }}</span>
+                                                                </div>
+                                                                <div class="small text-muted mt-1">{{ notif.createdAt|date('d/m/Y H:i') }}</div>
+
+                                                                <div class="mt-2 d-flex gap-2">
+                                                                    {% if notif.link %}
+                                                                        <a href="{{ notif.link }}" class="btn btn-sm btn-outline-light">View</a>
+                                                                    {% endif %}
+
+                                                                    {% if not notif.read %}
+                                                                        <form method="post" action="{{ path('user_notification_read', { id: notif.id }) }}">
+                                                                            <input type="hidden" name="_token" value="{{ csrf_token('notification_read_' ~ notif.id) }}">
+                                                                            <button type="submit" class="btn btn-sm btn-outline-secondary">Mark read</button>
+                                                                        </form>
+                                                                    {% endif %}
+                                                                </div>
+                                                            </div>
+                                                        {% endfor %}
+                                                    {% endif %}
+                                                </div>
                                             </div>
                                         </li>
+
+
+
+
+                                        <li class="nav-item dropdown">
+    <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown"
+        role="button" data-toggle="dropdown" aria-haspopup="true"
+        aria-expanded="false">
+        <i class="fas fa-user-circle"></i> {{ app.user.username }}
+    </a>
+    <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+        <a class="dropdown-item" href="{{ path('user_profile') }}">
+            <i class="fas fa-user"></i> Mon Profil
+        </a>
+        
+        {% if is_granted('ROLE_ADMIN') %}
+            <div class="dropdown-divider"></div>
+            <a class="dropdown-item admin-link" href="{{ path('admin_dashboard') }}">
+<i class="fas fa-user-shield"></i> Administration
+            </a>
+        {% endif %}
+        
+        <div class="dropdown-divider"></div>
+        <a class="dropdown-item" href="{{ path('app_logout') }}">
+            <i class="fas fa-sign-out-alt"></i> Déconnexion
+        </a>
+    </div>
+</li>
                                     {% else %}
                                         <li class="nav-item">
-                                            <a class="nav-link" href="{{ path('app_login') }}">Login</a>
+                                            <a class="nav-link" href="{{ path('app_login') }}">Connexion</a>
                                         </li>
                                     {% endif %}
                                 </ul>
                             </div>
                             {% if not app.user %}
-                                <a href="{{ path('app_register') }}" class="btn_1 d-none d-sm-block">Sign Up</a>
+                                <a href="{{ path('app_register') }}" class="btn_1 d-none d-sm-block">S'inscrire</a>
                             {% endif %}
                         </nav>
                     </div>
@@ -173,29 +227,26 @@
                                 <a href="{{ path('app_home') }}" class="footer_logo_iner"> 
                                     <img src="{{ asset('assets/img/eyetwin-logo.png') }}" alt="EyeTwin"> 
                                 </a>
-                                <p>The leading eSport platform to improve your gaming performance with intelligent analysis and personalized coaching.</p>
+                                <p>La plateforme eSport de référence pour améliorer vos performances gaming avec analyse intelligente et coaching personnalisé.</p>
                             </div>
                         </div>
                         <div class="col-sm-6 col-lg-3">
                             <div class="single_footer_part">
                                 <h4>Contact Info</h4>
-                                <p>Address: Tunis, Tunisia</p>
-                                <p>Email: contact@eyetwin.tn</p>
+                                <p>Adresse : Tunis, Tunisie</p>
+                                <p>Email : contact@eyetwin.tn</p>
                             </div>
                         </div>
                         <div class="col-sm-6 col-lg-3">
                             <div class="single_footer_part">
-                                <h4>Important Links</h4>
+                                <h4>Liens Importants</h4>
                                 <ul class="list-unstyled">
-                                    <li><a href="{{ path('app_home') }}">Home</a></li>
+                                    <li><a href="{{ path('app_home') }}">Accueil</a></li>
                                     {% if app.user %}
-                                        <li><a href="{{ path('app_video_upload') }}">Uploader</a></li>
-                                        {% if is_granted('ROLE_ADMIN') %}
-                                            <li><a href="{{ path('app_dashboard') }}">Dashboard</a></li>
-                                        {% endif %}
+                                        <li><a href="{{ path('app_dashboard') }}">Dashboard</a></li>
                                     {% else %}
-                                        <li><a href="{{ path('app_register') }}">Create Account</a></li>
-                                        <li><a href="{{ path('app_login') }}">Login</a></li>
+                                        <li><a href="{{ path('app_register') }}">Créer un compte</a></li>
+                                        <li><a href="{{ path('app_login') }}">Connexion</a></li>
                                     {% endif %}
                                 </ul>
                             </div>
@@ -203,7 +254,7 @@
                         <div class="col-sm-6 col-lg-3">
                             <div class="single_footer_part">
                                 <h4>Newsletter</h4>
-                                <p>Stay updated with the latest eSport news and tournaments.</p>
+                                <p>Restez informé des dernières actualités et tournois eSport.</p>
                                 <div id="mc_embed_signup">
                                     <form class="subscribe_form relative mail_part">
                                         <input type="email" name="email" placeholder="Email Address" 
@@ -223,7 +274,7 @@
                     <div class="row align-items-center">
                         <div class="col-lg-8">
                             <div class="copyright_text">
-                                <p>Copyright &copy;<script>document.write(new Date().getFullYear());</script> EyeTwin eSport Platform - All Rights Reserved</p>
+                                <p>Copyright &copy;<script>document.write(new Date().getFullYear());</script> EyeTwin eSport Platform - Tous droits réservés</p>
                             </div>
                         </div>
                         <div class="col-lg-4">
