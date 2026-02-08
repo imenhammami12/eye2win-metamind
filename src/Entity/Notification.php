@@ -24,7 +24,7 @@ class Notification
     #[ORM\Column(type: Types::TEXT)]
     private ?string $message = null;
 
-    #[ORM\Column]
+    #[ORM\Column(name:'`read`', type: 'boolean')]
     private ?bool $read = false;
 
     #[ORM\Column(type: Types::DATETIME_MUTABLE)]

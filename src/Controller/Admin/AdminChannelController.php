@@ -42,15 +42,6 @@ class AdminChannelController extends AbstractController
         ]);
     }
 
-
-    /*#[Route('/pending', name: 'admin_channels_pending')]
-    public function pending(ChannelRepository $repo): Response
-    {
-        return $this->render('admin/channel/pending.html.twig', [
-            'channels' => $repo->findPending(),
-        ]);
-    }*/
-
     #[Route('/{id}/approve', name: 'admin_channels_approve', methods: ['POST'])]
     public function approve(Channel $channel, Request $request, EntityManagerInterface $em, UserRepository $userRepo): Response
     {
