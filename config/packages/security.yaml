@@ -59,7 +59,7 @@ security:
             form_login:
                 login_path: app_login
                 check_path: app_login
-                default_target_path: app_dashboard
+                default_target_path: app_home
                 enable_csrf: true
             
             # User logout
@@ -94,6 +94,8 @@ security:
         
         # User routes - 2FA required if enabled
         - { path: ^/profile, roles: ROLE_USER }
+        - { path: ^/upload, roles: ROLE_USER }
+        - { path: ^/video, roles: ROLE_USER }
         - { path: ^/dashboard, roles: ROLE_USER }
 
 

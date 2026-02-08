@@ -24,8 +24,8 @@ class Notification
     #[ORM\Column(type: Types::TEXT)]
     private ?string $message = null;
 
-    #[ORM\Column(name:'`read`', type: 'boolean')]
-    private ?bool $read = false;
+    #[ORM\Column]
+    private ?bool $isRead = false;
 
     #[ORM\Column(type: Types::DATETIME_MUTABLE)]
     private ?\DateTimeInterface $createdAt = null;
@@ -33,10 +33,24 @@ class Notification
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $link = null;
 
+// src/Entity/Notification.php
+
+#[ORM\Column(type: 'boolean')]
+private bool $read = false;
+
+
+
+public function setRead(bool $read): self
+{
+    $this->read = $read;
+    return $this;
+}
+
+
     public function __construct()
     {
         $this->createdAt = new \DateTime();
-        $this->read = false;
+        $this->isRead = false;
     }
 
     // Getters et setters...
@@ -80,12 +94,12 @@ class Notification
 
     public function isRead(): ?bool
     {
-        return $this->read;
+        return $this->isRead;
     }
 
-    public function setRead(bool $read): static
+    public function setIsRead(bool $isRead): static
     {
-        $this->read = $read;
+        $this->isRead = $isRead;
         return $this;
     }
 
@@ -113,6 +127,6 @@ class Notification
 
     public function markAsRead(): void
     {
-        $this->read = true;
+        $this->isRead = true;
     }
 }

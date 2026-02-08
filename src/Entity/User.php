@@ -115,6 +115,12 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, TwoFact
     #[ORM\OneToMany(mappedBy: 'user', targetEntity: TrainingSession::class)]
     private Collection $trainingSessions;
 
+    /**
+     * @var Collection<int, Video>
+     */
+    #[ORM\OneToMany(targetEntity: Video::class, mappedBy: 'uploadedBy', orphanRemoval: true)]
+    private Collection $videos;
+
     public function __construct()
     {
         $this->ownedTeams = new ArrayCollection();
@@ -128,8 +134,8 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, TwoFact
         $this->accountStatus = AccountStatus::ACTIVE;
         $this->rolesJson = json_encode(['ROLE_USER']);
         $this->isTotpEnabled = false;
+        $this->videos = new ArrayCollection();
     }
-
     public function getId(): ?int
     {
         return $this->id;
@@ -442,4 +448,34 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, TwoFact
     }
 
     // ===== FIN MÉTHODES 2FA =====
+    /**
+     * @return Collection<int, Video>
+     */
+    public function getVideos(): Collection
+    {
+        return $this->videos;
+    }
+
+    public function addVideo(Video $video): static
+    {
+        if (!$this->videos->contains($video)) {
+            $this->videos->add($video);
+            $video->setUploadedBy($this);
+        }
+
+        return $this;
+    }
+
+    public function removeVideo(Video $video): static
+    {
+        if ($this->videos->removeElement($video)) {
+            // set the owning side to null (unless already changed)
+            if ($video->getUploadedBy() === $this) {
+                $video->setUploadedBy(null);
+            }
+        }
+
+        return $this;
+    }
+
 }

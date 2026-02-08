@@ -11,6 +11,7 @@ use App\Repository\AuditLogRepository;
 use App\Entity\AccountStatus;
 use App\Entity\ApplicationStatus;
 use Doctrine\ORM\EntityManagerInterface;
+use App\Repository\VideoRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
