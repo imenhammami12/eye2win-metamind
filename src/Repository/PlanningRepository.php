@@ -38,4 +38,18 @@ class PlanningRepository extends ServiceEntityRepository
             $this->getEntityManager()->flush();
         }
     }
+
+    /**
+     * Find all plannings sorted by date and time
+     * @param string $sortOrder 'ASC' or 'DESC'
+     * @return Planning[]
+     */
+    public function findAllOrderedByDate(string $sortOrder = 'DESC'): array
+    {
+        return $this->createQueryBuilder('p')
+            ->orderBy('p.date', $sortOrder)
+            ->addOrderBy('p.time', 'ASC')
+            ->getQuery()
+            ->getResult();
+    }
 }

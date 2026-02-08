@@ -23,4 +23,9 @@ class HomeController extends AbstractController
             'user' => $this->getUser(),
         ]);
     }
+        #[Route('/planning', name: 'app_planning')]
+    public function planning(): Response
+    {
+        return $this->render('home/planning.html.twig');
+    }
 }

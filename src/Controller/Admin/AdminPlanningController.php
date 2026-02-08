@@ -23,10 +23,40 @@ class AdminPlanningController extends AbstractController
         $search = $request->query->get('search', '');
         $typeFilter = $request->query->get('type', '');
         $levelFilter = $request->query->get('level', '');
+        $sortBy = $request->query->get('sort', 'date');
+        $sortOrder = $request->query->get('order', 'DESC');
         
-        $queryBuilder = $planningRepository->createQueryBuilder('p')
-            ->orderBy('p.date', 'DESC')
-            ->addOrderBy('p.time', 'DESC');
+        // Validate sort parameters
+        $validSortFields = ['date', 'time', 'localisation', 'type', 'level'];
+        if (!in_array($sortBy, $validSortFields)) {
+            $sortBy = 'date';
+        }
+        
+        if (!in_array($sortOrder, ['ASC', 'DESC'])) {
+            $sortOrder = 'DESC';
+        }
+        
+        $queryBuilder = $planningRepository->createQueryBuilder('p');
+        
+        // Handle special sorting for level and type enums
+        if ($sortBy === 'level') {
+            // Create CASE statement for proper level ordering
+            $orderCase = "CASE WHEN p.level = 'Beginner' THEN 1 WHEN p.level = 'Intermediate' THEN 2 WHEN p.level = 'Advanced' THEN 3 WHEN p.level = 'Professional' THEN 4 ELSE 5 END";
+            $queryBuilder->addSelect($orderCase . ' AS HIDDEN levelOrder')
+                ->orderBy('levelOrder', $sortOrder);
+        } elseif ($sortBy === 'type') {
+            // Create CASE statement for proper type ordering
+            $orderCase = "CASE WHEN p.type = 'FPS' THEN 1 WHEN p.type = 'MOBA' THEN 2 WHEN p.type = 'Battle Royale' THEN 3 WHEN p.type = 'Sport' THEN 4 WHEN p.type = 'Combat' THEN 5 WHEN p.type = 'RPG/MMORPG' THEN 6 WHEN p.type = 'Stratégie' THEN 7 ELSE 8 END";
+            $queryBuilder->addSelect($orderCase . ' AS HIDDEN typeOrder')
+                ->orderBy('typeOrder', $sortOrder);
+        } else {
+            $queryBuilder->orderBy('p.' . $sortBy, $sortOrder);
+            
+            // Add secondary sort by time if sorting by date
+            if ($sortBy === 'date') {
+                $queryBuilder->addOrderBy('p.time', $sortOrder);
+            }
+        }
         
         // Search by description or localisation
         if ($search) {
@@ -55,6 +85,8 @@ class AdminPlanningController extends AbstractController
             'levelFilter' => $levelFilter,
             'planningTypes' => PlanningType::cases(),
             'planningLevels' => PlanningLevel::cases(),
+            'sortBy' => $sortBy,
+            'sortOrder' => $sortOrder,
         ]);
     }
 
