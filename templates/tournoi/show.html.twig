@@ -25,34 +25,34 @@
             <div class="row">
                 <!-- Sidebar / Image -->
                 <div class="col-lg-4">
-                    <div class="card border-0 shadow-sm mb-4">
+                    <div class="card border-0 shadow-sm mb-4" style="background-color: #1a1a2e; color: #fff; border: 1px solid #2d2d44;">
                         {% if tournament.image %}
                             <img src="{{ asset('uploads/tournois/' ~ tournament.image) }}" 
-                                 class="card-img-top rounded" 
+                                 class="card-img-top rounded-top" 
                                  alt="{{ tournament.nom }}">
                         {% else %}
-                            <div class="bg-dark d-flex align-items-center justify-content-center rounded" style="height: 300px;">
+                            <div class="d-flex align-items-center justify-content-center rounded-top" style="height: 300px; background: linear-gradient(45deg, #16213e, #0f3460);">
                                 <i class="fas fa-trophy fa-5x text-white-50"></i>
                             </div>
                         {% endif %}
-                        <div class="card-body">
-                            <h4 class="mb-3">Tournament Info</h4>
+                        <div class="card-body p-4">
+                            <h4 class="mb-4 text-white" style="border-bottom: 2px solid #e94560; padding-bottom: 10px; display: inline-block;">Tournament Info</h4>
                             <ul class="list-group list-group-flush">
-                                <li class="list-group-item d-flex justify-content-between align-items-center">
+                                <li class="list-group-item d-flex justify-content-between align-items-center" style="background-color: transparent; color: #aeb8c9; border-bottom: 1px solid #2d2d44;">
                                     Type
-                                    <span class="badge bg-primary rounded-pill">{{ tournament.typeTournoi ? tournament.typeTournoi.name : 'N/A' }}</span>
+                                    <span class="badge rounded-pill" style="background-color: #e94560;">{{ tournament.typeTournoi ? tournament.typeTournoi.name : 'N/A' }}</span>
                                 </li>
-                                <li class="list-group-item d-flex justify-content-between align-items-center">
+                                <li class="list-group-item d-flex justify-content-between align-items-center" style="background-color: transparent; color: #aeb8c9; border-bottom: 1px solid #2d2d44;">
                                     Start Date
-                                    <span>{{ tournament.dateDebut ? tournament.dateDebut|date('M d, Y') : 'TBA' }}</span>
+                                    <span class="text-white">{{ tournament.dateDebut ? tournament.dateDebut|date('M d, Y') : 'TBA' }}</span>
                                 </li>
-                                <li class="list-group-item d-flex justify-content-between align-items-center">
+                                <li class="list-group-item d-flex justify-content-between align-items-center" style="background-color: transparent; color: #aeb8c9; border-bottom: 1px solid #2d2d44;">
                                     End Date
-                                    <span>{{ tournament.dateFin ? tournament.dateFin|date('M d, Y') : 'TBA' }}</span>
+                                    <span class="text-white">{{ tournament.dateFin ? tournament.dateFin|date('M d, Y') : 'TBA' }}</span>
                                 </li>
-                                <li class="list-group-item d-flex justify-content-between align-items-center">
+                                <li class="list-group-item d-flex justify-content-between align-items-center" style="background-color: transparent; color: #aeb8c9; border-bottom: none;">
                                     Total Matches
-                                    <span class="badge bg-secondary rounded-pill">{{ matches|length }}</span>
+                                    <span class="badge rounded-pill" style="background-color: #0f3460; border: 1px solid #2d2d44;">{{ matches|length }}</span>
                                 </li>
                             </ul>
                         </div>
