@@ -61,6 +61,9 @@
                                         <li class="nav-item">
                                             <a class="nav-link" href="{{ path('app_dashboard') }}">Dashboard</a>
                                         </li>
+                                        <li class="nav-item">
+                                            <a class="nav-link" href="{{ path('app_planning') }}">Planning</a>
+                                        </li>
                                         
                                                                                     <li class="nav-item dropdown">
     <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown"
@@ -177,6 +180,7 @@
                                     <li><a href="{{ path('app_home') }}">Accueil</a></li>
                                     {% if app.user %}
                                         <li><a href="{{ path('app_dashboard') }}">Dashboard</a></li>
+                                        <li><a href="{{ path('app_dashboard') }}">Planning</a></li>
                                     {% else %}
                                         <li><a href="{{ path('app_register') }}">Créer un compte</a></li>
                                         <li><a href="{{ path('app_login') }}">Connexion</a></li>

@@ -31,11 +31,23 @@ class AdminCoachApplicationController extends AbstractController
         CoachApplicationRepository $repository
     ): Response {
         $statusFilter = $request->query->get('status', '');
+        $sortBy = $request->query->get('sort', 'submittedAt');
+        $sortOrder = $request->query->get('order', 'DESC');
+        
+        // Validate sort parameters
+        $validSortFields = ['submittedAt', 'status', 'yearsOfExperience'];
+        if (!in_array($sortBy, $validSortFields)) {
+            $sortBy = 'submittedAt';
+        }
+        
+        if (!in_array($sortOrder, ['ASC', 'DESC'])) {
+            $sortOrder = 'DESC';
+        }
         
         $queryBuilder = $repository->createQueryBuilder('ca')
             ->leftJoin('ca.user', 'u')
             ->addSelect('u')
-            ->orderBy('ca.submittedAt', 'DESC');
+            ->orderBy('ca.' . $sortBy, $sortOrder);
         
         if ($statusFilter) {
             $queryBuilder->andWhere('ca.status = :status')
@@ -56,6 +68,8 @@ class AdminCoachApplicationController extends AbstractController
             'statusFilter' => $statusFilter,
             'stats' => $stats,
             'applicationStatuses' => ApplicationStatus::cases(),
+            'sortBy' => $sortBy,
+            'sortOrder' => $sortOrder,
         ]);
     }
     

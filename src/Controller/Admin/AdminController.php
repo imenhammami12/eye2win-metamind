@@ -30,7 +30,14 @@ class AdminController extends AbstractController
     #[IsGranted('ROLE_ADMIN')]
     public function dashboard(): Response
     {
-        return $this->render('admin/dashboard.html.twig', [
+        return $this->redirectToRoute('admin_planning_index');
+    }
+
+    #[Route('/planning-dashboard', name: 'admin_planning_dashboard')]
+    #[IsGranted('ROLE_ADMIN')]
+    public function planningDashboard(): Response
+    {
+        return $this->render('admin/planning_dashboard.html.twig', [
             'user' => $this->getUser(),
         ]);
     }

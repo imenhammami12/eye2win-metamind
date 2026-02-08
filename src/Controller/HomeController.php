@@ -17,10 +17,12 @@ class HomeController extends AbstractController
     #[Route('/dashboard', name: 'app_dashboard')]
     public function dashboard(): Response
     {
-        $this->denyAccessUnlessGranted('ROLE_USER');
-        
-        return $this->render('home/dashboard.html.twig', [
-            'user' => $this->getUser(),
-        ]);
+        return $this->render('home/dashboard.html.twig');
+    }
+
+    #[Route('/planning', name: 'app_planning')]
+    public function planning(): Response
+    {
+        return $this->render('home/planning.html.twig');
     }
 }

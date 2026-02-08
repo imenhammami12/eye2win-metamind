@@ -18,45 +18,4 @@
         </div>
     </div>
 </section>
-
-<section class="blog_part section_padding">
-    <div class="container">
-        <div class="row">
-            <div class="col-lg-12">
-                <div class="card">
-                    <div class="card-body text-center p-5">
-                        <i class="fas fa-user-circle fa-5x text-primary mb-4"></i>
-                        <h1>Bienvenue, {{ user.username }} !</h1>
-                        <p class="lead">Email : {{ user.email }}</p>
-                        <p>Membre depuis le {{ user.createdAt|date('d/m/Y') }}</p>
-                        
-                        <hr class="my-4">
-                        
-                        <div class="alert alert-info">
-                            <i class="fas fa-info-circle"></i> 
-                            Votre compte est actif et fonctionnel !
-                        </div>
-                        
-                        <div class="row mt-4">
-                            <div class="col-md-6 mb-3">
-                                <a href="{{ path('app_planning_index') }}" class="btn btn-primary w-100">
-                                    <i class="bi bi-calendar-event me-2"></i>View Planning
-                                </a>
-                            </div>
-                            <div class="col-md-6 mb-3">
-                                <a href="{{ path('app_my_sessions') }}" class="btn btn-success w-100">
-                                    <i class="bi bi-list-check me-2"></i>My Sessions
-                                </a>
-                            </div>
-                        </div>
-
-                        <a href="{{ path('app_logout') }}" class="btn btn-danger btn-lg mt-3">
-                            <i class="fas fa-sign-out-alt"></i> Se déconnecter
-                        </a>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-</section>
 {% endblock %}

@@ -23,10 +23,26 @@ class AdminPlanningController extends AbstractController
         $search = $request->query->get('search', '');
         $typeFilter = $request->query->get('type', '');
         $levelFilter = $request->query->get('level', '');
+        $sortBy = $request->query->get('sort', 'date');
+        $sortOrder = $request->query->get('order', 'DESC');
+        
+        // Validate sort parameters
+        $validSortFields = ['date', 'time', 'localisation', 'type', 'level'];
+        if (!in_array($sortBy, $validSortFields)) {
+            $sortBy = 'date';
+        }
+        
+        if (!in_array($sortOrder, ['ASC', 'DESC'])) {
+            $sortOrder = 'DESC';
+        }
         
         $queryBuilder = $planningRepository->createQueryBuilder('p')
-            ->orderBy('p.date', 'DESC')
-            ->addOrderBy('p.time', 'DESC');
+            ->orderBy('p.' . $sortBy, $sortOrder);
+            
+        // Add secondary sort by time if sorting by date
+        if ($sortBy === 'date') {
+            $queryBuilder->addOrderBy('p.time', $sortOrder);
+        }
         
         // Search by description or localisation
         if ($search) {
@@ -55,6 +71,8 @@ class AdminPlanningController extends AbstractController
             'levelFilter' => $levelFilter,
             'planningTypes' => PlanningType::cases(),
             'planningLevels' => PlanningLevel::cases(),
+            'sortBy' => $sortBy,
+            'sortOrder' => $sortOrder,
         ]);
     }
 
