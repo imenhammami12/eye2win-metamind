@@ -33,7 +33,7 @@ class Message
     #[ORM\Column(length: 255)]
     private ?string $senderEmail = null;
 
-    #[ORM\ManyToOne]
+    #[ORM\ManyToOne(inversedBy: 'messages')]
     #[ORM\JoinColumn(nullable: false)]
     private ?Channel $channel = null;
 

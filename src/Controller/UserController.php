@@ -207,8 +207,8 @@ class UserController extends AbstractController
         $target = $request->headers->get('Referer') ?: $this->generateUrl('community_channels_index');
         return $this->redirect($target);
     }
-        return $this->render('coach/application.html.twig', [
+        /*return $this->render('coach/application.html.twig', [
             'form' => $form->createView(),
         ]);
-    }
+    }*/
 }
