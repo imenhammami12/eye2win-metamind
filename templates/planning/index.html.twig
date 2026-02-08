@@ -23,6 +23,37 @@
     <!-- planning list -->
     <section class="blog_part section_padding" style="background-color: #0b1120;">
         <div class="container">
+            <!-- Sort Controls -->
+            <div class="mb-4">
+                <div class="row align-items-center">
+                    <div class="col-md-6">
+                        <h4 style="color: #f8fafc; margin-bottom: 0;">
+                            <i class="bi bi-calendar-event me-2"></i>Available Sessions
+                        </h4>
+                    </div>
+                    <div class="col-md-6">
+                        <form method="get" action="{{ path('app_planning_index') }}" class="d-flex gap-2 justify-content-md-end">
+                            <div style="flex: 1; max-width: 250px;">
+                                <select name="sort" class="form-select form-select-sm" onchange="this.form.submit();" style="background-color: #1e293b; color: #f8fafc; border-color: rgba(255,255,255,0.1);">
+                                    <option value="date" {{ sortBy == 'date' ? 'selected' : '' }}>Sort by Date</option>
+                                    <option value="time" {{ sortBy == 'time' ? 'selected' : '' }}>Sort by Time</option>
+                                </select>
+                            </div>
+                            <div style="flex: 1; max-width: 200px;">
+                                <select name="order" class="form-select form-select-sm" onchange="this.form.submit();" style="background-color: #1e293b; color: #f8fafc; border-color: rgba(255,255,255,0.1);">
+                                    <option value="DESC" {{ sortOrder == 'DESC' ? 'selected' : '' }}>
+                                        <i class="bi bi-arrow-down"></i> Newest First
+                                    </option>
+                                    <option value="ASC" {{ sortOrder == 'ASC' ? 'selected' : '' }}>
+                                        <i class="bi bi-arrow-up"></i> Oldest First
+                                    </option>
+                                </select>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
             <div class="row justify-content-center">
                 {% for planning in plannings %}
                     <div class="col-lg-4 col-md-6 mb-5">
