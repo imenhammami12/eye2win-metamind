@@ -45,6 +45,8 @@ class VideoUploadType extends AbstractType
                     'Public' => 'PUBLIC',
                 ],
                 'data' => 'PRIVATE',
+                'expanded' => true,
+                'multiple' => false,
             ])
             ->add('videoFile', FileType::class, [
                 'label' => 'Fichier vidéo (MP4)',

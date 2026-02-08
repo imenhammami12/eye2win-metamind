@@ -1,72 +1,68 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Uploader une vidéo{% endblock %}
+{% block title %}Upload a video{% endblock %}
 
 {% block body %}
-<section class="upload-hero">
+<section class="upload-shell">
     <div class="container">
-        <div class="upload-hero__content">
+        <div class="upload-header">
             <div>
-                <p class="upload-hero__eyebrow">Espace joueur</p>
-                <h1 class="upload-hero__title">Uploader une vidéo</h1>
-                <p class="upload-hero__subtitle">Partagez vos matchs en privé ou en public, avec un upload sécurisé et rapide.</p>
+                <p class="upload-kicker">Player space</p>
+                <h1>Upload a video</h1>
+                <p class="upload-subtitle">Choose visibility and upload your match securely.</p>
             </div>
-            <div class="upload-hero__badge">
-                <i class="bi bi-cloud-check"></i>
-                Stockage Cloudinary
-            </div>
+            <div class="upload-badge"><i class="bi bi-cloud-check" aria-hidden="true"></i> Cloudinary</div>
         </div>
-    </div>
-</section>
 
-<section class="upload-section">
-    <div class="container">
-        <div class="upload-grid">
-            <div class="upload-panel">
-                <div class="upload-panel__header">
+        <div class="upload-layout">
+            <div class="upload-card">
+                <div class="upload-card__header">
                     <div>
-                        <p class="upload-panel__eyebrow">Étape 1</p>
-                        <h5 class="upload-panel__title">Détails de la vidéo</h5>
+                        <span class="upload-step">Step 1</span>
+                        <h3>Video details</h3>
                     </div>
-                    <span class="upload-status"><i class="bi bi-shield-lock"></i> Sécurisé</span>
+                    <span class="upload-secure"><i class="bi bi-shield-lock" aria-hidden="true"></i> Secure</span>
                 </div>
-                <div class="upload-panel__body">
+
+                <div class="upload-card__body">
                     {{ form_start(form, { attr: { id: 'userVideoUploadForm' } }) }}
                         <div class="row g-4">
                             <div class="col-md-6">
-                                <label class="form-label">Titre <span class="text-danger">*</span></label>
+                                <label class="form-label">Title <span class="text-danger">*</span></label>
                                 {{ form_widget(form.title, { attr: { class: 'form-control' } }) }}
-                                <small class="form-text">Un titre court et descriptif</small>
+                                <small class="form-text">Short and descriptive title</small>
                             </div>
                             <div class="col-md-6">
-                                <label class="form-label">Type de jeu <span class="text-danger">*</span></label>
+                                <label class="form-label">Game type <span class="text-danger">*</span></label>
                                 {{ form_widget(form.gameType, { attr: { class: 'form-control' } }) }}
-                                <small class="form-text">Exemple : Valorant, CS2, FIFA</small>
+                                <small class="form-text">Example: Valorant, CS2, FIFA</small>
                             </div>
                             <div class="col-md-6">
-                                <label class="form-label">Visibilité <span class="text-danger">*</span></label>
-                                {{ form_widget(form.visibility, { attr: { class: 'form-select visibility-select' } }) }}
-                                <small class="form-text">Privé par défaut</small>
+                                <label class="form-label">Visibility <span class="text-danger">*</span></label>
+                                <div class="visibility-options">
+                                    {{ form_widget(form.visibility) }}
+                                </div>
+                                <small class="form-text">Private by default</small>
                             </div>
                             <div class="col-md-12">
-                                <label class="form-label">Fichier vidéo (MP4) <span class="text-danger">*</span></label>
-                                {{ form_widget(form.videoFile, { attr: { class: 'form-control' } }) }}
-                                <small class="form-text">MP4 uniquement, max 200MB</small>
+                                <label class="form-label">Video file (MP4) <span class="text-danger">*</span></label>
+                                {{ form_widget(form.videoFile, { attr: { class: 'form-control', 'accept': '.mp4,.MP4' } }) }}
+                                <small class="form-text">MP4 only, max 200MB</small>
                             </div>
                         </div>
 
                         <div class="upload-info">
-                            <i class="bi bi-info-circle"></i>
+                            <i class="bi bi-info-circle" aria-hidden="true"></i>
                             <div>
-                                <strong>Bon à savoir</strong>
-                                <p class="mb-0">Les vidéos privées ne sont visibles que par vous. Vous pouvez changer la visibilité plus tard.</p>
+                                <strong>Good to know</strong>
+                                <p class="mb-0">Private videos are only visible to you. You can change visibility later.</p>
                             </div>
                         </div>
 
                         <div id="userUploadProgress" class="mt-4 d-none">
                             <div class="d-flex justify-content-between align-items-center mb-2">
-                                <strong>Progression</strong>
-                                <span id="userUploadProgressText" class="text-muted">Upload en cours... 0%</span>
+                                <strong>Progress</strong>
+                                <span id="userUploadProgressText" class="text-muted">Uploading... 0%</span>
                             </div>
                             <div class="progress" style="height: 10px;">
                                 <div id="userUploadProgressBar" class="progress-bar progress-bar-striped progress-bar-animated" role="progressbar" style="width: 0%" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"></div>
@@ -75,26 +71,26 @@
 
                         <div class="upload-actions">
                             <button class="btn btn-primary" type="submit">
-                                <i class="bi bi-upload me-2"></i>Uploader
+                                <i class="bi bi-upload me-2" aria-hidden="true"></i>Upload
                             </button>
-                            <span class="upload-note">Stockage sécurisé et traitement automatique.</span>
+                            <span class="upload-note">Secure storage and automatic processing.</span>
                         </div>
                     {{ form_end(form) }}
                 </div>
             </div>
 
-            <aside class="upload-sidebar">
-                <div class="upload-card">
-                    <h6><i class="bi bi-lightning-charge"></i> Conseils rapides</h6>
+            <aside class="upload-side">
+                <div class="upload-side__card">
+                    <h4><i class="bi bi-lightning-charge" aria-hidden="true"></i> Quick tips</h4>
                     <ul>
-                        <li>MP4 recommandé pour de meilleures performances.</li>
-                        <li>Gardez la durée raisonnable pour un upload rapide.</li>
-                        <li>Ajoutez un titre clair pour faciliter la recherche.</li>
+                        <li>MP4 recommended for best performance</li>
+                        <li>Reduce file size for faster upload</li>
+                        <li>Choose a clear, precise title</li>
                     </ul>
                 </div>
-                <div class="upload-card">
-                    <h6><i class="bi bi-eye"></i> Visibilité</h6>
-                    <p>Public : visible par les autres joueurs. Privé : visible uniquement par vous.</p>
+                <div class="upload-side__card">
+                    <h4><i class="bi bi-eye" aria-hidden="true"></i> Visibility</h4>
+                    <p>Public: visible to other players. Private: visible only to you.</p>
                 </div>
             </aside>
         </div>
@@ -102,213 +98,192 @@
 </section>
 
 <style>
-    .upload-hero {
-        padding: 3rem 0 2rem;
-        background: radial-gradient(circle at top left, rgba(79, 70, 229, 0.25), transparent 55%),
-            radial-gradient(circle at top right, rgba(168, 85, 247, 0.2), transparent 60%);
+    .upload-shell {
+        padding: 2.5rem 0 4rem;
+        background: #0b0d18;
+        color: #f8fafc;
     }
 
-    .upload-hero__content {
+    .upload-header {
         display: flex;
-        align-items: center;
         justify-content: space-between;
+        align-items: center;
         gap: 2rem;
-        color: #f8fafc;
+        margin-bottom: 2rem;
         flex-wrap: wrap;
     }
 
-    .upload-hero__eyebrow {
+    .upload-kicker {
+        font-size: 0.75rem;
         text-transform: uppercase;
         letter-spacing: 0.2rem;
-        font-size: 0.75rem;
-        color: #c7d2fe;
+        color: #a5b4fc;
+        font-weight: 600;
         margin-bottom: 0.5rem;
     }
 
-    .upload-hero__title {
-        font-size: 2.3rem;
-        font-weight: 700;
-        margin-bottom: 0.75rem;
-    }
-
-    .upload-hero__subtitle {
-        color: #e2e8f0;
+    .upload-subtitle {
+        color: #cbd5f5;
         max-width: 520px;
     }
 
-    .upload-hero__badge {
+    .upload-badge {
         display: inline-flex;
         align-items: center;
         gap: 0.5rem;
-        padding: 0.75rem 1.25rem;
+        padding: 0.6rem 1.2rem;
         border-radius: 999px;
-        background: rgba(255, 255, 255, 0.12);
+        border: 1px solid rgba(255, 255, 255, 0.15);
+        background: rgba(15, 23, 42, 0.8);
         color: #e2e8f0;
         font-weight: 600;
     }
 
-    .upload-section {
-        padding: 2rem 0 4rem;
-    }
-
-    .upload-grid {
+    .upload-layout {
         display: grid;
         grid-template-columns: minmax(0, 1fr) 320px;
         gap: 2rem;
+        align-items: start;
     }
 
-    .upload-panel {
-        background: rgba(15, 18, 30, 0.94);
+    .upload-card {
+        background: rgba(17, 24, 39, 0.9);
         border: 1px solid rgba(255, 255, 255, 0.08);
-        border-radius: 24px;
+        border-radius: 22px;
         overflow: hidden;
         box-shadow: 0 24px 60px rgba(0, 0, 0, 0.35);
     }
 
-    .upload-panel__header {
+    .upload-card__header {
         display: flex;
-        align-items: center;
         justify-content: space-between;
+        align-items: center;
         padding: 1.5rem 2rem;
-        background: linear-gradient(135deg, rgba(99, 102, 241, 0.9), rgba(139, 92, 246, 0.9));
+        background: linear-gradient(135deg, rgba(99, 102, 241, 0.95), rgba(139, 92, 246, 0.95));
         color: #fff;
     }
 
-    .upload-panel__eyebrow {
-        margin: 0;
-        font-size: 0.75rem;
+    .upload-step {
+        font-size: 0.7rem;
         text-transform: uppercase;
         letter-spacing: 0.15rem;
-        opacity: 0.8;
+        color: rgba(255, 255, 255, 0.85);
+        font-weight: 600;
     }
 
-    .upload-panel__title {
-        margin: 0.25rem 0 0;
-        font-size: 1.15rem;
-        font-weight: 700;
-    }
-
-    .upload-status {
+    .upload-secure {
         display: inline-flex;
         align-items: center;
         gap: 0.4rem;
-        background: rgba(255, 255, 255, 0.2);
-        padding: 0.35rem 0.75rem;
+        padding: 0.35rem 0.8rem;
         border-radius: 999px;
+        background: rgba(255, 255, 255, 0.18);
         font-size: 0.8rem;
         font-weight: 600;
     }
 
-    .upload-panel__body {
+    .upload-card__body {
         padding: 2rem;
     }
 
-    .upload-sidebar {
+    .upload-side {
         display: flex;
         flex-direction: column;
         gap: 1.5rem;
     }
 
-    .upload-card {
-        background: rgba(15, 18, 30, 0.88);
+    .upload-side__card {
+        background: rgba(17, 24, 39, 0.9);
         border: 1px solid rgba(255, 255, 255, 0.08);
-        border-radius: 18px;
+        border-radius: 16px;
         padding: 1.5rem;
         color: #e2e8f0;
     }
 
-    .upload-card h6 {
+    .upload-side__card h4 {
         display: flex;
         align-items: center;
         gap: 0.5rem;
         margin-bottom: 0.75rem;
         font-weight: 700;
         color: #fff;
-    }
-
-    .upload-card ul {
-        padding-left: 1.2rem;
-        margin-bottom: 0;
-    }
-
-    .upload-card li {
-        margin-bottom: 0.5rem;
+        font-size: 1.05rem;
     }
 
     .form-label {
+        display: block;
         color: #e5e7eb;
         font-weight: 600;
-        margin-bottom: 0.35rem;
-        display: block;
+        margin-bottom: 0.5rem;
     }
 
     .form-text {
-        color: #9ca3af;
+        color: #94a3b8;
         font-size: 0.85rem;
         display: block;
-        margin-top: 0.45rem;
+        margin-top: 0.4rem;
         line-height: 1.4;
     }
 
     .form-control,
     .form-select {
-        background: rgba(255, 255, 255, 0.04);
+        width: 100%;
+        background: rgba(15, 23, 42, 0.85);
         border: 1px solid rgba(255, 255, 255, 0.12);
-        border-radius: 14px;
-        color: #f3f4f6;
+        border-radius: 12px;
+        color: #f8fafc;
         padding: 0.75rem 1rem;
         min-height: 48px;
-        line-height: 1.3;
+        line-height: 1.4;
         font-size: 0.95rem;
     }
 
     .form-control:focus,
     .form-select:focus {
-        border-color: rgba(99, 102, 241, 0.85);
-        box-shadow: 0 0 0 0.25rem rgba(99, 102, 241, 0.2);
-        background: rgba(255, 255, 255, 0.08);
-    }
-
-    .visibility-select {
-        appearance: none;
-        -webkit-appearance: none;
-        -moz-appearance: none;
-        height: 48px;
-        padding: 0 2.5rem 0 1rem;
-        line-height: 48px;
-        background-color: #111827;
-        background-image: linear-gradient(45deg, transparent 50%, #94a3b8 50%),
-            linear-gradient(135deg, #94a3b8 50%, transparent 50%),
-            linear-gradient(to right, rgba(255, 255, 255, 0.12), rgba(255, 255, 255, 0.12));
-        background-position: calc(100% - 18px) 50%, calc(100% - 12px) 50%, calc(100% - 2.5rem) 0.6rem;
-        background-size: 6px 6px, 6px 6px, 1px 1.8rem;
-        background-repeat: no-repeat;
-    }
-
-    .visibility-select:focus {
         border-color: rgba(99, 102, 241, 0.9);
         box-shadow: 0 0 0 0.25rem rgba(99, 102, 241, 0.2);
+        outline: none;
     }
 
-    .form-select option {
-        color: #111827;
-        background: #ffffff;
-        line-height: 1.4;
+    .visibility-options {
+        display: flex;
+        gap: 1rem;
+        flex-wrap: wrap;
+        margin-top: 0.25rem;
     }
 
-    .form-control[type="file"] {
-        padding: 0.55rem 0.9rem;
+    .visibility-options .form-check {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        background: rgba(15, 23, 42, 0.7);
+        border: 1px solid rgba(255, 255, 255, 0.12);
+        border-radius: 999px;
+        padding: 0.45rem 0.9rem;
+    }
+
+    .visibility-options .form-check-input {
+        margin: 0;
+        width: 1rem;
+        height: 1rem;
+        accent-color: #6366f1;
+    }
+
+    .visibility-options .form-check-label {
+        color: #e5e7eb;
+        font-weight: 600;
     }
 
     .upload-info {
-        margin-top: 1.75rem;
+        margin-top: 1.5rem;
         display: flex;
         gap: 0.75rem;
         background: rgba(99, 102, 241, 0.12);
         border: 1px solid rgba(99, 102, 241, 0.25);
-        border-radius: 14px;
+        border-radius: 12px;
         padding: 1rem 1.25rem;
-        color: #cbd5f5;
+        color: #c7d2fe;
+        align-items: flex-start;
     }
 
     .upload-info i {
@@ -318,7 +293,7 @@
     }
 
     .upload-actions {
-        margin-top: 1.75rem;
+        margin-top: 2rem;
         display: flex;
         flex-wrap: wrap;
         gap: 1rem;
@@ -329,11 +304,13 @@
         padding: 0.75rem 2.5rem;
         border-radius: 999px;
         font-weight: 600;
+        background: linear-gradient(135deg, #6366f1, #8b5cf6);
+        border: none;
         box-shadow: 0 12px 28px rgba(99, 102, 241, 0.35);
     }
 
     .upload-note {
-        color: #9ca3af;
+        color: #94a3b8;
         font-size: 0.9rem;
     }
 
@@ -348,13 +325,13 @@
     }
 
     @media (max-width: 992px) {
-        .upload-grid {
+        .upload-layout {
             grid-template-columns: 1fr;
         }
     }
 
     @media (max-width: 768px) {
-        .upload-panel__body {
+        .upload-card__body {
             padding: 1.5rem;
         }
 
@@ -392,14 +369,14 @@ document.addEventListener('DOMContentLoaded', function () {
         progressWrap.classList.remove('d-none');
         progressBar.style.width = '0%';
         progressBar.setAttribute('aria-valuenow', '0');
-        progressText.textContent = 'Upload en cours... 0%';
+        progressText.textContent = 'Uploading... 0%';
 
         xhr.upload.addEventListener('progress', function (e) {
             if (e.lengthComputable) {
                 const percent = Math.round((e.loaded / e.total) * 100);
                 progressBar.style.width = percent + '%';
                 progressBar.setAttribute('aria-valuenow', String(percent));
-                progressText.textContent = 'Upload en cours... ' + percent + '%';
+                progressText.textContent = 'Uploading... ' + percent + '%';
             }
         });
 
@@ -427,22 +404,18 @@ document.addEventListener('DOMContentLoaded', function () {
                 try {
                     const data = JSON.parse(xhr.responseText);
                     if (data.error) {
-                        if (Array.isArray(data.details) && data.details.length) {
-                            progressText.textContent = data.error + ' ' + data.details.join(' | ');
-                        } else {
-                            progressText.textContent = data.error;
-                        }
+                        progressText.textContent = data.error;
                         return;
                     }
                 } catch (e) {
                     // ignore JSON parse errors
                 }
-                progressText.textContent = 'Échec de l\'upload. Veuillez réessayer.';
+                progressText.textContent = 'Upload failed. Please try again.';
             }
         };
 
         xhr.onerror = function () {
-            progressText.textContent = 'Erreur réseau. Veuillez réessayer.';
+            progressText.textContent = 'Network error. Please try again.';
         };
 
         xhr.send(new FormData(form));
