@@ -22,13 +22,21 @@ class AdminTeamController extends AbstractController
         TeamRepository $teamRepository
     ): Response {
         $statusFilter = $request->query->get('status', '');
+        $search = $request->query->get('search', '');
+        $sortBy = $request->query->get('sort_by', 'createdAt');
+        $sortOrder = $request->query->get('sort_order', 'DESC');
+        
+        // Validate sort parameters
+        $validSortFields = ['createdAt', 'name', 'maxMembers'];
+        $sortBy = in_array($sortBy, $validSortFields) ? $sortBy : 'createdAt';
+        $sortOrder = in_array($sortOrder, ['ASC', 'DESC']) ? $sortOrder : 'DESC';
         
         $queryBuilder = $teamRepository->createQueryBuilder('t')
             ->leftJoin('t.owner', 'o')
             ->leftJoin('t.teamMemberships', 'tm')
-            ->addSelect('o', 'tm')
-            ->orderBy('t.createdAt', 'DESC');
+            ->addSelect('o', 'tm');
         
+        // Status filter
         if ($statusFilter === 'active') {
             $queryBuilder->andWhere('t.isActive = :active')
                 ->setParameter('active', true);
@@ -37,6 +45,21 @@ class AdminTeamController extends AbstractController
                 ->setParameter('active', false);
         }
         
+        // Search filter
+        if ($search) {
+            $queryBuilder->andWhere(
+                $queryBuilder->expr()->orX(
+                    $queryBuilder->expr()->like('t.name', ':search'),
+                    $queryBuilder->expr()->like('t.description', ':search'),
+                    $queryBuilder->expr()->like('o.username', ':search'),
+                    $queryBuilder->expr()->like('o.email', ':search')
+                )
+            )->setParameter('search', '%' . $search . '%');
+        }
+        
+        // Apply sorting
+        $queryBuilder->orderBy('t.' . $sortBy, $sortOrder);
+        
         $teams = $queryBuilder->getQuery()->getResult();
         
         $stats = $teamRepository->getStatistics();
@@ -44,6 +67,9 @@ class AdminTeamController extends AbstractController
         return $this->render('admin/teams/index.html.twig', [
             'teams' => $teams,
             'statusFilter' => $statusFilter,
+            'search' => $search,
+            'sortBy' => $sortBy,
+            'sortOrder' => $sortOrder,
             'stats' => $stats,
         ]);
     }

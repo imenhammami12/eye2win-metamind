@@ -4,67 +4,254 @@
 {% block page_title %}Dashboard{% endblock %}
 
 {% block body %}
+
+{# Header Section #}
 <div class="row g-4 mb-4 fade-in">
     <div class="col-12">
-        <div class="stat-card text-center py-5">
-            <div class="stat-card-icon mx-auto mb-4" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); width: 100px; height: 100px; display: flex; align-items: center; justify-content: center; border-radius: 20px;">
-                <i class="bi bi-speedometer2 text-white" style="font-size: 48px;"></i>
+        <div class="welcome-card text-center py-4">
+            <div class="stat-card-icon mx-auto mb-3" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); width: 80px; height: 80px; display: flex; align-items: center; justify-content: center; border-radius: 20px;">
+                <i class="bi bi-speedometer2 text-white" style="font-size: 40px;"></i>
             </div>
-            <h2 class="mb-3">Bienvenue dans l'administration</h2>
-            <p class="text-muted mb-4">Tableau de bord en cours de développement</p>
-            <div class="d-flex gap-3 justify-content-center flex-wrap">
-                <a href="{{ path('app_home') }}" class="btn btn-outline-primary">
-                    <i class="bi bi-house me-2"></i>Retour au site
-                </a>
-                <a href="{{ path('admin_logout') }}" class="btn btn-outline-danger">
-                    <i class="bi bi-box-arrow-right me-2"></i>Déconnexion
-                </a>
+            <h2 class="mb-2">Bienvenue, {{ app.user.username }}</h2>
+            <p class="text-muted">Vue d'ensemble de votre plateforme</p>
+        </div>
+    </div>
+</div>
+
+{# Statistics Cards - Row 1: Users #}
+<div class="row g-4 mb-4 fade-in" style="animation-delay: 0.1s;">
+    <div class="col-md-3">
+        <div class="stat-card">
+            <div class="stat-icon" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
+                <i class="bi bi-people-fill"></i>
+            </div>
+            <div class="stat-content">
+                <h3 class="stat-value">{{ totalUsers }}</h3>
+                <p class="stat-label">Total Utilisateurs</p>
+                <div class="stat-footer">
+                    <span class="badge bg-success">+{{ recentUsers }} cette semaine</span>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-3">
+        <div class="stat-card">
+            <div class="stat-icon" style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);">
+                <i class="bi bi-person-check-fill"></i>
+            </div>
+            <div class="stat-content">
+                <h3 class="stat-value">{{ activeUsers }}</h3>
+                <p class="stat-label">Utilisateurs Actifs</p>
+                <div class="stat-footer">
+                    <small class="text-muted">{{ suspendedUsers }} suspendus, {{ bannedUsers }} bannis</small>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-3">
+        <div class="stat-card">
+            <div class="stat-icon" style="background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);">
+                <i class="bi bi-person-badge-fill"></i>
+            </div>
+            <div class="stat-content">
+                <h3 class="stat-value">{{ totalCoaches }}</h3>
+                <p class="stat-label">Entraîneurs</p>
+                <div class="stat-footer">
+                    <small class="text-muted">{{ totalAdmins }} admins</small>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-3">
+        <div class="stat-card">
+            <div class="stat-icon" style="background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);">
+                <i class="bi bi-graph-up-arrow"></i>
+            </div>
+            <div class="stat-content">
+                <h3 class="stat-value">{{ usersLast30Days }}</h3>
+                <p class="stat-label">Nouveaux (30j)</p>
+                <div class="stat-footer">
+                    <small class="text-muted">Croissance</small>
+                </div>
             </div>
         </div>
     </div>
 </div>
 
-<div class="row g-4 fade-in" style="animation-delay: 0.1s;">
-    <div class="col-md-6">
-        <div class="table-card">
-            <div class="table-header">
-                <h5><i class="bi bi-info-circle me-2"></i>Informations</h5>
+{# Statistics Cards - Row 2: Teams & Applications #}
+<div class="row g-4 mb-4 fade-in" style="animation-delay: 0.2s;">
+    <div class="col-md-3">
+        <div class="stat-card">
+            <div class="stat-icon" style="background: linear-gradient(135deg, #fa709a 0%, #fee140 100%);">
+                <i class="bi bi-shield-fill-check"></i>
             </div>
-            <div class="p-4">
-                <p class="mb-3">
-                    <i class="bi bi-person-badge text-primary me-2"></i>
-                    <strong>Utilisateur connecté:</strong> {{ app.user.username }}
-                </p>
-                <p class="mb-3">
-                    <i class="bi bi-shield-check text-success me-2"></i>
-                    <strong>Rôles:</strong> 
-                    {% for role in app.user.roles %}
-                        <span class="badge bg-success">{{ role }}</span>
-                    {% endfor %}
-                </p>
-                <p class="mb-0">
-                    <i class="bi bi-envelope text-info me-2"></i>
-                    <strong>Email:</strong> {{ app.user.email }}
-                </p>
+            <div class="stat-content">
+                <h3 class="stat-value">{{ totalTeams }}</h3>
+                <p class="stat-label">Total Équipes</p>
+                <div class="stat-footer">
+                    <span class="badge bg-info">{{ activeTeams }} actives</span>
+                </div>
             </div>
         </div>
     </div>
     
+    <div class="col-md-3">
+        <div class="stat-card">
+            <div class="stat-icon" style="background: linear-gradient(135deg, #30cfd0 0%, #330867 100%);">
+                <i class="bi bi-people"></i>
+            </div>
+            <div class="stat-content">
+                <h3 class="stat-value">{{ totalMembers }}</h3>
+                <p class="stat-label">Membres d'Équipes</p>
+                <div class="stat-footer">
+                    <small class="text-muted">{{ activeMembers }} actifs</small>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-3">
+        <div class="stat-card">
+            <div class="stat-icon" style="background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%);">
+                <i class="bi bi-file-earmark-text-fill"></i>
+            </div>
+            <div class="stat-content">
+                <h3 class="stat-value">{{ totalApplications }}</h3>
+                <p class="stat-label">Candidatures</p>
+                <div class="stat-footer">
+                    <span class="badge bg-warning">{{ pendingApplications }} en attente</span>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-3">
+        <div class="stat-card">
+            <div class="stat-icon" style="background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 100%);">
+                <i class="bi bi-bell-fill"></i>
+            </div>
+            <div class="stat-content">
+                <h3 class="stat-value">{{ unreadNotifications }}</h3>
+                <p class="stat-label">Notifications</p>
+                <div class="stat-footer">
+                    <small class="text-muted">{{ totalNotifications }} total</small>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{# Detailed Information Cards #}
+<div class="row g-4 mb-4 fade-in" style="animation-delay: 0.3s;">
+    
+    {# Latest Users #}
     <div class="col-md-6">
         <div class="table-card">
             <div class="table-header">
-                <h5><i class="bi bi-clock-history me-2"></i>Activité récente</h5>
+                <h5><i class="bi bi-person-plus me-2"></i>Derniers Utilisateurs</h5>
             </div>
-            <div class="p-4 text-center text-muted">
-                <i class="bi bi-inbox" style="font-size: 48px; opacity: 0.3;"></i>
-                <p class="mt-3 mb-0">Aucune activité à afficher</p>
+            <div class="table-responsive">
+                <table class="table table-dark table-hover mb-0">
+                    <thead>
+                        <tr>
+                            <th>Nom</th>
+                            <th>Email</th>
+                            <th>Date</th>
+                            <th>Statut</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for user in latestUsers %}
+                        <tr>
+                            <td>{{ user.username }}</td>
+                            <td>{{ user.email }}</td>
+                            <td>{{ user.createdAt|date('d/m/Y') }}</td>
+                            <td>
+                                <span class="badge bg-success">{{ user.accountStatus.value }}</span>
+                            </td>
+                        </tr>
+                        {% else %}
+                        <tr>
+                            <td colspan="4" class="text-center text-muted">Aucun utilisateur</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    
+    {# Recent Activity #}
+    <div class="col-md-6">
+        <div class="table-card">
+            <div class="table-header">
+                <h5><i class="bi bi-clock-history me-2"></i>Activité Récente</h5>
+            </div>
+            <div class="p-3">
+                {% if recentLogs %}
+                    <div class="activity-list">
+                        {% for log in recentLogs %}
+                        <div class="activity-item">
+                            <div class="activity-icon">
+                                <i class="bi bi-circle-fill"></i>
+                            </div>
+                            <div class="activity-content">
+                                <p class="mb-1">{{ log.action }}</p>
+                                <small class="text-muted">{{ log.createdAt|date('d/m/Y H:i') }}</small>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <div class="text-center text-muted py-4">
+                        <i class="bi bi-inbox" style="font-size: 48px; opacity: 0.3;"></i>
+                        <p class="mt-3 mb-0">Aucune activité récente</p>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+{# Quick Actions #}
+<div class="row g-4 fade-in" style="animation-delay: 0.4s;">
+    <div class="col-12">
+        <div class="table-card">
+            <div class="table-header">
+                <h5><i class="bi bi-lightning-fill me-2"></i>Actions Rapides</h5>
+            </div>
+            <div class="p-4">
+                <div class="row g-3">
+                    <div class="col-md-3">
+                        <a href="{{ path('app_home') }}" class="btn btn-outline-primary w-100">
+                            <i class="bi bi-house me-2"></i>Retour au site
+                        </a>
+                    </div>
+                    <div class="col-md-3">
+                        <a href="#" class="btn btn-outline-info w-100">
+                            <i class="bi bi-people me-2"></i>Gérer Utilisateurs
+                        </a>
+                    </div>
+                    <div class="col-md-3">
+                        <a href="#" class="btn btn-outline-warning w-100">
+                            <i class="bi bi-file-earmark me-2"></i>Candidatures
+                        </a>
+                    </div>
+                    <div class="col-md-3">
+                        <a href="{{ path('admin_logout') }}" class="btn btn-outline-danger w-100">
+                            <i class="bi bi-box-arrow-right me-2"></i>Déconnexion
+                        </a>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
 </div>
 
 <style>
-    /* CORRECTION CRITIQUE : Ajouter forwards et opacity: 1 !important */
     .fade-in {
         animation: fadeIn 0.6s ease-in forwards;
         opacity: 1 !important;
@@ -81,15 +268,24 @@
         }
     }
     
+    .welcome-card {
+        background: rgba(255, 255, 255, 0.05);
+        border-radius: 15px;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        opacity: 1 !important;
+    }
+    
     .stat-card {
         background: rgba(255, 255, 255, 0.05);
         border-radius: 15px;
-        padding: 30px;
+        padding: 25px;
         border: 1px solid rgba(255, 255, 255, 0.1);
         transition: all 0.3s ease;
-        /* AJOUT : Forcer la visibilité */
+        height: 100%;
         opacity: 1 !important;
-        visibility: visible !important;
+        display: flex;
+        align-items: center;
+        gap: 20px;
     }
     
     .stat-card:hover {
@@ -98,14 +294,46 @@
         box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
     }
     
+    .stat-icon {
+        width: 70px;
+        height: 70px;
+        border-radius: 15px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 32px;
+        color: white;
+        flex-shrink: 0;
+    }
+    
+    .stat-content {
+        flex: 1;
+    }
+    
+    .stat-value {
+        font-size: 32px;
+        font-weight: 700;
+        margin: 0;
+        color: #fff;
+    }
+    
+    .stat-label {
+        font-size: 14px;
+        color: rgba(255, 255, 255, 0.7);
+        margin: 5px 0;
+    }
+    
+    .stat-footer {
+        margin-top: 10px;
+    }
+    
     .table-card {
         background: rgba(255, 255, 255, 0.05);
         border-radius: 15px;
         border: 1px solid rgba(255, 255, 255, 0.1);
         overflow: hidden;
-        /* AJOUT : Forcer la visibilité */
         opacity: 1 !important;
-        visibility: visible !important;
+        height: 100%;
     }
     
     .table-header {
@@ -119,15 +347,40 @@
         color: rgba(255, 255, 255, 0.9);
     }
     
-    /* AJOUT : S'assurer que tous les éléments restent visibles */
-    .row {
-        opacity: 1 !important;
-        visibility: visible !important;
+    .activity-list {
+        max-height: 400px;
+        overflow-y: auto;
     }
     
-    .col-12, .col-md-6 {
+    .activity-item {
+        display: flex;
+        gap: 15px;
+        padding: 15px;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    }
+    
+    .activity-item:last-child {
+        border-bottom: none;
+    }
+    
+    .activity-icon {
+        color: #667eea;
+        font-size: 8px;
+        padding-top: 5px;
+    }
+    
+    .activity-content {
+        flex: 1;
+    }
+    
+    .activity-content p {
+        color: rgba(255, 255, 255, 0.9);
+    }
+    
+    .row, .col-12, .col-md-3, .col-md-6 {
         opacity: 1 !important;
         visibility: visible !important;
     }
 </style>
+
 {% endblock %}
