@@ -1,5 +1,4 @@
 <?php
-// src/Controller/UserController.php
 
 namespace App\Controller;
 
@@ -8,6 +7,7 @@ use App\Entity\CoachApplication;
 use App\Entity\ApplicationStatus;
 use App\Form\UserProfileType;
 use App\Form\CoachApplicationType;
+use App\Repository\UserRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -27,20 +27,16 @@ class UserController extends AbstractController
         /** @var User $user */
         $user = $this->getUser();
         
-        // Récupérer toutes les demandes de coach de l'utilisateur
         $coachApplications = $em->getRepository(CoachApplication::class)
             ->findBy(['user' => $user], ['submittedAt' => 'DESC']);
         
-        // Déterminer la dernière demande et son statut
         $latestCoachApplication = !empty($coachApplications) ? $coachApplications[0] : null;
         
-        // Vérifier s'il y a une demande en attente
         $hasPendingApplication = false;
         if ($latestCoachApplication && $latestCoachApplication->getStatus() === ApplicationStatus::PENDING) {
             $hasPendingApplication = true;
         }
         
-        // Statistiques basiques
         $stats = [
             'teams_count' => $user->getTeamMemberships()->count(),
             'owned_teams_count' => $user->getOwnedTeams()->count(),
@@ -58,7 +54,8 @@ class UserController extends AbstractController
     public function editProfile(
         Request $request, 
         EntityManagerInterface $em,
-        SluggerInterface $slugger
+        SluggerInterface $slugger,
+        UserRepository $userRepository
     ): Response {
         $this->denyAccessUnlessGranted('ROLE_USER');
         
@@ -68,6 +65,19 @@ class UserController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
+            // NIVEAU 2 : Validation côté serveur
+            $newEmail = $form->get('email')->getData();
+            if ($newEmail !== $user->getEmail()) {
+                $existingUser = $userRepository->findOneBy(['email' => strtolower(trim($newEmail))]);
+                if ($existingUser && $existingUser->getId() !== $user->getId()) {
+                    $this->addFlash('error', 'This email address is already registered by another user.');
+                    return $this->render('user/edit_profile.html.twig', [
+                        'form' => $form->createView(),
+                        'user' => $user,
+                    ]);
+                }
+            }
+            
             // Gérer l'upload de la photo de profil
             $profilePictureFile = $form->get('profilePictureFile')->getData();
             
@@ -107,7 +117,6 @@ class UserController extends AbstractController
         /** @var User $user */
         $user = $this->getUser();
         
-        // Statistiques basiques
         $stats = [
             'teams_count' => $user->getTeamMemberships()->count(),
             'owned_teams_count' => $user->getOwnedTeams()->count(),
@@ -132,13 +141,11 @@ class UserController extends AbstractController
         /** @var User $user */
         $user = $this->getUser();
         
-        // Vérifier si l'utilisateur est déjà coach
         if (in_array('ROLE_COACH', $user->getRoles())) {
             $this->addFlash('info', 'You are already a coach!');
             return $this->redirectToRoute('user_profile');
         }
         
-        // Vérifier si l'utilisateur a déjà une demande en cours
         $existingApplication = $em->getRepository(CoachApplication::class)
             ->findOneBy([
                 'user' => $user,
@@ -157,7 +164,6 @@ class UserController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            // Gérer l'upload du CV
             $cvFile = $form->get('cvFileUpload')->getData();
             
             if ($cvFile) {

@@ -1655,3 +1655,62 @@
         font-size: 30px;
     }
 }
+/* Styles pour les messages d'erreur Symfony */
+.form_group .invalid-feedback,
+.form_group .form-error-message {
+    display: block;
+    margin-top: 0.5rem;
+    padding: 0.75rem 1rem;
+    background: linear-gradient(135deg, #ff6b6b 0%, #ee5a6f 100%);
+    color: white;
+    border-radius: 8px;
+    font-size: 0.9rem;
+    font-weight: 500;
+    box-shadow: 0 2px 8px rgba(255, 107, 107, 0.3);
+    animation: slideInDown 0.3s ease;
+}
+
+.form_group .invalid-feedback::before,
+.form_group .form-error-message::before {
+    content: "⚠️ ";
+    font-size: 1.1rem;
+    margin-right: 0.5rem;
+}
+
+/* Animation pour les erreurs */
+@keyframes slideInDown {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Style pour l'input avec erreur */
+.form_input.is-invalid,
+.form_input:invalid {
+    border: 2px solid #ff6b6b !important;
+    box-shadow: 0 0 0 0.2rem rgba(255, 107, 107, 0.25) !important;
+}
+
+/* Message de succès (pour contraste) */
+.form_group .valid-feedback {
+    display: block;
+    margin-top: 0.5rem;
+    padding: 0.75rem 1rem;
+    background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
+    color: white;
+    border-radius: 8px;
+    font-size: 0.9rem;
+    font-weight: 500;
+    box-shadow: 0 2px 8px rgba(67, 233, 123, 0.3);
+}
+
+.form_group .valid-feedback::before {
+    content: "✓ ";
+    font-size: 1.1rem;
+    margin-right: 0.5rem;
+}
