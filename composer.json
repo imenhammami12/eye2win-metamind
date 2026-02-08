@@ -10,7 +10,6 @@
         "doctrine/doctrine-bundle": "^2.18",
         "doctrine/doctrine-migrations-bundle": "^3.7",
         "doctrine/orm": "^3.6",
-<<<<<<< HEAD
         "easycorp/easyadmin-bundle": "^4.28",
         "endroid/qr-code": "5.0",
         "phpdocumentor/reflection-docblock": "5.2",
@@ -18,10 +17,6 @@
         "phpstan/phpdoc-parser": "^2.3",
         "scheb/2fa-bundle": "^7.13",
         "scheb/2fa-totp": "^7.13",
-=======
-        "phpdocumentor/reflection-docblock": "5.2",
-        "phpstan/phpdoc-parser": "^2.3",
->>>>>>> gestion_tournoi_match
         "symfony/asset": "6.4.*",
         "symfony/asset-mapper": "6.4.*",
         "symfony/console": "6.4.*",
@@ -52,10 +47,7 @@
         "symfony/web-link": "6.4.*",
         "symfony/yaml": "6.4.*",
         "twig/extra-bundle": "^2.12|^3.0",
-<<<<<<< HEAD
-=======
         "twig/string-extra": "^3.23",
->>>>>>> gestion_tournoi_match
         "twig/twig": "^2.12|^3.0"
     },
     "config": {
@@ -110,11 +102,7 @@
     "require-dev": {
         "doctrine/doctrine-fixtures-bundle": "*",
         "fakerphp/faker": "*",
-<<<<<<< HEAD
         "phpunit/phpunit": "^12.5",
-=======
-        "phpunit/phpunit": "^11.0",
->>>>>>> gestion_tournoi_match
         "symfony/browser-kit": "6.4.*",
         "symfony/css-selector": "6.4.*",
         "symfony/debug-bundle": "6.4.*",

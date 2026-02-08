@@ -2,12 +2,14 @@
 
 namespace App\Controller;
 
+use App\Entity\Notification;
 use App\Entity\User;
 use App\Entity\CoachApplication;
 use App\Entity\ApplicationStatus;
 use App\Form\UserProfileType;
 use App\Form\CoachApplicationType;
 use App\Repository\UserRepository;
+use App\Repository\NotificationRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -192,5 +194,22 @@ class UserController extends AbstractController
         return $this->render('coach/application.html.twig', [
             'form' => $form->createView(),
         ]);
+    }
+
+    #[Route('/notification/{id}/read', name: 'user_notification_read', methods: ['POST'], requirements: ['id' => '\d+'])]
+    public function markNotificationRead(int $id, Request $request, NotificationRepository $notificationRepo, EntityManagerInterface $em): Response
+    {
+        $this->denyAccessUnlessGranted('ROLE_USER');
+        if (!$this->isCsrfTokenValid('notification_read_'.$id, $request->request->get('_token'))) {
+            throw $this->createAccessDeniedException('Invalid token.');
+        }
+        $notification = $notificationRepo->find($id);
+        if (!$notification || $notification->getUser() !== $this->getUser()) {
+            throw $this->createAccessDeniedException('Notification not found.');
+        }
+        $notification->markAsRead();
+        $em->flush();
+        $target = $request->headers->get('Referer') ?: $this->generateUrl('community_channels_index');
+        return $this->redirect($target);
     }
 }
