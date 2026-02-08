@@ -3,11 +3,13 @@
 
 namespace App\Controller;
 
+use App\Entity\Notification;
 use App\Entity\User;
 use App\Entity\CoachApplication;
 use App\Entity\ApplicationStatus;
 use App\Form\UserProfileType;
 use App\Form\CoachApplicationType;
+use App\Repository\NotificationRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -30,22 +32,22 @@ class UserController extends AbstractController
         // Récupérer toutes les demandes de coach de l'utilisateur
         $coachApplications = $em->getRepository(CoachApplication::class)
             ->findBy(['user' => $user], ['submittedAt' => 'DESC']);
-        
+
         // Déterminer la dernière demande et son statut
         $latestCoachApplication = !empty($coachApplications) ? $coachApplications[0] : null;
-        
+
         // Vérifier s'il y a une demande en attente
         $hasPendingApplication = false;
         if ($latestCoachApplication && $latestCoachApplication->getStatus() === ApplicationStatus::PENDING) {
             $hasPendingApplication = true;
         }
-        
+
         // Statistiques basiques
         $stats = [
             'teams_count' => $user->getTeamMemberships()->count(),
             'owned_teams_count' => $user->getOwnedTeams()->count(),
         ];
-        
+
         return $this->render('user/profile.html.twig', [
             'user' => $user,
             'latestCoachApplication' => $latestCoachApplication,
@@ -121,45 +123,46 @@ class UserController extends AbstractController
         ]);
     }
 
+   
     #[Route('/apply-coach', name: 'user_apply_coach')]
     public function applyCoach(
-        Request $request, 
+        Request $request,
         EntityManagerInterface $em,
         SluggerInterface $slugger
     ): Response {
         $this->denyAccessUnlessGranted('ROLE_USER');
-        
+
         /** @var User $user */
         $user = $this->getUser();
-        
+
         // Vérifier si l'utilisateur est déjà coach
         if (in_array('ROLE_COACH', $user->getRoles())) {
             $this->addFlash('info', 'You are already a coach!');
             return $this->redirectToRoute('user_profile');
         }
-        
+
         // Vérifier si l'utilisateur a déjà une demande en cours
         $existingApplication = $em->getRepository(CoachApplication::class)
             ->findOneBy([
                 'user' => $user,
                 'status' => ApplicationStatus::PENDING
             ]);
-            
+
         if ($existingApplication) {
             $this->addFlash('warning', 'You already have a pending application.');
             return $this->redirectToRoute('user_profile');
         }
-        
+
         $application = new CoachApplication();
         $application->setUser($user);
-        
+
         $form = $this->createForm(CoachApplicationType::class, $application);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
             // Gérer l'upload du CV
             $cvFile = $form->get('cvFileUpload')->getData();
-            
+
             if ($cvFile) {
                 $originalFilename = pathinfo($cvFile->getClientOriginalName(), PATHINFO_FILENAME);
                 $safeFilename = $slugger->slug($originalFilename);
@@ -175,14 +178,35 @@ class UserController extends AbstractController
                     $this->addFlash('error', 'Error uploading CV.');
                 }
             }
-            
+
             $em->persist($application);
             $em->flush();
-            
+
             $this->addFlash('success', 'Your coach application has been submitted successfully!');
             return $this->redirectToRoute('user_profile');
         }
 
+    return $this->render('coach/application.html.twig', [
+        'form' => $form->createView(),
+    ]);
+}
+
+    #[Route('/notification/{id}/read', name: 'user_notification_read', methods: ['POST'], requirements: ['id' => '\d+'])]
+    public function markNotificationRead(int $id, Request $request, NotificationRepository $notificationRepo, EntityManagerInterface $em): Response
+    {
+        $this->denyAccessUnlessGranted('ROLE_USER');
+        if (!$this->isCsrfTokenValid('notification_read_'.$id, $request->request->get('_token'))) {
+            throw $this->createAccessDeniedException('Invalid token.');
+        }
+        $notification = $notificationRepo->find($id);
+        if (!$notification || $notification->getUser() !== $this->getUser()) {
+            throw $this->createAccessDeniedException('Notification not found.');
+        }
+        $notification->markAsRead();
+        $em->flush();
+        $target = $request->headers->get('Referer') ?: $this->generateUrl('community_channels_index');
+        return $this->redirect($target);
+    }
         return $this->render('coach/application.html.twig', [
             'form' => $form->createView(),
         ]);
