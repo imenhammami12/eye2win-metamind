@@ -4,6 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
+<<<<<<< HEAD
     "content-hash": "6f05883c8489f4b8fc23b4784fdf9475",
     "packages": [
         {
@@ -140,6 +141,11 @@
             "time": "2024-11-12T16:29:46+00:00"
         },
         {
+=======
+    "content-hash": "29ec47ddec4960efb0dd74d51ebab411",
+    "packages": [
+        {
+>>>>>>> gestion_tournoi_match
             "name": "composer/semver",
             "version": "3.4.4",
             "source": {
@@ -217,6 +223,7 @@
             "time": "2025-08-20T19:15:30+00:00"
         },
         {
+<<<<<<< HEAD
             "name": "dasprid/enum",
             "version": "1.0.7",
             "source": {
@@ -267,6 +274,8 @@
             "time": "2025-09-16T12:23:56+00:00"
         },
         {
+=======
+>>>>>>> gestion_tournoi_match
             "name": "doctrine/collections",
             "version": "2.6.0",
             "source": {
@@ -714,6 +723,7 @@
         },
         {
             "name": "doctrine/event-manager",
+<<<<<<< HEAD
             "version": "2.1.0",
             "source": {
                 "type": "git",
@@ -724,6 +734,18 @@
                 "type": "zip",
                 "url": "https://api.github.com/repos/doctrine/event-manager/zipball/c07799fcf5ad362050960a0fd068dded40b1e312",
                 "reference": "c07799fcf5ad362050960a0fd068dded40b1e312",
+=======
+            "version": "2.1.1",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/doctrine/event-manager.git",
+                "reference": "dda33921b198841ca8dbad2eaa5d4d34769d18cf"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/doctrine/event-manager/zipball/dda33921b198841ca8dbad2eaa5d4d34769d18cf",
+                "reference": "dda33921b198841ca8dbad2eaa5d4d34769d18cf",
+>>>>>>> gestion_tournoi_match
                 "shasum": ""
             },
             "require": {
@@ -785,7 +807,11 @@
             ],
             "support": {
                 "issues": "https://github.com/doctrine/event-manager/issues",
+<<<<<<< HEAD
                 "source": "https://github.com/doctrine/event-manager/tree/2.1.0"
+=======
+                "source": "https://github.com/doctrine/event-manager/tree/2.1.1"
+>>>>>>> gestion_tournoi_match
             },
             "funding": [
                 {
@@ -801,7 +827,11 @@
                     "type": "tidelift"
                 }
             ],
+<<<<<<< HEAD
             "time": "2026-01-17T22:40:21+00:00"
+=======
+            "time": "2026-01-29T07:11:08+00:00"
+>>>>>>> gestion_tournoi_match
         },
         {
             "name": "doctrine/inflector",
@@ -1145,6 +1175,7 @@
         },
         {
             "name": "doctrine/orm",
+<<<<<<< HEAD
             "version": "3.6.1",
             "source": {
                 "type": "git",
@@ -1155,6 +1186,18 @@
                 "type": "zip",
                 "url": "https://api.github.com/repos/doctrine/orm/zipball/2148940290e4c44b9101095707e71fb590832fa5",
                 "reference": "2148940290e4c44b9101095707e71fb590832fa5",
+=======
+            "version": "3.6.2",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/doctrine/orm.git",
+                "reference": "4262eb495b4d2a53b45de1ac58881e0091f2970f"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/doctrine/orm/zipball/4262eb495b4d2a53b45de1ac58881e0091f2970f",
+                "reference": "4262eb495b4d2a53b45de1ac58881e0091f2970f",
+>>>>>>> gestion_tournoi_match
                 "shasum": ""
             },
             "require": {
@@ -1227,9 +1270,15 @@
             ],
             "support": {
                 "issues": "https://github.com/doctrine/orm/issues",
+<<<<<<< HEAD
                 "source": "https://github.com/doctrine/orm/tree/3.6.1"
             },
             "time": "2026-01-09T05:28:15+00:00"
+=======
+                "source": "https://github.com/doctrine/orm/tree/3.6.2"
+            },
+            "time": "2026-01-30T21:41:41+00:00"
+>>>>>>> gestion_tournoi_match
         },
         {
             "name": "doctrine/persistence",
@@ -1380,6 +1429,7 @@
             "time": "2025-10-26T09:35:14+00:00"
         },
         {
+<<<<<<< HEAD
             "name": "easycorp/easyadmin-bundle",
             "version": "v4.28.1",
             "source": {
@@ -1485,6 +1535,8 @@
             "time": "2026-02-05T20:39:12+00:00"
         },
         {
+=======
+>>>>>>> gestion_tournoi_match
             "name": "egulias/email-validator",
             "version": "4.0.4",
             "source": {
@@ -1552,6 +1604,7 @@
             "time": "2025-03-06T22:45:56+00:00"
         },
         {
+<<<<<<< HEAD
             "name": "endroid/qr-code",
             "version": "5.0.0",
             "source": {
@@ -1812,6 +1865,8 @@
             "time": "2022-12-02T22:17:43+00:00"
         },
         {
+=======
+>>>>>>> gestion_tournoi_match
             "name": "monolog/monolog",
             "version": "3.10.0",
             "source": {
@@ -1915,6 +1970,7 @@
             "time": "2026-01-02T08:56:05+00:00"
         },
         {
+<<<<<<< HEAD
             "name": "paragonie/constant_time_encoding",
             "version": "v3.1.3",
             "source": {
@@ -1984,6 +2040,8 @@
             "time": "2025-09-24T15:06:41+00:00"
         },
         {
+=======
+>>>>>>> gestion_tournoi_match
             "name": "phpdocumentor/reflection-common",
             "version": "2.2.0",
             "source": {
@@ -2151,6 +2209,7 @@
             "time": "2025-11-21T15:09:14+00:00"
         },
         {
+<<<<<<< HEAD
             "name": "phpoffice/phpspreadsheet",
             "version": "5.4.0",
             "source": {
@@ -2260,6 +2319,8 @@
             "time": "2026-01-11T04:52:00+00:00"
         },
         {
+=======
+>>>>>>> gestion_tournoi_match
             "name": "phpstan/phpdoc-parser",
             "version": "2.3.2",
             "source": {
@@ -2613,6 +2674,7 @@
             "time": "2024-09-11T13:17:53+00:00"
         },
         {
+<<<<<<< HEAD
             "name": "psr/simple-cache",
             "version": "3.0.0",
             "source": {
@@ -2855,6 +2917,8 @@
             "time": "2026-01-23T10:53:01+00:00"
         },
         {
+=======
+>>>>>>> gestion_tournoi_match
             "name": "symfony/asset",
             "version": "v6.4.32",
             "source": {
@@ -3012,6 +3076,7 @@
         },
         {
             "name": "symfony/cache",
+<<<<<<< HEAD
             "version": "v6.4.32",
             "source": {
                 "type": "git",
@@ -3022,6 +3087,18 @@
                 "type": "zip",
                 "url": "https://api.github.com/repos/symfony/cache/zipball/1b4c97d554c8c6d2c09546fcdef7f1aa338560a7",
                 "reference": "1b4c97d554c8c6d2c09546fcdef7f1aa338560a7",
+=======
+            "version": "v6.4.33",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/symfony/cache.git",
+                "reference": "5b088fa41eb9568748dc255c45e4054c387ba73b"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/symfony/cache/zipball/5b088fa41eb9568748dc255c45e4054c387ba73b",
+                "reference": "5b088fa41eb9568748dc255c45e4054c387ba73b",
+>>>>>>> gestion_tournoi_match
                 "shasum": ""
             },
             "require": {
@@ -3088,7 +3165,11 @@
                 "psr6"
             ],
             "support": {
+<<<<<<< HEAD
                 "source": "https://github.com/symfony/cache/tree/v6.4.32"
+=======
+                "source": "https://github.com/symfony/cache/tree/v6.4.33"
+>>>>>>> gestion_tournoi_match
             },
             "funding": [
                 {
@@ -3108,7 +3189,11 @@
                     "type": "tidelift"
                 }
             ],
+<<<<<<< HEAD
             "time": "2026-01-23T12:55:33+00:00"
+=======
+            "time": "2026-01-27T15:05:20+00:00"
+>>>>>>> gestion_tournoi_match
         },
         {
             "name": "symfony/cache-contracts",
@@ -3707,6 +3792,7 @@
         },
         {
             "name": "symfony/doctrine-messenger",
+<<<<<<< HEAD
             "version": "v6.4.32",
             "source": {
                 "type": "git",
@@ -3717,6 +3803,18 @@
                 "type": "zip",
                 "url": "https://api.github.com/repos/symfony/doctrine-messenger/zipball/67d85018aacc5700275ec844f43b4d1415367e99",
                 "reference": "67d85018aacc5700275ec844f43b4d1415367e99",
+=======
+            "version": "v6.4.33",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/symfony/doctrine-messenger.git",
+                "reference": "d79025bf53e7e74a1a11811a3a51785cd1dc828b"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/symfony/doctrine-messenger/zipball/d79025bf53e7e74a1a11811a3a51785cd1dc828b",
+                "reference": "d79025bf53e7e74a1a11811a3a51785cd1dc828b",
+>>>>>>> gestion_tournoi_match
                 "shasum": ""
             },
             "require": {
@@ -3759,7 +3857,11 @@
             "description": "Symfony Doctrine Messenger Bridge",
             "homepage": "https://symfony.com",
             "support": {
+<<<<<<< HEAD
                 "source": "https://github.com/symfony/doctrine-messenger/tree/v6.4.32"
+=======
+                "source": "https://github.com/symfony/doctrine-messenger/tree/v6.4.33"
+>>>>>>> gestion_tournoi_match
             },
             "funding": [
                 {
@@ -3779,7 +3881,11 @@
                     "type": "tidelift"
                 }
             ],
+<<<<<<< HEAD
             "time": "2026-01-07T15:36:36+00:00"
+=======
+            "time": "2026-01-27T09:43:00+00:00"
+>>>>>>> gestion_tournoi_match
         },
         {
             "name": "symfony/dotenv",
@@ -4238,6 +4344,7 @@
         },
         {
             "name": "symfony/finder",
+<<<<<<< HEAD
             "version": "v6.4.32",
             "source": {
                 "type": "git",
@@ -4248,6 +4355,18 @@
                 "type": "zip",
                 "url": "https://api.github.com/repos/symfony/finder/zipball/3ec24885c1d9ababbb9c8f63bb42fea3c8c9b6de",
                 "reference": "3ec24885c1d9ababbb9c8f63bb42fea3c8c9b6de",
+=======
+            "version": "v6.4.33",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/symfony/finder.git",
+                "reference": "24965ca011dac87431729640feef8bcf7b5523e0"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/symfony/finder/zipball/24965ca011dac87431729640feef8bcf7b5523e0",
+                "reference": "24965ca011dac87431729640feef8bcf7b5523e0",
+>>>>>>> gestion_tournoi_match
                 "shasum": ""
             },
             "require": {
@@ -4282,7 +4401,11 @@
             "description": "Finds files and directories via an intuitive fluent interface",
             "homepage": "https://symfony.com",
             "support": {
+<<<<<<< HEAD
                 "source": "https://github.com/symfony/finder/tree/v6.4.32"
+=======
+                "source": "https://github.com/symfony/finder/tree/v6.4.33"
+>>>>>>> gestion_tournoi_match
             },
             "funding": [
                 {
@@ -4302,7 +4425,11 @@
                     "type": "tidelift"
                 }
             ],
+<<<<<<< HEAD
             "time": "2026-01-10T14:09:00+00:00"
+=======
+            "time": "2026-01-26T13:03:48+00:00"
+>>>>>>> gestion_tournoi_match
         },
         {
             "name": "symfony/flex",
@@ -4480,6 +4607,7 @@
         },
         {
             "name": "symfony/framework-bundle",
+<<<<<<< HEAD
             "version": "v6.4.32",
             "source": {
                 "type": "git",
@@ -4490,6 +4618,18 @@
                 "type": "zip",
                 "url": "https://api.github.com/repos/symfony/framework-bundle/zipball/f64f9b23f2d7c22e79a59598ad67d7bf3f39339d",
                 "reference": "f64f9b23f2d7c22e79a59598ad67d7bf3f39339d",
+=======
+            "version": "v6.4.33",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/symfony/framework-bundle.git",
+                "reference": "9ef2d0b63b9e855ba351e770a603d89699115801"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/symfony/framework-bundle/zipball/9ef2d0b63b9e855ba351e770a603d89699115801",
+                "reference": "9ef2d0b63b9e855ba351e770a603d89699115801",
+>>>>>>> gestion_tournoi_match
                 "shasum": ""
             },
             "require": {
@@ -4609,7 +4749,11 @@
             "description": "Provides a tight integration between Symfony components and the Symfony full-stack framework",
             "homepage": "https://symfony.com",
             "support": {
+<<<<<<< HEAD
                 "source": "https://github.com/symfony/framework-bundle/tree/v6.4.32"
+=======
+                "source": "https://github.com/symfony/framework-bundle/tree/v6.4.33"
+>>>>>>> gestion_tournoi_match
             },
             "funding": [
                 {
@@ -4629,6 +4773,7 @@
                     "type": "tidelift"
                 }
             ],
+<<<<<<< HEAD
             "time": "2026-01-12T10:43:21+00:00"
         },
         {
@@ -4643,6 +4788,22 @@
                 "type": "zip",
                 "url": "https://api.github.com/repos/symfony/http-client/zipball/e8e50d6ee3b39cb64b8d7dabcbd3426335cdc94e",
                 "reference": "e8e50d6ee3b39cb64b8d7dabcbd3426335cdc94e",
+=======
+            "time": "2026-01-26T14:46:41+00:00"
+        },
+        {
+            "name": "symfony/http-client",
+            "version": "v6.4.33",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/symfony/http-client.git",
+                "reference": "50e5386dbef6361b6c2d9a2eb22954f8525b8921"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/symfony/http-client/zipball/50e5386dbef6361b6c2d9a2eb22954f8525b8921",
+                "reference": "50e5386dbef6361b6c2d9a2eb22954f8525b8921",
+>>>>>>> gestion_tournoi_match
                 "shasum": ""
             },
             "require": {
@@ -4707,7 +4868,11 @@
                 "http"
             ],
             "support": {
+<<<<<<< HEAD
                 "source": "https://github.com/symfony/http-client/tree/v6.4.32"
+=======
+                "source": "https://github.com/symfony/http-client/tree/v6.4.33"
+>>>>>>> gestion_tournoi_match
             },
             "funding": [
                 {
@@ -4727,7 +4892,11 @@
                     "type": "tidelift"
                 }
             ],
+<<<<<<< HEAD
             "time": "2026-01-23T15:58:11+00:00"
+=======
+            "time": "2026-01-27T15:43:08+00:00"
+>>>>>>> gestion_tournoi_match
         },
         {
             "name": "symfony/http-client-contracts",
@@ -4809,6 +4978,7 @@
         },
         {
             "name": "symfony/http-foundation",
+<<<<<<< HEAD
             "version": "v6.4.32",
             "source": {
                 "type": "git",
@@ -4819,6 +4989,18 @@
                 "type": "zip",
                 "url": "https://api.github.com/repos/symfony/http-foundation/zipball/a7c652d0d0a6be8fbf9dead2e36f31e46c482adf",
                 "reference": "a7c652d0d0a6be8fbf9dead2e36f31e46c482adf",
+=======
+            "version": "v6.4.33",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/symfony/http-foundation.git",
+                "reference": "f1a490cc9d595ba7ebe684220e625d1e472ad278"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/symfony/http-foundation/zipball/f1a490cc9d595ba7ebe684220e625d1e472ad278",
+                "reference": "f1a490cc9d595ba7ebe684220e625d1e472ad278",
+>>>>>>> gestion_tournoi_match
                 "shasum": ""
             },
             "require": {
@@ -4866,7 +5048,11 @@
             "description": "Defines an object-oriented layer for the HTTP specification",
             "homepage": "https://symfony.com",
             "support": {
+<<<<<<< HEAD
                 "source": "https://github.com/symfony/http-foundation/tree/v6.4.32"
+=======
+                "source": "https://github.com/symfony/http-foundation/tree/v6.4.33"
+>>>>>>> gestion_tournoi_match
             },
             "funding": [
                 {
@@ -4886,6 +5072,7 @@
                     "type": "tidelift"
                 }
             ],
+<<<<<<< HEAD
             "time": "2026-01-09T09:10:39+00:00"
         },
         {
@@ -4900,6 +5087,22 @@
                 "type": "zip",
                 "url": "https://api.github.com/repos/symfony/http-kernel/zipball/e40d93fce00d928a553ba0f323da4b3f8506f858",
                 "reference": "e40d93fce00d928a553ba0f323da4b3f8506f858",
+=======
+            "time": "2026-01-27T15:04:55+00:00"
+        },
+        {
+            "name": "symfony/http-kernel",
+            "version": "v6.4.33",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/symfony/http-kernel.git",
+                "reference": "73fa5c999d7f741ca544a97d3c791cc97890ae4d"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/symfony/http-kernel/zipball/73fa5c999d7f741ca544a97d3c791cc97890ae4d",
+                "reference": "73fa5c999d7f741ca544a97d3c791cc97890ae4d",
+>>>>>>> gestion_tournoi_match
                 "shasum": ""
             },
             "require": {
@@ -4984,7 +5187,11 @@
             "description": "Provides a structured process for converting a Request into a Response",
             "homepage": "https://symfony.com",
             "support": {
+<<<<<<< HEAD
                 "source": "https://github.com/symfony/http-kernel/tree/v6.4.32"
+=======
+                "source": "https://github.com/symfony/http-kernel/tree/v6.4.33"
+>>>>>>> gestion_tournoi_match
             },
             "funding": [
                 {
@@ -5004,7 +5211,11 @@
                     "type": "tidelift"
                 }
             ],
+<<<<<<< HEAD
             "time": "2026-01-24T16:04:03+00:00"
+=======
+            "time": "2026-01-28T10:02:13+00:00"
+>>>>>>> gestion_tournoi_match
         },
         {
             "name": "symfony/intl",
@@ -6339,6 +6550,7 @@
             "time": "2025-06-24T13:30:11+00:00"
         },
         {
+<<<<<<< HEAD
             "name": "symfony/polyfill-uuid",
             "version": "v1.33.0",
             "source": {
@@ -6433,6 +6645,19 @@
                 "type": "zip",
                 "url": "https://api.github.com/repos/symfony/process/zipball/c593135be689b21e6164b1e8f6f5dbf1506b065c",
                 "reference": "c593135be689b21e6164b1e8f6f5dbf1506b065c",
+=======
+            "name": "symfony/process",
+            "version": "v6.4.33",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/symfony/process.git",
+                "reference": "c46e854e79b52d07666e43924a20cb6dc546644e"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/symfony/process/zipball/c46e854e79b52d07666e43924a20cb6dc546644e",
+                "reference": "c46e854e79b52d07666e43924a20cb6dc546644e",
+>>>>>>> gestion_tournoi_match
                 "shasum": ""
             },
             "require": {
@@ -6464,7 +6689,11 @@
             "description": "Executes commands in sub-processes",
             "homepage": "https://symfony.com",
             "support": {
+<<<<<<< HEAD
                 "source": "https://github.com/symfony/process/tree/v6.4.32"
+=======
+                "source": "https://github.com/symfony/process/tree/v6.4.33"
+>>>>>>> gestion_tournoi_match
             },
             "funding": [
                 {
@@ -6484,7 +6713,11 @@
                     "type": "tidelift"
                 }
             ],
+<<<<<<< HEAD
             "time": "2026-01-15T13:23:20+00:00"
+=======
+            "time": "2026-01-23T16:02:12+00:00"
+>>>>>>> gestion_tournoi_match
         },
         {
             "name": "symfony/property-access",
@@ -6569,6 +6802,7 @@
         },
         {
             "name": "symfony/property-info",
+<<<<<<< HEAD
             "version": "v6.4.32",
             "source": {
                 "type": "git",
@@ -6579,6 +6813,18 @@
                 "type": "zip",
                 "url": "https://api.github.com/repos/symfony/property-info/zipball/5dda35816740c390bf374897a018256c7ede7ecc",
                 "reference": "5dda35816740c390bf374897a018256c7ede7ecc",
+=======
+            "version": "v6.4.33",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/symfony/property-info.git",
+                "reference": "7d961dbb543fcfaa57fa55e555edd466e90160be"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/symfony/property-info/zipball/7d961dbb543fcfaa57fa55e555edd466e90160be",
+                "reference": "7d961dbb543fcfaa57fa55e555edd466e90160be",
+>>>>>>> gestion_tournoi_match
                 "shasum": ""
             },
             "require": {
@@ -6587,7 +6833,11 @@
             },
             "conflict": {
                 "doctrine/annotations": "<1.12",
+<<<<<<< HEAD
                 "phpdocumentor/reflection-docblock": "<5.2",
+=======
+                "phpdocumentor/reflection-docblock": "<5.2|>=6",
+>>>>>>> gestion_tournoi_match
                 "phpdocumentor/type-resolver": "<1.5.1",
                 "symfony/cache": "<5.4",
                 "symfony/dependency-injection": "<5.4|>=6.0,<6.4",
@@ -6635,7 +6885,11 @@
                 "validator"
             ],
             "support": {
+<<<<<<< HEAD
                 "source": "https://github.com/symfony/property-info/tree/v6.4.32"
+=======
+                "source": "https://github.com/symfony/property-info/tree/v6.4.33"
+>>>>>>> gestion_tournoi_match
             },
             "funding": [
                 {
@@ -6655,7 +6909,11 @@
                     "type": "tidelift"
                 }
             ],
+<<<<<<< HEAD
             "time": "2026-01-23T09:06:36+00:00"
+=======
+            "time": "2026-01-27T15:12:57+00:00"
+>>>>>>> gestion_tournoi_match
         },
         {
             "name": "symfony/routing",
@@ -7199,6 +7457,7 @@
         },
         {
             "name": "symfony/serializer",
+<<<<<<< HEAD
             "version": "v6.4.32",
             "source": {
                 "type": "git",
@@ -7209,6 +7468,18 @@
                 "type": "zip",
                 "url": "https://api.github.com/repos/symfony/serializer/zipball/8e02b21b88a4978aad275f002f614ac9eb52469b",
                 "reference": "8e02b21b88a4978aad275f002f614ac9eb52469b",
+=======
+            "version": "v6.4.33",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/symfony/serializer.git",
+                "reference": "b53a060656bd28060c9fa28e2cab151348fd49b5"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/symfony/serializer/zipball/b53a060656bd28060c9fa28e2cab151348fd49b5",
+                "reference": "b53a060656bd28060c9fa28e2cab151348fd49b5",
+>>>>>>> gestion_tournoi_match
                 "shasum": ""
             },
             "require": {
@@ -7277,7 +7548,11 @@
             "description": "Handles serializing and deserializing data structures, including object graphs, into array structures or other formats like XML and JSON.",
             "homepage": "https://symfony.com",
             "support": {
+<<<<<<< HEAD
                 "source": "https://github.com/symfony/serializer/tree/v6.4.32"
+=======
+                "source": "https://github.com/symfony/serializer/tree/v6.4.33"
+>>>>>>> gestion_tournoi_match
             },
             "funding": [
                 {
@@ -7297,7 +7572,11 @@
                     "type": "tidelift"
                 }
             ],
+<<<<<<< HEAD
             "time": "2026-01-21T18:25:17+00:00"
+=======
+            "time": "2026-01-26T08:32:52+00:00"
+>>>>>>> gestion_tournoi_match
         },
         {
             "name": "symfony/service-contracts",
@@ -7997,6 +8276,7 @@
             "time": "2026-01-05T12:44:39+00:00"
         },
         {
+<<<<<<< HEAD
             "name": "symfony/uid",
             "version": "v6.4.32",
             "source": {
@@ -8075,6 +8355,8 @@
             "time": "2025-12-23T15:07:59+00:00"
         },
         {
+=======
+>>>>>>> gestion_tournoi_match
             "name": "symfony/ux-turbo",
             "version": "v2.32.0",
             "source": {
@@ -8178,6 +8460,7 @@
             "time": "2025-12-17T06:03:34+00:00"
         },
         {
+<<<<<<< HEAD
             "name": "symfony/ux-twig-component",
             "version": "v2.32.0",
             "source": {
@@ -8276,6 +8559,19 @@
                 "type": "zip",
                 "url": "https://api.github.com/repos/symfony/validator/zipball/0c3f60adce4e6fc86583b0c7e363ce90fe3ca3e7",
                 "reference": "0c3f60adce4e6fc86583b0c7e363ce90fe3ca3e7",
+=======
+            "name": "symfony/validator",
+            "version": "v6.4.33",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/symfony/validator.git",
+                "reference": "da1a40418439c0483ca7e0d4ae4c4f744f6b8536"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/symfony/validator/zipball/da1a40418439c0483ca7e0d4ae4c4f744f6b8536",
+                "reference": "da1a40418439c0483ca7e0d4ae4c4f744f6b8536",
+>>>>>>> gestion_tournoi_match
                 "shasum": ""
             },
             "require": {
@@ -8343,7 +8639,11 @@
             "description": "Provides tools to validate values",
             "homepage": "https://symfony.com",
             "support": {
+<<<<<<< HEAD
                 "source": "https://github.com/symfony/validator/tree/v6.4.31"
+=======
+                "source": "https://github.com/symfony/validator/tree/v6.4.33"
+>>>>>>> gestion_tournoi_match
             },
             "funding": [
                 {
@@ -8363,7 +8663,11 @@
                     "type": "tidelift"
                 }
             ],
+<<<<<<< HEAD
             "time": "2025-12-24T09:35:58+00:00"
+=======
+            "time": "2026-01-26T16:20:53+00:00"
+>>>>>>> gestion_tournoi_match
         },
         {
             "name": "symfony/var-dumper",
@@ -8772,6 +9076,7 @@
             "time": "2025-12-18T20:46:15+00:00"
         },
         {
+<<<<<<< HEAD
             "name": "twig/html-extra",
             "version": "v3.23.0",
             "source": {
@@ -8783,12 +9088,30 @@
                 "type": "zip",
                 "url": "https://api.github.com/repos/twigphp/html-extra/zipball/2ef1d0ccaa06d4f4405b330fe6c4b6f7b50fbbc3",
                 "reference": "2ef1d0ccaa06d4f4405b330fe6c4b6f7b50fbbc3",
+=======
+            "name": "twig/string-extra",
+            "version": "v3.23.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/twigphp/string-extra.git",
+                "reference": "6ec8f2e8ca9b2193221a02cb599dc92c36384368"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/twigphp/string-extra/zipball/6ec8f2e8ca9b2193221a02cb599dc92c36384368",
+                "reference": "6ec8f2e8ca9b2193221a02cb599dc92c36384368",
+>>>>>>> gestion_tournoi_match
                 "shasum": ""
             },
             "require": {
                 "php": ">=8.1.0",
+<<<<<<< HEAD
                 "symfony/deprecation-contracts": "^2.5|^3",
                 "symfony/mime": "^5.4|^6.4|^7.0|^8.0",
+=======
+                "symfony/string": "^5.4|^6.4|^7.0|^8.0",
+                "symfony/translation-contracts": "^1.1|^2|^3",
+>>>>>>> gestion_tournoi_match
                 "twig/twig": "^3.13|^4.0"
             },
             "require-dev": {
@@ -8796,11 +9119,16 @@
             },
             "type": "library",
             "autoload": {
+<<<<<<< HEAD
                 "files": [
                     "Resources/functions.php"
                 ],
                 "psr-4": {
                     "Twig\\Extra\\Html\\": ""
+=======
+                "psr-4": {
+                    "Twig\\Extra\\String\\": ""
+>>>>>>> gestion_tournoi_match
                 },
                 "exclude-from-classmap": [
                     "/Tests/"
@@ -8818,6 +9146,7 @@
                     "role": "Lead Developer"
                 }
             ],
+<<<<<<< HEAD
             "description": "A Twig extension for HTML",
             "homepage": "https://twig.symfony.com",
             "keywords": [
@@ -8826,6 +9155,18 @@
             ],
             "support": {
                 "source": "https://github.com/twigphp/html-extra/tree/v3.23.0"
+=======
+            "description": "A Twig extension for Symfony String",
+            "homepage": "https://twig.symfony.com",
+            "keywords": [
+                "html",
+                "string",
+                "twig",
+                "unicode"
+            ],
+            "support": {
+                "source": "https://github.com/twigphp/string-extra/tree/v3.23.0"
+>>>>>>> gestion_tournoi_match
             },
             "funding": [
                 {
@@ -9515,6 +9856,7 @@
         },
         {
             "name": "phpunit/php-code-coverage",
+<<<<<<< HEAD
             "version": "12.5.2",
             "source": {
                 "type": "git",
@@ -9525,6 +9867,18 @@
                 "type": "zip",
                 "url": "https://api.github.com/repos/sebastianbergmann/php-code-coverage/zipball/4a9739b51cbcb355f6e95659612f92e282a7077b",
                 "reference": "4a9739b51cbcb355f6e95659612f92e282a7077b",
+=======
+            "version": "11.0.12",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/sebastianbergmann/php-code-coverage.git",
+                "reference": "2c1ed04922802c15e1de5d7447b4856de949cf56"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/sebastianbergmann/php-code-coverage/zipball/2c1ed04922802c15e1de5d7447b4856de949cf56",
+                "reference": "2c1ed04922802c15e1de5d7447b4856de949cf56",
+>>>>>>> gestion_tournoi_match
                 "shasum": ""
             },
             "require": {
@@ -9532,6 +9886,7 @@
                 "ext-libxml": "*",
                 "ext-xmlwriter": "*",
                 "nikic/php-parser": "^5.7.0",
+<<<<<<< HEAD
                 "php": ">=8.3",
                 "phpunit/php-file-iterator": "^6.0",
                 "phpunit/php-text-template": "^5.0",
@@ -9543,6 +9898,20 @@
             },
             "require-dev": {
                 "phpunit/phpunit": "^12.5.1"
+=======
+                "php": ">=8.2",
+                "phpunit/php-file-iterator": "^5.1.0",
+                "phpunit/php-text-template": "^4.0.1",
+                "sebastian/code-unit-reverse-lookup": "^4.0.1",
+                "sebastian/complexity": "^4.0.1",
+                "sebastian/environment": "^7.2.1",
+                "sebastian/lines-of-code": "^3.0.1",
+                "sebastian/version": "^5.0.2",
+                "theseer/tokenizer": "^1.3.1"
+            },
+            "require-dev": {
+                "phpunit/phpunit": "^11.5.46"
+>>>>>>> gestion_tournoi_match
             },
             "suggest": {
                 "ext-pcov": "PHP extension that provides line coverage",
@@ -9551,7 +9920,11 @@
             "type": "library",
             "extra": {
                 "branch-alias": {
+<<<<<<< HEAD
                     "dev-main": "12.5.x-dev"
+=======
+                    "dev-main": "11.0.x-dev"
+>>>>>>> gestion_tournoi_match
                 }
             },
             "autoload": {
@@ -9580,7 +9953,11 @@
             "support": {
                 "issues": "https://github.com/sebastianbergmann/php-code-coverage/issues",
                 "security": "https://github.com/sebastianbergmann/php-code-coverage/security/policy",
+<<<<<<< HEAD
                 "source": "https://github.com/sebastianbergmann/php-code-coverage/tree/12.5.2"
+=======
+                "source": "https://github.com/sebastianbergmann/php-code-coverage/tree/11.0.12"
+>>>>>>> gestion_tournoi_match
             },
             "funding": [
                 {
@@ -9600,6 +9977,7 @@
                     "type": "tidelift"
                 }
             ],
+<<<<<<< HEAD
             "time": "2025-12-24T07:03:04+00:00"
         },
         {
@@ -9621,11 +9999,38 @@
             },
             "require-dev": {
                 "phpunit/phpunit": "^12.0"
+=======
+            "time": "2025-12-24T07:01:01+00:00"
+        },
+        {
+            "name": "phpunit/php-file-iterator",
+            "version": "5.1.1",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/sebastianbergmann/php-file-iterator.git",
+                "reference": "2f3a64888c814fc235386b7387dd5b5ed92ad903"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/sebastianbergmann/php-file-iterator/zipball/2f3a64888c814fc235386b7387dd5b5ed92ad903",
+                "reference": "2f3a64888c814fc235386b7387dd5b5ed92ad903",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=8.2"
+            },
+            "require-dev": {
+                "phpunit/phpunit": "^11.3"
+>>>>>>> gestion_tournoi_match
             },
             "type": "library",
             "extra": {
                 "branch-alias": {
+<<<<<<< HEAD
                     "dev-main": "6.0-dev"
+=======
+                    "dev-main": "5.1-dev"
+>>>>>>> gestion_tournoi_match
                 }
             },
             "autoload": {
@@ -9653,12 +10058,17 @@
             "support": {
                 "issues": "https://github.com/sebastianbergmann/php-file-iterator/issues",
                 "security": "https://github.com/sebastianbergmann/php-file-iterator/security/policy",
+<<<<<<< HEAD
                 "source": "https://github.com/sebastianbergmann/php-file-iterator/tree/6.0.0"
+=======
+                "source": "https://github.com/sebastianbergmann/php-file-iterator/tree/5.1.1"
+>>>>>>> gestion_tournoi_match
             },
             "funding": [
                 {
                     "url": "https://github.com/sebastianbergmann",
                     "type": "github"
+<<<<<<< HEAD
                 }
             ],
             "time": "2025-02-07T04:58:37+00:00"
@@ -9683,6 +10093,44 @@
             "require-dev": {
                 "ext-pcntl": "*",
                 "phpunit/phpunit": "^12.0"
+=======
+                },
+                {
+                    "url": "https://liberapay.com/sebastianbergmann",
+                    "type": "liberapay"
+                },
+                {
+                    "url": "https://thanks.dev/u/gh/sebastianbergmann",
+                    "type": "thanks_dev"
+                },
+                {
+                    "url": "https://tidelift.com/funding/github/packagist/phpunit/php-file-iterator",
+                    "type": "tidelift"
+                }
+            ],
+            "time": "2026-02-02T13:52:54+00:00"
+        },
+        {
+            "name": "phpunit/php-invoker",
+            "version": "5.0.1",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/sebastianbergmann/php-invoker.git",
+                "reference": "c1ca3814734c07492b3d4c5f794f4b0995333da2"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/sebastianbergmann/php-invoker/zipball/c1ca3814734c07492b3d4c5f794f4b0995333da2",
+                "reference": "c1ca3814734c07492b3d4c5f794f4b0995333da2",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=8.2"
+            },
+            "require-dev": {
+                "ext-pcntl": "*",
+                "phpunit/phpunit": "^11.0"
+>>>>>>> gestion_tournoi_match
             },
             "suggest": {
                 "ext-pcntl": "*"
@@ -9690,7 +10138,11 @@
             "type": "library",
             "extra": {
                 "branch-alias": {
+<<<<<<< HEAD
                     "dev-main": "6.0-dev"
+=======
+                    "dev-main": "5.0-dev"
+>>>>>>> gestion_tournoi_match
                 }
             },
             "autoload": {
@@ -9717,7 +10169,11 @@
             "support": {
                 "issues": "https://github.com/sebastianbergmann/php-invoker/issues",
                 "security": "https://github.com/sebastianbergmann/php-invoker/security/policy",
+<<<<<<< HEAD
                 "source": "https://github.com/sebastianbergmann/php-invoker/tree/6.0.0"
+=======
+                "source": "https://github.com/sebastianbergmann/php-invoker/tree/5.0.1"
+>>>>>>> gestion_tournoi_match
             },
             "funding": [
                 {
@@ -9725,6 +10181,7 @@
                     "type": "github"
                 }
             ],
+<<<<<<< HEAD
             "time": "2025-02-07T04:58:58+00:00"
         },
         {
@@ -9746,11 +10203,38 @@
             },
             "require-dev": {
                 "phpunit/phpunit": "^12.0"
+=======
+            "time": "2024-07-03T05:07:44+00:00"
+        },
+        {
+            "name": "phpunit/php-text-template",
+            "version": "4.0.1",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/sebastianbergmann/php-text-template.git",
+                "reference": "3e0404dc6b300e6bf56415467ebcb3fe4f33e964"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/sebastianbergmann/php-text-template/zipball/3e0404dc6b300e6bf56415467ebcb3fe4f33e964",
+                "reference": "3e0404dc6b300e6bf56415467ebcb3fe4f33e964",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=8.2"
+            },
+            "require-dev": {
+                "phpunit/phpunit": "^11.0"
+>>>>>>> gestion_tournoi_match
             },
             "type": "library",
             "extra": {
                 "branch-alias": {
+<<<<<<< HEAD
                     "dev-main": "5.0-dev"
+=======
+                    "dev-main": "4.0-dev"
+>>>>>>> gestion_tournoi_match
                 }
             },
             "autoload": {
@@ -9777,7 +10261,11 @@
             "support": {
                 "issues": "https://github.com/sebastianbergmann/php-text-template/issues",
                 "security": "https://github.com/sebastianbergmann/php-text-template/security/policy",
+<<<<<<< HEAD
                 "source": "https://github.com/sebastianbergmann/php-text-template/tree/5.0.0"
+=======
+                "source": "https://github.com/sebastianbergmann/php-text-template/tree/4.0.1"
+>>>>>>> gestion_tournoi_match
             },
             "funding": [
                 {
@@ -9785,6 +10273,7 @@
                     "type": "github"
                 }
             ],
+<<<<<<< HEAD
             "time": "2025-02-07T04:59:16+00:00"
         },
         {
@@ -9806,11 +10295,38 @@
             },
             "require-dev": {
                 "phpunit/phpunit": "^12.0"
+=======
+            "time": "2024-07-03T05:08:43+00:00"
+        },
+        {
+            "name": "phpunit/php-timer",
+            "version": "7.0.1",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/sebastianbergmann/php-timer.git",
+                "reference": "3b415def83fbcb41f991d9ebf16ae4ad8b7837b3"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/sebastianbergmann/php-timer/zipball/3b415def83fbcb41f991d9ebf16ae4ad8b7837b3",
+                "reference": "3b415def83fbcb41f991d9ebf16ae4ad8b7837b3",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=8.2"
+            },
+            "require-dev": {
+                "phpunit/phpunit": "^11.0"
+>>>>>>> gestion_tournoi_match
             },
             "type": "library",
             "extra": {
                 "branch-alias": {
+<<<<<<< HEAD
                     "dev-main": "8.0-dev"
+=======
+                    "dev-main": "7.0-dev"
+>>>>>>> gestion_tournoi_match
                 }
             },
             "autoload": {
@@ -9837,7 +10353,11 @@
             "support": {
                 "issues": "https://github.com/sebastianbergmann/php-timer/issues",
                 "security": "https://github.com/sebastianbergmann/php-timer/security/policy",
+<<<<<<< HEAD
                 "source": "https://github.com/sebastianbergmann/php-timer/tree/8.0.0"
+=======
+                "source": "https://github.com/sebastianbergmann/php-timer/tree/7.0.1"
+>>>>>>> gestion_tournoi_match
             },
             "funding": [
                 {
@@ -9845,6 +10365,7 @@
                     "type": "github"
                 }
             ],
+<<<<<<< HEAD
             "time": "2025-02-07T04:59:38+00:00"
         },
         {
@@ -9859,6 +10380,22 @@
                 "type": "zip",
                 "url": "https://api.github.com/repos/sebastianbergmann/phpunit/zipball/79dee3d2685b80518e94b9ea741b3f822b213a5e",
                 "reference": "79dee3d2685b80518e94b9ea741b3f822b213a5e",
+=======
+            "time": "2024-07-03T05:09:35+00:00"
+        },
+        {
+            "name": "phpunit/phpunit",
+            "version": "11.5.51",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/sebastianbergmann/phpunit.git",
+                "reference": "ad14159f92910b0f0e3928c13e9b2077529de091"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/sebastianbergmann/phpunit/zipball/ad14159f92910b0f0e3928c13e9b2077529de091",
+                "reference": "ad14159f92910b0f0e3928c13e9b2077529de091",
+>>>>>>> gestion_tournoi_match
                 "shasum": ""
             },
             "require": {
@@ -9871,6 +10408,7 @@
                 "myclabs/deep-copy": "^1.13.4",
                 "phar-io/manifest": "^2.0.4",
                 "phar-io/version": "^3.2.1",
+<<<<<<< HEAD
                 "php": ">=8.3",
                 "phpunit/php-code-coverage": "^12.5.2",
                 "phpunit/php-file-iterator": "^6.0.0",
@@ -9888,13 +10426,41 @@
                 "sebastian/version": "^6.0.0",
                 "staabm/side-effects-detector": "^1.0.5"
             },
+=======
+                "php": ">=8.2",
+                "phpunit/php-code-coverage": "^11.0.12",
+                "phpunit/php-file-iterator": "^5.1.1",
+                "phpunit/php-invoker": "^5.0.1",
+                "phpunit/php-text-template": "^4.0.1",
+                "phpunit/php-timer": "^7.0.1",
+                "sebastian/cli-parser": "^3.0.2",
+                "sebastian/code-unit": "^3.0.3",
+                "sebastian/comparator": "^6.3.3",
+                "sebastian/diff": "^6.0.2",
+                "sebastian/environment": "^7.2.1",
+                "sebastian/exporter": "^6.3.2",
+                "sebastian/global-state": "^7.0.2",
+                "sebastian/object-enumerator": "^6.0.1",
+                "sebastian/recursion-context": "^6.0.3",
+                "sebastian/type": "^5.1.3",
+                "sebastian/version": "^5.0.2",
+                "staabm/side-effects-detector": "^1.0.5"
+            },
+            "suggest": {
+                "ext-soap": "To be able to generate mocks based on WSDL files"
+            },
+>>>>>>> gestion_tournoi_match
             "bin": [
                 "phpunit"
             ],
             "type": "library",
             "extra": {
                 "branch-alias": {
+<<<<<<< HEAD
                     "dev-main": "12.5-dev"
+=======
+                    "dev-main": "11.5-dev"
+>>>>>>> gestion_tournoi_match
                 }
             },
             "autoload": {
@@ -9926,7 +10492,11 @@
             "support": {
                 "issues": "https://github.com/sebastianbergmann/phpunit/issues",
                 "security": "https://github.com/sebastianbergmann/phpunit/security/policy",
+<<<<<<< HEAD
                 "source": "https://github.com/sebastianbergmann/phpunit/tree/12.5.7"
+=======
+                "source": "https://github.com/sebastianbergmann/phpunit/tree/11.5.51"
+>>>>>>> gestion_tournoi_match
             },
             "funding": [
                 {
@@ -9950,6 +10520,7 @@
                     "type": "tidelift"
                 }
             ],
+<<<<<<< HEAD
             "time": "2026-01-24T16:12:53+00:00"
         },
         {
@@ -9971,11 +10542,38 @@
             },
             "require-dev": {
                 "phpunit/phpunit": "^12.0"
+=======
+            "time": "2026-02-05T07:59:30+00:00"
+        },
+        {
+            "name": "sebastian/cli-parser",
+            "version": "3.0.2",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/sebastianbergmann/cli-parser.git",
+                "reference": "15c5dd40dc4f38794d383bb95465193f5e0ae180"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/sebastianbergmann/cli-parser/zipball/15c5dd40dc4f38794d383bb95465193f5e0ae180",
+                "reference": "15c5dd40dc4f38794d383bb95465193f5e0ae180",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=8.2"
+            },
+            "require-dev": {
+                "phpunit/phpunit": "^11.0"
+>>>>>>> gestion_tournoi_match
             },
             "type": "library",
             "extra": {
                 "branch-alias": {
+<<<<<<< HEAD
                     "dev-main": "4.2-dev"
+=======
+                    "dev-main": "3.0-dev"
+>>>>>>> gestion_tournoi_match
                 }
             },
             "autoload": {
@@ -9999,12 +10597,17 @@
             "support": {
                 "issues": "https://github.com/sebastianbergmann/cli-parser/issues",
                 "security": "https://github.com/sebastianbergmann/cli-parser/security/policy",
+<<<<<<< HEAD
                 "source": "https://github.com/sebastianbergmann/cli-parser/tree/4.2.0"
+=======
+                "source": "https://github.com/sebastianbergmann/cli-parser/tree/3.0.2"
+>>>>>>> gestion_tournoi_match
             },
             "funding": [
                 {
                     "url": "https://github.com/sebastianbergmann",
                     "type": "github"
+<<<<<<< HEAD
                 },
                 {
                     "url": "https://liberapay.com/sebastianbergmann",
@@ -10033,17 +10636,157 @@
                 "type": "zip",
                 "url": "https://api.github.com/repos/sebastianbergmann/comparator/zipball/6a7de5df2e094f9a80b40a522391a7e6022df5f6",
                 "reference": "6a7de5df2e094f9a80b40a522391a7e6022df5f6",
+=======
+                }
+            ],
+            "time": "2024-07-03T04:41:36+00:00"
+        },
+        {
+            "name": "sebastian/code-unit",
+            "version": "3.0.3",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/sebastianbergmann/code-unit.git",
+                "reference": "54391c61e4af8078e5b276ab082b6d3c54c9ad64"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/sebastianbergmann/code-unit/zipball/54391c61e4af8078e5b276ab082b6d3c54c9ad64",
+                "reference": "54391c61e4af8078e5b276ab082b6d3c54c9ad64",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=8.2"
+            },
+            "require-dev": {
+                "phpunit/phpunit": "^11.5"
+            },
+            "type": "library",
+            "extra": {
+                "branch-alias": {
+                    "dev-main": "3.0-dev"
+                }
+            },
+            "autoload": {
+                "classmap": [
+                    "src/"
+                ]
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "BSD-3-Clause"
+            ],
+            "authors": [
+                {
+                    "name": "Sebastian Bergmann",
+                    "email": "sebastian@phpunit.de",
+                    "role": "lead"
+                }
+            ],
+            "description": "Collection of value objects that represent the PHP code units",
+            "homepage": "https://github.com/sebastianbergmann/code-unit",
+            "support": {
+                "issues": "https://github.com/sebastianbergmann/code-unit/issues",
+                "security": "https://github.com/sebastianbergmann/code-unit/security/policy",
+                "source": "https://github.com/sebastianbergmann/code-unit/tree/3.0.3"
+            },
+            "funding": [
+                {
+                    "url": "https://github.com/sebastianbergmann",
+                    "type": "github"
+                }
+            ],
+            "time": "2025-03-19T07:56:08+00:00"
+        },
+        {
+            "name": "sebastian/code-unit-reverse-lookup",
+            "version": "4.0.1",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/sebastianbergmann/code-unit-reverse-lookup.git",
+                "reference": "183a9b2632194febd219bb9246eee421dad8d45e"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/sebastianbergmann/code-unit-reverse-lookup/zipball/183a9b2632194febd219bb9246eee421dad8d45e",
+                "reference": "183a9b2632194febd219bb9246eee421dad8d45e",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=8.2"
+            },
+            "require-dev": {
+                "phpunit/phpunit": "^11.0"
+            },
+            "type": "library",
+            "extra": {
+                "branch-alias": {
+                    "dev-main": "4.0-dev"
+                }
+            },
+            "autoload": {
+                "classmap": [
+                    "src/"
+                ]
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "BSD-3-Clause"
+            ],
+            "authors": [
+                {
+                    "name": "Sebastian Bergmann",
+                    "email": "sebastian@phpunit.de"
+                }
+            ],
+            "description": "Looks up which function or method a line of code belongs to",
+            "homepage": "https://github.com/sebastianbergmann/code-unit-reverse-lookup/",
+            "support": {
+                "issues": "https://github.com/sebastianbergmann/code-unit-reverse-lookup/issues",
+                "security": "https://github.com/sebastianbergmann/code-unit-reverse-lookup/security/policy",
+                "source": "https://github.com/sebastianbergmann/code-unit-reverse-lookup/tree/4.0.1"
+            },
+            "funding": [
+                {
+                    "url": "https://github.com/sebastianbergmann",
+                    "type": "github"
+                }
+            ],
+            "time": "2024-07-03T04:45:54+00:00"
+        },
+        {
+            "name": "sebastian/comparator",
+            "version": "6.3.3",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/sebastianbergmann/comparator.git",
+                "reference": "2c95e1e86cb8dd41beb8d502057d1081ccc8eca9"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/sebastianbergmann/comparator/zipball/2c95e1e86cb8dd41beb8d502057d1081ccc8eca9",
+                "reference": "2c95e1e86cb8dd41beb8d502057d1081ccc8eca9",
+>>>>>>> gestion_tournoi_match
                 "shasum": ""
             },
             "require": {
                 "ext-dom": "*",
                 "ext-mbstring": "*",
+<<<<<<< HEAD
                 "php": ">=8.3",
                 "sebastian/diff": "^7.0",
                 "sebastian/exporter": "^7.0"
             },
             "require-dev": {
                 "phpunit/phpunit": "^12.2"
+=======
+                "php": ">=8.2",
+                "sebastian/diff": "^6.0",
+                "sebastian/exporter": "^6.0"
+            },
+            "require-dev": {
+                "phpunit/phpunit": "^11.4"
+>>>>>>> gestion_tournoi_match
             },
             "suggest": {
                 "ext-bcmath": "For comparing BcMath\\Number objects"
@@ -10051,7 +10794,11 @@
             "type": "library",
             "extra": {
                 "branch-alias": {
+<<<<<<< HEAD
                     "dev-main": "7.1-dev"
+=======
+                    "dev-main": "6.3-dev"
+>>>>>>> gestion_tournoi_match
                 }
             },
             "autoload": {
@@ -10091,7 +10838,11 @@
             "support": {
                 "issues": "https://github.com/sebastianbergmann/comparator/issues",
                 "security": "https://github.com/sebastianbergmann/comparator/security/policy",
+<<<<<<< HEAD
                 "source": "https://github.com/sebastianbergmann/comparator/tree/7.1.4"
+=======
+                "source": "https://github.com/sebastianbergmann/comparator/tree/6.3.3"
+>>>>>>> gestion_tournoi_match
             },
             "funding": [
                 {
@@ -10111,6 +10862,7 @@
                     "type": "tidelift"
                 }
             ],
+<<<<<<< HEAD
             "time": "2026-01-24T09:28:48+00:00"
         },
         {
@@ -10125,19 +10877,46 @@
                 "type": "zip",
                 "url": "https://api.github.com/repos/sebastianbergmann/complexity/zipball/bad4316aba5303d0221f43f8cee37eb58d384bbb",
                 "reference": "bad4316aba5303d0221f43f8cee37eb58d384bbb",
+=======
+            "time": "2026-01-24T09:26:40+00:00"
+        },
+        {
+            "name": "sebastian/complexity",
+            "version": "4.0.1",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/sebastianbergmann/complexity.git",
+                "reference": "ee41d384ab1906c68852636b6de493846e13e5a0"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/sebastianbergmann/complexity/zipball/ee41d384ab1906c68852636b6de493846e13e5a0",
+                "reference": "ee41d384ab1906c68852636b6de493846e13e5a0",
+>>>>>>> gestion_tournoi_match
                 "shasum": ""
             },
             "require": {
                 "nikic/php-parser": "^5.0",
+<<<<<<< HEAD
                 "php": ">=8.3"
             },
             "require-dev": {
                 "phpunit/phpunit": "^12.0"
+=======
+                "php": ">=8.2"
+            },
+            "require-dev": {
+                "phpunit/phpunit": "^11.0"
+>>>>>>> gestion_tournoi_match
             },
             "type": "library",
             "extra": {
                 "branch-alias": {
+<<<<<<< HEAD
                     "dev-main": "5.0-dev"
+=======
+                    "dev-main": "4.0-dev"
+>>>>>>> gestion_tournoi_match
                 }
             },
             "autoload": {
@@ -10161,7 +10940,11 @@
             "support": {
                 "issues": "https://github.com/sebastianbergmann/complexity/issues",
                 "security": "https://github.com/sebastianbergmann/complexity/security/policy",
+<<<<<<< HEAD
                 "source": "https://github.com/sebastianbergmann/complexity/tree/5.0.0"
+=======
+                "source": "https://github.com/sebastianbergmann/complexity/tree/4.0.1"
+>>>>>>> gestion_tournoi_match
             },
             "funding": [
                 {
@@ -10169,6 +10952,7 @@
                     "type": "github"
                 }
             ],
+<<<<<<< HEAD
             "time": "2025-02-07T04:55:25+00:00"
         },
         {
@@ -10191,11 +10975,39 @@
             "require-dev": {
                 "phpunit/phpunit": "^12.0",
                 "symfony/process": "^7.2"
+=======
+            "time": "2024-07-03T04:49:50+00:00"
+        },
+        {
+            "name": "sebastian/diff",
+            "version": "6.0.2",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/sebastianbergmann/diff.git",
+                "reference": "b4ccd857127db5d41a5b676f24b51371d76d8544"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/sebastianbergmann/diff/zipball/b4ccd857127db5d41a5b676f24b51371d76d8544",
+                "reference": "b4ccd857127db5d41a5b676f24b51371d76d8544",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=8.2"
+            },
+            "require-dev": {
+                "phpunit/phpunit": "^11.0",
+                "symfony/process": "^4.2 || ^5"
+>>>>>>> gestion_tournoi_match
             },
             "type": "library",
             "extra": {
                 "branch-alias": {
+<<<<<<< HEAD
                     "dev-main": "7.0-dev"
+=======
+                    "dev-main": "6.0-dev"
+>>>>>>> gestion_tournoi_match
                 }
             },
             "autoload": {
@@ -10228,7 +11040,11 @@
             "support": {
                 "issues": "https://github.com/sebastianbergmann/diff/issues",
                 "security": "https://github.com/sebastianbergmann/diff/security/policy",
+<<<<<<< HEAD
                 "source": "https://github.com/sebastianbergmann/diff/tree/7.0.0"
+=======
+                "source": "https://github.com/sebastianbergmann/diff/tree/6.0.2"
+>>>>>>> gestion_tournoi_match
             },
             "funding": [
                 {
@@ -10236,6 +11052,7 @@
                     "type": "github"
                 }
             ],
+<<<<<<< HEAD
             "time": "2025-02-07T04:55:46+00:00"
         },
         {
@@ -10257,6 +11074,29 @@
             },
             "require-dev": {
                 "phpunit/phpunit": "^12.0"
+=======
+            "time": "2024-07-03T04:53:05+00:00"
+        },
+        {
+            "name": "sebastian/environment",
+            "version": "7.2.1",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/sebastianbergmann/environment.git",
+                "reference": "a5c75038693ad2e8d4b6c15ba2403532647830c4"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/sebastianbergmann/environment/zipball/a5c75038693ad2e8d4b6c15ba2403532647830c4",
+                "reference": "a5c75038693ad2e8d4b6c15ba2403532647830c4",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=8.2"
+            },
+            "require-dev": {
+                "phpunit/phpunit": "^11.3"
+>>>>>>> gestion_tournoi_match
             },
             "suggest": {
                 "ext-posix": "*"
@@ -10264,7 +11104,11 @@
             "type": "library",
             "extra": {
                 "branch-alias": {
+<<<<<<< HEAD
                     "dev-main": "8.0-dev"
+=======
+                    "dev-main": "7.2-dev"
+>>>>>>> gestion_tournoi_match
                 }
             },
             "autoload": {
@@ -10292,7 +11136,11 @@
             "support": {
                 "issues": "https://github.com/sebastianbergmann/environment/issues",
                 "security": "https://github.com/sebastianbergmann/environment/security/policy",
+<<<<<<< HEAD
                 "source": "https://github.com/sebastianbergmann/environment/tree/8.0.3"
+=======
+                "source": "https://github.com/sebastianbergmann/environment/tree/7.2.1"
+>>>>>>> gestion_tournoi_match
             },
             "funding": [
                 {
@@ -10312,6 +11160,7 @@
                     "type": "tidelift"
                 }
             ],
+<<<<<<< HEAD
             "time": "2025-08-12T14:11:56+00:00"
         },
         {
@@ -10326,20 +11175,48 @@
                 "type": "zip",
                 "url": "https://api.github.com/repos/sebastianbergmann/exporter/zipball/016951ae10980765e4e7aee491eb288c64e505b7",
                 "reference": "016951ae10980765e4e7aee491eb288c64e505b7",
+=======
+            "time": "2025-05-21T11:55:47+00:00"
+        },
+        {
+            "name": "sebastian/exporter",
+            "version": "6.3.2",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/sebastianbergmann/exporter.git",
+                "reference": "70a298763b40b213ec087c51c739efcaa90bcd74"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/sebastianbergmann/exporter/zipball/70a298763b40b213ec087c51c739efcaa90bcd74",
+                "reference": "70a298763b40b213ec087c51c739efcaa90bcd74",
+>>>>>>> gestion_tournoi_match
                 "shasum": ""
             },
             "require": {
                 "ext-mbstring": "*",
+<<<<<<< HEAD
                 "php": ">=8.3",
                 "sebastian/recursion-context": "^7.0"
             },
             "require-dev": {
                 "phpunit/phpunit": "^12.0"
+=======
+                "php": ">=8.2",
+                "sebastian/recursion-context": "^6.0"
+            },
+            "require-dev": {
+                "phpunit/phpunit": "^11.3"
+>>>>>>> gestion_tournoi_match
             },
             "type": "library",
             "extra": {
                 "branch-alias": {
+<<<<<<< HEAD
                     "dev-main": "7.0-dev"
+=======
+                    "dev-main": "6.3-dev"
+>>>>>>> gestion_tournoi_match
                 }
             },
             "autoload": {
@@ -10382,7 +11259,11 @@
             "support": {
                 "issues": "https://github.com/sebastianbergmann/exporter/issues",
                 "security": "https://github.com/sebastianbergmann/exporter/security/policy",
+<<<<<<< HEAD
                 "source": "https://github.com/sebastianbergmann/exporter/tree/7.0.2"
+=======
+                "source": "https://github.com/sebastianbergmann/exporter/tree/6.3.2"
+>>>>>>> gestion_tournoi_match
             },
             "funding": [
                 {
@@ -10402,6 +11283,7 @@
                     "type": "tidelift"
                 }
             ],
+<<<<<<< HEAD
             "time": "2025-09-24T06:16:11+00:00"
         },
         {
@@ -10426,11 +11308,41 @@
             "require-dev": {
                 "ext-dom": "*",
                 "phpunit/phpunit": "^12.0"
+=======
+            "time": "2025-09-24T06:12:51+00:00"
+        },
+        {
+            "name": "sebastian/global-state",
+            "version": "7.0.2",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/sebastianbergmann/global-state.git",
+                "reference": "3be331570a721f9a4b5917f4209773de17f747d7"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/sebastianbergmann/global-state/zipball/3be331570a721f9a4b5917f4209773de17f747d7",
+                "reference": "3be331570a721f9a4b5917f4209773de17f747d7",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=8.2",
+                "sebastian/object-reflector": "^4.0",
+                "sebastian/recursion-context": "^6.0"
+            },
+            "require-dev": {
+                "ext-dom": "*",
+                "phpunit/phpunit": "^11.0"
+>>>>>>> gestion_tournoi_match
             },
             "type": "library",
             "extra": {
                 "branch-alias": {
+<<<<<<< HEAD
                     "dev-main": "8.0-dev"
+=======
+                    "dev-main": "7.0-dev"
+>>>>>>> gestion_tournoi_match
                 }
             },
             "autoload": {
@@ -10456,12 +11368,17 @@
             "support": {
                 "issues": "https://github.com/sebastianbergmann/global-state/issues",
                 "security": "https://github.com/sebastianbergmann/global-state/security/policy",
+<<<<<<< HEAD
                 "source": "https://github.com/sebastianbergmann/global-state/tree/8.0.2"
+=======
+                "source": "https://github.com/sebastianbergmann/global-state/tree/7.0.2"
+>>>>>>> gestion_tournoi_match
             },
             "funding": [
                 {
                     "url": "https://github.com/sebastianbergmann",
                     "type": "github"
+<<<<<<< HEAD
                 },
                 {
                     "url": "https://liberapay.com/sebastianbergmann",
@@ -10490,19 +11407,48 @@
                 "type": "zip",
                 "url": "https://api.github.com/repos/sebastianbergmann/lines-of-code/zipball/97ffee3bcfb5805568d6af7f0f893678fc076d2f",
                 "reference": "97ffee3bcfb5805568d6af7f0f893678fc076d2f",
+=======
+                }
+            ],
+            "time": "2024-07-03T04:57:36+00:00"
+        },
+        {
+            "name": "sebastian/lines-of-code",
+            "version": "3.0.1",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/sebastianbergmann/lines-of-code.git",
+                "reference": "d36ad0d782e5756913e42ad87cb2890f4ffe467a"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/sebastianbergmann/lines-of-code/zipball/d36ad0d782e5756913e42ad87cb2890f4ffe467a",
+                "reference": "d36ad0d782e5756913e42ad87cb2890f4ffe467a",
+>>>>>>> gestion_tournoi_match
                 "shasum": ""
             },
             "require": {
                 "nikic/php-parser": "^5.0",
+<<<<<<< HEAD
                 "php": ">=8.3"
             },
             "require-dev": {
                 "phpunit/phpunit": "^12.0"
+=======
+                "php": ">=8.2"
+            },
+            "require-dev": {
+                "phpunit/phpunit": "^11.0"
+>>>>>>> gestion_tournoi_match
             },
             "type": "library",
             "extra": {
                 "branch-alias": {
+<<<<<<< HEAD
                     "dev-main": "4.0-dev"
+=======
+                    "dev-main": "3.0-dev"
+>>>>>>> gestion_tournoi_match
                 }
             },
             "autoload": {
@@ -10526,7 +11472,11 @@
             "support": {
                 "issues": "https://github.com/sebastianbergmann/lines-of-code/issues",
                 "security": "https://github.com/sebastianbergmann/lines-of-code/security/policy",
+<<<<<<< HEAD
                 "source": "https://github.com/sebastianbergmann/lines-of-code/tree/4.0.0"
+=======
+                "source": "https://github.com/sebastianbergmann/lines-of-code/tree/3.0.1"
+>>>>>>> gestion_tournoi_match
             },
             "funding": [
                 {
@@ -10534,6 +11484,7 @@
                     "type": "github"
                 }
             ],
+<<<<<<< HEAD
             "time": "2025-02-07T04:57:28+00:00"
         },
         {
@@ -10557,11 +11508,40 @@
             },
             "require-dev": {
                 "phpunit/phpunit": "^12.0"
+=======
+            "time": "2024-07-03T04:58:38+00:00"
+        },
+        {
+            "name": "sebastian/object-enumerator",
+            "version": "6.0.1",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/sebastianbergmann/object-enumerator.git",
+                "reference": "f5b498e631a74204185071eb41f33f38d64608aa"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/sebastianbergmann/object-enumerator/zipball/f5b498e631a74204185071eb41f33f38d64608aa",
+                "reference": "f5b498e631a74204185071eb41f33f38d64608aa",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=8.2",
+                "sebastian/object-reflector": "^4.0",
+                "sebastian/recursion-context": "^6.0"
+            },
+            "require-dev": {
+                "phpunit/phpunit": "^11.0"
+>>>>>>> gestion_tournoi_match
             },
             "type": "library",
             "extra": {
                 "branch-alias": {
+<<<<<<< HEAD
                     "dev-main": "7.0-dev"
+=======
+                    "dev-main": "6.0-dev"
+>>>>>>> gestion_tournoi_match
                 }
             },
             "autoload": {
@@ -10584,7 +11564,11 @@
             "support": {
                 "issues": "https://github.com/sebastianbergmann/object-enumerator/issues",
                 "security": "https://github.com/sebastianbergmann/object-enumerator/security/policy",
+<<<<<<< HEAD
                 "source": "https://github.com/sebastianbergmann/object-enumerator/tree/7.0.0"
+=======
+                "source": "https://github.com/sebastianbergmann/object-enumerator/tree/6.0.1"
+>>>>>>> gestion_tournoi_match
             },
             "funding": [
                 {
@@ -10592,6 +11576,7 @@
                     "type": "github"
                 }
             ],
+<<<<<<< HEAD
             "time": "2025-02-07T04:57:48+00:00"
         },
         {
@@ -10613,11 +11598,38 @@
             },
             "require-dev": {
                 "phpunit/phpunit": "^12.0"
+=======
+            "time": "2024-07-03T05:00:13+00:00"
+        },
+        {
+            "name": "sebastian/object-reflector",
+            "version": "4.0.1",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/sebastianbergmann/object-reflector.git",
+                "reference": "6e1a43b411b2ad34146dee7524cb13a068bb35f9"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/sebastianbergmann/object-reflector/zipball/6e1a43b411b2ad34146dee7524cb13a068bb35f9",
+                "reference": "6e1a43b411b2ad34146dee7524cb13a068bb35f9",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=8.2"
+            },
+            "require-dev": {
+                "phpunit/phpunit": "^11.0"
+>>>>>>> gestion_tournoi_match
             },
             "type": "library",
             "extra": {
                 "branch-alias": {
+<<<<<<< HEAD
                     "dev-main": "5.0-dev"
+=======
+                    "dev-main": "4.0-dev"
+>>>>>>> gestion_tournoi_match
                 }
             },
             "autoload": {
@@ -10640,7 +11652,11 @@
             "support": {
                 "issues": "https://github.com/sebastianbergmann/object-reflector/issues",
                 "security": "https://github.com/sebastianbergmann/object-reflector/security/policy",
+<<<<<<< HEAD
                 "source": "https://github.com/sebastianbergmann/object-reflector/tree/5.0.0"
+=======
+                "source": "https://github.com/sebastianbergmann/object-reflector/tree/4.0.1"
+>>>>>>> gestion_tournoi_match
             },
             "funding": [
                 {
@@ -10648,6 +11664,7 @@
                     "type": "github"
                 }
             ],
+<<<<<<< HEAD
             "time": "2025-02-07T04:58:17+00:00"
         },
         {
@@ -10669,11 +11686,38 @@
             },
             "require-dev": {
                 "phpunit/phpunit": "^12.0"
+=======
+            "time": "2024-07-03T05:01:32+00:00"
+        },
+        {
+            "name": "sebastian/recursion-context",
+            "version": "6.0.3",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/sebastianbergmann/recursion-context.git",
+                "reference": "f6458abbf32a6c8174f8f26261475dc133b3d9dc"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/sebastianbergmann/recursion-context/zipball/f6458abbf32a6c8174f8f26261475dc133b3d9dc",
+                "reference": "f6458abbf32a6c8174f8f26261475dc133b3d9dc",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=8.2"
+            },
+            "require-dev": {
+                "phpunit/phpunit": "^11.3"
+>>>>>>> gestion_tournoi_match
             },
             "type": "library",
             "extra": {
                 "branch-alias": {
+<<<<<<< HEAD
                     "dev-main": "7.0-dev"
+=======
+                    "dev-main": "6.0-dev"
+>>>>>>> gestion_tournoi_match
                 }
             },
             "autoload": {
@@ -10704,7 +11748,11 @@
             "support": {
                 "issues": "https://github.com/sebastianbergmann/recursion-context/issues",
                 "security": "https://github.com/sebastianbergmann/recursion-context/security/policy",
+<<<<<<< HEAD
                 "source": "https://github.com/sebastianbergmann/recursion-context/tree/7.0.1"
+=======
+                "source": "https://github.com/sebastianbergmann/recursion-context/tree/6.0.3"
+>>>>>>> gestion_tournoi_match
             },
             "funding": [
                 {
@@ -10724,6 +11772,7 @@
                     "type": "tidelift"
                 }
             ],
+<<<<<<< HEAD
             "time": "2025-08-13T04:44:59+00:00"
         },
         {
@@ -10745,11 +11794,38 @@
             },
             "require-dev": {
                 "phpunit/phpunit": "^12.0"
+=======
+            "time": "2025-08-13T04:42:22+00:00"
+        },
+        {
+            "name": "sebastian/type",
+            "version": "5.1.3",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/sebastianbergmann/type.git",
+                "reference": "f77d2d4e78738c98d9a68d2596fe5e8fa380f449"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/sebastianbergmann/type/zipball/f77d2d4e78738c98d9a68d2596fe5e8fa380f449",
+                "reference": "f77d2d4e78738c98d9a68d2596fe5e8fa380f449",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=8.2"
+            },
+            "require-dev": {
+                "phpunit/phpunit": "^11.3"
+>>>>>>> gestion_tournoi_match
             },
             "type": "library",
             "extra": {
                 "branch-alias": {
+<<<<<<< HEAD
                     "dev-main": "6.0-dev"
+=======
+                    "dev-main": "5.1-dev"
+>>>>>>> gestion_tournoi_match
                 }
             },
             "autoload": {
@@ -10773,7 +11849,11 @@
             "support": {
                 "issues": "https://github.com/sebastianbergmann/type/issues",
                 "security": "https://github.com/sebastianbergmann/type/security/policy",
+<<<<<<< HEAD
                 "source": "https://github.com/sebastianbergmann/type/tree/6.0.3"
+=======
+                "source": "https://github.com/sebastianbergmann/type/tree/5.1.3"
+>>>>>>> gestion_tournoi_match
             },
             "funding": [
                 {
@@ -10793,6 +11873,7 @@
                     "type": "tidelift"
                 }
             ],
+<<<<<<< HEAD
             "time": "2025-08-09T06:57:12+00:00"
         },
         {
@@ -10811,11 +11892,35 @@
             },
             "require": {
                 "php": ">=8.3"
+=======
+            "time": "2025-08-09T06:55:48+00:00"
+        },
+        {
+            "name": "sebastian/version",
+            "version": "5.0.2",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/sebastianbergmann/version.git",
+                "reference": "c687e3387b99f5b03b6caa64c74b63e2936ff874"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/sebastianbergmann/version/zipball/c687e3387b99f5b03b6caa64c74b63e2936ff874",
+                "reference": "c687e3387b99f5b03b6caa64c74b63e2936ff874",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=8.2"
+>>>>>>> gestion_tournoi_match
             },
             "type": "library",
             "extra": {
                 "branch-alias": {
+<<<<<<< HEAD
                     "dev-main": "6.0-dev"
+=======
+                    "dev-main": "5.0-dev"
+>>>>>>> gestion_tournoi_match
                 }
             },
             "autoload": {
@@ -10839,7 +11944,11 @@
             "support": {
                 "issues": "https://github.com/sebastianbergmann/version/issues",
                 "security": "https://github.com/sebastianbergmann/version/security/policy",
+<<<<<<< HEAD
                 "source": "https://github.com/sebastianbergmann/version/tree/6.0.0"
+=======
+                "source": "https://github.com/sebastianbergmann/version/tree/5.0.2"
+>>>>>>> gestion_tournoi_match
             },
             "funding": [
                 {
@@ -10847,7 +11956,11 @@
                     "type": "github"
                 }
             ],
+<<<<<<< HEAD
             "time": "2025-02-07T05:00:38+00:00"
+=======
+            "time": "2024-10-09T05:16:32+00:00"
+>>>>>>> gestion_tournoi_match
         },
         {
             "name": "staabm/side-effects-detector",
@@ -11377,6 +12490,7 @@
         },
         {
             "name": "theseer/tokenizer",
+<<<<<<< HEAD
             "version": "2.0.1",
             "source": {
                 "type": "git",
@@ -11387,13 +12501,29 @@
                 "type": "zip",
                 "url": "https://api.github.com/repos/theseer/tokenizer/zipball/7989e43bf381af0eac72e4f0ca5bcbfa81658be4",
                 "reference": "7989e43bf381af0eac72e4f0ca5bcbfa81658be4",
+=======
+            "version": "1.3.1",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/theseer/tokenizer.git",
+                "reference": "b7489ce515e168639d17feec34b8847c326b0b3c"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/theseer/tokenizer/zipball/b7489ce515e168639d17feec34b8847c326b0b3c",
+                "reference": "b7489ce515e168639d17feec34b8847c326b0b3c",
+>>>>>>> gestion_tournoi_match
                 "shasum": ""
             },
             "require": {
                 "ext-dom": "*",
                 "ext-tokenizer": "*",
                 "ext-xmlwriter": "*",
+<<<<<<< HEAD
                 "php": "^8.1"
+=======
+                "php": "^7.2 || ^8.0"
+>>>>>>> gestion_tournoi_match
             },
             "type": "library",
             "autoload": {
@@ -11415,7 +12545,11 @@
             "description": "A small library for converting tokenized PHP source code into XML and potentially other formats",
             "support": {
                 "issues": "https://github.com/theseer/tokenizer/issues",
+<<<<<<< HEAD
                 "source": "https://github.com/theseer/tokenizer/tree/2.0.1"
+=======
+                "source": "https://github.com/theseer/tokenizer/tree/1.3.1"
+>>>>>>> gestion_tournoi_match
             },
             "funding": [
                 {
@@ -11423,12 +12557,20 @@
                     "type": "github"
                 }
             ],
+<<<<<<< HEAD
             "time": "2025-12-08T11:19:18+00:00"
+=======
+            "time": "2025-11-17T20:03:58+00:00"
+>>>>>>> gestion_tournoi_match
         }
     ],
     "aliases": [],
     "minimum-stability": "stable",
+<<<<<<< HEAD
     "stability-flags": [],
+=======
+    "stability-flags": {},
+>>>>>>> gestion_tournoi_match
     "prefer-stable": true,
     "prefer-lowest": false,
     "platform": {
@@ -11436,6 +12578,11 @@
         "ext-ctype": "*",
         "ext-iconv": "*"
     },
+<<<<<<< HEAD
     "platform-dev": [],
     "plugin-api-version": "2.6.0"
+=======
+    "platform-dev": {},
+    "plugin-api-version": "2.9.0"
+>>>>>>> gestion_tournoi_match
 }
