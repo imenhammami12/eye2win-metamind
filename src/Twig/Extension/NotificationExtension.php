@@ -7,7 +7,7 @@ use Symfony\Bundle\SecurityBundle\Security;
 use Twig\Extension\AbstractExtension;
 use Twig\Extension\GlobalsInterface;
 
-class NotificationExtension extends AbstractExtension implements GlobalsInterface
+class NotificationExtension extends AbstractExtension implements GlobalsInterface /// GlobalsInterface : it can inject vars into every template automatically
 {
     public function __construct(
         private NotificationRepository $notificationRepo,
@@ -38,6 +38,6 @@ class NotificationExtension extends AbstractExtension implements GlobalsInterfac
             'navNotifications' => $notifs,
             'navUnreadCount' => $unread,
         ];
-    }
+    }/// this is made so navbar/layout can always display notifications without each controller needing to pass them.
 
 }

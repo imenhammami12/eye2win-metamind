@@ -28,13 +28,15 @@ class NotificationRepository extends ServiceEntityRepository
             ->andWhere('n.type IN (:types)')
             ->setParameter('user', $user)
             ->setParameter('types', [NotificationType::CHANNEL_APPROVED, NotificationType::CHANNEL_REJECTED])
-            // ✅ unread first, then newest
+            // unread first, then newest
             ->orderBy('n.read', 'ASC')
             ->addOrderBy('n.createdAt', 'DESC')
             ->setMaxResults($limit)
             ->getQuery()
             ->getResult();
-    }
+    }/// returns notifs for user with only CHANNEL_APPROVED or CHANNEL_REJECTED
+    /// used in channelController::index
+    /// twig global extension (navbar show notifs anywhere) (not only in community)
 
 
     //    /**

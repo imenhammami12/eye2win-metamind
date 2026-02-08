@@ -52,8 +52,7 @@ class ChannelRepository extends ServiceEntityRepository
             ;
 
         return $qb->getQuery()->getResult();
-
-    }
+    } /// returns only channels that are approved + active /// used in channelController index+show
 
     public function findAdminList(string $q, string $status, string $type, string $active): array
     {
@@ -81,7 +80,7 @@ class ChannelRepository extends ServiceEntityRepository
         }
 
         return $qb->orderBy('c.createdAt', 'DESC')->getQuery()->getResult();
-    }
+    }/// used in adminchannelcontroller for filtering
 
     public function countByStatus(string $status): int
     {
@@ -91,7 +90,7 @@ class ChannelRepository extends ServiceEntityRepository
             ->setParameter('s', $status)
             ->getQuery()
             ->getSingleScalarResult();
-    }
+    } /// count channels by status user in adminchannelcontroller for pending count in admin ui
 
 
 }

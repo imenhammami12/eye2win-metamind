@@ -26,7 +26,7 @@ final class MessageController extends AbstractController
     public function edit(Message $message, Request $request, EntityManagerInterface $em): Response
     {
         if ($message->getSenderEmail() !== $this->getUser()->getUserIdentifier()) {
-            throw $this->createAccessDeniedException("Tu ne peux pas modifier ce message.");
+            throw $this->createAccessDeniedException("you can't edit this message.");
         }
 
         if ($message->isDeleted()) {
@@ -36,7 +36,7 @@ final class MessageController extends AbstractController
         $form = $this->createForm(MessageType::class, $message);
         $form->handleRequest($request);
 
-        // ✅ POST => save
+        // POST => save
         if ($request->isMethod('POST') && $form->isSubmitted() && $form->isValid()) {
             $message->setEditedAt(new \DateTimeImmutable());
             $em->flush();
@@ -44,7 +44,7 @@ final class MessageController extends AbstractController
             return $this->redirectToRoute('community_channels_show', ['id' => $message->getChannel()->getId()]);
         }
 
-        // ✅ GET => retourne sur le channel avec ?edit=id (inline)
+        // GET => retourne sur le channel avec ?edit=id (inline)
         return $this->redirectToRoute('community_channels_show', [
             'id' => $message->getChannel()->getId(),
             'edit' => $message->getId(),
@@ -56,7 +56,7 @@ final class MessageController extends AbstractController
     public function delete(Message $message, Request $request, EntityManagerInterface $em): Response
     {
         if ($message->getSenderEmail() !== $this->getUser()->getUserIdentifier()) {
-            throw $this->createAccessDeniedException("Tu ne peux pas supprimer ce message.");
+            throw $this->createAccessDeniedException("you can't delete message.");
         }
 
         if ($this->isCsrfTokenValid('delete_message_'.$message->getId(), $request->request->get('_token'))) {

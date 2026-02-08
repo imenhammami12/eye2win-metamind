@@ -24,7 +24,7 @@ class AdminChannelController extends AbstractController
     {
         $q = trim((string) $request->query->get('q', ''));
         $status = (string) $request->query->get('status', 'all'); // all|approved|pending|rejected
-        $type = (string) $request->query->get('type', 'all');     // all|public|private (selon ton enum)
+        $type = (string) $request->query->get('type', 'all');     // all|public|private (enum)
         $active = (string) $request->query->get('active', 'all'); // all|1|0
 
         $channels = $repo->findAdminList($q, $status, $type, $active);
@@ -123,7 +123,7 @@ class AdminChannelController extends AbstractController
             $channel->setCreatedAt($now);
             $channel->setCreatedBy($this->getUser()->getUserIdentifier());
 
-            // ✅ Admin creates directly approved + active
+            // Admin creates directly approved + active
             $channel->setStatus(Channel::STATUS_APPROVED);
             $channel->setIsActive(true);
             $channel->setApprovedBy($this->getUser()->getUserIdentifier());
@@ -150,7 +150,7 @@ class AdminChannelController extends AbstractController
 
         if ($form->isSubmitted() && $form->isValid()) {
             $em->flush();
-            $this->addFlash('success', 'Channel modifié ✅');
+            $this->addFlash('success', 'Channel edited ✅');
             return $this->redirectToRoute('admin_channels_index');
         }
 
@@ -171,7 +171,7 @@ class AdminChannelController extends AbstractController
         $em->remove($channel);
         $em->flush();
 
-        $this->addFlash('success', 'Channel supprimé ✅');
+        $this->addFlash('success', 'Channel deleted ✅');
         return $this->redirectToRoute('admin_channels_index');
     }
 

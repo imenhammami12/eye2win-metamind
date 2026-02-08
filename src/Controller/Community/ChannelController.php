@@ -29,7 +29,7 @@ class ChannelController extends AbstractController
 
         return $this->render('community/channel/index.html.twig', [
             'channels' => $channels,
-            'channelNotifications' => $channelNotifications,
+            'channelNotifications' => $channelNotifications, //notif is now no more displayed in the page itself (icon)
         ]);
     }
 
@@ -52,7 +52,7 @@ class ChannelController extends AbstractController
             $em->persist($channel);
             $em->flush();
 
-            $this->addFlash('success', 'Channel créé ✅ En attente de validation admin.');
+            $this->addFlash('success', 'Channel created ✅ Waiting for admin validation.');
             return $this->redirectToRoute('community_channels_index');
         }
 
@@ -70,7 +70,7 @@ class ChannelController extends AbstractController
         ChannelRepository $channelRepo
     ): Response
     {
-        // ✅ Access control: only APPROVED+active+allowed (same logic as index)
+        // Access control: only APPROVED+active+allowed (same logic as index)
         $visible = $channelRepo->findVisibleForUser();
         $visibleIds = array_map(fn($c) => $c->getId(), $visible);
 
@@ -139,10 +139,10 @@ class ChannelController extends AbstractController
     #[Route('/channels/{id}/edit', name: 'community_channels_edit', requirements: ['id' => '\d+'])]
     public function edit(Channel $channel, Request $request, EntityManagerInterface $em): Response
     {
-        // ✅ only creator can edit
+        // only creator can edit
         $identifier = $this->getUser()?->getUserIdentifier();
         if ($channel->getCreatedBy() !== $identifier) {
-            throw $this->createAccessDeniedException("Vous ne pouvez pas modifier ce channel.");
+            throw $this->createAccessDeniedException("you can't modify this channel.");
         }
 
         $form = $this->createForm(ChannelType::class, $channel);
@@ -151,7 +151,7 @@ class ChannelController extends AbstractController
         if ($form->isSubmitted() && $form->isValid()) {
             $em->flush();
 
-            $this->addFlash('success', 'Channel modifié ✅');
+            $this->addFlash('success', 'Channel edited ✅');
             return $this->redirectToRoute('community_channels_index');
         }
 
@@ -165,10 +165,10 @@ class ChannelController extends AbstractController
     #[Route('/channels/{id}/delete', name: 'community_channels_delete', methods: ['POST'], requirements: ['id' => '\d+'])]
     public function delete(Channel $channel, Request $request, EntityManagerInterface $em): Response
     {
-        // ✅ only creator can delete
+        // only creator can delete
         $identifier = $this->getUser()?->getUserIdentifier();
         if ($channel->getCreatedBy() !== $identifier) {
-            throw $this->createAccessDeniedException("Vous ne pouvez pas supprimer ce channel.");
+            throw $this->createAccessDeniedException("you can't delete this channel.");
         }
 
         if (!$this->isCsrfTokenValid('delete_channel_'.$channel->getId(), $request->request->get('_token'))) {

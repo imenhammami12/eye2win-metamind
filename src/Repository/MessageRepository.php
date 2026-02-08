@@ -50,7 +50,7 @@ class MessageRepository extends ServiceEntityRepository
             ->setParameter('del', false)
             ->orderBy('m.sentAt', 'ASC')
             ->getQuery()->getResult();
-    }
+    } /// Returns messages for a channel but only non-deleted ones /// old version, it doesn't show the deleted messages
 
     public function findForChannelAll(int $channelId): array
     {
@@ -60,7 +60,8 @@ class MessageRepository extends ServiceEntityRepository
             ->orderBy('m.sentAt', 'ASC')
             ->getQuery()
             ->getResult();
-    }
+    }/// Returns all messages including deleted
+    /// used in channel show , deleted messages appear with placeholder text
 
     public function findAdminList(string $q = '', string $status = 'active', string $sort = 'sentAt', string $dir = 'desc'): array
     {
@@ -80,7 +81,7 @@ class MessageRepository extends ServiceEntityRepository
                 ->setParameter('q', '%'.mb_strtolower($q).'%');
         }
 
-        // ✅ Sort whitelist
+        // Sort whitelist
         $map = [
             'sentAt'  => 'm.sentAt',
             'channel' => 'c.name',
@@ -94,13 +95,13 @@ class MessageRepository extends ServiceEntityRepository
 
         $qb->orderBy($sortField, $dir);
 
-        // stable sort (évite les résultats “qui bougent”)
+        // stable sort
         if ($sortField !== 'm.id') {
             $qb->addOrderBy('m.id', 'DESC');
         }
 
         return $qb->getQuery()->getResult();
-    }
+    }/// used in admincontrollermessage::index
 
 
 }
