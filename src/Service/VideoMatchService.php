@@ -15,7 +15,7 @@ class VideoMatchService
     ) {
     }
 
-    public function createFromUpload(User $user, string $title, string $gameType, UploadedFile $file): Video
+    public function createFromUpload(User $user, string $title, string $gameType, UploadedFile $file, string $visibility = 'PRIVATE'): Video
     {
         $upload = $this->cloudinaryUploader->uploadVideo($file);
 
@@ -30,6 +30,7 @@ class VideoMatchService
             ->setPublicId($upload['public_id'] ?? null)
             ->setDuration($upload['duration'] ?? null)
             ->setStatus('UPLOADED')
+            ->setVisibility($visibility)
             ->setUploadedAt(new \DateTime())
             ->setUploadedBy($user);
 

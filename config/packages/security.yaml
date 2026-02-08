@@ -81,7 +81,7 @@ security:
         - { path: ^/profile, roles: ROLE_USER }
         - { path: ^/upload, roles: ROLE_USER }
         - { path: ^/video, roles: ROLE_USER }
-        - { path: ^/dashboard, roles: ROLE_ADMIN }
+        - { path: ^/dashboard, roles: ROLE_USER }
 
 
 when@test:

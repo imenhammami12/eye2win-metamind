@@ -54,6 +54,12 @@
                     <i class="bi bi-people"></i>
                     <span>Users</span>
                 </a>
+
+                <a href="{{ path('admin_videos_index') }}" 
+                   class="{{ app.request.attributes.get('_route') starts with 'admin_videos' or app.request.attributes.get('_route') starts with 'admin_video' ? 'active' : '' }}">
+                    <i class="bi bi-camera-video"></i>
+                    <span>Videos</span>
+                </a>
                 
 
                 <a href="{{ path('admin_coach_applications_index') }}" 

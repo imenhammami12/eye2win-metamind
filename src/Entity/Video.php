@@ -42,6 +42,9 @@ class Video
     #[ORM\Column(length: 255)]
     private ?string $status = null;
 
+    #[ORM\Column(length: 10)]
+    private ?string $visibility = 'PRIVATE';
+
     #[ORM\ManyToOne(inversedBy: 'videos')]
     #[ORM\JoinColumn(nullable: false)]
     private ?User $uploadedBy = null;
@@ -55,6 +58,7 @@ class Video
     public function __construct()
     {
         $this->playerStats = new ArrayCollection();
+        $this->visibility = 'PRIVATE';
     }
 
     public function getId(): ?int
@@ -190,6 +194,18 @@ class Video
     public function setStatus(string $status): static
     {
         $this->status = $status;
+
+        return $this;
+    }
+
+    public function getVisibility(): ?string
+    {
+        return $this->visibility;
+    }
+
+    public function setVisibility(string $visibility): static
+    {
+        $this->visibility = $visibility;
 
         return $this;
     }

@@ -10,14 +10,14 @@
             <div class="stat-card-icon mx-auto mb-4" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); width: 100px; height: 100px; display: flex; align-items: center; justify-content: center; border-radius: 20px;">
                 <i class="bi bi-speedometer2 text-white" style="font-size: 48px;"></i>
             </div>
-            <h2 class="mb-3">Bienvenue dans l'administration</h2>
-            <p class="text-muted mb-4">Tableau de bord en cours de développement</p>
+            <h2 class="mb-3">Welcome to the admin panel</h2>
+            <p class="text-muted mb-4">Dashboard under development</p>
             <div class="d-flex gap-3 justify-content-center flex-wrap">
                 <a href="{{ path('app_home') }}" class="btn btn-outline-primary">
-                    <i class="bi bi-house me-2"></i>Retour au site
+                    <i class="bi bi-house me-2"></i>Back to site
                 </a>
                 <a href="{{ path('admin_logout') }}" class="btn btn-outline-danger">
-                    <i class="bi bi-box-arrow-right me-2"></i>Déconnexion
+                    <i class="bi bi-box-arrow-right me-2"></i>Logout
                 </a>
             </div>
         </div>
@@ -28,16 +28,16 @@
     <div class="col-md-6">
         <div class="table-card">
             <div class="table-header">
-                <h5><i class="bi bi-info-circle me-2"></i>Informations</h5>
+                <h5><i class="bi bi-info-circle me-2"></i>Information</h5>
             </div>
             <div class="p-4">
                 <p class="mb-3">
                     <i class="bi bi-person-badge text-primary me-2"></i>
-                    <strong>Utilisateur connecté:</strong> {{ app.user.username }}
+                    <strong>Logged-in user:</strong> {{ app.user.username }}
                 </p>
                 <p class="mb-3">
                     <i class="bi bi-shield-check text-success me-2"></i>
-                    <strong>Rôles:</strong> 
+                    <strong>Roles:</strong> 
                     {% for role in app.user.roles %}
                         <span class="badge bg-success">{{ role }}</span>
                     {% endfor %}
@@ -53,11 +53,63 @@
     <div class="col-md-6">
         <div class="table-card">
             <div class="table-header">
-                <h5><i class="bi bi-clock-history me-2"></i>Activité récente</h5>
+                <h5><i class="bi bi-clock-history me-2"></i>Recent activity</h5>
             </div>
             <div class="p-4 text-center text-muted">
                 <i class="bi bi-inbox" style="font-size: 48px; opacity: 0.3;"></i>
-                <p class="mt-3 mb-0">Aucune activité à afficher</p>
+                <p class="mt-3 mb-0">No activity to display</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row g-4 fade-in" style="animation-delay: 0.2s;">
+    <div class="col-12">
+        <div class="table-card">
+            <div class="table-header">
+                <h5><i class="bi bi-camera-video me-2"></i>All Videos</h5>
+            </div>
+            <div class="p-4">
+                {% if videos is empty %}
+                    <div class="alert alert-info">No videos available.</div>
+                {% else %}
+                    <div class="table-responsive">
+                        <table class="custom-table table">
+                            <thead>
+                                <tr>
+                                    <th style="width: 260px;">Title</th>
+                                    <th style="width: 180px;">Uploaded by</th>
+                                    <th style="width: 120px;">Status</th>
+                                    <th style="width: 150px;">Created at</th>
+                                    <th style="width: 140px;">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for video in videos %}
+                                    <tr>
+                                        <td>
+                                            <strong>{{ video.title }}</strong>
+                                            {% if video.gameType %}
+                                                <div class="text-muted small">{{ video.gameType }}</div>
+                                            {% endif %}
+                                        </td>
+                                        <td>{{ video.uploadedBy ? video.uploadedBy.username : '—' }}</td>
+                                        <td><span class="badge bg-info">{{ video.status }}</span></td>
+                                        <td>
+                                            <small class="text-muted">
+                                                <i class="bi bi-calendar3 me-1"></i>
+                                                {{ video.createdAt ? video.createdAt|date('M d, Y H:i') : '—' }}
+                                            </small>
+                                        </td>
+                                        <td>
+                                            <a href="{{ path('admin_videos_index') }}" class="btn btn-sm btn-outline-primary">Manage</a>
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                {% endif %}
             </div>
         </div>
     </div>

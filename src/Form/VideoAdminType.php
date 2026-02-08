@@ -45,6 +45,13 @@ class VideoAdminType extends AbstractType
                     'FAILED' => 'FAILED',
                 ],
             ]);
+        $builder->add('visibility', ChoiceType::class, [
+            'label' => 'Visibilité',
+            'choices' => [
+                'PRIVATE' => 'PRIVATE',
+                'PUBLIC' => 'PUBLIC',
+            ],
+        ]);
     }
 
     public function configureOptions(OptionsResolver $resolver): void

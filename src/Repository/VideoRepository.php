@@ -42,6 +42,22 @@ class VideoRepository extends ServiceEntityRepository
             ->getResult();
     }
 
+    /**
+     * @return Video[]
+     */
+    public function findVisibleForUser(User $user): array
+    {
+        return $this->createQueryBuilder('v')
+            ->leftJoin('v.uploadedBy', 'u')
+            ->addSelect('u')
+            ->andWhere('v.uploadedBy = :user OR v.visibility = :public')
+            ->setParameter('user', $user)
+            ->setParameter('public', 'PUBLIC')
+            ->orderBy('v.uploadedAt', 'DESC')
+            ->getQuery()
+            ->getResult();
+    }
+
 //    /**
 //     * @return Video[] Returns an array of Video objects
 //     */
