@@ -1,71 +1,478 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Create a Team{% endblock %}
+{% block title %}Create Your Gaming Team{% endblock %}
 
 {% block body %}
-<section class="breadcrumb_part">
+<!-- Breadcrumb Section -->
+<section class="breadcrumb_part breadcrumb_bg">
     <div class="container">
         <div class="row">
             <div class="col-lg-12">
-                <div class="breadcrumb_iner">
-                    <h2>Create a Team</h2>
-                </div>
-            </div>
-        </div>
-    </div>
-</section>
-
-<section class="blog_part section_padding">
-    <div class="container">
-        <div class="row justify-content-center">
-            <div class="col-lg-8">
-                <div class="card">
-                    <div class="card-body">
-                        <h4 class="mb-4"><i class="fas fa-users"></i> New Team</h4>
-                        
-                        {{ form_start(form, {'attr': {'novalidate': 'novalidate'}}) }}
-                        
-                        <div class="mb-3">
-                            {{ form_label(form.name) }}
-                            {{ form_widget(form.name) }}
-                            {{ form_errors(form.name) }}
-                            <small class="form-text text-muted">The name must be unique and representative</small>
+                <div class="breadcrumb">
+                    <div class="breadcrumb_iner">
+                        <div class="breadcrumb_iner_item">
+                            <h2>Create Team</h2>
+                            <p><a href="{{ path('app_home') }}">Home</a> <span>/</span> <a href="{{ path('app_teams_index') }}">Teams</a> <span>/</span> Create</p>
                         </div>
-                        
-                        <div class="mb-3">
-                            {{ form_label(form.description) }}
-                            {{ form_widget(form.description) }}
-                            {{ form_errors(form.description) }}
-                        </div>
-                        
-                        <div class="mb-3">
-                            {{ form_label(form.maxMembers) }}
-                            {{ form_widget(form.maxMembers) }}
-                            {{ form_errors(form.maxMembers) }}
-                            <small class="form-text text-muted">Maximum number of members (between 1 and 50)</small>
-                        </div>
-                        
-                        <div class="mb-3">
-                            {{ form_label(form.logoFile) }}
-                            {{ form_widget(form.logoFile) }}
-                            {{ form_errors(form.logoFile) }}
-                            <small class="form-text text-muted">Accepted formats: JPG, PNG, GIF, WEBP (Max: 2MB)</small>
-                        </div>
-                        
-                        <div class="d-grid gap-2">
-                            <button type="submit" class="btn btn-primary btn-lg">
-                                <i class="fas fa-save"></i> Create Team
-                            </button>
-                            <a href="{{ path('app_teams_index') }}" class="btn btn-secondary">
-                                <i class="fas fa-times"></i> Cancel
-                            </a>
-                        </div>
-                        
-                        {{ form_end(form) }}
                     </div>
                 </div>
             </div>
         </div>
     </div>
 </section>
+
+<!-- Team Creation Form Section -->
+<section class="team-creation-section section_padding">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-10">
+                <!-- Header Card -->
+                <div class="creation-header text-center mb-5">
+                    <h2 class="section-title">Build Your <span style="color: #ff0000;">Dream Team</span></h2>
+                    <p class="section-subtitle">Create a legendary gaming squad and dominate the battlefield</p>
+                </div>
+
+                <!-- Main Form Card -->
+                <div class="team-form-card">
+                    <div class="form-card-header">
+                        <i class="fas fa-users-cog"></i>
+                        <h4>Team Configuration</h4>
+                    </div>
+                    
+                    <div class="form-card-body">
+                        {{ form_start(form, {'attr': {'novalidate': 'novalidate', 'class': 'team-creation-form'}}) }}
+                        
+                        <!-- Team Name -->
+                        <div class="form-group-custom mb-4">
+                            <label class="form-label-custom">
+                                <i class="fas fa-shield-alt"></i> Team Name
+                            </label>
+                            {{ form_widget(form.name, {'attr': {'class': 'form-control-custom', 'placeholder': 'Enter your team name...'}}) }}
+                            {{ form_errors(form.name) }}
+                            <div class="form-hint">
+                                <i class="fas fa-info-circle"></i> Choose a unique and memorable name for your team
+                            </div>
+                        </div>
+                        
+                        <!-- Team Description -->
+                        <div class="form-group-custom mb-4">
+                            <label class="form-label-custom">
+                                <i class="fas fa-file-alt"></i> Team Description
+                            </label>
+                            {{ form_widget(form.description, {'attr': {'class': 'form-control-custom', 'placeholder': 'Describe your team\'s goals and playstyle...', 'rows': '5'}}) }}
+                            {{ form_errors(form.description) }}
+                            <div class="form-hint">
+                                <i class="fas fa-info-circle"></i> Tell others what your team is about
+                            </div>
+                        </div>
+                        
+                        <!-- Max Members -->
+                        <div class="form-group-custom mb-4">
+                            <label class="form-label-custom">
+                                <i class="fas fa-users"></i> Maximum Members
+                            </label>
+                            <div class="input-group-custom">
+                                {{ form_widget(form.maxMembers, {'attr': {'class': 'form-control-custom', 'min': '1', 'max': '50'}}) }}
+                                <span class="input-addon">Players</span>
+                            </div>
+                            {{ form_errors(form.maxMembers) }}
+                            <div class="form-hint">
+                                <i class="fas fa-info-circle"></i> Set the maximum number of members (1-50)
+                            </div>
+                        </div>
+                        
+                        <!-- Team Logo Upload -->
+                        <div class="form-group-custom mb-4">
+                            <label class="form-label-custom">
+                                <i class="fas fa-image"></i> Team Logo
+                            </label>
+                            <div class="logo-upload-area">
+                                <div class="upload-preview" id="logoPreview">
+                                    <i class="fas fa-cloud-upload-alt"></i>
+                                    <p>Click to upload or drag & drop</p>
+                                    <small>JPG, PNG, GIF, WEBP (Max: 2MB)</small>
+                                </div>
+                                {{ form_widget(form.logoFile, {'attr': {'class': 'file-input-custom', 'accept': 'image/*'}}) }}
+                            </div>
+                            {{ form_errors(form.logoFile) }}
+                            <div class="form-hint">
+                                <i class="fas fa-info-circle"></i> Upload a logo that represents your team
+                            </div>
+                        </div>
+                        
+                        <!-- Action Buttons -->
+                        <div class="form-actions">
+                            <button type="submit" class="btn_1">
+                                <i class="fas fa-rocket"></i> Launch Team
+                            </button>
+                            <a href="{{ path('app_teams_index') }}" class="btn_2">
+                                <i class="fas fa-times-circle"></i> Cancel
+                            </a>
+                        </div>
+                        
+                        {{ form_end(form) }}
+                    </div>
+                </div>
+
+                <!-- Help Section -->
+                <div class="help-section mt-5">
+                    <div class="row">
+                        <div class="col-md-4 mb-3">
+                            <div class="help-card">
+                                <div class="help-icon">
+                                    <i class="fas fa-trophy"></i>
+                                </div>
+                                <h5>Build to Win</h5>
+                                <p>Create a team with clear goals and strategies to dominate competitions</p>
+                            </div>
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <div class="help-card">
+                                <div class="help-icon">
+                                    <i class="fas fa-user-friends"></i>
+                                </div>
+                                <h5>Find Players</h5>
+                                <p>Recruit skilled players who share your vision and playstyle</p>
+                            </div>
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <div class="help-card">
+                                <div class="help-icon">
+                                    <i class="fas fa-chart-line"></i>
+                                </div>
+                                <h5>Track Progress</h5>
+                                <p>Monitor your team's performance and climb the leaderboards</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<style>
+/* Team Creation Section Styles */
+.team-creation-section {
+    background: linear-gradient(180deg, rgba(11,17,31,0.5) 0%, rgba(0,0,0,0.8) 100%);
+    position: relative;
+}
+
+.creation-header .section-title {
+    font-size: 45px;
+    font-weight: 700;
+    margin-bottom: 15px;
+    color: #fff;
+}
+
+.creation-header .section-subtitle {
+    font-size: 18px;
+    color: #bebebe;
+    font-family: "Poppins", sans-serif;
+}
+
+/* Form Card Styling */
+.team-form-card {
+    background: linear-gradient(135deg, rgba(11,17,31,0.95) 0%, rgba(20,25,40,0.95) 100%);
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: 0 10px 40px rgba(255,0,0,0.1);
+    border: 1px solid rgba(255,0,0,0.2);
+}
+
+.form-card-header {
+    background: linear-gradient(to right, #ff0000 0%, #c6019a 100%);
+    padding: 25px 30px;
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.form-card-header i {
+    font-size: 28px;
+    color: #fff;
+}
+
+.form-card-header h4 {
+    margin: 0;
+    color: #fff;
+    font-size: 24px;
+    font-weight: 600;
+}
+
+.form-card-body {
+    padding: 40px;
+}
+
+@media (max-width: 768px) {
+    .form-card-body {
+        padding: 25px 20px;
+    }
+}
+
+/* Custom Form Groups */
+.form-group-custom {
+    margin-bottom: 30px;
+}
+
+.form-label-custom {
+    display: block;
+    color: #fff;
+    font-size: 16px;
+    font-weight: 500;
+    margin-bottom: 12px;
+    font-family: "Poppins", sans-serif;
+}
+
+.form-label-custom i {
+    color: #ff0000;
+    margin-right: 8px;
+}
+
+/* Custom Form Controls */
+.form-control-custom {
+    width: 100%;
+    padding: 15px 20px;
+    background: rgba(249,249,255,0.05);
+    border: 2px solid rgba(255,255,255,0.1);
+    border-radius: 8px;
+    color: #fff;
+    font-size: 15px;
+    font-family: "Poppins", sans-serif;
+    transition: all 0.3s ease;
+}
+
+.form-control-custom:focus {
+    outline: none;
+    border-color: #ff0000;
+    background: rgba(249,249,255,0.08);
+    box-shadow: 0 0 20px rgba(255,0,0,0.1);
+}
+
+.form-control-custom::placeholder {
+    color: rgba(255,255,255,0.4);
+}
+
+textarea.form-control-custom {
+    resize: vertical;
+    min-height: 120px;
+}
+
+/* Input Group Custom */
+.input-group-custom {
+    display: flex;
+    align-items: stretch;
+}
+
+.input-group-custom .form-control-custom {
+    border-top-right-radius: 0;
+    border-bottom-right-radius: 0;
+}
+
+.input-group-custom .input-addon {
+    background: linear-gradient(to right, #ff0000 0%, #c6019a 100%);
+    color: #fff;
+    padding: 15px 25px;
+    border-top-right-radius: 8px;
+    border-bottom-right-radius: 8px;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+}
+
+/* Form Hints */
+.form-hint {
+    margin-top: 8px;
+    font-size: 13px;
+    color: rgba(255,255,255,0.6);
+    font-family: "Poppins", sans-serif;
+}
+
+.form-hint i {
+    color: #ff0000;
+    margin-right: 5px;
+}
+
+/* Logo Upload Area */
+.logo-upload-area {
+    position: relative;
+}
+
+.upload-preview {
+    border: 2px dashed rgba(255,0,0,0.3);
+    border-radius: 8px;
+    padding: 40px 20px;
+    text-align: center;
+    background: rgba(249,249,255,0.03);
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.upload-preview:hover {
+    border-color: #ff0000;
+    background: rgba(255,0,0,0.05);
+}
+
+.upload-preview i {
+    font-size: 48px;
+    color: #ff0000;
+    margin-bottom: 15px;
+}
+
+.upload-preview p {
+    color: #fff;
+    margin-bottom: 5px;
+    font-weight: 500;
+}
+
+.upload-preview small {
+    color: rgba(255,255,255,0.5);
+}
+
+.file-input-custom {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    opacity: 0;
+    cursor: pointer;
+}
+
+/* Form Actions */
+.form-actions {
+    display: flex;
+    gap: 15px;
+    margin-top: 40px;
+    padding-top: 30px;
+    border-top: 1px solid rgba(255,255,255,0.1);
+}
+
+.form-actions .btn_1,
+.form-actions .btn_2 {
+    flex: 1;
+    text-align: center;
+    padding: 18px 30px;
+    font-size: 16px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+@media (max-width: 576px) {
+    .form-actions {
+        flex-direction: column;
+    }
+}
+
+/* Error Styling */
+.form-error-message {
+    color: #ff4444;
+    font-size: 13px;
+    margin-top: 5px;
+    display: block;
+}
+
+/* Help Section */
+.help-section {
+    margin-top: 50px;
+}
+
+.help-card {
+    background: rgba(11,17,31,0.6);
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 8px;
+    padding: 30px 25px;
+    text-align: center;
+    transition: all 0.3s ease;
+    height: 100%;
+}
+
+.help-card:hover {
+    background: rgba(255,0,0,0.05);
+    border-color: rgba(255,0,0,0.3);
+    transform: translateY(-5px);
+}
+
+.help-icon {
+    width: 70px;
+    height: 70px;
+    background: linear-gradient(135deg, #ff0000 0%, #c6019a 100%);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 20px;
+}
+
+.help-icon i {
+    font-size: 32px;
+    color: #fff;
+}
+
+.help-card h5 {
+    color: #fff;
+    font-size: 20px;
+    margin-bottom: 12px;
+    font-weight: 600;
+}
+
+.help-card p {
+    color: rgba(255,255,255,0.7);
+    font-size: 14px;
+    line-height: 1.6;
+    margin: 0;
+}
+
+/* Responsive Adjustments */
+@media (max-width: 991px) {
+    .creation-header .section-title {
+        font-size: 35px;
+    }
+    
+    .creation-header .section-subtitle {
+        font-size: 16px;
+    }
+}
+
+@media (max-width: 576px) {
+    .creation-header .section-title {
+        font-size: 28px;
+    }
+    
+    .form-card-header {
+        padding: 20px;
+    }
+    
+    .form-card-header h4 {
+        font-size: 20px;
+    }
+}
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Logo preview functionality
+    const logoInput = document.querySelector('.file-input-custom');
+    const previewArea = document.getElementById('logoPreview');
+    
+    if (logoInput && previewArea) {
+        logoInput.addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(event) {
+                    previewArea.innerHTML = `
+                        <img src="${event.target.result}" alt="Logo Preview" style="max-width: 200px; max-height: 200px; border-radius: 8px;">
+                        <p style="margin-top: 15px; color: #4cd3e3;">✓ Logo selected</p>
+                        <small>${file.name}</small>
+                    `;
+                };
+                reader.readAsDataURL(file);
+            }
+        });
+    }
+});
+</script>
+
 {% endblock %}
