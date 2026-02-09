@@ -35,7 +35,7 @@ class Notification
 
 // src/Entity/Notification.php
 
-#[ORM\Column(type: 'boolean')]
+#[ORM\Column(name:'`read`' ,type: 'boolean')]
 private bool $read = false;
 
 

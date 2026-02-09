@@ -18,7 +18,7 @@
             </div>
 
             <div class="p-4">
-                {{ form_start(form, { attr: { id: 'videoUploadForm' } }) }}
+                {{ form_start(form, { attr: { id: 'videoUploadForm', method: 'POST', enctype: 'multipart/form-data' } }) }}
                     <div class="row g-4">
                         <div class="col-md-12 form-group-enhanced">
                             <label class="form-label fw-bold">
@@ -126,7 +126,8 @@ document.addEventListener('DOMContentLoaded', function () {
             return;
         }
 
-        const actionUrl = form.getAttribute('action') || window.location.href;
+        // Get the form action URL
+        const actionUrl = form.action || window.location.href;
         const xhr = new XMLHttpRequest();
         xhr.open(form.method.toUpperCase(), actionUrl);
         xhr.setRequestHeader('X-Requested-With', 'XMLHttpRequest');
@@ -179,12 +180,16 @@ document.addEventListener('DOMContentLoaded', function () {
                 } catch (e) {
                     // ignore JSON parse errors
                 }
-                progressText.textContent = 'Upload failed. Please retry.';
+                progressText.textContent = 'Upload failed (HTTP ' + xhr.status + '). Please retry.';
             }
         };
 
         xhr.onerror = function () {
             progressText.textContent = 'Network error. Please retry.';
+        };
+
+        xhr.onabort = function () {
+            progressText.textContent = 'Upload cancelled.';
         };
 
         xhr.send(new FormData(form));
