@@ -25,7 +25,7 @@
                 </div>
 
                 <div class="upload-card__body">
-                    {{ form_start(form, { attr: { id: 'userVideoUploadForm' } }) }}
+                    {{ form_start(form, { attr: { id: 'userVideoUploadForm', novalidate: 'novalidate' } }) }}
                         <div class="row g-4">
                             <div class="col-md-6">
                                 <label class="form-label">Title <span class="text-danger">*</span></label>
@@ -355,11 +355,6 @@ document.addEventListener('DOMContentLoaded', function () {
 
     form.addEventListener('submit', function (event) {
         event.preventDefault();
-
-        if (!form.checkValidity()) {
-            form.reportValidity();
-            return;
-        }
 
         const actionUrl = form.getAttribute('action') || window.location.href;
         const xhr = new XMLHttpRequest();

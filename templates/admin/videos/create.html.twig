@@ -18,7 +18,7 @@
             </div>
 
             <div class="p-4">
-                {{ form_start(form, { attr: { id: 'videoUploadForm' } }) }}
+                {{ form_start(form, { attr: { id: 'videoUploadForm', novalidate: 'novalidate' } }) }}
                     <div class="row g-4">
                         <div class="col-md-12 form-group-enhanced">
                             <label class="form-label fw-bold">
@@ -120,11 +120,6 @@ document.addEventListener('DOMContentLoaded', function () {
 
     form.addEventListener('submit', function (event) {
         event.preventDefault();
-
-        if (!form.checkValidity()) {
-            form.reportValidity();
-            return;
-        }
 
         const actionUrl = form.getAttribute('action') || window.location.href;
         const xhr = new XMLHttpRequest();
