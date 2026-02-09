@@ -13,6 +13,12 @@ use Symfony\Component\Security\Http\Attribute\IsGranted;
 #[IsGranted('ROLE_USER')]
 class TournoiController extends AbstractController
 {
+    #[Route('/landing', name: 'app_tournoi_landing')]
+    public function landing(): Response
+    {
+        return $this->render('tournoi/landing.html.twig');
+    }
+
     #[Route('/', name: 'app_tournoi_index')]
     public function index(TournoiRepository $tournoiRepository): Response
     {
