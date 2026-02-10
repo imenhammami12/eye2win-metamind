@@ -1,0 +1,249 @@
+{% extends 'admin_layout.html.twig' %}
+
+{% block title %}Edit Planning{% endblock %}
+{% block page_title %}Edit Session{% endblock %}
+
+{% block body %}
+<div class="mb-3 fade-in">
+    <a href="{{ path('admin_planning_index') }}" class="btn btn-outline-secondary">
+        <i class="bi bi-arrow-left me-2"></i>Back to List
+    </a>
+</div>
+
+<div class="row justify-content-center fade-in" style="animation-delay: 0.1s;">
+    <div class="col-lg-8">
+        <div class="table-card">
+            {# Header Gradient matching Create (Blue) #}
+            <div class="card-header-gradient" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 1.5rem; border-radius: 16px 16px 0 0;">
+                <h5 class="mb-0 text-white"><i class="bi bi-pencil-square me-2"></i>Edit Session Details</h5>
+            </div>
+            
+            {{ form_start(form, {'attr': {'class': 'p-4', 'id': 'editPlanningForm', 'novalidate': 'novalidate'}}) }}
+                
+                <div class="row g-4">
+                    {# Image Section #}
+                    <div class="col-12 text-center mb-4">
+                        <div class="image-preview-container mb-2" id="imagePreviewContainer" style="{{ planning.image ? 'display: block;' : 'display: none;' }}">
+                            <img id="imagePreview" 
+                                 src="{{ planning.image ? asset('uploads/planning/' ~ planning.image) : '#' }}" 
+                                 alt="Preview" 
+                                 class="img-fluid rounded shadow-sm" 
+                                 style="max-height: 200px; border: 2px solid #667eea;">
+                        </div>
+                        <div class="upload-area p-4 border rounded border-dashed cursor-pointer hover-bg-light transition-all" 
+                             style="border-style: dashed !important; border-color: #dee2e6;"
+                             onclick="document.getElementById('{{ form.image.vars.id }}').click()">
+                            <i class="bi bi-cloud-upload display-4 text-primary mb-3"></i>
+                            <p class="mb-0 text-muted fw-bold">Click to update cover image</p>
+                            <p class="small text-muted mb-0">(JPG, PNG, WEBP - Max 2MB)</p>
+                        </div>
+                        <div class="d-none">
+                            {{ form_widget(form.image, {'attr': {'accept': 'image/*', 'onchange': 'readURL(this)'}}) }}
+                        </div>
+                        {{ form_errors(form.image) }}
+                    </div>
+
+                    {# Type & Level #}
+                    <div class="col-md-6 form-group-enhanced">
+                        <label class="form-label fw-bold">
+                            <i class="bi bi-controller me-1"></i>Game Type 
+                            <span class="required-indicator" style="color: #fa709a;">*</span>
+                        </label>
+                        {{ form_widget(form.type) }}
+                        {{ form_errors(form.type) }}
+                    </div>
+                    
+                    <div class="col-md-6 form-group-enhanced">
+                        <label class="form-label fw-bold">
+                            <i class="bi bi-bar-chart me-1"></i>Skill Level 
+                            <span class="required-indicator" style="color: #fa709a;">*</span>
+                        </label>
+                        {{ form_widget(form.level) }}
+                        {{ form_errors(form.level) }}
+                    </div>
+
+                    {# Location Mode #}
+                    <div class="col-12 form-group-enhanced">
+                        <label class="form-label fw-bold">
+                            <i class="bi bi-geo me-1"></i>Location Mode 
+                            <span class="required-indicator" style="color: #fa709a;">*</span>
+                        </label>
+                        <div class="d-flex gap-3 mt-2">
+                            {% for child in form.mode %}
+                                <div class="form-check custom-radio-card">
+                                    {{ form_widget(child, {'attr': {'class': 'form-check-input mode-selector'}}) }}
+                                    {{ form_label(child, null, {'label_attr': {'class': 'form-check-label fw-medium'}}) }}
+                                </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+
+                    {# Location Details (Conditional) #}
+                    <div class="col-12" id="locationDetailsGroup" style="display: none;">
+                        <label class="form-label fw-bold">
+                            <i class="bi bi-geo-alt me-1"></i>Location Details 
+                            <span class="required-indicator" style="color: #fa709a;">*</span>
+                        </label>
+                        <div class="input-group">
+                            <span class="input-group-text bg-light border-end-0"><i class="bi bi-pin-map"></i></span>
+                            {{ form_widget(form.localisation) }}
+                        </div>
+                        <small class="text-muted">Specify the address or site name.</small>
+                        {{ form_errors(form.localisation) }}
+                    </div>
+
+                    {# Date & Time #}
+                    <div class="col-md-6 form-group-enhanced">
+                        <label class="form-label fw-bold">
+                            <i class="bi bi-calendar3 me-1"></i>Date 
+                            <span class="required-indicator" style="color: #fa709a;">*</span>
+                        </label>
+                        {{ form_widget(form.date) }}
+                        {{ form_errors(form.date) }}
+                    </div>
+
+                    <div class="col-md-6 form-group-enhanced">
+                        <label class="form-label fw-bold">
+                            <i class="bi bi-clock me-1"></i>Time 
+                            <span class="required-indicator" style="color: #fa709a;">*</span>
+                        </label>
+                        {{ form_widget(form.time) }}
+                        {{ form_errors(form.time) }}
+                    </div>
+
+                    {# Description #}
+                    <div class="col-12 form-group-enhanced">
+                        <label class="form-label fw-bold">
+                            <i class="bi bi-file-text me-1"></i>Description 
+                            <span class="required-indicator" style="color: #fa709a;">*</span>
+                        </label>
+                        {{ form_widget(form.description) }}
+                        {{ form_errors(form.description) }}
+                    </div>
+
+                    {# Partner Toggle #}
+                    <div class="col-12">
+                        <div class="form-check form-switch p-3 rounded border border-secondary" style="background: rgba(255, 255, 255, 0.05);">
+                            {{ form_widget(form.needPartner) }}
+                            <label class="form-check-label fw-bold ms-2 text-white" for="{{ form.needPartner.vars.id }}">
+                                <i class="bi bi-people me-2"></i>Looking for partners?
+                            </label>
+                            <div class="small text-muted ms-4 mt-1">Enable this if you need other players to join.</div>
+                        </div>
+                    </div>
+                </div>
+
+                {# Action Buttons #}
+                <div class="mt-5 d-flex gap-2 border-top pt-4">
+                    <button type="submit" class="btn btn-success px-4" id="submitBtn">
+                        <i class="bi bi-check-lg me-2"></i>Update Session
+                    </button>
+                    <a href="{{ path('admin_planning_index') }}" class="btn btn-outline-secondary px-4">
+                        <i class="bi bi-x-lg me-2"></i>Cancel
+                    </a>
+                </div>
+
+            {{ form_end(form) }}
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block javascripts %}
+<script>
+    // Image Preview
+    function readURL(input) {
+        if (input.files && input.files[0]) {
+            var reader = new FileReader();
+            reader.onload = function (e) {
+                document.getElementById('imagePreview').src = e.target.result;
+                document.getElementById('imagePreviewContainer').style.display = 'block';
+                document.querySelector('.upload-area').style.display = 'none';
+            }
+            reader.readAsDataURL(input.files[0]);
+        }
+    }
+
+    document.addEventListener('DOMContentLoaded', function() {
+        const form = document.getElementById('editPlanningForm');
+        const locationGroup = document.getElementById('locationDetailsGroup');
+        const locationInput = document.getElementById('{{ form.localisation.vars.id }}');
+        const modeRadios = document.querySelectorAll('.mode-selector');
+        
+        // Mode Toggle Logic
+        function updateLocationVisibility() {
+            let isOnSite = false;
+            modeRadios.forEach(radio => {
+                if(radio.checked && radio.value === 'onsite') isOnSite = true;
+            });
+
+            if (isOnSite) {
+                locationGroup.style.display = 'block';
+                // Animation
+                locationGroup.style.animation = 'slideInUp 0.3s ease';
+                locationInput.required = true;
+                if(locationInput.value === 'Online') locationInput.value = '';
+            } else {
+                locationGroup.style.display = 'none';
+                locationInput.required = false;
+                locationInput.value = 'Online';
+            }
+        }
+
+        modeRadios.forEach(radio => radio.addEventListener('change', updateLocationVisibility));
+        
+        // Initialize
+        updateLocationVisibility();
+
+        // Submit Button Loading State
+        form.addEventListener('submit', function(e) {
+            const btn = document.getElementById('submitBtn');
+            btn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Updating...';
+        });
+
+        // Real-time validation
+        form.querySelectorAll('.form-control, .form-select').forEach(input => {
+            input.addEventListener('blur', function() {
+                if (this.checkValidity()) {
+                    this.classList.add('is-valid');
+                    this.classList.remove('is-invalid');
+                } else {
+                    this.classList.add('is-invalid');
+                    this.classList.remove('is-valid');
+                }
+            });
+        });
+    });
+</script>
+
+<style>
+    /* Reuse styles from Create */
+    .form-group-enhanced { position: relative; }
+    .hover-bg-light:hover { background-color: #f8f9fa; border-color: #fda085 !important; }
+    .cursor-pointer { cursor: pointer; }
+    .transition-all { transition: all 0.3s ease; }
+    .form-control.is-valid, .form-select.is-valid { border-color: #43e97b; }
+    .form-control.is-invalid, .form-select.is-invalid { border-color: #fa709a; }
+    
+    @keyframes slideInUp {
+        from { transform: translateY(10px); opacity: 0; }
+        to { transform: translateY(0); opacity: 1; }
+    }
+
+    /* Error Message Styling */
+    .invalid-feedback, .text-danger, ul li.text-danger {
+        color: #fa709a !important;
+        font-size: 0.875em;
+        margin-top: 0.25rem;
+        display: block;
+        list-style-type: none;
+        padding-left: 0;
+    }
+    .form-group-enhanced ul, .col-12 ul {
+        list-style: none;
+        padding: 0;
+        margin: 5px 0 0 0;
+        color: #fa709a;
+    }
+</style>
+{% endblock %}

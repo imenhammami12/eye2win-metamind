@@ -1,0 +1,123 @@
+{% extends 'admin_layout.html.twig' %}
+
+{% block title %}{{ tournoi.nom }} - Tournoi Details{% endblock %}
+{% block page_title %}Tournoi Details{% endblock %}
+
+{% block body %}
+<div class="mb-3 fade-in">
+    <a href="{{ path('admin_tournoi_index') }}" class="btn btn-outline-secondary">
+        <i class="bi bi-arrow-left me-2"></i>Back to List
+    </a>
+</div>
+
+<div class="row g-4">
+    {# Tournoi Image & Status #}
+    <div class="col-lg-4">
+        <div class="table-card text-center fade-in" style="animation-delay: 0.1s;">
+            <div class="mb-4 position-relative">
+                {% if tournoi.image %}
+                    <img src="{{ asset('uploads/tournois/' ~ tournoi.image) }}" 
+                         alt="{{ tournoi.nom }}" 
+                         style="width: 100%; max-width: 300px; height: auto; border-radius: 12px; box-shadow: 0 8px 24px rgba(0,0,0,0.2);"
+                         loading="lazy">
+                {% else %}
+                    <div style="width: 150px; height: 150px; margin: 0 auto; border-radius: 12px; background: linear-gradient(135deg, #667eea, #764ba2); display: flex; align-items: center; justify-content: center; color: white; font-size: 48px; font-weight: bold; box-shadow: 0 8px 24px rgba(0,0,0,0.2);">
+                        <i class="bi bi-trophy"></i>
+                    </div>
+                {% endif %}
+            </div>
+            
+            <h4 class="mb-1">{{ tournoi.nom }}</h4>
+            <span class="badge bg-secondary mb-3">{{ tournoi.typeTournoi ? tournoi.typeTournoi.name : 'N/A' }}</span>
+            
+            <div class="d-grid gap-2 mt-4">
+                <a href="{{ path('admin_tournoi_edit', {id: tournoi.id}) }}" class="btn btn-warning">
+                    <i class="bi bi-pencil me-2"></i>Edit Tournoi
+                </a>
+                <button type="button" 
+                        class="btn btn-danger"
+                        onclick="confirmAction('{{ path('admin_tournoi_delete', {id: tournoi.id}) }}', '{{ csrf_token('delete-' ~ tournoi.id) }}', 'Are you sure you want to delete this tournament? This action cannot be undone.')">
+                    <i class="bi bi-trash me-2"></i>Delete Tournoi
+                </button>
+            </div>
+        </div>
+    </div>
+    
+    {# Tournoi Information #}
+    <div class="col-lg-8">
+        <div class="table-card mb-4 fade-in" style="animation-delay: 0.3s;">
+            <div class="table-header">
+                <h5><i class="bi bi-info-circle me-2"></i>General Information</h5>
+            </div>
+            
+            <div class="px-3">
+                <div class="row mb-3">
+                    <div class="col-md-4 text-white-50">
+                        <i class="bi bi-calendar-event me-2"></i>Start Date
+                    </div>
+                    <div class="col-md-8 text-white">
+                        {{ tournoi.dateDebut ? tournoi.dateDebut|date('F d, Y') : 'N/A' }}
+                    </div>
+                </div>
+                <div class="row mb-3">
+                    <div class="col-md-4 text-white-50">
+                        <i class="bi bi-calendar-check me-2"></i>End Date
+                    </div>
+                    <div class="col-md-8 text-white">
+                        {{ tournoi.dateFin ? tournoi.dateFin|date('F d, Y') : 'N/A' }}
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-4 text-white-50">
+                        <i class="bi bi-file-text me-2"></i>Description
+                    </div>
+                    <div class="col-md-8 text-white">
+                        {{ tournoi.description|nl2br }}
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        {# Matchs #}
+        <div class="table-card fade-in" style="animation-delay: 0.5s;">
+            <div class="table-header">
+                <h5><i class="bi bi-controller me-2"></i>Matchs <span class="badge bg-light text-dark ms-2">{{ tournoi.matchs|length }}</span></h5>
+            </div>
+            
+            <div class="table-responsive">
+                <table class="custom-table table">
+                    <thead>
+                        <tr>
+                            <th>Match Title</th>
+                            <th>Date</th>
+                            <th class="text-end">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for match in tournoi.matchs %}
+                            <tr>
+                                <td>
+                                    <a href="{{ path('admin_matches_show', {id: match.id}) }}" class="text-white text-decoration-none hover-effect fw-bold">
+                                        {{ match.equipe1 }} <span class="text-muted mx-1">vs</span> {{ match.equipe2 }}
+                                        <i class="bi bi-box-arrow-up-right ms-2 small opacity-50"></i>
+                                    </a>
+                                </td>
+                                <td>{{ match.dateMatch ? match.dateMatch|date('M d, Y') : 'N/A' }}</td>
+                                <td class="text-end">
+                                    <a href="{{ path('admin_matches_show', {id: match.id}) }}" class="btn btn-sm btn-outline-info">
+                                        <i class="bi bi-eye"></i> Details
+                                    </a>
+                                </td>
+                            </tr>
+                        {% else %}
+                            <tr>
+                                <td colspan="2" class="text-center text-muted py-4">No matches found</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

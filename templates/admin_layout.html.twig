@@ -54,12 +54,27 @@
                     <i class="bi bi-people"></i>
                     <span>Users</span>
                 </a>
-                
+
+                <a href="{{ path('admin_planning_index') }}" 
+                   class="{{ app.request.attributes.get('_route') starts with 'admin_planning' ? 'active' : '' }}">
+                    <i class="bi bi-calendar-event"></i>
+                    <span>Planning</span>
+                </a>
+                <a href="{{ path('admin_tournoi_index') }}" 
+                   class="{{ app.request.attributes.get('_route') starts with 'admin_tournoi' ? 'active' : '' }}">
+                    <i class="bi bi-trophy"></i>
+                    <span>Tournois</span>
+                </a>
+               <a href="{{ path('admin_videos_index') }}" 
+                   class="{{ app.request.attributes.get('_route') starts with 'admin_videos' or app.request.attributes.get('_route') starts with 'admin_video' ? 'active' : '' }}">
+                    <i class="bi bi-camera-video"></i>
+                    <span>Videos</span>
+                </a>
 
                 <a href="{{ path('admin_coach_applications_index') }}" 
                    class="{{ app.request.attributes.get('_route') starts with 'admin_coach_applications' ? 'active' : '' }}">
                     <i class="bi bi-clipboard-check"></i>
-                    <span>Demandes Coach</span>
+                    <span> Coach Application </span>
                     {% if pendingApplicationsCount|default(0) > 0 %}
                         <span class="badge bg-danger">{{ pendingApplicationsCount }}</span>
                     {% endif %}
@@ -84,6 +99,12 @@
                 </a>
 
 
+
+<a href="{{ path('admin_teams_index') }}" 
+   class="{{ app.request.attributes.get('_route') starts with 'admin_teams' ? 'active' : '' }}">
+    <i class="bi bi-grid-3x3"></i>
+    <span>Teams</span>
+</a>
 
                 <div class="sidebar-divider"></div>
                 
@@ -158,6 +179,9 @@
             
         </main>
     </div>
+
+    {# Modals Container #}
+    {% block modal_container %}{% endblock %}
     
     {# Bootstrap JS Bundle #}
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>

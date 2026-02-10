@@ -1,0 +1,66 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Tournaments - EyeTwin{% endblock %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    <style>
+        .pulse-effect {
+            animation: pulse 2s infinite;
+        }
+        @keyframes pulse {
+            0% {
+                transform: scale(1);
+                box-shadow: 0 0 0 0 rgba(0, 123, 255, 0.7);
+            }
+            70% {
+                transform: scale(1.05);
+                box-shadow: 0 0 0 10px rgba(0, 123, 255, 0);
+            }
+            100% {
+                transform: scale(1);
+                box-shadow: 0 0 0 0 rgba(0, 123, 255, 0);
+            }
+        }
+    </style>
+{% endblock %}
+
+{% block body %}
+<!-- Breadcrumb -->
+<section class="breadcrumb breadcrumb_bg">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-12">
+                <div class="breadcrumb_iner text-center">
+                    <div class="breadcrumb_iner_item">
+                        <h2>Tournaments</h2>
+                        <p><a href="{{ path('app_home') }}">Home</a> <span>-</span> Tournaments</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="blog_part section_padding">
+    <div class="container">
+        <div class="row justification-content-center">
+            <div class="col-lg-8">
+                <div class="card">
+                    <div class="card-body text-center p-5">
+                        <i class="fas fa-gamepad fa-5x text-primary mb-4"></i>
+                        <h1>Ready to Compete?</h1>
+                        <p class="lead">Join the battle and prove your skills in our tournaments.</p>
+                        
+                        <div class="mt-5">
+                            <a href="{{ path('app_tournoi_index') }}" class="btn btn_1 btn-lg pulse-effect">
+                                <i class="fas fa-trophy me-2"></i> Browse Tournaments
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

@@ -4,11 +4,30 @@
 {% block page_title %}User Details{% endblock %}
 
 {% block body %}
+{% set isCurrentUser = user.id == app.user.id %}
+{% set isTargetAdmin = 'ROLE_ADMIN' in user.roles %}
+{% set canModifyRole = not isCurrentUser and (not isTargetAdmin or is_granted('ROLE_SUPER_ADMIN')) %}
+{% set canSuspendBan = not isCurrentUser and (not isTargetAdmin or is_granted('ROLE_SUPER_ADMIN')) %}
+{% set canDelete = not isCurrentUser and (not isTargetAdmin or is_granted('ROLE_SUPER_ADMIN')) %}
+
 <div class="mb-3 fade-in">
     <a href="{{ path('admin_users_index') }}" class="btn btn-outline-secondary">
         <i class="bi bi-arrow-left me-2"></i>Back to List
     </a>
 </div>
+
+{# Permission Warnings #}
+{% if not canModifyRole and not isCurrentUser %}
+<div class="alert alert-warning fade-in mb-3">
+    <i class="bi bi-shield-exclamation me-2"></i>
+    <strong>Limited Permissions:</strong> Only Super Administrators can modify other Administrators. You can view this user's information but cannot make changes.
+</div>
+{% elseif isCurrentUser %}
+<div class="alert alert-info fade-in mb-3">
+    <i class="bi bi-person-badge me-2"></i>
+    <strong>Viewing Your Own Profile:</strong> You cannot modify your own role or account status for security reasons.
+</div>
+{% endif %}
 
 <div class="row g-4">
     {# User Profile Card #}
@@ -26,11 +45,16 @@
                     </div>
                 {% endif %}
                 
-                {# Online status indicator #}
-                <div style="position: absolute; bottom: 10px; right: calc(50% - 65px); width: 20px; height: 20px; background: #43e97b; border: 3px solid var(--dark-bg); border-radius: 50%; box-shadow: 0 0 12px rgba(67, 233, 123, 0.6);"></div>
+                {# Account status indicator #}
+                <div style="position: absolute; bottom: 10px; right: calc(50% - 65px); width: 20px; height: 20px; background: {{ user.accountStatus.value == 'ACTIVE' ? '#43e97b' : (user.accountStatus.value == 'SUSPENDED' ? '#ffa500' : '#ff4444') }}; border: 3px solid var(--dark-bg); border-radius: 50%; box-shadow: 0 0 12px {{ user.accountStatus.value == 'ACTIVE' ? 'rgba(67, 233, 123, 0.6)' : (user.accountStatus.value == 'SUSPENDED' ? 'rgba(255, 165, 0, 0.6)' : 'rgba(255, 68, 68, 0.6)') }};"></div>
             </div>
             
-            <h4 class="mb-1">{{ user.fullName ?? user.username }}</h4>
+            <h4 class="mb-1">
+                {{ user.fullName ?? user.username }}
+                {% if isCurrentUser %}
+                    <span class="badge bg-info ms-2">You</span>
+                {% endif %}
+            </h4>
             <p class="text-muted mb-3">@{{ user.username }}</p>
             
             <div class="mb-3 d-flex gap-2 justify-content-center flex-wrap">
@@ -48,7 +72,9 @@
                     </span>
                 {% endif %}
                 
-                <span class="badge bg-{{ user.accountStatus.badgeClass }}">
+                <span class="badge bg-{{ user.accountStatus.badgeClass }}" 
+                      data-bs-toggle="tooltip" 
+                      title="{{ user.accountStatus.description }}">
                     <i class="bi bi-{{ user.accountStatus.value == 'ACTIVE' ? 'check-circle' : (user.accountStatus.value == 'SUSPENDED' ? 'exclamation-triangle' : 'x-circle') }} me-1"></i>
                     {{ user.accountStatus.label }}
                 </span>
@@ -71,19 +97,24 @@
                     <label class="form-label fw-bold">
                         <i class="bi bi-shield-check me-2"></i>Change Role
                     </label>
-                    <select name="role" class="form-select mb-3" {% if user.id == app.user.id %}disabled{% endif %}>
+                    <select name="role" class="form-select mb-3" {% if not canModifyRole %}disabled{% endif %}>
                         <option value="ROLE_USER" {% if 'ROLE_ADMIN' not in user.roles and 'ROLE_COACH' not in user.roles %}selected{% endif %}>User</option>
                         <option value="ROLE_COACH" {% if 'ROLE_COACH' in user.roles and 'ROLE_ADMIN' not in user.roles %}selected{% endif %}>Coach</option>
-                        <option value="ROLE_ADMIN" {% if 'ROLE_ADMIN' in user.roles %}selected{% endif %}>Administrator</option>
+                        <option value="ROLE_ADMIN" {% if 'ROLE_ADMIN' in user.roles %}selected{% endif %} {% if not is_granted('ROLE_SUPER_ADMIN') %}disabled{% endif %}>Administrator {% if not is_granted('ROLE_SUPER_ADMIN') %}(Super Admin only){% endif %}</option>
                     </select>
                     
-                    <button type="submit" class="btn btn-primary btn-sm w-100" {% if user.id == app.user.id %}disabled{% endif %}>
+                    <button type="submit" class="btn btn-primary btn-sm w-100" {% if not canModifyRole %}disabled{% endif %}>
                         <i class="bi bi-save me-2"></i>Update Role
                     </button>
                     
-                    {% if user.id == app.user.id %}
+                    {% if not canModifyRole %}
                         <small class="text-muted d-block mt-2">
-                            <i class="bi bi-info-circle me-1"></i>You cannot modify your own role
+                            <i class="bi bi-info-circle me-1"></i>
+                            {% if isCurrentUser %}
+                                You cannot modify your own role
+                            {% else %}
+                                Only Super Admins can modify Administrator roles
+                            {% endif %}
                         </small>
                     {% endif %}
                 </form>
@@ -91,40 +122,65 @@
             
             <hr>
             
+            {# Account Status Information #}
+            {% if user.accountStatus.value != 'ACTIVE' %}
+            <div class="alert alert-{{ user.accountStatus.value == 'SUSPENDED' ? 'warning' : 'danger' }} text-start mb-3">
+                <h6 class="alert-heading">
+                    <i class="bi bi-{{ user.accountStatus.value == 'SUSPENDED' ? 'exclamation-triangle' : 'x-octagon' }} me-2"></i>
+                    Account {{ user.accountStatus.label }}
+                </h6>
+                <p class="mb-0 small">{{ user.accountStatus.description }}</p>
+            </div>
+            {% endif %}
+            
             {# Action Buttons #}
             <div class="d-grid gap-2">
                 {% if user.accountStatus.value == 'ACTIVE' %}
                     <button type="button" 
                             class="btn btn-warning"
-                            onclick="confirmAction('{{ path('admin_users_suspend', {id: user.id}) }}', '{{ csrf_token('suspend-' ~ user.id) }}', 'Suspend this user?')"
-                            {% if user.id == app.user.id %}disabled{% endif %}>
-                        <i class="bi bi-exclamation-triangle me-2"></i>Suspend User
+                            onclick="confirmAction('{{ path('admin_users_suspend', {id: user.id}) }}', '{{ csrf_token('suspend-' ~ user.id) }}', 'Suspend this user? This is a temporary action. The user will not be able to log in until you reactivate their account.')"
+                            title="{% if not canSuspendBan %}{{ isTargetAdmin ? 'Only Super Admins can suspend Admins' : 'Cannot suspend yourself' }}{% else %}Temporarily suspend user access{% endif %}"
+                            data-bs-toggle="tooltip"
+                            {% if not canSuspendBan %}disabled{% endif %}>
+                        <i class="bi bi-exclamation-triangle me-2"></i>Suspend User (Temporary)
                     </button>
                     
                     <button type="button" 
                             class="btn btn-danger"
-                            onclick="confirmAction('{{ path('admin_users_ban', {id: user.id}) }}', '{{ csrf_token('ban-' ~ user.id) }}', 'Ban this user?')"
-                            {% if user.id == app.user.id %}disabled{% endif %}>
-                        <i class="bi bi-x-circle me-2"></i>Ban User
+                            onclick="confirmAction('{{ path('admin_users_ban', {id: user.id}) }}', '{{ csrf_token('ban-' ~ user.id) }}', 'Ban this user permanently? This user will not be able to log in or register with this email again. This is a serious action.')"
+                            title="{% if not canSuspendBan %}{{ isTargetAdmin ? 'Only Super Admins can ban Admins' : 'Cannot ban yourself' }}{% else %}Permanently ban user{% endif %}"
+                            data-bs-toggle="tooltip"
+                            {% if not canSuspendBan %}disabled{% endif %}>
+                        <i class="bi bi-x-circle me-2"></i>Ban User (Permanent)
                     </button>
                 {% else %}
                     <button type="button" 
                             class="btn btn-success"
-                            onclick="confirmAction('{{ path('admin_users_activate', {id: user.id}) }}', '{{ csrf_token('activate-' ~ user.id) }}', 'Reactivate this user?')">
+                            onclick="confirmAction('{{ path('admin_users_activate', {id: user.id}) }}', '{{ csrf_token('activate-' ~ user.id) }}', 'Reactivate this user? They will be able to log in normally again.')"
+                            title="Reactivate user account"
+                            data-bs-toggle="tooltip"
+                            {% if not canSuspendBan and user.accountStatus.value == 'BANNED' and isTargetAdmin %}disabled{% endif %}>
                         <i class="bi bi-check-circle me-2"></i>Reactivate User
                     </button>
                 {% endif %}
                 
                 <button type="button" 
                         class="btn btn-danger"
-                        onclick="confirmAction('{{ path('admin_users_delete', {id: user.id}) }}', '{{ csrf_token('delete-' ~ user.id) }}', 'Permanently delete this user? This action cannot be undone!')"
-                        {% if user.id == app.user.id %}disabled{% endif %}>
+                        onclick="confirmAction('{{ path('admin_users_delete', {id: user.id}) }}', '{{ csrf_token('delete-' ~ user.id) }}', 'Permanently delete this user and all their data? This action cannot be undone!')"
+                        title="{% if not canDelete %}{{ isTargetAdmin ? 'Only Super Admins can delete Admins' : 'Cannot delete yourself' }}{% else %}Permanently delete user{% endif %}"
+                        data-bs-toggle="tooltip"
+                        {% if not canDelete %}disabled{% endif %}>
                     <i class="bi bi-trash me-2"></i>Delete User
                 </button>
                 
-                {% if user.id == app.user.id %}
+                {% if not canSuspendBan or not canDelete %}
                     <small class="text-muted">
-                        <i class="bi bi-shield-lock me-1"></i>Self-modification restricted
+                        <i class="bi bi-shield-lock me-1"></i>
+                        {% if isCurrentUser %}
+                            Self-modification restricted for security
+                        {% else %}
+                            Super Admin permission required
+                        {% endif %}
                     </small>
                 {% endif %}
             </div>
@@ -133,101 +189,130 @@
     
     {# User Information #}
     <div class="col-lg-8">
-        {# Stats Cards
-        <div class="row g-3 mb-4 fade-in" style="animation-delay: 0.2s;">
-            <div class="col-md-3">
-                <div class="stat-card">
-                    <div class="stat-card-icon" style="background: linear-gradient(135deg, #667eea, #764ba2); font-size: 20px;">
-                        <i class="bi bi-plug text-white"></i>
-                    </div>
-                    <div class="stat-card-title">Connections</div>
-                    <div class="stat-card-value">{{ stats.totalConnections }}</div>
-                </div>
-            </div>
-            
-            <div class="col-md-3">
-                <div class="stat-card">
-                    <div class="stat-card-icon" style="background: linear-gradient(135deg, #4facfe, #00f2fe); font-size: 20px;">
-                        <i class="bi bi-grid-3x3 text-white"></i>
-                    </div>
-                    <div class="stat-card-title">Teams</div>
-                    <div class="stat-card-value">{{ stats.teamsCount }}</div>
-                </div>
-            </div>
-            
-            <div class="col-md-3">
-                <div class="stat-card">
-                    <div class="stat-card-icon" style="background: linear-gradient(135deg, #43e97b, #38f9d7); font-size: 20px;">
-                        <i class="bi bi-people text-white"></i>
-                    </div>
-                    <div class="stat-card-title">Teams Created</div>
-                    <div class="stat-card-value">{{ stats.ownedTeamsCount }}</div>
-                </div>
-            </div>
-            
-            <div class="col-md-3">
-                <div class="stat-card">
-                    <div class="stat-card-icon" style="background: linear-gradient(135deg, #fa709a, #fee140); font-size: 20px;">
-                        <i class="bi bi-bell text-white"></i>
-                    </div>
-                    <div class="stat-card-title">Notifications</div>
-                    <div class="stat-card-value">{{ stats.unreadNotifications }}</div>
-                </div>
-            </div>
-        </div>
-         #}
         {# Personal Information #}
-        <div class="table-card mb-4 fade-in" style="animation-delay: 0.3s;">
-            <div class="table-header">
-                <h5><i class="bi bi-info-circle me-2"></i>Personal Information</h5>
-            </div>
-            
-            <table class="table table-borderless">
-                <tbody>
-                    <tr>
-                        <th style="width: 200px;"><i class="bi bi-envelope me-2"></i>Email</th>
-                        <td>
+     {# Personal Information #}
+<div class="table-card mb-4 fade-in" style="animation-delay: 0.3s;">
+    <div class="table-header">
+        <h5>
+            <i class="bi bi-info-circle me-2"></i>
+            Personal Information
+        </h5>
+    </div>
+
+    <div class="p-4">
+
+        <div class="row g-4">
+
+            {# Email #}
+            <div class="col-md-6">
+                <div class="d-flex align-items-start gap-3 info-item">
+                    <div class="info-icon text-primary">
+                        <i class="bi bi-envelope"></i>
+                    </div>
+                    <div>
+                        <small class="text-muted">Email</small>
+                        <div class="fw-semibold">
                             <a href="mailto:{{ user.email }}" class="text-decoration-none">
                                 {{ user.email }}
                             </a>
-                        </td>
-                    </tr>
-                    <tr>
-                        <th><i class="bi bi-at me-2"></i>Username</th>
-                        <td>@{{ user.username }}</td>
-                    </tr>
-                    <tr>
-                        <th><i class="bi bi-person me-2"></i>Full Name</th>
-                        <td>{{ user.fullName ?? 'Not provided' }}</td>
-                    </tr>
-                   
-                    <tr>
-    <th><i class="bi bi-calendar-plus me-2"></i>Registration Date</th>
-    <td>
-        <i class="bi bi-calendar3 me-2"></i>
-        {{ user.createdAt|date('F d, Y \\a\\t h:i A') }}
-        <small class="text-muted ms-2">({{ (('now'|date('U') - user.createdAt|date('U')) / 86400)|round }} days ago)</small>
-    </td>
-</tr>
-<tr>
-    <th><i class="bi bi-clock-history me-2"></i>Last Login</th>
-    <td>
-        <i class="bi bi-clock me-2"></i>
-        {{ user.lastLogin|date('F d, Y \\a\\t h:i A') }}
-        <small class="text-muted ms-2">({{ (('now'|date('U') - user.lastLogin|date('U')) / 86400)|round }} days ago)</small>
-    </td>
-</tr>
-                    <tr>
-                        <th><i class="bi bi-toggle-on me-2"></i>Account Status</th>
-                        <td>
-                            <span class="badge bg-{{ user.accountStatus.badgeClass }}">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            {# Username #}
+            <div class="col-md-6">
+                <div class="d-flex align-items-start gap-3 info-item">
+                    <div class="info-icon text-info">
+                        <i class="bi bi-at"></i>
+                    </div>
+                    <div>
+                        <small class="text-muted">Username</small>
+                        <div class="fw-semibold">@{{ user.username }}</div>
+                    </div>
+                </div>
+            </div>
+
+            {# Full Name #}
+            <div class="col-md-6">
+                <div class="d-flex align-items-start gap-3 info-item">
+                    <div class="info-icon text-success">
+                        <i class="bi bi-person"></i>
+                    </div>
+                    <div>
+                        <small class="text-muted">Full Name</small>
+                        <div class="fw-semibold">
+                            {{ user.fullName ?? 'Not provided' }}
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            {# Registration Date #}
+            <div class="col-md-6">
+                <div class="d-flex align-items-start gap-3 info-item">
+                    <div class="info-icon text-warning">
+                        <i class="bi bi-calendar-plus"></i>
+                    </div>
+                    <div>
+                        <small class="text-muted">Registered</small>
+                        <div class="fw-semibold">
+                            {{ user.createdAt|date('M d, Y · h:i A') }}
+                            <span class="text-muted ms-2">
+                                ({{ (('now'|date('U') - user.createdAt|date('U')) / 86400)|round }} days ago)
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            {# Last Login #}
+            <div class="col-md-6">
+                <div class="d-flex align-items-start gap-3 info-item">
+                    <div class="info-icon text-secondary">
+                        <i class="bi bi-clock-history"></i>
+                    </div>
+                    <div>
+                        <small class="text-muted">Last Login</small>
+                        <div class="fw-semibold">
+                            {% if user.lastLogin %}
+                                {{ user.lastLogin|date('M d, Y · h:i A') }}
+                            {% else %}
+                                <span class="text-muted">Never</span>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            {# Account Status #}
+            <div class="col-md-6">
+                <div class="d-flex align-items-start gap-3 info-item">
+                    <div class="info-icon text-primary">
+                        <i class="bi bi-toggle-on"></i>
+                    </div>
+                    <div>
+                        <small class="text-muted">Account Status</small>
+                        <div>
+                            <span class="badge bg-{{ user.accountStatus.badgeClass }}"
+                                  data-bs-toggle="tooltip"
+                                  title="{{ user.accountStatus.description }}">
+                                <i class="bi bi-{{ user.accountStatus.value == 'ACTIVE'
+                                    ? 'check-circle'
+                                    : (user.accountStatus.value == 'SUSPENDED'
+                                        ? 'exclamation-triangle'
+                                        : 'x-circle') }} me-1"></i>
                                 {{ user.accountStatus.label }}
                             </span>
-                        </td>
-                    </tr>
-                </tbody>
-            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
         </div>
+    </div>
+</div>
+
         
         {# Teams #}
         <div class="table-card mb-4 fade-in" style="animation-delay: 0.4s;">
@@ -332,6 +417,16 @@
 
 {% block javascripts %}
 <script>
+// Initialize Bootstrap tooltips
+document.addEventListener('DOMContentLoaded', function() {
+    const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+    tooltipTriggerList.map(function (tooltipTriggerEl) {
+        return new bootstrap.Tooltip(tooltipTriggerEl, {
+            delay: { show: 300, hide: 100 }
+        });
+    });
+});
+
 // Enhanced hover effects for stat cards
 document.querySelectorAll('.stat-card').forEach((card, index) => {
     card.style.animationDelay = `${index * 0.1}s`;

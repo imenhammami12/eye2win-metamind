@@ -30,17 +30,65 @@ class AdminCoachApplicationController extends AbstractController
         Request $request,
         CoachApplicationRepository $repository
     ): Response {
+        // 🔍 FILTRES MULTIPLES
         $statusFilter = $request->query->get('status', '');
+        $search = $request->query->get('search', '');
+        $dateFrom = $request->query->get('date_from', '');
+        $dateTo = $request->query->get('date_to', '');
+        $sortBy = $request->query->get('sort_by', 'submittedAt');
+        $sortOrder = $request->query->get('sort_order', 'DESC');
         
         $queryBuilder = $repository->createQueryBuilder('ca')
             ->leftJoin('ca.user', 'u')
-            ->addSelect('u')
-            ->orderBy('ca.submittedAt', 'DESC');
+            ->addSelect('u');
         
+        // Filtre par statut
         if ($statusFilter) {
             $queryBuilder->andWhere('ca.status = :status')
                 ->setParameter('status', $statusFilter);
         }
+        
+        // Recherche par nom, username, email
+        if ($search) {
+            $queryBuilder->andWhere(
+                'u.username LIKE :search OR u.email LIKE :search OR u.fullName LIKE :search OR ca.certifications LIKE :search OR ca.experience LIKE :search'
+            )
+            ->setParameter('search', '%' . $search . '%');
+        }
+        
+        // Filtre par date de soumission (début)
+        if ($dateFrom) {
+            try {
+                $dateFromObj = new \DateTime($dateFrom . ' 00:00:00');
+                $queryBuilder->andWhere('ca.submittedAt >= :dateFrom')
+                    ->setParameter('dateFrom', $dateFromObj);
+            } catch (\Exception $e) {
+                // Date invalide, on ignore
+            }
+        }
+        
+        // Filtre par date de soumission (fin)
+        if ($dateTo) {
+            try {
+                $dateToObj = new \DateTime($dateTo . ' 23:59:59');
+                $queryBuilder->andWhere('ca.submittedAt <= :dateTo')
+                    ->setParameter('dateTo', $dateToObj);
+            } catch (\Exception $e) {
+                // Date invalide, on ignore
+            }
+        }
+        
+        // Tri
+        $validSortFields = ['submittedAt', 'reviewedAt', 'status'];
+        if (in_array($sortBy, $validSortFields)) {
+            $validSortOrder = in_array(strtoupper($sortOrder), ['ASC', 'DESC']) ? strtoupper($sortOrder) : 'DESC';
+            $queryBuilder->orderBy('ca.' . $sortBy, $validSortOrder);
+        } else {
+            $queryBuilder->orderBy('ca.submittedAt', 'DESC');
+        }
+        
+        // Tri secondaire par nom d'utilisateur
+        $queryBuilder->addOrderBy('u.username', 'ASC');
         
         $applications = $queryBuilder->getQuery()->getResult();
         
@@ -49,11 +97,17 @@ class AdminCoachApplicationController extends AbstractController
             'pending' => $repository->count(['status' => ApplicationStatus::PENDING]),
             'approved' => $repository->count(['status' => ApplicationStatus::APPROVED]),
             'rejected' => $repository->count(['status' => ApplicationStatus::REJECTED]),
+            'total' => $repository->count([]),
         ];
         
         return $this->render('admin/coach_applications/index.html.twig', [
             'applications' => $applications,
             'statusFilter' => $statusFilter,
+            'search' => $search,
+            'dateFrom' => $dateFrom,
+            'dateTo' => $dateTo,
+            'sortBy' => $sortBy,
+            'sortOrder' => $sortOrder,
             'stats' => $stats,
             'applicationStatuses' => ApplicationStatus::cases(),
         ]);

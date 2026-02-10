@@ -1,0 +1,115 @@
+{% extends 'admin_layout.html.twig' %}
+
+{% block title %}Edit Video{% endblock %}
+{% block page_title %}Edit Video{% endblock %}
+
+{% block body %}
+<div class="mb-3 fade-in">
+    <a href="{{ path('admin_videos_index') }}" class="btn btn-outline-secondary">
+        <i class="bi bi-arrow-left me-2"></i>Back to List
+    </a>
+</div>
+
+<div class="row g-4">
+    <div class="col-lg-8">
+        <div class="table-card fade-in" style="animation-delay: 0.1s;">
+            <div class="card-header-gradient" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 1.25rem 1.5rem; border-radius: 16px 16px 0 0;">
+                <h5 class="mb-0 text-white"><i class="bi bi-pencil-square me-2"></i>Edit Video</h5>
+            </div>
+            <div class="p-4">
+                {{ form_start(form) }}
+                    <div class="row g-4">
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold"><i class="bi bi-type me-1"></i>Title</label>
+                            {{ form_widget(form.title, { attr: { class: 'form-control form-control-lg' } }) }}
+                            <small class="text-muted">Short and descriptive name.</small>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold"><i class="bi bi-controller me-1"></i>Game Type</label>
+                            {{ form_widget(form.gameType, { attr: { class: 'form-control form-control-lg' } }) }}
+                            <small class="text-muted">Example: Valorant, CS2, FIFA.</small>
+                        </div>
+                        <div class="col-md-12">
+                            <label class="form-label fw-bold"><i class="bi bi-toggle-on me-1"></i>Status</label>
+                            {{ form_widget(form.status, { attr: { class: 'form-select form-select-lg' } }) }}
+                            <small class="text-muted">Set the current processing state.</small>
+                        </div>
+                        <div class="col-md-12">
+                            <label class="form-label fw-bold"><i class="bi bi-eye me-1"></i>Visibility</label>
+                            {{ form_widget(form.visibility, { attr: { class: 'form-select form-select-lg' } }) }}
+                            <small class="text-muted">Public videos are visible to other users.</small>
+                        </div>
+                    </div>
+
+                    <div class="alert mt-4" style="background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.08); border-radius: 12px;">
+                        <div class="d-flex align-items-start">
+                            <i class="bi bi-info-circle me-3" style="font-size: 22px; color: #a5b4fc;"></i>
+                            <div>
+                                <strong style="color: #a5b4fc;">Tip</strong>
+                                <p class="mb-0 mt-1 text-muted">Keep titles consistent for better search and filtering.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mt-4 d-flex gap-2">
+                        <button class="btn btn-primary">
+                            <i class="bi bi-save me-2"></i>Save Changes
+                        </button>
+                        <a href="{{ path('admin_videos_index') }}" class="btn btn-outline-secondary">Cancel</a>
+                    </div>
+                {{ form_end(form) }}
+            </div>
+        </div>
+    </div>
+
+    <div class="col-lg-4">
+        <div class="table-card fade-in" style="animation-delay: 0.15s;">
+            <div class="table-header">
+                <h5><i class="bi bi-info-circle me-2"></i>Information</h5>
+            </div>
+            <div class="p-4">
+                <p class="mb-1"><strong>Title:</strong> {{ video.title }}</p>
+                <p class="mb-1"><strong>Uploaded by:</strong> {{ video.uploadedBy ? video.uploadedBy.username : '—' }}</p>
+                <p class="mb-0"><strong>Created at:</strong> {{ video.createdAt ? video.createdAt|date('M d, Y H:i') : '—' }}</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .table-card {
+        border-radius: 16px;
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        box-shadow: 0 14px 34px rgba(0, 0, 0, 0.25);
+    }
+
+    .form-control, .form-select {
+        border-radius: 14px;
+        background: rgba(255, 255, 255, 0.03);
+        border: 1px solid rgba(255, 255, 255, 0.12);
+        color: #fff;
+    }
+
+    .form-control:focus, .form-select:focus {
+        border-color: #8ba4ff;
+        box-shadow: 0 0 0 0.2rem rgba(139, 164, 255, 0.25);
+        background: rgba(255, 255, 255, 0.06);
+    }
+
+    .btn-primary {
+        border-radius: 999px;
+        box-shadow: 0 10px 24px rgba(76, 99, 255, 0.35);
+    }
+
+    .btn-outline-secondary {
+        border-radius: 999px;
+        border-color: rgba(255, 255, 255, 0.3);
+        color: rgba(255, 255, 255, 0.85);
+    }
+
+    small.text-muted {
+        display: block;
+        margin-top: 6px;
+    }
+</style>
+{% endblock %}

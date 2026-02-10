@@ -165,6 +165,10 @@
 {% endblock %}
 
 {% block javascripts %}
+    {{ parent() }}
+
+    <script src="{{ asset('js/admin-user-validation.js') }}"></script>
+
 <script>
 document.addEventListener('DOMContentLoaded', function() {
     // Password visibility toggle
