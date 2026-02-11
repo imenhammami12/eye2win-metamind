@@ -1,0 +1,244 @@
+{# expects: channels, pendingCount #}
+
+{#<div class="mb-3">#}
+{#    <h6 class="text-muted mb-0">#}
+{#        <i class="bi bi-info-circle me-2"></i>#}
+{#        Found <strong>{{ channels|length }}</strong> channel{{ channels|length != 1 ? 's' : '' }}#}
+{#        {% if pendingCount > 0 %}#}
+{#            <span class="badge bg-warning ms-2">#}
+{#        <i class="bi bi-hourglass-split me-1"></i>{{ pendingCount }} pending#}
+{#      </span>#}
+{#        {% endif %}#}
+{#    </h6>#}
+{#</div>#}
+
+{#<div class="table-card fade-in">#}
+{#    <div class="table-header">#}
+{#        <h5><i class="bi bi-chat-square-dots me-2"></i>Channels List</h5>#}
+{#    </div>#}
+
+{#    <div class="table-responsive">#}
+{#        <table class="custom-table table">#}
+{#            <thead>... keep your same <tr> headers ...</thead>#}
+{#            <tbody>#}
+{#            {% for c in channels %}#}
+{#                ... keep your same <tr> rows ...#}
+{#            {% else %}#}
+{#                <tr>#}
+{#                    <td colspan="8" class="text-center text-muted py-5">#}
+{#                        <div class="empty-state">#}
+{#                            <i class="bi bi-inbox" style="font-size:64px; opacity:.2;"></i>#}
+{#                            <h4 class="mt-3 mb-2">No Channels Found</h4>#}
+{#                            <p class="text-muted">Try adjusting filters</p>#}
+{#                        </div>#}
+{#                    </td>#}
+{#                </tr>#}
+{#            {% endfor %}#}
+{#            </tbody>#}
+{#        </table>#}
+{#    </div>#}
+{#</div>#}
+{# templates/admin/channel/_table.html.twig #}
+{# variables attendues :
+   - channels
+   - pendingCount
+   - q, status, type, active, sort, dir
+#}
+
+{% macro sort_link(label, field, q, status, type, active, sort, dir) %}
+    {% set nextDir = (sort == field and dir == 'asc') ? 'desc' : 'asc' %}
+    <a class="text-decoration-none" style="color: inherit;"
+       href="{{ path('admin_channels_index', {
+           q: q,
+           status: status,
+           type: type,
+           active: active,
+           sort: field,
+           dir: nextDir
+       }) }}">
+        {{ label }}
+        {% if sort == field %}
+            <i class="bi {{ dir == 'asc' ? 'bi-caret-up-fill' : 'bi-caret-down-fill' }} ms-1"></i>
+        {% else %}
+            <i class="bi bi-arrow-down-up ms-1" style="opacity: .4;"></i>
+        {% endif %}
+    </a>
+{% endmacro %}
+
+{% import _self as ui %}
+
+{# ✅ Summary (comme ton index) #}
+<div class="mb-3 fade-in" style="animation-delay: 0.1s;">
+    <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
+        <h6 class="text-muted mb-0">
+            <i class="bi bi-info-circle me-2"></i>
+            Found <strong>{{ channels|length }}</strong>
+            channel{{ channels|length != 1 ? 's' : '' }}
+
+            {% if pendingCount > 0 %}
+                <span class="badge bg-warning ms-2">
+                    <i class="bi bi-hourglass-split me-1"></i>
+                    {{ pendingCount }} pending
+                </span>
+            {% endif %}
+        </h6>
+
+        <a href="{{ path('admin_channels_new') }}" class="btn btn-success">
+            <i class="bi bi-plus-circle me-2"></i>New Channel
+        </a>
+    </div>
+</div>
+
+{# ✅ Re-inject CSRF map for delete modal (OBLIGATOIRE après AJAX) #}
+<script>
+    window.__deleteTokens = {
+        {% for c in channels %}
+        "{{ c.id }}": "{{ csrf_token('admin_delete_channel_' ~ c.id) }}",
+        {% endfor %}
+    };
+</script>
+
+{# ✅ Channels Table (identique à ton index) #}
+<div class="table-card fade-in" style="animation-delay: 0.2s;">
+    <div class="table-header">
+        <h5>
+            <i class="bi bi-chat-square-dots me-2"></i>
+            Channels List
+        </h5>
+    </div>
+
+    <div class="table-responsive">
+        <table class="custom-table table">
+            <thead>
+            <tr>
+                <th style="width:80px;">#</th>
+                <th style="width:220px;">{{ ui.sort_link('Name', 'name', q, status, type, active, sort, dir) }}</th>
+                <th style="width:140px;">{{ ui.sort_link('Game', 'game', q, status, type, active, sort, dir) }}</th>
+                <th style="width:120px;">{{ ui.sort_link('Type', 'type', q, status, type, active, sort, dir) }}</th>
+                <th style="width:140px;">Status</th>
+                <th style="width:110px;">Active</th>
+                <th style="width:200px;">Created By</th>
+                <th style="width:200px;">Actions</th>
+            </tr>
+            </thead>
+
+            <tbody>
+            {% for c in channels %}
+                <tr class="fade-in" style="animation-delay: {{ loop.index * 0.03 }}s;">
+                    <td><strong>{{ c.id }}</strong></td>
+
+                    <td>
+                        <strong>{{ c.name }}</strong>
+                        {% if c.rejectionReason %}
+                            <div class="text-muted" style="font-size: 12px; opacity: .8;">
+                                <i class="bi bi-info-circle me-1"></i>
+                                {{ c.rejectionReason }}
+                            </div>
+                        {% endif %}
+                    </td>
+
+                    <td>{{ c.game }}</td>
+
+                    <td>
+                        {% if c.type == 'public' %}
+                            <span class="badge bg-info">
+                                <i class="bi bi-globe me-1"></i>Public
+                            </span>
+                        {% else %}
+                            <span class="badge bg-secondary">
+                                <i class="bi bi-lock-fill me-1"></i>Private
+                            </span>
+                        {% endif %}
+                    </td>
+
+                    <td>
+                        {% if c.status == 'approved' %}
+                            <span class="badge bg-success">
+                                <i class="bi bi-check-circle me-1"></i>Approved
+                            </span>
+                        {% elseif c.status == 'pending' %}
+                            <span class="badge bg-warning text-dark">
+                                <i class="bi bi-hourglass-split me-1"></i>Pending
+                            </span>
+                        {% else %}
+                            <span class="badge bg-danger">
+                                <i class="bi bi-x-circle me-1"></i>Rejected
+                            </span>
+                        {% endif %}
+                    </td>
+
+                    <td>
+                        {% if c.isActive %}
+                            <span class="badge bg-success">Yes</span>
+                        {% else %}
+                            <span class="badge bg-secondary">No</span>
+                        {% endif %}
+                    </td>
+
+                    <td>
+                        <small class="text-muted">{{ c.createdBy ?? '-' }}</small>
+                    </td>
+
+                    <td>
+                        <div class="btn-group" role="group">
+                            <a class="btn btn-sm btn-warning"
+                               href="{{ path('admin_channels_edit', {id: c.id}) }}"
+                               data-bs-toggle="tooltip"
+                               title="Edit">
+                                <i class="bi bi-pencil"></i>
+                            </a>
+
+                            {% if c.status == 'pending' %}
+                                <button type="button"
+                                        class="btn btn-sm btn-success"
+                                        onclick="confirmAction('{{ path('admin_channels_approve', {id: c.id}) }}', '{{ csrf_token('approve_' ~ c.id) }}', 'Approve this channel?')"
+                                        data-bs-toggle="tooltip"
+                                        title="Approve">
+                                    <i class="bi bi-check-lg"></i>
+                                </button>
+
+                                <button type="button"
+                                        class="btn btn-sm btn-danger"
+                                        onclick="openRejectModal({{ c.id }}, '{{ c.name|e('js') }}', '{{ csrf_token('reject_' ~ c.id) }}')"
+                                        title="Reject">
+                                    <i class="bi bi-x-lg"></i>
+                                </button>
+                            {% endif %}
+
+                            <button type="button"
+                                    class="btn btn-sm btn-secondary"
+                                    onclick="confirmAction('{{ path('admin_channels_toggle', {id: c.id}) }}', '{{ csrf_token('toggle_' ~ c.id) }}', 'Toggle active state?')"
+                                    data-bs-toggle="tooltip"
+                                    title="Toggle active">
+                                <i class="bi bi-toggle2-on"></i>
+                            </button>
+
+                            <button type="button"
+                                    class="btn btn-sm btn-danger"
+                                    data-bs-toggle="modal"
+                                    data-bs-target="#deleteChannelModal"
+                                    data-channel-id="{{ c.id }}"
+                                    data-channel-name="{{ c.name|e('html_attr') }}"
+                                    data-messages-count="{{ c.messages|length }}"
+                                    data-delete-url="{{ path('admin_channels_delete', {id: c.id}) }}"
+                                    title="Delete">
+                                <i class="bi bi-trash"></i>
+                            </button>
+                        </div>
+                    </td>
+                </tr>
+            {% else %}
+                <tr>
+                    <td colspan="8" class="text-center text-muted py-5">
+                        <div class="empty-state">
+                            <i class="bi bi-inbox" style="font-size: 64px; opacity: 0.2;"></i>
+                            <h4 class="mt-3 mb-2">No Channels Found</h4>
+                            <p class="text-muted">Try adjusting filters</p>
+                        </div>
+                    </td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>

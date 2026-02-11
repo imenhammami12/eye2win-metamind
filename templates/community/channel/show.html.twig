@@ -402,11 +402,11 @@
 
                                     <div class="edit-actions">
                                         <button class="btn btn-danger btn-sm">
-                                            <i class="fas fa-save"></i> Sauver
+                                            <i class="fas fa-save"></i> Save
                                         </button>
                                         <a class="btn btn-secondary btn-sm"
                                            href="{{ path('community_channels_show', {id: channel.id}) }}">
-                                            Annuler
+                                            Cancel
                                         </a>
                                     </div>
 
@@ -415,7 +415,7 @@
 
                             {% else %}
                                 {% if m.isDeleted %}
-                                    <div class="msg-deleted">Ce message a été supprimé.</div>
+                                    <div class="msg-deleted">this message is deleted.</div>
                                 {% else %}
                                     <div class="msg-text">{{ m.content }}</div>
                                 {% endif %}
@@ -431,7 +431,7 @@
                     </div>
                 {% else %}
                     <div class="text-center" style="color: rgba(255,255,255,0.75); padding: 30px 10px;">
-                        Aucun message pour le moment. Lance la conversation 🔥
+                        No message at the moment. Start a conversation 🔥
                     </div>
                 {% endfor %}
             </div>
@@ -440,14 +440,14 @@
                 {% if is_granted('ROLE_USER') %}
                     {{ form_start(messageForm) }}
                     <div class="compose-row">
-                        {{ form_widget(messageForm.content, {'attr': {'placeholder': 'Écris ton message...', 'rows': 2}}) }}
+                        {{ form_widget(messageForm.content, {'attr': {'placeholder': 'Type here...', 'rows': 2}}) }}
                         <button class="btn-send" type="submit">
-                            <i class="fas fa-paper-plane"></i> Envoyer
+                            <i class="fas fa-paper-plane"></i> Send
                         </button>
                     </div>
                     {{ form_end(messageForm) }}
                 {% else %}
-                    <div class="text-muted">Connecte-toi pour envoyer un message.</div>
+                    <div class="text-muted">Login to send a message.</div>
                 {% endif %}
             </div>
         </div>

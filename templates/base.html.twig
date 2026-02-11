@@ -342,5 +342,86 @@
     <!-- custom js -->
     <script src="{{ asset('assets/js/custom.js') }}"></script>
     {% endblock %}
+
+    {# ✅ Global Confirm Modal (Bootstrap) #}
+    <div class="modal fade" id="confirmActionModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content" style="background: rgba(15,15,20,0.95); border:1px solid rgba(255,255,255,0.08); border-radius:16px;">
+                <div class="modal-header" style="border-bottom:1px solid rgba(255,255,255,0.08);">
+                    <h5 class="modal-title" id="confirmActionTitle" style="color:#fff;">Confirm</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+
+                <div class="modal-body" style="color: rgba(255,255,255,0.85);">
+                    <div id="confirmActionMessage">Are you sure?</div>
+                </div>
+
+                <div class="modal-footer" style="border-top:1px solid rgba(255,255,255,0.08);">
+                    <button type="button" class="btn btn-outline-light" data-bs-dismiss="modal">Cancel</button>
+
+                    {# ✅ This form is used to submit POST actions (with CSRF if provided) #}
+                    <form id="confirmActionForm" method="post" action="">
+                        <input type="hidden" name="_token" id="confirmActionToken" value="">
+                        <button type="submit" class="btn btn-danger" id="confirmActionBtn">Confirm</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        window.openConfirmModal = function({ title = 'Confirm', message = 'Are you sure?', action = '', method = 'post', token = '', confirmText = 'Confirm' }) {
+            document.getElementById('confirmActionTitle').textContent = title;
+            document.getElementById('confirmActionMessage').textContent = message;
+
+            const form = document.getElementById('confirmActionForm');
+            const tokenInput = document.getElementById('confirmActionToken');
+            const btn = document.getElementById('confirmActionBtn');
+
+            form.action = action;
+            form.method = method.toLowerCase() === 'get' ? 'get' : 'post';
+            tokenInput.value = token || '';
+            tokenInput.style.display = token ? 'block' : 'none';
+
+            btn.textContent = confirmText;
+
+            bootstrap.Modal.getOrCreateInstance(document.getElementById('confirmActionModal')).show();
+        };
+
+        // ✅ Replace any native confirm() usage
+        document.addEventListener('submit', function(e) {
+            const form = e.target;
+            if (!form.matches('[data-confirm]')) return;
+
+            e.preventDefault();
+
+            window.openConfirmModal({
+                title: form.getAttribute('data-confirm-title') || 'Confirm',
+                message: form.getAttribute('data-confirm') || 'Are you sure?',
+                action: form.getAttribute('action'),
+                method: form.getAttribute('method') || 'post',
+                token: (form.querySelector('input[name="_token"]') || {}).value || '',
+                confirmText: form.getAttribute('data-confirm-btn') || 'Confirm'
+            });
+        });
+
+        document.addEventListener('click', function(e) {
+            const btn = e.target.closest('[data-confirm-link]');
+            if (!btn) return;
+
+            e.preventDefault();
+
+            window.openConfirmModal({
+                title: btn.getAttribute('data-confirm-title') || 'Confirm',
+                message: btn.getAttribute('data-confirm-link') || 'Are you sure?',
+                action: btn.getAttribute('href') || btn.getAttribute('data-action'),
+                method: btn.getAttribute('data-method') || 'post',
+                token: btn.getAttribute('data-token') || '',
+                confirmText: btn.getAttribute('data-confirm-btn') || 'Confirm'
+            });
+        });
+    </script>
+
+
 </body>
 </html>

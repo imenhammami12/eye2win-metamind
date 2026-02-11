@@ -305,5 +305,105 @@
     
     {% block javascripts %}{% endblock %}
     {% block modals %}{% endblock %}
+
+    <div class="modal fade" id="confirmActionModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content" style="background:#101622; border:1px solid rgba(255,255,255,.08);">
+                <div class="modal-header" style="border-bottom:1px solid rgba(255,255,255,.08);">
+                    <h5 class="modal-title text-white" id="confirmActionTitle">Confirm action</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+
+                <div class="modal-body text-white-50">
+                    <p class="mb-0" id="confirmActionText">Are you sure?</p>
+                </div>
+
+                <div class="modal-footer" style="border-top:1px solid rgba(255,255,255,.08);">
+                    <button type="button" class="btn btn-outline-light" data-bs-dismiss="modal">Cancel</button>
+
+                    <form id="confirmActionForm" method="post" action="">
+                        <input type="hidden" name="_token" id="confirmActionToken" value="">
+                        <button type="submit" class="btn btn-danger" id="confirmActionSubmit">Confirm</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const modalEl = document.getElementById('confirmActionModal');
+            if (!modalEl) return;
+
+            modalEl.addEventListener('show.bs.modal', (event) => {
+                const btn = event.relatedTarget;
+
+                const url   = btn.getAttribute('data-action-url');
+                const token = btn.getAttribute('data-token');
+                const title = btn.getAttribute('data-title') || 'Confirm action';
+                const msg   = btn.getAttribute('data-message') || 'Are you sure?';
+                const label = btn.getAttribute('data-confirm-label') || 'Confirm';
+
+                document.getElementById('confirmActionTitle').textContent = title;
+                document.getElementById('confirmActionText').textContent = msg;
+
+                const form = document.getElementById('confirmActionForm');
+                form.action = url;
+
+                document.getElementById('confirmActionToken').value = token;
+                document.getElementById('confirmActionSubmit').textContent = label;
+
+                // Optional: switch button color depending on action label
+                const submitBtn = document.getElementById('confirmActionSubmit');
+                submitBtn.classList.remove('btn-danger','btn-success','btn-warning','btn-primary');
+                submitBtn.classList.add(label.toLowerCase().includes('restore') ? 'btn-success' : 'btn-danger');
+            });
+        });
+    </script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const form = document.getElementById('channelsFiltersForm');
+            if (!form) return;
+
+            const results = document.getElementById('channelsResults');
+
+            const fetchResults = async () => {
+                const url = new URL(form.action, window.location.origin);
+                const params = new URLSearchParams(new FormData(form));
+                url.search = params.toString();
+
+                const res = await fetch(url.toString(), {
+                    headers: { 'X-Requested-With': 'XMLHttpRequest' }
+                });
+
+                const html = await res.text();
+                results.innerHTML = html;
+
+                // keep url updated (nice UX)
+                window.history.replaceState({}, '', url.toString());
+            };
+
+            // submit button
+            form.addEventListener('submit', (e) => {
+                e.preventDefault();
+                fetchResults();
+            });
+
+            // dynamic triggers
+            form.querySelectorAll('input, select').forEach(el => {
+                el.addEventListener('change', fetchResults);
+
+                // only for search input: live typing
+                if (el.name === 'q') {
+                    let t;
+                    el.addEventListener('input', () => {
+                        clearTimeout(t);
+                        t = setTimeout(fetchResults, 250);
+                    });
+                }
+            });
+        });
+    </script>
+
+
 </body>
 </html>

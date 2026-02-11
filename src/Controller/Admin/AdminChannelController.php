@@ -27,10 +27,29 @@ class AdminChannelController extends AbstractController
         $type = (string) $request->query->get('type', 'all');     // all|public|private (enum)
         $active = (string) $request->query->get('active', 'all'); // all|1|0
 
-        $channels = $repo->findAdminList($q, $status, $type, $active);
+        // ✅ sorting
+        $sort = (string) $request->query->get('sort', 'createdAt');
+        $dir  = strtolower((string) $request->query->get('dir', 'desc'));
+        $dir  = $dir === 'asc' ? 'asc' : 'desc';
+
+        $channels = $repo->findAdminList($q, $status, $type, $active,$sort,$dir);
 
         // stats pour cards
         $pendingCount = $repo->countByStatus(Channel::STATUS_PENDING);
+
+        if ($request->isXmlHttpRequest()) {
+            return $this->render('admin/channel/_table.html.twig', [
+                'channels' => $channels,
+                'q' => $q,
+                'status' => $status,
+                'type' => $type,
+                'active' => $active,
+                'sort' => $sort,
+                'dir' => $dir,
+                'pendingCount' => $pendingCount,
+            ]);
+        }
+
 
         return $this->render('admin/channel/index.html.twig', [
             'channels' => $channels,
@@ -39,6 +58,8 @@ class AdminChannelController extends AbstractController
             'type' => $type,
             'active' => $active,
             'pendingCount' => $pendingCount,
+            'sort' => $sort,
+            'dir' => $dir,
         ]);
     }
 

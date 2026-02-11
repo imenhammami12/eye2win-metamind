@@ -16,11 +16,11 @@ class ChannelType extends AbstractType
         $builder
             ->add('name', null, [
                 'label' => 'Name',
-                'attr' => ['placeholder' => 'Nom du channel'],
+                'attr' => ['placeholder' => "channel's name" ],
             ])
             ->add('description', null, [
                 'label' => 'Description',
-                'attr' => ['placeholder' => 'Décris ton channel...'],
+                'attr' => ['placeholder' => 'Describe your channel...'],
             ])
             ->add('game', null, [
                 'label' => 'Game',
@@ -39,7 +39,7 @@ class ChannelType extends AbstractType
             ->add('imageUrl', null, [
                 'label' => 'Image URL (optional)',
                 'required' => false,
-                'attr' => ['placeholder' => 'URL image (optionnel)'],
+                'attr' => ['placeholder' => 'URL image (optional)'],
             ]);
     }
 

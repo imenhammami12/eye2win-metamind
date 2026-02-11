@@ -54,7 +54,7 @@ class ChannelRepository extends ServiceEntityRepository
         return $qb->getQuery()->getResult();
     } /// returns only channels that are approved + active /// used in channelController index+show
 
-    public function findAdminList(string $q, string $status, string $type, string $active): array
+    public function findAdminList(string $q, string $status, string $type, string $active, string $sort, string $dir): array
     {
         $qb = $this->createQueryBuilder('c');
 
@@ -78,8 +78,33 @@ class ChannelRepository extends ServiceEntityRepository
         if ($active !== 'all') {
             $qb->andWhere('c.isActive = :active')->setParameter('active', $active === '1');
         }
+        $sortMap = [
+            'id'        => 'c.id',
+            'name'      => 'c.name',
+            'game'      => 'c.game',
+            'type'      => 'c.type',
+            'status'    => 'c.status',
+            'active'    => 'c.isActive',
+            'createdAt' => 'c.createdAt',
+            'createdBy' => 'c.createdBy',
+            'approvedAt'=> 'c.approvedAt',
+        ];
 
-        return $qb->orderBy('c.createdAt', 'DESC')->getQuery()->getResult();
+        $sortExpr = $sortMap[$sort] ?? 'c.createdAt';
+        $dirSql   = strtoupper($dir) === 'asc' ? 'ASC' : 'DESC';
+
+        $qb->orderBy($sortExpr, $dirSql);
+
+        if($sortExpr !== 'c.id'){
+            $qb->addOrderBy('c.id','DESC');
+        }
+        return $qb->getQuery()->getResult();
+
+        /*return $qb
+            ->orderBy('c.createdAt', 'DESC')
+            ->addOrderBy($sortExpr, $dirSql)
+            ->getQuery()
+            ->getResult();*/
     }/// used in adminchannelcontroller for filtering
 
     public function countByStatus(string $status): int
