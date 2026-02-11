@@ -91,12 +91,15 @@ security:
         # Admin routes - NO 2FA required
         - { path: ^/admin/audit, roles: ROLE_SUPER_ADMIN }
         - { path: ^/admin, roles: ROLE_ADMIN }
-        
+        - { path: ^/admin/complaints, roles: ROLE_ADMIN }
+
         # User routes - 2FA required if enabled
         - { path: ^/profile, roles: ROLE_USER }
         - { path: ^/upload, roles: ROLE_USER }
         - { path: ^/video, roles: ROLE_USER }
         - { path: ^/dashboard, roles: ROLE_USER }
+        - { path: ^/complaints, roles: ROLE_USER }
+
 
 
 when@test:

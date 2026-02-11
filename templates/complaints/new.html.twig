@@ -1,0 +1,194 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Submit Complaint{% endblock %}
+
+{% block body %}
+<section class="breadcrumb_part">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-12">
+                <div class="breadcrumb_iner">
+                    <h2>Submit Complaint</h2>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="py-5">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-8">
+                <div class="card" style="background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 12px;">
+                    <div class="card-body p-4">
+                        <div class="text-center mb-4">
+                            <h3>Submit a Support Ticket</h3>
+                            <p class="text-muted">We're here to help! Please provide details about your issue.</p>
+                        </div>
+
+                        <form method="post" enctype="multipart/form-data">
+                            <input type="hidden" name="_token" value="{{ csrf_token('new-complaint') }}">
+
+                            <!-- Category Selection -->
+                            <div class="mb-4">
+                                <label class="form-label">Category *</label>
+                                <div class="row g-3">
+                                    {% for category in categories %}
+                                    <div class="col-md-6">
+                                        <div class="category-option">
+                                            <input type="radio" 
+                                                   class="btn-check" 
+                                                   name="category" 
+                                                   id="category_{{ category.value }}" 
+                                                   value="{{ category.value }}"
+                                                   required>
+                                            <label class="btn btn-outline-light w-100 text-start" 
+                                                   for="category_{{ category.value }}"
+                                                   style="border: 2px solid rgba(255, 255, 255, 0.1); border-radius: 8px; padding: 1rem;">
+                                                <div class="d-flex align-items-start">
+                                                    <i class="{{ category.icon }} me-3" style="font-size: 1.5rem; color: rgba(255, 255, 255, 0.6);"></i>
+                                                    <div>
+                                                        <strong class="d-block mb-1">{{ category.label }}</strong>
+                                                        <small class="text-muted">{{ category.description }}</small>
+                                                    </div>
+                                                </div>
+                                            </label>
+                                        </div>
+                                    </div>
+                                    {% endfor %}
+                                </div>
+                            </div>
+
+                            <!-- Subject -->
+                            <div class="mb-4">
+                                <label for="subject" class="form-label">Subject *</label>
+                                <input type="text" 
+                                       class="form-control" 
+                                       id="subject" 
+                                       name="subject" 
+                                       placeholder="Brief summary of your issue"
+                                       minlength="5"
+                                       maxlength="200"
+                                       required>
+                                <small class="form-text text-muted">Minimum 5 characters, maximum 200 characters</small>
+                            </div>
+
+                            <!-- Description -->
+                            <div class="mb-4">
+                                <label for="description" class="form-label">Description *</label>
+                                <textarea class="form-control" 
+                                          id="description" 
+                                          name="description" 
+                                          rows="6" 
+                                          placeholder="Please provide detailed information about your issue..."
+                                          minlength="10"
+                                          required></textarea>
+                                <small class="form-text text-muted">Be as detailed as possible to help us resolve your issue quickly</small>
+                            </div>
+
+                            <!-- Attachment -->
+                            <div class="mb-4">
+                                <label for="attachment" class="form-label">Attachment (Optional)</label>
+                                <input type="file" 
+                                       class="form-control" 
+                                       id="attachment" 
+                                       name="attachment"
+                                       accept="image/*,.pdf,.doc,.docx">
+                                <small class="form-text text-muted">You can attach screenshots or documents to help explain your issue (Max 5MB)</small>
+                            </div>
+
+                            <!-- Information Box -->
+                            <div class="alert alert-info" style="background: rgba(13, 110, 253, 0.1); border: 1px solid rgba(13, 110, 253, 0.3);">
+                                <h6 class="alert-heading">
+                                    <i class="fas fa-info-circle"></i> What happens next?
+                                </h6>
+                                <ul class="mb-0" style="padding-left: 1.5rem;">
+                                    <li>Your complaint will be reviewed by our support team</li>
+                                    <li>You'll receive a response within 24-48 hours</li>
+                                    <li>You can track the status of your complaint anytime</li>
+                                    <li>You'll be notified when there's an update</li>
+                                </ul>
+                            </div>
+
+                            <!-- Submit Buttons -->
+                            <div class="d-flex gap-2 justify-content-end">
+                                <a href="{{ path('app_complaints_index') }}" class="btn btn-outline-light">
+                                    <i class="fas fa-times"></i> Cancel
+                                </a>
+                                <button type="submit" class="btn btn_1">
+                                    <i class="fas fa-paper-plane"></i> Submit Complaint
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- Help Section -->
+                <div class="card mt-4" style="background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.05); border-radius: 12px;">
+                    <div class="card-body">
+                        <h5><i class="fas fa-question-circle"></i> Need Help?</h5>
+                        <p class="text-muted mb-0">
+                            Before submitting a complaint, you might want to check our 
+                            <a href="#" class="text-decoration-none">FAQ section</a> or 
+                            <a href="#" class="text-decoration-none">Knowledge Base</a> 
+                            for quick answers to common questions.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<style>
+.category-option {
+    height: 100%;
+}
+
+.category-option .btn-check:checked + .btn {
+    background-color: rgba(255, 255, 255, 0.1);
+    border-color: #007bff;
+}
+
+.form-control {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    color: white;
+}
+
+.form-control:focus {
+    background: rgba(255, 255, 255, 0.08);
+    border-color: #007bff;
+    color: white;
+}
+
+.form-control::placeholder {
+    color: rgba(255, 255, 255, 0.4);
+}
+
+.form-label {
+    font-weight: 600;
+    color: rgba(255, 255, 255, 0.9);
+}
+</style>
+
+<script>
+// File size validation
+document.getElementById('attachment').addEventListener('change', function(e) {
+    const file = e.target.files[0];
+    if (file && file.size > 5 * 1024 * 1024) { // 5MB
+        alert('File size must be less than 5MB');
+        e.target.value = '';
+    }
+});
+
+// Character counter for description
+const descriptionField = document.getElementById('description');
+if (descriptionField) {
+    descriptionField.addEventListener('input', function() {
+        const length = this.value.length;
+        // You can add a character counter here if needed
+    });
+}
+</script>
+{% endblock %}

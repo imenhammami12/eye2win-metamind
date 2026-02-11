@@ -9,7 +9,7 @@ parameters:
     cv_directory: '%kernel.project_dir%/public/uploads/cv'
     teams_directory: '%kernel.project_dir%/public/uploads/teams'
     tournois_directory: '%kernel.project_dir%/public/uploads/tournois'
-
+    complaints_directory: '%kernel.project_dir%/public/uploads/complaints'
 
 services:
     # default configuration for services in *this* file
