@@ -9,6 +9,7 @@ use App\Entity\User;
 use App\Entity\AuditLog;
 use App\Repository\ComplaintRepository;
 use App\Repository\UserRepository;
+use App\Service\ComplaintNotificationService;
 use Doctrine\ORM\EntityManagerInterface;
 use Knp\Component\Pager\PaginatorInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -16,11 +17,16 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
+use App\Service\NotificationService;
 
 #[Route('/admin/complaints')]
 #[IsGranted('ROLE_ADMIN')]
 class AdminComplaintController extends AbstractController
 {
+    public function __construct(
+        private NotificationService $notificationService
+    ) {}
+
     #[Route('/', name: 'admin_complaints_index')]
     public function index(
         Request $request,
@@ -173,11 +179,16 @@ class AdminComplaintController extends AbstractController
                 "Complaint #{$complaint->getId()} assigned to {$admin->getUsername()}"
             );
             
+            // Send notification
+            $this->notificationService->notifyComplaintAssigned($complaint, $admin);
+            
             $this->addFlash('success', "Complaint assigned to {$admin->getUsername()} successfully");
         }
         
         $em->flush();
-        
+    
+        $this->notificationService->notifyComplaintAssigned($complaint, $admin);
+
         return $this->redirectToRoute('admin_complaints_show', ['id' => $complaint->getId()]);
     }
     
@@ -204,8 +215,15 @@ class AdminComplaintController extends AbstractController
             "Status changed from {$oldStatus->value} to {$newStatus->value}"
         );
         
-        $em->flush();
+        // Send notification
+        $this->notificationService->notifyComplaintStatusChanged($complaint, $oldStatus->getLabel(), $newStatus->getLabel());
         
+        $em->flush();
+           $this->notificationService->notifyComplaintStatusChanged(
+            $complaint,
+            $oldStatus->getLabel(),
+            $newStatus->getLabel()
+        );
         $this->addFlash('success', "Complaint status updated to {$newStatus->getLabel()}");
         return $this->redirectToRoute('admin_complaints_show', ['id' => $complaint->getId()]);
     }
@@ -233,8 +251,16 @@ class AdminComplaintController extends AbstractController
             "Priority changed from {$oldPriority->value} to {$newPriority->value}"
         );
         
+        // Send notification
+        $this->notificationService->notifyComplaintPriorityChanged($complaint, $oldPriority->getLabel(), $newPriority->getLabel());
+        
         $em->flush();
         
+         $this->notificationService->notifyComplaintPriorityChanged(
+            $complaint,
+            $oldPriority->getLabel(),
+            $newPriority->getLabel()
+        );
         $this->addFlash('success', "Complaint priority updated to {$newPriority->getLabel()}");
         return $this->redirectToRoute('admin_complaints_show', ['id' => $complaint->getId()]);
     }
@@ -276,8 +302,13 @@ class AdminComplaintController extends AbstractController
             "Admin response added to complaint #{$complaint->getId()}"
         );
         
+        // Send notification
+        $this->notificationService->notifyComplaintResponded($complaint);
+        
         $em->flush();
         
+        $this->notificationService->notifyComplaintResponded($complaint);
+
         $this->addFlash('success', 'Response submitted successfully');
         return $this->redirectToRoute('admin_complaints_show', ['id' => $complaint->getId()]);
     }
@@ -310,8 +341,12 @@ class AdminComplaintController extends AbstractController
             "Complaint #{$complaint->getId()} marked as resolved"
         );
         
-        $em->flush();
+        // Send notification
+        $this->notificationService->notifyComplaintResolved($complaint);
         
+        $em->flush();
+        $this->notificationService->notifyComplaintResolved($complaint);
+
         $this->addFlash('success', 'Complaint resolved successfully');
         return $this->redirectToRoute('admin_complaints_show', ['id' => $complaint->getId()]);
     }

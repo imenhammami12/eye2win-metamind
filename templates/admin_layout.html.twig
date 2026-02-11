@@ -19,6 +19,7 @@
     {# Enhanced Gaming Admin CSS #}
     <link rel="stylesheet" href="{{ asset('assets/css/admincss.css') }}">
     
+   <link rel="stylesheet" href="{{ asset('assets/css/admin-notifications.css') }}">
 
     
     {% block stylesheets %}{% endblock %}
@@ -319,5 +320,9 @@
     
     {% block javascripts %}{% endblock %}
     {% block modals %}{% endblock %}
+    <script src="{{ asset('assets/js/admin-notifications.js') }}"></script>
+{% if app.user %}
+    <script src="{{ asset('assets/js/admin-notifications.js') }}"></script>
+{% endif %}
 </body>
 </html>

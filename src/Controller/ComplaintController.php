@@ -1,6 +1,7 @@
 <?php
 
 namespace App\Controller;
+use App\Service\NotificationService;
 
 use App\Entity\Complaint;
 use App\Entity\ComplaintCategory;
@@ -18,6 +19,10 @@ use Symfony\Component\String\Slugger\SluggerInterface;
 #[IsGranted('ROLE_USER')]
 class ComplaintController extends AbstractController
 {
+    public function __construct(
+        private NotificationService $notificationService
+    ) {}
+    
     #[Route('/', name: 'app_complaints_index')]
     public function index(ComplaintRepository $complaintRepository): Response
     {
@@ -69,6 +74,8 @@ class ComplaintController extends AbstractController
             $em->persist($complaint);
             $em->flush();
             
+            $this->notificationService->notifyComplaintSubmitted($complaint);
+
             $this->addFlash('success', 'Your complaint has been submitted successfully. We will review it shortly.');
             return $this->redirectToRoute('app_complaints_show', ['id' => $complaint->getId()]);
         }

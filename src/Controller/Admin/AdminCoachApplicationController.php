@@ -16,12 +16,15 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
+use App\Service\NotificationService;
 
 #[Route('/admin/coach-applications')]
 #[IsGranted('ROLE_ADMIN')]
 class AdminCoachApplicationController extends AbstractController
 {
     public function __construct(
+        private NotificationService $notificationService,
+
         private CoachApplicationEmailService $emailService
     ) {
     }
@@ -162,6 +165,8 @@ class AdminCoachApplicationController extends AbstractController
         
         $em->flush();
         
+        $this->notificationService->notifyCoachApplicationApproved($application);
+
         // Send approval email
         $this->emailService->sendApprovalEmail($application);
         
@@ -207,7 +212,8 @@ class AdminCoachApplicationController extends AbstractController
         );
         
         $em->flush();
-        
+        $this->notificationService->notifyCoachApplicationRejected($application);
+ 
         // Send rejection email
         $this->emailService->sendRejectionEmail($application);
         
