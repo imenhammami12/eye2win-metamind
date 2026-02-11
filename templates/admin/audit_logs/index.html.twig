@@ -1,0 +1,269 @@
+{% extends 'admin_layout.html.twig' %}
+
+{% block title %}Audit Logs - Administration{% endblock %}
+{% block page_title %}Audit Logs{% endblock %}
+
+{% block body %}
+
+{# Statistics Cards - Gaming Style #}
+<div class="row g-4 mb-4 fade-in">
+    <div class="col-md-3">
+        <div class="stat-card">
+            <div class="stat-card-icon" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
+                <i class="bi bi-journal-text text-white"></i>
+            </div>
+            <div class="stat-card-title">Total Logs</div>
+            <div class="stat-card-value">{{ stats.total|number_format(0, ',', ' ') }}</div>
+        </div>
+    </div>
+    
+    <div class="col-md-3">
+        <div class="stat-card">
+            <div class="stat-card-icon" style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);">
+                <i class="bi bi-calendar-day text-white"></i>
+            </div>
+            <div class="stat-card-title">Today</div>
+            <div class="stat-card-value">{{ stats.today }}</div>
+        </div>
+    </div>
+    
+    <div class="col-md-3">
+        <div class="stat-card">
+            <div class="stat-card-icon" style="background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);">
+                <i class="bi bi-calendar-week text-white"></i>
+            </div>
+            <div class="stat-card-title">Last 7 Days</div>
+            <div class="stat-card-value">{{ stats.last7Days }}</div>
+        </div>
+    </div>
+    
+    <div class="col-md-3">
+        <div class="stat-card">
+            <div class="stat-card-icon" style="background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);">
+                <i class="bi bi-calendar-month text-white"></i>
+            </div>
+            <div class="stat-card-title">Last 30 Days</div>
+            <div class="stat-card-value">{{ stats.last30Days }}</div>
+        </div>
+    </div>
+</div>
+
+{# Filters Card - Gaming Style #}
+<div class="table-card mb-4 fade-in" style="animation-delay: 0.1s;">
+    <div class="table-header d-flex justify-content-between align-items-center">
+        <h5 class="mb-0"><i class="bi bi-funnel me-2"></i>Filters</h5>
+        <button class="btn btn-sm btn-outline-secondary" type="button" data-bs-toggle="collapse" data-bs-target="#filterCollapse" aria-expanded="true">
+            <i class="bi bi-chevron-down"></i>
+        </button>
+    </div>
+    
+    <div class="collapse show" id="filterCollapse">
+        <form method="get" class="p-3" id="filterForm">
+            <div class="row g-3">
+                <div class="col-md-3">
+                    <label class="form-label">
+                        <i class="bi bi-lightning me-1"></i>Action
+                    </label>
+                    <select name="action" class="form-select" onchange="this.form.submit()">
+                        <option value="">All Actions</option>
+                        {% for act in actions %}
+                            <option value="{{ act }}" {% if action == act %}selected{% endif %}>{{ act|replace({'_': ' '}) }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                
+                <div class="col-md-3">
+                    <label class="form-label">
+                        <i class="bi bi-grid me-1"></i>Entity Type
+                    </label>
+                    <select name="entity_type" class="form-select" onchange="this.form.submit()">
+                        <option value="">All Types</option>
+                        {% for type in entityTypes %}
+                            <option value="{{ type }}" {% if entityType == type %}selected{% endif %}>{{ type }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                
+                <div class="col-md-2">
+                    <label class="form-label">
+                        <i class="bi bi-calendar-range me-1"></i>Date From
+                    </label>
+                    <input type="date" name="date_from" class="form-control" value="{{ dateFrom }}" onchange="this.form.submit()">
+                </div>
+                
+                <div class="col-md-2">
+                    <label class="form-label">
+                        <i class="bi bi-calendar-range me-1"></i>Date To
+                    </label>
+                    <input type="date" name="date_to" class="form-control" value="{{ dateTo }}" onchange="this.form.submit()">
+                </div>
+                
+                <div class="col-md-2 d-flex align-items-end gap-2">
+                    {% if action or entityType or dateFrom or dateTo %}
+                        <a href="{{ path('admin_audit_logs_index') }}" class="btn btn-outline-secondary flex-fill">
+                            <i class="bi bi-x-lg"></i>
+                        </a>
+                    {% endif %}
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+{# Results Summary #}
+<div class="mb-3 fade-in" style="animation-delay: 0.15s;">
+    <h6 class="text-muted mb-0">
+        <i class="bi bi-info-circle me-2"></i>
+        Found <strong>{{ auditLogs|length }}</strong> audit log{{ auditLogs|length != 1 ? 's' : '' }}
+        {% if action or entityType or dateFrom or dateTo %}
+            <span class="badge bg-primary">Filtered</span>
+        {% endif %}
+    </h6>
+</div>
+
+{# Audit Logs Table - Gaming Style #}
+<div class="table-card fade-in" style="animation-delay: 0.2s;">
+    <div class="table-header d-flex justify-content-between align-items-center">
+        <h5><i class="bi bi-list-ul me-2"></i>Audit Logs ({{ auditLogs|length }})</h5>
+        <div class="btn-group" role="group">
+            <a href="{{ path('admin_audit_logs_index', {sort_by: 'createdAt', sort_order: sortOrder == 'ASC' ? 'DESC' : 'ASC', action: action, entity_type: entityType, date_from: dateFrom, date_to: dateTo}) }}" 
+               class="btn btn-sm {{ sortBy == 'createdAt' ? 'btn-primary' : 'btn-outline-primary' }}">
+                <i class="bi bi-calendar me-1"></i>Date
+                {% if sortBy == 'createdAt' %}
+                    <i class="bi bi-arrow-{{ sortOrder == 'ASC' ? 'up' : 'down' }}"></i>
+                {% endif %}
+            </a>
+            <a href="{{ path('admin_audit_logs_index', {sort_by: 'action', sort_order: sortOrder == 'ASC' ? 'DESC' : 'ASC', action: action, entity_type: entityType, date_from: dateFrom, date_to: dateTo}) }}" 
+               class="btn btn-sm {{ sortBy == 'action' ? 'btn-primary' : 'btn-outline-primary' }}">
+                <i class="bi bi-lightning me-1"></i>Action
+                {% if sortBy == 'action' %}
+                    <i class="bi bi-arrow-{{ sortOrder == 'ASC' ? 'up' : 'down' }}"></i>
+                {% endif %}
+            </a>
+        </div>
+    </div>
+    
+    <div class="table-responsive">
+        <table class="custom-table table">
+<thead>
+    <tr>
+        <th>User</th>
+        <th>Action</th>
+        <th>Entity</th>
+        <th style="width: 180px;">Date & Time</th>
+        <th>Details</th>
+        <th style="width: 130px;">IP Address</th>
+        <th style="width: 100px;" class="text-center">Actions</th>
+    </tr>
+</thead>
+
+
+<tbody>
+    {% for log in auditLogs %}
+    <tr class="fade-in" style="animation-delay: {{ loop.index * 0.05 }}s;">
+        <td>
+            {% if log.user %}
+                <a href="{{ path('admin_users_show', {id: log.user.id}) }}" class="text-decoration-none" style="color: #43e97b;">
+                    <i class="bi bi-person-circle me-1"></i><strong>{{ log.user.username }}</strong>
+                </a>
+            {% else %}
+                <span class="text-muted">
+                    <i class="bi bi-gear me-1"></i>System
+                </span>
+            {% endif %}
+        </td>
+        <td>
+            {% if log.action starts with 'DELETE' or log.action starts with 'BAN' or 'REJECT' in log.action %}
+                <span class="badge bg-danger">{{ log.action|replace({'_': ' '}) }}</span>
+            {% elseif log.action starts with 'CREATE' or log.action starts with 'APPROVE' or 'ACTIVATED' in log.action %}
+                <span class="badge bg-success">{{ log.action|replace({'_': ' '}) }}</span>
+            {% elseif log.action starts with 'UPDATE' or log.action starts with 'EDIT' or 'SUSPEND' in log.action %}
+                <span class="badge bg-warning">{{ log.action|replace({'_': ' '}) }}</span>
+            {% else %}
+                <span class="badge bg-info">{{ log.action|replace({'_': ' '}) }}</span>
+            {% endif %}
+        </td>
+        <td>
+            {% if log.entityType %}
+                <span class="badge bg-secondary">
+                    {{ log.entityType }}
+                    {% if log.entityId %}#{{ log.entityId }}{% endif %}
+                </span>
+            {% else %}
+                <span class="text-muted">N/A</span>
+            {% endif %}
+        </td>
+        <td>
+            <div class="d-flex flex-column">
+                <small class="fw-bold">{{ log.createdAt|date('d/m/Y') }}</small>
+                <small class="text-muted">{{ log.createdAt|date('H:i:s') }}</small>
+            </div>
+        </td>
+        <td>
+            <div class="text-truncate" style="max-width: 400px;" title="{{ log.details }}">
+                <small>{{ log.details }}</small>
+            </div>
+        </td>
+        <td>
+            <small class="text-muted" style="font-family: 'JetBrains Mono', monospace; font-size: 11px;">
+                {{ log.ipAddress ?? 'N/A' }}
+            </small>
+        </td>
+        <td class="text-center">
+            <a href="{{ path('admin_audit_logs_show', {id: log.id}) }}" 
+               class="btn btn-sm btn-info"
+               title="View details"
+               data-bs-toggle="tooltip">
+                <i class="bi bi-eye"></i>
+            </a>
+        </td>
+    </tr>
+    {% else %}
+    <tr>
+        <td colspan="7" class="text-center text-muted py-5">
+            <div class="empty-state">
+                <i class="bi bi-inbox" style="font-size: 64px; opacity: 0.2;"></i>
+                <h4 class="mt-3 mb-2">No Audit Logs Found</h4>
+                {% if action or entityType or dateFrom or dateTo %}
+                    <p class="text-muted">Try adjusting your filters</p>
+                    <a href="{{ path('admin_audit_logs_index') }}" class="btn btn-sm btn-outline-primary mt-2">
+                        <i class="bi bi-x-lg me-1"></i>Clear Filters
+                    </a>
+                {% else %}
+                    <p class="text-muted">Audit logs will appear here as actions are performed</p>
+                {% endif %}
+            </div>
+        </td>
+    </tr>
+    {% endfor %}
+</tbody>
+        </table>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block javascripts %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Initialize Bootstrap tooltips
+    const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+    tooltipTriggerList.map(function (tooltipTriggerEl) {
+        return new bootstrap.Tooltip(tooltipTriggerEl, {
+            delay: { show: 300, hide: 100 }
+        });
+    });
+    
+    // Row highlight on hover
+    document.querySelectorAll('.custom-table tbody tr').forEach(row => {
+        row.addEventListener('mouseenter', function() {
+            this.style.transform = 'translateX(2px)';
+        });
+        
+        row.addEventListener('mouseleave', function() {
+            this.style.transform = 'translateX(0)';
+        });
+    });
+});
+</script>
+{% endblock %}

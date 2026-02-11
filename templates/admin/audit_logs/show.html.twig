@@ -1,0 +1,147 @@
+{% extends 'admin_layout.html.twig' %}
+
+{% block title %}Audit Log #{{ auditLog.id }} - Administration{% endblock %}
+{% block page_title %}Audit Log Details{% endblock %}
+
+{% block body %}
+
+<div class="mb-3 fade-in">
+    <a href="{{ path('admin_audit_logs_index') }}" class="btn btn-outline-secondary">
+        <i class="bi bi-arrow-left me-2"></i>Back to Audit Logs
+    </a>
+</div>
+
+<div class="row g-4">
+    <div class="col-lg-8">
+        <div class="table-card fade-in">
+            <div class="table-header">
+                <h5><i class="bi bi-info-circle me-2"></i>Log Information</h5>
+            </div>
+            <div class="p-4">
+                <div class="table-responsive">
+                    <table class="table table-dark mb-0">
+                        <tbody>
+                            <tr>
+                                <th style="width: 200px;">Log ID</th>
+                                <td><span class="badge bg-secondary fs-6">#{{ auditLog.id }}</span></td>
+                            </tr>
+                            <tr>
+                                <th>Date & Time</th>
+                                <td>
+                                    <strong>{{ auditLog.createdAt|date('d/m/Y H:i:s') }}</strong>
+                                    <small class="text-muted ms-2">({{ auditLog.createdAt|date('e') }})</small>
+                                </td>
+                            </tr>
+                            <tr>
+                                <th>User</th>
+                                <td>
+                                    {% if auditLog.user %}
+                                        <a href="{{ path('admin_users_show', {id: auditLog.user.id}) }}" class="text-decoration-none" style="color: #43e97b;">
+                                            <i class="bi bi-person-circle me-1"></i>{{ auditLog.user.username }}
+                                        </a>
+                                        <br>
+                                        <small class="text-muted">{{ auditLog.user.email }}</small>
+                                    {% else %}
+                                        <span class="text-muted"><i class="bi bi-gear me-1"></i>System</span>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            <tr>
+                                <th>Action</th>
+                                <td>
+                                    {% if auditLog.action starts with 'DELETE' or auditLog.action starts with 'BAN' %}
+                                        <span class="badge bg-danger fs-6">{{ auditLog.action|replace({'_': ' '}) }}</span>
+                                    {% elseif auditLog.action starts with 'CREATE' or auditLog.action starts with 'APPROVE' %}
+                                        <span class="badge bg-success fs-6">{{ auditLog.action|replace({'_': ' '}) }}</span>
+                                    {% elseif auditLog.action starts with 'UPDATE' or auditLog.action starts with 'EDIT' %}
+                                        <span class="badge bg-warning fs-6">{{ auditLog.action|replace({'_': ' '}) }}</span>
+                                    {% else %}
+                                        <span class="badge bg-info fs-6">{{ auditLog.action|replace({'_': ' '}) }}</span>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            <tr>
+                                <th>Entity Type</th>
+                                <td>
+                                    {% if auditLog.entityType %}
+                                        <span class="badge bg-secondary">{{ auditLog.entityType }}</span>
+                                    {% else %}
+                                        <span class="text-muted">N/A</span>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            <tr>
+                                <th>Entity ID</th>
+                                <td>
+                                    {% if auditLog.entityId %}
+                                        <span class="badge bg-secondary">#{{ auditLog.entityId }}</span>
+                                    {% else %}
+                                        <span class="text-muted">N/A</span>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            <tr>
+                                <th>IP Address</th>
+                                <td>
+                                    <code style="font-family: 'JetBrains Mono', monospace; color: #4facfe;">{{ auditLog.ipAddress ?? 'N/A' }}</code>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-lg-4">
+        <div class="table-card fade-in" style="animation-delay: 0.1s;">
+            <div class="table-header">
+                <h5><i class="bi bi-clock-history me-2"></i>Timeline</h5>
+            </div>
+            <div class="p-4">
+                <div class="mb-3 p-3" style="background: rgba(255,255,255,0.03); border-radius: 10px;">
+                    <small class="text-muted d-block mb-1">Time ago</small>
+                    <strong>
+                        {% set diff = date().timestamp - auditLog.createdAt.timestamp %}
+                        {% if diff < 60 %}
+                            {{ diff }} seconds ago
+                        {% elseif diff < 3600 %}
+                            {{ (diff / 60)|round }} minutes ago
+                        {% elseif diff < 86400 %}
+                            {{ (diff / 3600)|round }} hours ago
+                        {% else %}
+                            {{ (diff / 86400)|round }} days ago
+                        {% endif %}
+                    </strong>
+                </div>
+                
+                <div class="mb-3 p-3" style="background: rgba(255,255,255,0.03); border-radius: 10px;">
+                    <small class="text-muted d-block mb-1">Day of week</small>
+                    <strong>{{ auditLog.createdAt|date('l') }}</strong>
+                </div>
+                
+                <div class="p-3" style="background: rgba(255,255,255,0.03); border-radius: 10px;">
+                    <small class="text-muted d-block mb-1">Timestamp</small>
+                    <code style="font-family: 'JetBrains Mono', monospace; color: #4facfe;">{{ auditLog.createdAt|date('U') }}</code>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row mt-4">
+    <div class="col-12">
+        <div class="table-card fade-in" style="animation-delay: 0.2s;">
+            <div class="table-header">
+                <h5><i class="bi bi-text-left me-2"></i>Details</h5>
+            </div>
+            <div class="p-4">
+                <div class="p-3 rounded" style="background: linear-gradient(135deg, rgba(30, 15, 45, 0.95), rgba(45, 27, 61, 0.95)); border: 1px solid rgba(255, 60, 100, 0.3);">
+                    <pre class="mb-0 text-light" style="white-space: pre-wrap; word-wrap: break-word; font-family: 'JetBrains Mono', monospace; font-size: 13px; line-height: 1.6;">{{ auditLog.details }}</pre>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}

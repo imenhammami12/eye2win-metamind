@@ -105,7 +105,13 @@
     <i class="bi bi-grid-3x3"></i>
     <span>Teams</span>
 </a>
-
+{% if is_granted('ROLE_SUPER_ADMIN') %}
+    <a href="{{ path('admin_audit_logs_index') }}" 
+       class="{{ app.request.attributes.get('_route') starts with 'admin_audit_logs' ? 'active' : '' }}">
+        <i class="bi bi-journal-text"></i>
+        <span>Audit Logs</span>
+    </a>
+{% endif %}
                 <div class="sidebar-divider"></div>
                 
                 <a href="{{ path('app_home') }}" 
