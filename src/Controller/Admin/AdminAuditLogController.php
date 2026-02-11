@@ -3,6 +3,7 @@
 namespace App\Controller\Admin;
 
 use App\Repository\AuditLogRepository;
+use Knp\Component\Pager\PaginatorInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -16,7 +17,8 @@ class AdminAuditLogController extends AbstractController
     #[Route('/', name: 'admin_audit_logs_index')]
     public function index(
         Request $request,
-        AuditLogRepository $auditLogRepository
+        AuditLogRepository $auditLogRepository,
+        PaginatorInterface $paginator
     ): Response {
         // Filtres
         $action = $request->query->get('action', '');
@@ -82,7 +84,12 @@ class AdminAuditLogController extends AbstractController
             $queryBuilder->orderBy('al.createdAt', 'DESC');
         }
         
-        $auditLogs = $queryBuilder->getQuery()->getResult();
+        // Pagination
+        $pagination = $paginator->paginate(
+            $queryBuilder,
+            $request->query->getInt('page', 1),
+            20 // Nombre d'éléments par page
+        );
         
         // Récupérer les actions uniques pour le filtre
         $actions = $auditLogRepository->createQueryBuilder('al')
@@ -98,7 +105,7 @@ class AdminAuditLogController extends AbstractController
             ->getQuery()
             ->getResult();
         
-        // Statistiques
+        // Statistiques (pour toutes les données, pas seulement la page)
         $stats = [
             'total' => $auditLogRepository->count([]),
             'today' => count($auditLogRepository->findByDate(new \DateTime('today'))),
@@ -107,7 +114,7 @@ class AdminAuditLogController extends AbstractController
         ];
         
         return $this->render('admin/audit_logs/index.html.twig', [
-            'auditLogs' => $auditLogs,
+            'pagination' => $pagination,
             'actions' => array_column($actions, 'action'),
             'entityTypes' => array_column($entityTypes, 'entityType'),
             'action' => $action,

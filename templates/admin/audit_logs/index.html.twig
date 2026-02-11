@@ -114,8 +114,7 @@
 <div class="mb-3 fade-in" style="animation-delay: 0.15s;">
     <h6 class="text-muted mb-0">
         <i class="bi bi-info-circle me-2"></i>
-        Found <strong>{{ auditLogs|length }}</strong> audit log{{ auditLogs|length != 1 ? 's' : '' }}
-        {% if action or entityType or dateFrom or dateTo %}
+Found <strong>{{ pagination.getTotalItemCount }}</strong> audit log{{ pagination.getTotalItemCount != 1 ? 's' : '' }}        {% if action or entityType or dateFrom or dateTo %}
             <span class="badge bg-primary">Filtered</span>
         {% endif %}
     </h6>
@@ -124,7 +123,7 @@
 {# Audit Logs Table - Gaming Style #}
 <div class="table-card fade-in" style="animation-delay: 0.2s;">
     <div class="table-header d-flex justify-content-between align-items-center">
-        <h5><i class="bi bi-list-ul me-2"></i>Audit Logs ({{ auditLogs|length }})</h5>
+        <h5><i class="bi bi-list-ul me-2"></i>Audit Logs ({{ pagination.getTotalItemCount }})</h5>
         <div class="btn-group" role="group">
             <a href="{{ path('admin_audit_logs_index', {sort_by: 'createdAt', sort_order: sortOrder == 'ASC' ? 'DESC' : 'ASC', action: action, entity_type: entityType, date_from: dateFrom, date_to: dateTo}) }}" 
                class="btn btn-sm {{ sortBy == 'createdAt' ? 'btn-primary' : 'btn-outline-primary' }}">
@@ -159,7 +158,7 @@
 
 
 <tbody>
-    {% for log in auditLogs %}
+    {% for log in pagination %}
     <tr class="fade-in" style="animation-delay: {{ loop.index * 0.05 }}s;">
         <td>
             {% if log.user %}
@@ -240,6 +239,30 @@
         </table>
     </div>
 </div>
+
+</div>
+
+{# Pagination #}
+{% if pagination.getTotalItemCount > 20 %}
+<div class="d-flex justify-content-between align-items-center mt-4 fade-in" style="animation-delay: 0.3s;">
+    <div class="text-muted">
+        Showing {{ ((pagination.currentPageNumber - 1) * 20) + 1 }} 
+        to {{ min(pagination.currentPageNumber * 20, pagination.getTotalItemCount) }} 
+        of {{ pagination.getTotalItemCount }} entries
+    </div>
+    
+    <div class="pagination-wrapper">
+        {{ knp_pagination_render(pagination, '@KnpPaginator/Pagination/bootstrap_v5_pagination.html.twig', {}, {
+            'action': action,
+            'entity_type': entityType,
+            'date_from': dateFrom,
+            'date_to': dateTo,
+            'sort_by': sortBy,
+            'sort_order': sortOrder
+        }) }}
+    </div>
+</div>
+{% endif %}
 
 {% endblock %}
 
