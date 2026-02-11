@@ -478,4 +478,38 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, TwoFact
         return $this;
     }
 
+
+    /**
+ * @ORM\Column(type="string", length=20, nullable=true)
+ */
+private ?string $phone = null;
+
+/**
+ * @ORM\Column(type="string", length=100, nullable=true)
+ */
+private ?string $telegramChatId = null;
+
+// Add these getter and setter methods:
+
+public function getPhone(): ?string
+{
+    return $this->phone;
+}
+
+public function setPhone(?string $phone): static
+{
+    $this->phone = $phone;
+    return $this;
+}
+
+public function getTelegramChatId(): ?string
+{
+    return $this->telegramChatId;
+}
+
+public function setTelegramChatId(?string $telegramChatId): static
+{
+    $this->telegramChatId = $telegramChatId;
+    return $this;
+}
 }

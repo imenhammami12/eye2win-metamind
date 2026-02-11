@@ -41,3 +41,14 @@ services:
         arguments:
             $fromEmail: '%env(MAILER_FROM_EMAIL)%'
             $fromName: '%env(MAILER_FROM_NAME)%'
+    
+    # Configuration du service de notification multi-canal pour reset password
+    App\Service\MultiChannelNotificationService:
+        arguments:
+            $fromEmail: '%env(MAILER_FROM_EMAIL)%'
+            $fromName: '%env(MAILER_FROM_NAME)%'
+            $twilioAccountSid: '%env(default::TWILIO_ACCOUNT_SID)%'
+            $twilioAuthToken: '%env(default::TWILIO_AUTH_TOKEN)%'
+            $twilioPhoneNumber: '%env(default::TWILIO_PHONE_NUMBER)%'
+            $telegramBotToken: '%env(default::TELEGRAM_BOT_TOKEN)%'
+            $devMode: false
