@@ -10,6 +10,7 @@ use App\Entity\NotificationType;
 use App\Repository\CoachApplicationRepository;
 use App\Service\CoachApplicationEmailService;
 use Doctrine\ORM\EntityManagerInterface;
+use Knp\Component\Pager\PaginatorInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -28,7 +29,8 @@ class AdminCoachApplicationController extends AbstractController
     #[Route('/', name: 'admin_coach_applications_index')]
     public function index(
         Request $request,
-        CoachApplicationRepository $repository
+        CoachApplicationRepository $repository,
+        PaginatorInterface $paginator
     ): Response {
         // 🔍 FILTRES MULTIPLES
         $statusFilter = $request->query->get('status', '');
@@ -90,7 +92,12 @@ class AdminCoachApplicationController extends AbstractController
         // Tri secondaire par nom d'utilisateur
         $queryBuilder->addOrderBy('u.username', 'ASC');
         
-        $applications = $queryBuilder->getQuery()->getResult();
+        // Pagination
+        $pagination = $paginator->paginate(
+            $queryBuilder,
+            $request->query->getInt('page', 1),
+            20 // Items per page
+        );
         
         // Statistics
         $stats = [
@@ -101,7 +108,7 @@ class AdminCoachApplicationController extends AbstractController
         ];
         
         return $this->render('admin/coach_applications/index.html.twig', [
-            'applications' => $applications,
+            'pagination' => $pagination,
             'statusFilter' => $statusFilter,
             'search' => $search,
             'dateFrom' => $dateFrom,

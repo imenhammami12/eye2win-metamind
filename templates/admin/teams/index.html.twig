@@ -5,7 +5,6 @@
 
 {% block body %}
 
-
 {# ================= FILTERS ================= #}
 <div class="table-card mb-4 fade-in" style="animation-delay: 0.1s;">
     <div class="table-header d-flex justify-content-between align-items-center">
@@ -93,7 +92,7 @@
 <div class="mb-3 fade-in" style="animation-delay: 0.15s;">
     <h6 class="text-muted mb-0">
         <i class="bi bi-info-circle me-2"></i>
-        Found <strong>{{ teams|length }}</strong> team{{ teams|length != 1 ? 's' : '' }}
+        Found <strong>{{ pagination.getTotalItemCount }}</strong> team{{ pagination.getTotalItemCount != 1 ? 's' : '' }}
         {% if statusFilter or search %}
             <span class="badge bg-primary">Filtered</span>
         {% endif %}
@@ -103,10 +102,10 @@
 {# ================= TEAMS TABLE ================= #}
 <div class="table-card fade-in" style="animation-delay: 0.2s;">
     <div class="table-header">
-        <h5><i class="bi bi-grid-3x3 me-2"></i>Teams List</h5>
+        <h5><i class="bi bi-grid-3x3 me-2"></i>Teams List ({{ pagination.getTotalItemCount }})</h5>
     </div>
 
-    {% if teams|length > 0 %}
+    {% if pagination.getTotalItemCount > 0 %}
     <div class="table-responsive">
         <table class="custom-table table">
             <thead>
@@ -121,7 +120,7 @@
                 </tr>
             </thead>
             <tbody>
-                {% for team in teams %}
+                {% for team in pagination %}
                     {% set activeMembers = team.teamMemberships
                         |filter(m => m.status.value == 'ACTIVE')
                         |length %}
@@ -254,6 +253,26 @@
         </div>
     {% endif %}
 </div>
+
+{# Pagination #}
+{% if pagination.getTotalItemCount > 20 %}
+<div class="d-flex justify-content-between align-items-center mt-4 fade-in" style="animation-delay: 0.3s;">
+    <div class="text-muted">
+        Showing {{ ((pagination.currentPageNumber - 1) * 20) + 1 }} 
+        to {{ min(pagination.currentPageNumber * 20, pagination.getTotalItemCount) }} 
+        of {{ pagination.getTotalItemCount }} entries
+    </div>
+    
+    <div class="pagination-wrapper">
+        {{ knp_pagination_render(pagination, '@KnpPaginator/Pagination/bootstrap_v5_pagination.html.twig', {}, {
+            'status': statusFilter,
+            'search': search,
+            'sort_by': sortBy,
+            'sort_order': sortOrder
+        }) }}
+    </div>
+</div>
+{% endif %}
 
 {% endblock %}
 

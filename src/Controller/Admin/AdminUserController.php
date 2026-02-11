@@ -7,6 +7,7 @@ use App\Entity\AccountStatus;
 use App\Entity\AuditLog;
 use App\Repository\UserRepository;
 use Doctrine\ORM\EntityManagerInterface;
+use Knp\Component\Pager\PaginatorInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -19,8 +20,11 @@ use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 class AdminUserController extends AbstractController
 {
     #[Route('/', name: 'admin_users_index')]
-    public function index(Request $request, UserRepository $userRepository): Response
-    {
+    public function index(
+        Request $request, 
+        UserRepository $userRepository,
+        PaginatorInterface $paginator
+    ): Response {
         $search = $request->query->get('search', '');
         $roleFilter = $request->query->get('role', '');
         $statusFilter = $request->query->get('status', '');
@@ -46,14 +50,46 @@ class AdminUserController extends AbstractController
                 ->setParameter('status', $statusFilter);
         }
         
-        $users = $queryBuilder->getQuery()->getResult();
+        // Pagination
+        $pagination = $paginator->paginate(
+            $queryBuilder,
+            $request->query->getInt('page', 1),
+            20 // Items per page
+        );
+        
+        // Calculate statistics for all users (not just current page)
+        $allUsersQb = $userRepository->createQueryBuilder('u');
+        
+        // Apply same filters for stats
+        if ($search) {
+            $allUsersQb->andWhere('u.username LIKE :search OR u.email LIKE :search OR u.fullName LIKE :search')
+                ->setParameter('search', '%' . $search . '%');
+        }
+        if ($roleFilter) {
+            $allUsersQb->andWhere('u.rolesJson LIKE :role')
+                ->setParameter('role', '%' . $roleFilter . '%');
+        }
+        if ($statusFilter) {
+            $allUsersQb->andWhere('u.accountStatus = :status')
+                ->setParameter('status', $statusFilter);
+        }
+        
+        $allUsers = $allUsersQb->getQuery()->getResult();
+        
+        $stats = [
+            'total' => count($allUsers),
+            'active' => count(array_filter($allUsers, fn($u) => $u->getAccountStatus()->value === 'ACTIVE')),
+            'coaches' => count(array_filter($allUsers, fn($u) => in_array('ROLE_COACH', $u->getRoles()))),
+            'admins' => count(array_filter($allUsers, fn($u) => in_array('ROLE_ADMIN', $u->getRoles()))),
+        ];
         
         return $this->render('admin/users/index.html.twig', [
-            'users' => $users,
+            'pagination' => $pagination,
             'search' => $search,
             'roleFilter' => $roleFilter,
             'statusFilter' => $statusFilter,
             'accountStatuses' => AccountStatus::cases(),
+            'stats' => $stats,
         ]);
     }
     
@@ -299,74 +335,74 @@ class AdminUserController extends AbstractController
     }
     
     #[Route('/create', name: 'admin_users_create')]
-public function create(
-    Request $request,
-    EntityManagerInterface $em,
-    UserPasswordHasherInterface $passwordHasher,
-    UserRepository $userRepository // 👈 AJOUTER ceci
-): Response {
-    if ($request->isMethod('POST')) {
-        if (!$this->isCsrfTokenValid('create-user', $request->request->get('_token'))) {
-            throw $this->createAccessDeniedException('Invalid CSRF token');
+    public function create(
+        Request $request,
+        EntityManagerInterface $em,
+        UserPasswordHasherInterface $passwordHasher,
+        UserRepository $userRepository
+    ): Response {
+        if ($request->isMethod('POST')) {
+            if (!$this->isCsrfTokenValid('create-user', $request->request->get('_token'))) {
+                throw $this->createAccessDeniedException('Invalid CSRF token');
+            }
+            
+            // 🛡️ NIVEAU 2 : Validation côté serveur
+            $username = $request->request->get('username');
+            $email = $request->request->get('email');
+            
+            // Vérifier unicité du username
+            $existingUsername = $userRepository->findOneBy(['username' => $username]);
+            if ($existingUsername) {
+                $this->addFlash('error', 'This username is already taken');
+                return $this->render('admin/users/create.html.twig');
+            }
+            
+            // Vérifier unicité de l'email
+            $existingEmail = $userRepository->findOneBy(['email' => strtolower(trim($email))]);
+            if ($existingEmail) {
+                $this->addFlash('error', 'This email is already registered');
+                return $this->render('admin/users/create.html.twig');
+            }
+            
+            $user = new User();
+            $user->setEmail($email);
+            $user->setUsername($username);
+            $user->setFullName($request->request->get('fullName'));
+            
+            $password = $passwordHasher->hashPassword($user, $request->request->get('password'));
+            $user->setPassword($password);
+            
+            $role = $request->request->get('role', 'ROLE_USER');
+            
+            // Only SUPER_ADMIN can create admins
+            if ($role === 'ROLE_ADMIN' && !$this->isGranted('ROLE_SUPER_ADMIN')) {
+                $this->addFlash('error', 'Only Super Administrators can create Administrator accounts');
+                return $this->render('admin/users/create.html.twig');
+            }
+            
+            $roles = ['ROLE_USER'];
+            if ($role !== 'ROLE_USER') {
+                $roles[] = $role;
+            }
+            $user->setRoles($roles);
+            
+            $this->createAuditLog(
+                $em,
+                'USER_CREATED',
+                'User',
+                null,
+                "New user created: " . $user->getUsername() . " with role: $role"
+            );
+            
+            $em->persist($user);
+            $em->flush();
+            
+            $this->addFlash('success', 'User created successfully');
+            return $this->redirectToRoute('admin_users_show', ['id' => $user->getId()]);
         }
         
-        // 🛡️ NIVEAU 2 : Validation côté serveur
-        $username = $request->request->get('username');
-        $email = $request->request->get('email');
-        
-        // Vérifier unicité du username
-        $existingUsername = $userRepository->findOneBy(['username' => $username]);
-        if ($existingUsername) {
-            $this->addFlash('error', 'This username is already taken');
-            return $this->render('admin/users/create.html.twig');
-        }
-        
-        // Vérifier unicité de l'email
-        $existingEmail = $userRepository->findOneBy(['email' => strtolower(trim($email))]);
-        if ($existingEmail) {
-            $this->addFlash('error', 'This email is already registered');
-            return $this->render('admin/users/create.html.twig');
-        }
-        
-        $user = new User();
-        $user->setEmail($email);
-        $user->setUsername($username);
-        $user->setFullName($request->request->get('fullName'));
-        
-        $password = $passwordHasher->hashPassword($user, $request->request->get('password'));
-        $user->setPassword($password);
-        
-        $role = $request->request->get('role', 'ROLE_USER');
-        
-        // Only SUPER_ADMIN can create admins
-        if ($role === 'ROLE_ADMIN' && !$this->isGranted('ROLE_SUPER_ADMIN')) {
-            $this->addFlash('error', 'Only Super Administrators can create Administrator accounts');
-            return $this->render('admin/users/create.html.twig');
-        }
-        
-        $roles = ['ROLE_USER'];
-        if ($role !== 'ROLE_USER') {
-            $roles[] = $role;
-        }
-        $user->setRoles($roles);
-        
-        $this->createAuditLog(
-            $em,
-            'USER_CREATED',
-            'User',
-            null,
-            "New user created: " . $user->getUsername() . " with role: $role"
-        );
-        
-        $em->persist($user);
-        $em->flush();
-        
-        $this->addFlash('success', 'User created successfully');
-        return $this->redirectToRoute('admin_users_show', ['id' => $user->getId()]);
+        return $this->render('admin/users/create.html.twig');
     }
-    
-    return $this->render('admin/users/create.html.twig');
-}
     
     private function createAuditLog(
         EntityManagerInterface $em,

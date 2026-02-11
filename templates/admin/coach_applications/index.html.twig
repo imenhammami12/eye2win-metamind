@@ -161,7 +161,7 @@
 <div class="mb-3 fade-in" style="animation-delay: 0.15s;">
     <h6 class="text-muted mb-0">
         <i class="bi bi-info-circle me-2"></i>
-        Found <strong>{{ applications|length }}</strong> application{{ applications|length != 1 ? 's' : '' }}
+        Found <strong>{{ pagination.getTotalItemCount }}</strong> application{{ pagination.getTotalItemCount != 1 ? 's' : '' }}
         {% if statusFilter or search or dateFrom or dateTo %}
             <span class="badge bg-primary">Filtered</span>
         {% endif %}
@@ -171,7 +171,7 @@
 {# Applications Table #}
 <div class="table-card fade-in" style="animation-delay: 0.2s;">
     <div class="table-header">
-        <h5><i class="bi bi-clipboard-check me-2"></i>Applications List</h5>
+        <h5><i class="bi bi-clipboard-check me-2"></i>Applications List ({{ pagination.getTotalItemCount }})</h5>
     </div>
     
     <div class="table-responsive">
@@ -188,7 +188,7 @@
                 </tr>
             </thead>
             <tbody>
-                {% for application in applications %}
+                {% for application in pagination %}
                     <tr class="fade-in" style="animation-delay: {{ loop.index * 0.05 }}s;">
                         <td>
                             {% if application.user.profilePicture %}
@@ -300,6 +300,28 @@
         </table>
     </div>
 </div>
+
+{# Pagination #}
+{% if pagination.getTotalItemCount > 20 %}
+<div class="d-flex justify-content-between align-items-center mt-4 fade-in" style="animation-delay: 0.3s;">
+    <div class="text-muted">
+        Showing {{ ((pagination.currentPageNumber - 1) * 20) + 1 }} 
+        to {{ min(pagination.currentPageNumber * 20, pagination.getTotalItemCount) }} 
+        of {{ pagination.getTotalItemCount }} entries
+    </div>
+    
+    <div class="pagination-wrapper">
+        {{ knp_pagination_render(pagination, '@KnpPaginator/Pagination/bootstrap_v5_pagination.html.twig', {}, {
+            'status': statusFilter,
+            'search': search,
+            'date_from': dateFrom,
+            'date_to': dateTo,
+            'sort_by': sortBy,
+            'sort_order': sortOrder
+        }) }}
+    </div>
+</div>
+{% endif %}
 {% endblock %}
 
 {% block javascripts %}

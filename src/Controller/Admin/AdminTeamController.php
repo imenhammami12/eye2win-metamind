@@ -6,6 +6,7 @@ use App\Entity\Team;
 use App\Repository\TeamRepository;
 use App\Repository\TeamMembershipRepository;
 use Doctrine\ORM\EntityManagerInterface;
+use Knp\Component\Pager\PaginatorInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -19,7 +20,8 @@ class AdminTeamController extends AbstractController
     #[Route('/', name: 'admin_teams_index')]
     public function index(
         Request $request,
-        TeamRepository $teamRepository
+        TeamRepository $teamRepository,
+        PaginatorInterface $paginator
     ): Response {
         $statusFilter = $request->query->get('status', '');
         $search = $request->query->get('search', '');
@@ -60,12 +62,17 @@ class AdminTeamController extends AbstractController
         // Apply sorting
         $queryBuilder->orderBy('t.' . $sortBy, $sortOrder);
         
-        $teams = $queryBuilder->getQuery()->getResult();
+        // Pagination
+        $pagination = $paginator->paginate(
+            $queryBuilder,
+            $request->query->getInt('page', 1),
+            20 // Items per page
+        );
         
         $stats = $teamRepository->getStatistics();
         
         return $this->render('admin/teams/index.html.twig', [
-            'teams' => $teams,
+            'pagination' => $pagination,
             'statusFilter' => $statusFilter,
             'search' => $search,
             'sortBy' => $sortBy,

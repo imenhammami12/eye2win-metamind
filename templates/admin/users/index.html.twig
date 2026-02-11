@@ -5,7 +5,7 @@
 
 {% block body %}
 {# Quick Stats - MOVED TO TOP #}
-{% if users|length > 0 %}
+{% if stats.total > 0 %}
 <div class="row g-3 mb-4 fade-in">
     <div class="col-xl-3 col-lg-6 col-md-6">
         <div class="stat-card">
@@ -13,7 +13,7 @@
                 <i class="bi bi-people text-white"></i>
             </div>
             <div class="stat-card-title">Total Users</div>
-            <div class="stat-card-value">{{ users|length }}</div>
+            <div class="stat-card-value">{{ stats.total }}</div>
         </div>
     </div>
     
@@ -23,9 +23,7 @@
                 <i class="bi bi-check-circle text-white"></i>
             </div>
             <div class="stat-card-title">Active</div>
-            <div class="stat-card-value">
-                {{ users|filter(u => u.accountStatus.value == 'ACTIVE')|length }}
-            </div>
+            <div class="stat-card-value">{{ stats.active }}</div>
         </div>
     </div>
     
@@ -35,9 +33,7 @@
                 <i class="bi bi-award text-white"></i>
             </div>
             <div class="stat-card-title">Coaches</div>
-            <div class="stat-card-value">
-                {{ users|filter(u => 'ROLE_COACH' in u.roles)|length }}
-            </div>
+            <div class="stat-card-value">{{ stats.coaches }}</div>
         </div>
     </div>
     
@@ -47,9 +43,7 @@
                 <i class="bi bi-shield text-white"></i>
             </div>
             <div class="stat-card-title">Admins</div>
-            <div class="stat-card-value">
-                {{ users|filter(u => 'ROLE_ADMIN' in u.roles)|length }}
-            </div>
+            <div class="stat-card-value">{{ stats.admins }}</div>
         </div>
     </div>
 </div>
@@ -123,7 +117,7 @@
     <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
         <h6 class="text-muted mb-0">
             <i class="bi bi-info-circle me-2"></i>
-            Found <strong>{{ users|length }}</strong> user{{ users|length != 1 ? 's' : '' }}
+            Found <strong>{{ pagination.getTotalItemCount }}</strong> user{{ pagination.getTotalItemCount != 1 ? 's' : '' }}
         </h6>
         <a href="{{ path('admin_users_create') }}" class="btn btn-success">
             <i class="bi bi-plus-circle me-2"></i>New User
@@ -134,7 +128,7 @@
 {# Users Table #}
 <div class="table-card fade-in" style="animation-delay: 0.2s;">
     <div class="table-header">
-        <h5><i class="bi bi-people me-2"></i>Users List</h5>
+        <h5><i class="bi bi-people me-2"></i>Users List ({{ pagination.getTotalItemCount }})</h5>
     </div>
     
     <div class="table-responsive">
@@ -152,7 +146,7 @@
                 </tr>
             </thead>
             <tbody>
-                {% for user in users %}
+                {% for user in pagination %}
                     {% set isCurrentUser = user.id == app.user.id %}
                     {% set isTargetAdmin = 'ROLE_ADMIN' in user.roles %}
                     {% set canModify = not isCurrentUser and (not isTargetAdmin or is_granted('ROLE_SUPER_ADMIN')) %}
@@ -275,9 +269,28 @@
     </div>
 </div>
 
+{# Pagination #}
+{% if pagination.getTotalItemCount > 20 %}
+<div class="d-flex justify-content-between align-items-center mt-4 fade-in" style="animation-delay: 0.3s;">
+    <div class="text-muted">
+        Showing {{ ((pagination.currentPageNumber - 1) * 20) + 1 }} 
+        to {{ min(pagination.currentPageNumber * 20, pagination.getTotalItemCount) }} 
+        of {{ pagination.getTotalItemCount }} entries
+    </div>
+    
+    <div class="pagination-wrapper">
+        {{ knp_pagination_render(pagination, '@KnpPaginator/Pagination/bootstrap_v5_pagination.html.twig', {}, {
+            'search': search,
+            'role': roleFilter,
+            'status': statusFilter
+        }) }}
+    </div>
+</div>
+{% endif %}
+
 {# Permission Info Alert #}
 {% if not is_granted('ROLE_SUPER_ADMIN') %}
-<div class="alert alert-info mt-4 fade-in" style="animation-delay: 0.3s;">
+<div class="alert alert-info mt-4 fade-in" style="animation-delay: 0.4s;">
     <i class="bi bi-info-circle me-2"></i>
     <strong>Permission Notice:</strong> You have ROLE_ADMIN access. Only Super Administrators can suspend, ban, or delete other Administrators.
 </div>
