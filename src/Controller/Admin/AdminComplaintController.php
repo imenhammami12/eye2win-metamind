@@ -9,7 +9,6 @@ use App\Entity\User;
 use App\Entity\AuditLog;
 use App\Repository\ComplaintRepository;
 use App\Repository\UserRepository;
-use App\Service\ComplaintNotificationService;
 use Doctrine\ORM\EntityManagerInterface;
 use Knp\Component\Pager\PaginatorInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -95,13 +94,12 @@ class AdminComplaintController extends AbstractController
     public function show(Complaint $complaint, UserRepository $userRepository): Response
     {
         // Get all users with ROLE_ADMIN
-        // Method 1: Try repository method
         $admins = [];
         
         try {
             $admins = $userRepository->findAdmins();
         } catch (\Exception $e) {
-            // Method 2: Fallback - get all users and filter manually
+            // Fallback - get all users and filter manually
             try {
                 $allUsers = $userRepository->findAll();
                 foreach ($allUsers as $user) {
@@ -114,12 +112,10 @@ class AdminComplaintController extends AbstractController
                     return strcmp($a->getUsername(), $b->getUsername());
                 });
             } catch (\Exception $e2) {
-                // Last resort: empty array
                 $admins = [];
             }
         }
         
-        // Debug: Add flash message to see how many admins were found
         if (empty($admins)) {
             $this->addFlash('warning', 'No administrators found in the system. Please check user roles.');
         }
@@ -179,16 +175,14 @@ class AdminComplaintController extends AbstractController
                 "Complaint #{$complaint->getId()} assigned to {$admin->getUsername()}"
             );
             
-            // Send notification
+            $em->flush();
+            
+            // Send notification AFTER flush
             $this->notificationService->notifyComplaintAssigned($complaint, $admin);
             
             $this->addFlash('success', "Complaint assigned to {$admin->getUsername()} successfully");
         }
         
-        $em->flush();
-    
-        $this->notificationService->notifyComplaintAssigned($complaint, $admin);
-
         return $this->redirectToRoute('admin_complaints_show', ['id' => $complaint->getId()]);
     }
     
@@ -215,15 +209,15 @@ class AdminComplaintController extends AbstractController
             "Status changed from {$oldStatus->value} to {$newStatus->value}"
         );
         
-        // Send notification
-        $this->notificationService->notifyComplaintStatusChanged($complaint, $oldStatus->getLabel(), $newStatus->getLabel());
-        
         $em->flush();
-           $this->notificationService->notifyComplaintStatusChanged(
+        
+        // Send notification AFTER flush
+        $this->notificationService->notifyComplaintStatusChanged(
             $complaint,
             $oldStatus->getLabel(),
             $newStatus->getLabel()
         );
+        
         $this->addFlash('success', "Complaint status updated to {$newStatus->getLabel()}");
         return $this->redirectToRoute('admin_complaints_show', ['id' => $complaint->getId()]);
     }
@@ -251,16 +245,15 @@ class AdminComplaintController extends AbstractController
             "Priority changed from {$oldPriority->value} to {$newPriority->value}"
         );
         
-        // Send notification
-        $this->notificationService->notifyComplaintPriorityChanged($complaint, $oldPriority->getLabel(), $newPriority->getLabel());
-        
         $em->flush();
         
-         $this->notificationService->notifyComplaintPriorityChanged(
+        // Send notification AFTER flush
+        $this->notificationService->notifyComplaintPriorityChanged(
             $complaint,
             $oldPriority->getLabel(),
             $newPriority->getLabel()
         );
+        
         $this->addFlash('success', "Complaint priority updated to {$newPriority->getLabel()}");
         return $this->redirectToRoute('admin_complaints_show', ['id' => $complaint->getId()]);
     }
@@ -302,13 +295,11 @@ class AdminComplaintController extends AbstractController
             "Admin response added to complaint #{$complaint->getId()}"
         );
         
-        // Send notification
-        $this->notificationService->notifyComplaintResponded($complaint);
-        
         $em->flush();
         
+        // Send notification AFTER flush
         $this->notificationService->notifyComplaintResponded($complaint);
-
+        
         $this->addFlash('success', 'Response submitted successfully');
         return $this->redirectToRoute('admin_complaints_show', ['id' => $complaint->getId()]);
     }
@@ -341,12 +332,11 @@ class AdminComplaintController extends AbstractController
             "Complaint #{$complaint->getId()} marked as resolved"
         );
         
-        // Send notification
+        $em->flush();
+        
+        // Send notification AFTER flush
         $this->notificationService->notifyComplaintResolved($complaint);
         
-        $em->flush();
-        $this->notificationService->notifyComplaintResolved($complaint);
-
         $this->addFlash('success', 'Complaint resolved successfully');
         return $this->redirectToRoute('admin_complaints_show', ['id' => $complaint->getId()]);
     }

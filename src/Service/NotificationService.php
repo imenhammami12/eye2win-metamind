@@ -11,19 +11,23 @@ use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Mercure\HubInterface;
 use Symfony\Component\Mercure\Update;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
+use Psr\Log\LoggerInterface;
 
 class NotificationService
 {
     public function __construct(
         private EntityManagerInterface $entityManager,
         private UrlGeneratorInterface $urlGenerator,
-        private ?HubInterface $hub = null
+        private ?HubInterface $hub = null,
+        private ?LoggerInterface $logger = null
     ) {}
 
     // ==================== COMPLAINT NOTIFICATIONS ====================
     
     public function notifyComplaintSubmitted(Complaint $complaint): void
     {
+        $this->log('🔔 notifyComplaintSubmitted called for complaint ID: ' . $complaint->getId());
+        
         // Notify user
         $userNotif = $this->createNotification(
             $complaint->getSubmittedBy(),
@@ -32,10 +36,21 @@ class NotificationService
             $this->urlGenerator->generate('app_complaints_show', ['id' => $complaint->getId()])
         );
         $this->publishNotification($userNotif);
+        $this->log('✅ User notification created: ' . $userNotif->getId());
 
-        // Notify all admins
+        // Notify all admins - CRITICAL SECTION
+        $this->log('👥 Getting admins...');
         $admins = $this->getAdmins();
+        $this->log('👥 Found ' . count($admins) . ' admins');
+        
+        if (empty($admins)) {
+            $this->log('⚠️ WARNING: No admins found! Cannot send admin notifications.');
+            return;
+        }
+        
         foreach ($admins as $admin) {
+            $this->log('📧 Creating notification for admin: ' . $admin->getUsername() . ' (ID: ' . $admin->getId() . ')');
+            
             $adminNotif = $this->createNotification(
                 $admin,
                 NotificationType::COMPLAINT_NEW,
@@ -45,12 +60,19 @@ class NotificationService
                 ),
                 $this->urlGenerator->generate('admin_complaints_show', ['id' => $complaint->getId()])
             );
+            
+            $this->log('✅ Admin notification created: ' . $adminNotif->getId());
             $this->publishNotification($adminNotif);
+            $this->log('📡 Notification published to Mercure for admin ID: ' . $admin->getId());
         }
+        
+        $this->log('🎉 All notifications sent!');
     }
 
     public function notifyComplaintAssigned(Complaint $complaint, User $assignedAdmin): void
     {
+        $this->log('🔔 notifyComplaintAssigned called');
+        
         $userNotif = $this->createNotification(
             $complaint->getSubmittedBy(),
             NotificationType::COMPLAINT_UPDATED,
@@ -119,6 +141,8 @@ class NotificationService
 
     public function notifyCoachApplicationSubmitted(CoachApplication $application): void
     {
+        $this->log('🔔 notifyCoachApplicationSubmitted called for application ID: ' . $application->getId());
+        
         $userNotif = $this->createNotification(
             $application->getUser(),
             NotificationType::COACH_APPLICATION_STATUS,
@@ -126,17 +150,33 @@ class NotificationService
             $this->urlGenerator->generate('user_profile')
         );
         $this->publishNotification($userNotif);
+        $this->log('✅ User notification created');
 
+        // Notify all admins
+        $this->log('👥 Getting admins for coach application...');
         $admins = $this->getAdmins();
+        $this->log('👥 Found ' . count($admins) . ' admins');
+        
+        if (empty($admins)) {
+            $this->log('⚠️ WARNING: No admins found!');
+            return;
+        }
+        
         foreach ($admins as $admin) {
+            $this->log('📧 Creating coach application notification for admin: ' . $admin->getUsername());
+            
             $adminNotif = $this->createNotification(
                 $admin,
                 NotificationType::COACH_APPLICATION,
                 sprintf('New coach application from %s', $application->getUser()->getUsername()),
                 $this->urlGenerator->generate('admin_coach_applications_show', ['id' => $application->getId()])
             );
+            
+            $this->log('✅ Admin notification created: ' . $adminNotif->getId());
             $this->publishNotification($adminNotif);
         }
+        
+        $this->log('🎉 All coach application notifications sent!');
     }
 
     public function notifyCoachApplicationApproved(CoachApplication $application): void
@@ -182,7 +222,8 @@ class NotificationService
     private function publishNotification(Notification $notification): void
     {
         if (!$this->hub) {
-            return; // Mercure not configured
+            $this->log('⚠️ Mercure Hub not configured');
+            return;
         }
 
         $diff = time() - $notification->getCreatedAt()->getTimestamp();
@@ -198,21 +239,57 @@ class NotificationService
             'createdAt' => $notification->getCreatedAt()->format('Y-m-d H:i:s')
         ];
 
-        $update = new Update(
-            'notifications/user/' . $notification->getUser()->getId(),
-            json_encode($data)
-        );
+        try {
+            $update = new Update(
+                'notifications/user/' . $notification->getUser()->getId(),
+                json_encode($data)
+            );
 
-        $this->hub->publish($update);
+            $this->hub->publish($update);
+            $this->log('📡 Published to Mercure topic: notifications/user/' . $notification->getUser()->getId());
+        } catch (\Exception $e) {
+            $this->log('❌ Failed to publish to Mercure: ' . $e->getMessage());
+        }
     }
 
     private function getAdmins(): array
     {
+        $this->log('🔍 Searching for admins (including SUPER_ADMIN)...');
+        
         try {
-            return $this->entityManager->getRepository(User::class)->findAdmins();
-        } catch (\Exception $e) {
+            // Get ALL users and filter by role in PHP
+            // This respects the role hierarchy defined in security.yaml
             $allUsers = $this->entityManager->getRepository(User::class)->findAll();
-            return array_filter($allUsers, fn(User $user) => in_array('ROLE_ADMIN', $user->getRoles(), true));
+            $this->log('📊 Total users found: ' . count($allUsers));
+            
+            $admins = [];
+            foreach ($allUsers as $user) {
+                $roles = $user->getRoles();
+                $this->log('👤 Checking user: ' . $user->getUsername() . ' with roles: ' . implode(', ', $roles));
+                
+                // Check if user has ROLE_ADMIN or ROLE_SUPER_ADMIN
+                if (in_array('ROLE_ADMIN', $roles, true) || in_array('ROLE_SUPER_ADMIN', $roles, true)) {
+                    $admins[] = $user;
+                    $this->log('✅ User ' . $user->getUsername() . ' is an admin!');
+                }
+            }
+            
+            $this->log('✅ Found ' . count($admins) . ' admin(s) total');
+            
+            return $admins;
+        } catch (\Exception $e) {
+            $this->log('❌ Error finding admins: ' . $e->getMessage());
+            return [];
         }
+    }
+    
+    private function log(string $message): void
+    {
+        if ($this->logger) {
+            $this->logger->info($message);
+        }
+        
+        // Also log to PHP error log for easy debugging
+        error_log('[NotificationService] ' . $message);
     }
 }

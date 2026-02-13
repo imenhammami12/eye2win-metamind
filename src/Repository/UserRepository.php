@@ -14,18 +14,34 @@ class UserRepository extends ServiceEntityRepository
     }
 
     /**
-     * Find all users with ROLE_ADMIN
+     * Find all users with ROLE_ADMIN or ROLE_SUPER_ADMIN
+     * 
+     * IMPORTANT: Cannot use SQL LIKE because SUPER_ADMIN doesn't contain "ADMIN" string
+     * Must load all users and filter in PHP to respect role hierarchy
      * 
      * @return User[]
      */
     public function findAdmins(): array
     {
-        return $this->createQueryBuilder('u')
-            ->where('u.rolesJson LIKE :role')
-            ->setParameter('role', '%ROLE_ADMIN%')
-            ->orderBy('u.username', 'ASC')
-            ->getQuery()
-            ->getResult();
+        // Get all users and filter by role in PHP
+        // This is the ONLY reliable way to respect Symfony's role hierarchy
+        $allUsers = $this->findAll();
+        $admins = [];
+        
+        foreach ($allUsers as $user) {
+            $roles = $user->getRoles();
+            // Check if user has ROLE_ADMIN or ROLE_SUPER_ADMIN
+            if (in_array('ROLE_ADMIN', $roles, true) || in_array('ROLE_SUPER_ADMIN', $roles, true)) {
+                $admins[] = $user;
+            }
+        }
+        
+        // Sort by username
+        usort($admins, function($a, $b) {
+            return strcmp($a->getUsername(), $b->getUsername());
+        });
+        
+        return $admins;
     }
 
     /**
@@ -35,12 +51,8 @@ class UserRepository extends ServiceEntityRepository
      */
     public function findUsersByRole(string $role): array
     {
-        return $this->createQueryBuilder('u')
-            ->where('u.rolesJson LIKE :role')
-            ->setParameter('role', '%' . $role . '%')
-            ->orderBy('u.createdAt', 'DESC')
-            ->getQuery()
-            ->getResult();
+        $allUsers = $this->findAll();
+        return array_filter($allUsers, fn(User $user) => in_array($role, $user->getRoles(), true));
     }
 
     /**
@@ -119,12 +131,7 @@ class UserRepository extends ServiceEntityRepository
      */
     public function countByRole(string $role): int
     {
-        return $this->createQueryBuilder('u')
-            ->select('COUNT(u.id)')
-            ->where('u.rolesJson LIKE :role')
-            ->setParameter('role', '%' . $role . '%')
-            ->getQuery()
-            ->getSingleScalarResult();
+        return count($this->findUsersByRole($role));
     }
 
     /**
@@ -145,27 +152,19 @@ class UserRepository extends ServiceEntityRepository
     }
 
     /**
-     * Find all admins (alternative method using PHP filtering)
-     * Use this if the SQL LIKE method has issues
+     * Alternative method: Find all admins using SQL OR condition
+     * Use this if performance is an issue
      * 
      * @return User[]
      */
-    public function findAllAdmins(): array
+    public function findAdminsViaSQL(): array
     {
-        $allUsers = $this->findAll();
-        $admins = [];
-
-        foreach ($allUsers as $user) {
-            if (in_array('ROLE_ADMIN', $user->getRoles(), true)) {
-                $admins[] = $user;
-            }
-        }
-
-        // Sort by username
-        usort($admins, function($a, $b) {
-            return strcmp($a->getUsername(), $b->getUsername());
-        });
-
-        return $admins;
+        return $this->createQueryBuilder('u')
+            ->where('u.rolesJson LIKE :admin OR u.rolesJson LIKE :superadmin')
+            ->setParameter('admin', '%ROLE_ADMIN%')
+            ->setParameter('superadmin', '%ROLE_SUPER_ADMIN%')
+            ->orderBy('u.username', 'ASC')
+            ->getQuery()
+            ->getResult();
     }
 }

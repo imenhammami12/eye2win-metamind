@@ -24,7 +24,6 @@ class AdminCoachApplicationController extends AbstractController
 {
     public function __construct(
         private NotificationService $notificationService,
-
         private CoachApplicationEmailService $emailService
     ) {
     }
@@ -146,15 +145,6 @@ class AdminCoachApplicationController extends AbstractController
         // Approve the application (automatically adds COACH role)
         $application->approve($comment);
         
-        // Create notification for the user
-        $notification = new Notification();
-        $notification->setUser($application->getUser());
-        $notification->setType(NotificationType::COACH_APPROVED);
-        $notification->setMessage('Congratulations! Your coach application has been approved.');
-        $notification->setLink('/profile');
-        
-        $em->persist($notification);
-        
         $this->createAuditLog(
             $em,
             'COACH_APPLICATION_APPROVED',
@@ -165,8 +155,9 @@ class AdminCoachApplicationController extends AbstractController
         
         $em->flush();
         
+        // Send notification AFTER flush
         $this->notificationService->notifyCoachApplicationApproved($application);
-
+        
         // Send approval email
         $this->emailService->sendApprovalEmail($application);
         
@@ -194,15 +185,6 @@ class AdminCoachApplicationController extends AbstractController
         // Reject the application
         $application->reject($comment);
         
-        // Create notification for the user
-        $notification = new Notification();
-        $notification->setUser($application->getUser());
-        $notification->setType(NotificationType::COACH_REJECTED);
-        $notification->setMessage('Your coach application has been rejected. Check the details for more information.');
-        $notification->setLink('/profile');
-        
-        $em->persist($notification);
-        
         $this->createAuditLog(
             $em,
             'COACH_APPLICATION_REJECTED',
@@ -212,8 +194,10 @@ class AdminCoachApplicationController extends AbstractController
         );
         
         $em->flush();
+        
+        // Send notification AFTER flush
         $this->notificationService->notifyCoachApplicationRejected($application);
- 
+        
         // Send rejection email
         $this->emailService->sendRejectionEmail($application);
         
