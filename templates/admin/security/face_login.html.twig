@@ -1,10 +1,10 @@
 {# templates/security/face_login.html.twig #}
 <!DOCTYPE html>
-<html lang="fr">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Connexion par Reconnaissance Faciale - EyeTwin</title>
+    <title>Facial Recognition Login - EyeTwin</title>
     
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
@@ -200,13 +200,13 @@
     <div class="face-container">
         <div class="face-header">
             <img src="{{ asset('assets/img/eyetwin-logo.png') }}" alt="EyeTwin Logo" style="max-width: 160px; margin-bottom: 20px;">
-            <h1>🎭 Reconnaissance Faciale</h1>
-            <p>Authentification biométrique sécurisée</p>
+            <h1>🎭 Facial Recognition</h1>
+            <p>Secure biometric authentication</p>
         </div>
 
         <div class="status info" id="status">
             <i class="bi bi-hourglass-split"></i>
-            <span>Chargement des modèles d'IA...</span>
+            <span>Loading AI models...</span>
         </div>
 
         <div class="video-container" id="videoContainer" style="display: none;">
@@ -216,13 +216,13 @@
 
         <button id="captureBtn" class="btn-login" disabled>
             <i class="bi bi-camera"></i>
-            <span>Capturer et se connecter</span>
+            <span>Capture and login</span>
         </button>
 
         <div class="back-link">
             <a href="{{ path('admin_login') }}">
                 <i class="bi bi-arrow-left"></i>
-                Connexion classique
+                Standard login
             </a>
         </div>
     </div>
@@ -239,10 +239,10 @@
         const MODEL_URL = 'https://cdn.jsdelivr.net/npm/@vladmandic/face-api/model';
         let detectionInterval = null;
 
-        // 1. Charger les modèles IA
+        // 1. Load AI models
         async function loadModels() {
             try {
-                updateStatus('info', 'bi-hourglass-split', 'Chargement des modèles d\'IA...');
+                updateStatus('info', 'bi-hourglass-split', 'Loading AI models...');
                 
                 await Promise.all([
                     faceapi.nets.tinyFaceDetector.loadFromUri(MODEL_URL),
@@ -250,15 +250,15 @@
                     faceapi.nets.faceRecognitionNet.loadFromUri(MODEL_URL)
                 ]);
                 
-                updateStatus('success', 'bi-check-circle', 'Modèles chargés. Démarrage de la caméra...');
+                updateStatus('success', 'bi-check-circle', 'Models loaded. Starting camera...');
                 await startVideo();
             } catch (error) {
-                updateStatus('error', 'bi-x-circle', 'Erreur: ' + error.message);
+                updateStatus('error', 'bi-x-circle', 'Error: ' + error.message);
                 console.error(error);
             }
         }
 
-        // 2. Démarrer la caméra
+        // 2. Start camera
         async function startVideo() {
             try {
                 const stream = await navigator.mediaDevices.getUserMedia({ 
@@ -276,18 +276,18 @@
                     canvas.width = video.videoWidth;
                     canvas.height = video.videoHeight;
                     
-                    updateStatus('success', 'bi-camera', 'Caméra active. Positionnez votre visage.');
+                    updateStatus('success', 'bi-camera', 'Camera active. Position your face.');
                     captureBtn.disabled = false;
                     
                     startDetection();
                 });
             } catch (error) {
-                updateStatus('error', 'bi-exclamation-triangle', 'Impossible d\'accéder à la caméra');
+                updateStatus('error', 'bi-exclamation-triangle', 'Unable to access camera');
                 console.error(error);
             }
         }
 
-        // 3. Détection en temps réel
+        // 3. Real-time detection
         function startDetection() {
             const ctx = canvas.getContext('2d');
             
@@ -309,12 +309,12 @@
                         faceapi.draw.drawFaceLandmarks(canvas, resizedDetections);
                         
                         if (detections.length === 1) {
-                            updateStatus('success', 'bi-check-circle', 'Visage détecté ✓');
+                            updateStatus('success', 'bi-check-circle', 'Face detected ✓');
                         } else {
-                            updateStatus('info', 'bi-person', `${detections.length} visages détectés`);
+                            updateStatus('info', 'bi-person', `${detections.length} faces detected`);
                         }
                     } else {
-                        updateStatus('info', 'bi-search', 'Recherche de visage...');
+                        updateStatus('info', 'bi-search', 'Searching for face...');
                     }
                 } catch (error) {
                     console.error('Detection error:', error);
@@ -322,36 +322,36 @@
             }, 100);
         }
 
-        // 4. Capturer et authentifier
+        // 4. Capture and authenticate
         captureBtn.addEventListener('click', async () => {
             captureBtn.disabled = true;
             captureBtn.classList.add('loading');
-            updateStatus('info', 'bi-hourglass-split', 'Analyse biométrique en cours...');
+            updateStatus('info', 'bi-hourglass-split', 'Biometric analysis in progress...');
             
-            // Arrêter la détection temps réel
+            // Stop real-time detection
             if (detectionInterval) {
                 clearInterval(detectionInterval);
             }
             
             try {
-                // Détecter le visage avec descripteur
+                // Detect face with descriptor
                 const detection = await faceapi
                     .detectSingleFace(video, new faceapi.TinyFaceDetectorOptions())
                     .withFaceLandmarks()
                     .withFaceDescriptor();
                 
                 if (!detection) {
-                    throw new Error('Aucun visage détecté. Réessayez.');
+                    throw new Error('No face detected. Please try again.');
                 }
                 
-                // Capturer l'image
+                // Capture image
                 const tempCanvas = document.createElement('canvas');
                 tempCanvas.width = video.videoWidth;
                 tempCanvas.height = video.videoHeight;
                 tempCanvas.getContext('2d').drawImage(video, 0, 0);
                 const imageData = tempCanvas.toDataURL('image/jpeg', 0.8);
                 
-                // Envoyer au serveur
+                // Send to server
                 const response = await fetch('{{ path("face_login_verify") }}', {
                     method: 'POST',
                     headers: {
@@ -366,17 +366,17 @@
                 const result = await response.json();
                 
                 if (result.success) {
-                    updateStatus('success', 'bi-shield-check', '✓ Authentification réussie !');
+                    updateStatus('success', 'bi-shield-check', '✓ Authentication successful!');
                     
-                    // Redirection
+                    // Redirect
                     setTimeout(() => {
                         window.location.href = result.redirect;
                     }, 1500);
                 } else {
-                    updateStatus('error', 'bi-x-circle', result.message || 'Visage non reconnu');
+                    updateStatus('error', 'bi-x-circle', result.message || 'Face not recognized');
                     captureBtn.disabled = false;
                     captureBtn.classList.remove('loading');
-                    startDetection(); // Relancer la détection
+                    startDetection(); // Restart detection
                 }
             } catch (error) {
                 updateStatus('error', 'bi-exclamation-triangle', error.message);
@@ -392,10 +392,10 @@
             statusDiv.innerHTML = `<i class="bi ${icon}"></i><span>${message}</span>`;
         }
 
-        // Démarrer au chargement
+        // Start on load
         loadModels();
 
-        // Nettoyage à la fermeture
+        // Cleanup on close
         window.addEventListener('beforeunload', () => {
             if (video.srcObject) {
                 video.srcObject.getTracks().forEach(track => track.stop());

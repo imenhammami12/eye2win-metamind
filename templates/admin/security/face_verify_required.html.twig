@@ -1,10 +1,6 @@
-{% extends 'base.html.twig' %}
-
-{% block title %}Vérification Faciale Requise{% endblock %}
-
 {% block body %}
 <!DOCTYPE html>
-<html lang="fr">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -45,6 +41,16 @@
         .verify-header {
             text-align: center;
             margin-bottom: 30px;
+        }
+
+        .logo-container {
+            margin-bottom: 20px;
+        }
+
+        .logo-container img {
+            max-width: 180px;
+            height: auto;
+            filter: drop-shadow(0 4px 12px rgba(255, 60, 100, 0.3));
         }
 
         .verify-header .icon {
@@ -195,11 +201,14 @@
 <body>
     <div class="verify-container">
         <div class="verify-header">
+            <div class="logo-container">
+                <img src="{{ asset('assets/img/eyetwin-logo.png') }}" alt="EyeTwin Logo">
+            </div>
             <div class="icon">
                 <i class="bi bi-shield-lock-fill"></i>
             </div>
-            <h1>Vérification Faciale Requise</h1>
-            <p>Votre compte est protégé par la reconnaissance faciale</p>
+            <h1>Facial Verification Required</h1>
+            <p>Your account is protected by facial recognition</p>
             <div class="username">
                 <i class="bi bi-person-circle"></i> {{ username }}
             </div>
@@ -207,7 +216,7 @@
 
         <div class="status info" id="status">
             <i class="bi bi-hourglass-split"></i>
-            <span>Chargement des modèles d'IA...</span>
+            <span>Loading AI models...</span>
         </div>
 
         <div class="video-container" id="videoContainer" style="display: none;">
@@ -217,12 +226,12 @@
 
         <button id="verifyBtn" class="btn-verify" disabled>
             <i class="bi bi-camera-fill"></i>
-            <span>Vérifier mon visage</span>
+            <span>Verify my face</span>
         </button>
 
         <button id="cancelBtn" class="btn-cancel">
             <i class="bi bi-x-circle"></i>
-            Annuler et se déconnecter
+            Cancel and logout
         </button>
 
         <div class="debug-info" id="debugInfo" style="display: none;"></div>
@@ -254,35 +263,35 @@
             }
         }
 
-        // Bouton annuler
+        // Cancel button
         cancelBtn.addEventListener('click', () => {
             window.location.href = '{{ path("admin_logout") }}';
         });
 
-        // Charger les modèles
+        // Load models
         async function loadModels() {
             try {
-                updateStatus('info', 'bi-hourglass-split', 'Chargement des modèles...');
-                debug('⏳ Début du chargement des modèles');
+                updateStatus('info', 'bi-hourglass-split', 'Loading models...');
+                debug('⏳ Starting model loading');
                 
                 await faceapi.nets.tinyFaceDetector.loadFromUri(MODEL_URL);
-                debug('✅ TinyFaceDetector chargé');
+                debug('✅ TinyFaceDetector loaded');
                 
                 await faceapi.nets.faceLandmark68Net.loadFromUri(MODEL_URL);
-                debug('✅ FaceLandmark68Net chargé');
+                debug('✅ FaceLandmark68Net loaded');
                 
                 await faceapi.nets.faceRecognitionNet.loadFromUri(MODEL_URL);
-                debug('✅ FaceRecognitionNet chargé');
+                debug('✅ FaceRecognitionNet loaded');
                 
-                updateStatus('success', 'bi-check-circle', 'Modèles chargés. Démarrage caméra...');
+                updateStatus('success', 'bi-check-circle', 'Models loaded. Starting camera...');
                 await startVideo();
             } catch (error) {
-                debug('❌ Erreur chargement modèles', error.message);
-                updateStatus('error', 'bi-x-circle', 'Erreur: ' + error.message);
+                debug('❌ Model loading error', error.message);
+                updateStatus('error', 'bi-x-circle', 'Error: ' + error.message);
             }
         }
 
-        // Démarrer la caméra
+        // Start camera
         async function startVideo() {
             try {
                 const stream = await navigator.mediaDevices.getUserMedia({ 
@@ -300,19 +309,19 @@
                     canvas.width = video.videoWidth;
                     canvas.height = video.videoHeight;
                     
-                    debug('📹 Caméra démarrée', { width: video.videoWidth, height: video.videoHeight });
-                    updateStatus('success', 'bi-camera', 'Caméra active. Positionnez votre visage.');
+                    debug('📹 Camera started', { width: video.videoWidth, height: video.videoHeight });
+                    updateStatus('success', 'bi-camera', 'Camera active. Position your face.');
                     verifyBtn.disabled = false;
                     
                     startDetection();
                 });
             } catch (error) {
-                debug('❌ Erreur caméra', error.message);
-                updateStatus('error', 'bi-exclamation-triangle', 'Impossible d\'accéder à la caméra');
+                debug('❌ Camera error', error.message);
+                updateStatus('error', 'bi-exclamation-triangle', 'Unable to access camera');
             }
         }
 
-        // Détection temps réel
+        // Real-time detection
         function startDetection() {
             const ctx = canvas.getContext('2d');
             
@@ -335,66 +344,66 @@
                         faceapi.draw.drawFaceLandmarks(canvas, resized);
                         
                         if (detections.length === 1) {
-                            updateStatus('success', 'bi-check-circle', 'Visage détecté ✓ Vous pouvez vérifier');
+                            updateStatus('success', 'bi-check-circle', 'Face detected ✓ You can verify');
                         } else {
-                            updateStatus('warning', 'bi-people', `${detections.length} visages détectés`);
+                            updateStatus('warning', 'bi-people', `${detections.length} faces detected`);
                         }
                     } else {
                         faceDetected = false;
                     }
                 } catch (error) {
-                    debug('Erreur détection temps réel', error.message);
+                    debug('Real-time detection error', error.message);
                 }
             }, 100);
         }
 
-        // Vérifier
+        // Verify
         verifyBtn.addEventListener('click', async () => {
-            debug('🖱️ Bouton vérifier cliqué');
+            debug('🖱️ Verify button clicked');
             verifyBtn.disabled = true;
-            updateStatus('info', 'bi-hourglass-split', 'Vérification en cours...');
+            updateStatus('info', 'bi-hourglass-split', 'Verification in progress...');
             
             if (detectionInterval) {
                 clearInterval(detectionInterval);
-                debug('⏸️ Détection temps réel arrêtée');
+                debug('⏸️ Real-time detection stopped');
             }
             
             try {
-                // Attendre un peu pour stabiliser l'image
+                // Wait a bit to stabilize the image
                 await new Promise(resolve => setTimeout(resolve, 500));
                 
-                debug('🔍 Détection du visage...');
+                debug('🔍 Detecting face...');
                 const detection = await faceapi
                     .detectSingleFace(video, new faceapi.TinyFaceDetectorOptions())
                     .withFaceLandmarks()
                     .withFaceDescriptor();
                 
                 if (!detection) {
-                    throw new Error('Aucun visage détecté. Assurez-vous d\'être bien visible et réessayez.');
+                    throw new Error('No face detected. Make sure you are clearly visible and try again.');
                 }
                 
-                debug('✅ Visage détecté', { 
+                debug('✅ Face detected', { 
                     score: detection.detection.score,
                     descriptorLength: detection.descriptor.length 
                 });
                 
-                // Créer l'image
+                // Create image
                 const tempCanvas = document.createElement('canvas');
                 tempCanvas.width = video.videoWidth;
                 tempCanvas.height = video.videoHeight;
                 tempCanvas.getContext('2d').drawImage(video, 0, 0);
                 const imageData = tempCanvas.toDataURL('image/jpeg', 0.8);
                 
-                debug('📷 Image capturée', { size: Math.round(imageData.length / 1024) + 'KB' });
-                updateStatus('info', 'bi-cloud-upload', 'Envoi au serveur...');
+                debug('📷 Image captured', { size: Math.round(imageData.length / 1024) + 'KB' });
+                updateStatus('info', 'bi-cloud-upload', 'Sending to server...');
                 
-                // Préparer les données
+                // Prepare data
                 const payload = {
                     image: imageData,
                     descriptor: Array.from(detection.descriptor)
                 };
                 
-                debug('📤 Envoi au serveur', { 
+                debug('📤 Sending to server', { 
                     descriptorLength: payload.descriptor.length,
                     imageSize: Math.round(imageData.length / 1024) + 'KB'
                 });
@@ -408,36 +417,36 @@
                     body: JSON.stringify(payload)
                 });
                 
-                debug('📥 Réponse reçue', { status: response.status, ok: response.ok });
+                debug('📥 Response received', { status: response.status, ok: response.ok });
                 
-                // Lire la réponse comme texte d'abord
+                // Read response as text first
                 const responseText = await response.text();
-                debug('📄 Réponse brute', responseText.substring(0, 200));
+                debug('📄 Raw response', responseText.substring(0, 200));
                 
                 let result;
                 try {
                     result = JSON.parse(responseText);
                 } catch (e) {
-                    debug('❌ Erreur parsing JSON', e.message);
-                    throw new Error('Erreur serveur: réponse invalide. Vérifiez les logs Symfony.');
+                    debug('❌ JSON parsing error', e.message);
+                    throw new Error('Server error: invalid response. Check Symfony logs.');
                 }
                 
-                debug('📊 Résultat parsé', result);
+                debug('📊 Parsed result', result);
                 
                 if (result.success) {
-                    updateStatus('success', 'bi-shield-check', '✓ Vérification réussie !');
-                    debug('✅ Vérification réussie, redirection vers:', result.redirect);
+                    updateStatus('success', 'bi-shield-check', '✓ Verification successful!');
+                    debug('✅ Verification successful, redirecting to:', result.redirect);
                     setTimeout(() => {
                         window.location.href = result.redirect;
                     }, 1000);
                 } else {
-                    debug('⚠️ Vérification échouée', result.message);
-                    updateStatus('error', 'bi-x-circle', result.message || 'Visage non reconnu');
+                    debug('⚠️ Verification failed', result.message);
+                    updateStatus('error', 'bi-x-circle', result.message || 'Face not recognized');
                     verifyBtn.disabled = false;
                     startDetection();
                 }
             } catch (error) {
-                debug('❌ Erreur complète', error);
+                debug('❌ Complete error', error);
                 updateStatus('error', 'bi-exclamation-triangle', error.message);
                 verifyBtn.disabled = false;
                 startDetection();
@@ -449,10 +458,10 @@
             statusDiv.innerHTML = `<i class="bi ${icon}"></i><span>${message}</span>`;
         }
 
-        // Démarrage
+        // Start
         loadModels();
 
-        // Test de la route au chargement
+        // Test route on load
         fetch('{{ path("face_verify_check") }}', {
             method: 'POST',
             headers: { 
@@ -467,12 +476,12 @@
             debug('❌ Route inaccessible', error.message);
         });
 
-        // Toggle debug au clic sur le titre
+        // Toggle debug on title click
         document.querySelector('.verify-header h1').addEventListener('dblclick', () => {
             debugInfo.style.display = debugInfo.style.display === 'none' ? 'block' : 'none';
         });
 
-        // Nettoyage
+        // Cleanup
         window.addEventListener('beforeunload', () => {
             if (video.srcObject) video.srcObject.getTracks().forEach(track => track.stop());
             if (detectionInterval) clearInterval(detectionInterval);

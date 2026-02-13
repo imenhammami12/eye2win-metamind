@@ -1,7 +1,7 @@
 {% extends 'admin_layout.html.twig' %}
 
-{% block title %}Mon Profil{% endblock %}
-{% block page_title %}Mon Profil{% endblock %}
+{% block title %}My Profile{% endblock %}
+{% block page_title %}My Profile{% endblock %}
 
 {% block stylesheets %}
 <style>
@@ -268,16 +268,16 @@
             <h2>{{ user.fullName ?? user.username }}</h2>
             <p><i class="bi bi-envelope"></i> {{ user.email }}</p>
             <p><i class="bi bi-person-badge"></i> @{{ user.username }}</p>
-            <p><i class="bi bi-calendar"></i> Membre depuis {{ user.createdAt|date('d/m/Y') }}</p>
+            <p><i class="bi bi-calendar"></i> Member since {{ user.createdAt|date('m/d/Y') }}</p>
         </div>
     </div>
 
     <div class="profile-tabs">
         <button class="profile-tab active" onclick="showTab('general')">
-            <i class="bi bi-person"></i> Informations
+            <i class="bi bi-person"></i> Information
         </button>
         <button class="profile-tab" onclick="showTab('security')">
-            <i class="bi bi-shield-check"></i> Sécurité
+            <i class="bi bi-shield-check"></i> Security
         </button>
     </div>
 
@@ -285,18 +285,18 @@
         <div class="profile-section">
             <h3 class="section-title">
                 <i class="bi bi-info-circle"></i>
-                Informations personnelles
+                Personal Information
             </h3>
             <div class="info-row">
-                <span class="info-label"><i class="bi bi-person"></i> Nom complet</span>
-                <span class="info-value">{{ user.fullName ?? 'Non renseigné' }}</span>
+                <span class="info-label"><i class="bi bi-person"></i> Full Name</span>
+                <span class="info-value">{{ user.fullName ?? 'Not provided' }}</span>
             </div>
             <div class="info-row">
                 <span class="info-label"><i class="bi bi-envelope"></i> Email</span>
                 <span class="info-value">{{ user.email }}</span>
             </div>
             <div class="info-row">
-                <span class="info-label"><i class="bi bi-person-badge"></i> Nom d'utilisateur</span>
+                <span class="info-label"><i class="bi bi-person-badge"></i> Username</span>
                 <span class="info-value">{{ user.username }}</span>
             </div>
         </div>
@@ -306,7 +306,7 @@
         <div class="profile-section">
             <h3 class="section-title">
                 <i class="bi bi-shield-lock"></i>
-                Fonctionnalités de sécurité
+                Security Features
             </h3>
 
             <div class="security-feature">
@@ -315,26 +315,25 @@
                 </div>
                 <div class="security-feature-info">
                     <div class="security-feature-title">
-                        Reconnaissance faciale
+                        Facial Recognition
                         {% if hasFaceAuth %}
-                            <span class="badge badge-success">Activé</span>
+                            <span class="badge badge-success">Enabled</span>
                         {% else %}
-                            <span class="badge badge-danger">Désactivé</span>
+                            <span class="badge badge-danger">Disabled</span>
                         {% endif %}
                     </div>
                     <div class="security-feature-desc">
-                        Connectez-vous rapidement et en toute sécurité avec votre visage
+                        Log in quickly and securely with your face
                     </div>
                 </div>
                 <div>
                     {% if hasFaceAuth %}
                         <button onclick="removeFaceAuth()" class="btn-action btn-outline">
-                            <i class="bi bi-x-circle"></i> Désactiver
+                            <i class="bi bi-x-circle"></i> Disable
                         </button>
                     {% else %}
                         <a href="{{ path('app_profile_face_register') }}" class="btn-action btn-primary">
-
-                            <i class="bi bi-camera-fill"></i> Activer
+                            <i class="bi bi-camera-fill"></i> Enable
                         </a>
                     {% endif %}
                 </div>
@@ -354,7 +353,7 @@
     }
 
     async function removeFaceAuth() {
-        if (!confirm('Êtes-vous sûr de vouloir désactiver la reconnaissance faciale ?')) return;
+        if (!confirm('Are you sure you want to disable facial recognition?')) return;
         
         try {
             const response = await fetch('{{ path("face_remove") }}', {
@@ -366,10 +365,10 @@
                 alert(result.message);
                 window.location.reload();
             } else {
-                alert('Erreur: ' + result.message);
+                alert('Error: ' + result.message);
             }
         } catch (error) {
-            alert('Erreur: ' + error.message);
+            alert('Error: ' + error.message);
         }
     }
 </script>

@@ -1,7 +1,7 @@
 {% extends 'admin_layout.html.twig' %}
 
-{% block title %}Enregistrement Facial{% endblock %}
-{% block page_title %}Enregistrement Facial{% endblock %}
+{% block title %}Facial Registration{% endblock %}
+{% block page_title %}Facial Registration{% endblock %}
 
 {% block stylesheets %}
 <style>
@@ -171,14 +171,14 @@
         <div class="face-reg-header">
             <h2>
                 <i class="bi bi-camera-fill"></i>
-                Enregistrement Facial
+                Facial Registration
             </h2>
-            <p>Positionnez votre visage dans le cadre et cliquez sur "Capturer"</p>
+            <p>Position your face in the frame and click "Capture"</p>
         </div>
 
         <div id="faceRegStatus" class="alert alert-info">
             <i class="bi bi-hourglass-split"></i>
-            <span>Initialisation de la caméra...</span>
+            <span>Initializing camera...</span>
         </div>
 
         <div id="faceVideoContainer" style="display: none;">
@@ -189,12 +189,12 @@
         <div class="face-controls">
             <button type="button" id="captureFaceBtn" class="btn-action btn-primary" disabled>
                 <i class="bi bi-camera"></i>
-                <span>Capturer mon visage</span>
+                <span>Capture my face</span>
             </button>
             
             <a href="{{ path('app_profile') }}" class="btn-action btn-secondary">
                 <i class="bi bi-x-circle"></i>
-                <span>Annuler</span>
+                <span>Cancel</span>
             </a>
         </div>
     </div>
@@ -209,20 +209,20 @@
     const MODEL_URL = 'https://cdn.jsdelivr.net/npm/@vladmandic/face-api/model';
 
     document.addEventListener('DOMContentLoaded', async function() {
-        console.log('✅ Démarrage enregistrement facial...');
+        console.log('✅ Starting facial registration...');
         
-        // Attacher événement au bouton
+        // Attach event to button
         document.getElementById('captureFaceBtn').addEventListener('click', function() {
             if (!this.disabled) captureAndRegister();
         });
 
-        // Charger modèles et démarrer caméra
+        // Load models and start camera
         await loadFaceModels();
     });
 
     async function loadFaceModels() {
         try {
-            updateFaceStatus('info', 'bi-hourglass-split', 'Chargement des modèles IA...');
+            updateFaceStatus('info', 'bi-hourglass-split', 'Loading AI models...');
             
             await Promise.all([
                 faceapi.nets.tinyFaceDetector.loadFromUri(MODEL_URL),
@@ -231,11 +231,11 @@
             ]);
             
             modelsLoaded = true;
-            console.log('✅ Modèles chargés');
+            console.log('✅ Models loaded');
             await startFaceVideo();
         } catch (error) {
-            console.error('❌ Erreur modèles:', error);
-            updateFaceStatus('danger', 'bi-x-circle', 'Erreur de chargement: ' + error.message);
+            console.error('❌ Models error:', error);
+            updateFaceStatus('danger', 'bi-x-circle', 'Loading error: ' + error.message);
         }
     }
 
@@ -245,7 +245,7 @@
         const captureFaceBtn = document.getElementById('captureFaceBtn');
         
         try {
-            updateFaceStatus('info', 'bi-camera', 'Accès à la caméra...');
+            updateFaceStatus('info', 'bi-camera', 'Accessing camera...');
             
             const stream = await navigator.mediaDevices.getUserMedia({ 
                 video: { 
@@ -258,21 +258,21 @@
             faceVideo.srcObject = stream;
             
             faceVideo.addEventListener('loadedmetadata', () => {
-                console.log('✅ Caméra active');
+                console.log('✅ Camera active');
                 document.getElementById('faceVideoContainer').style.display = 'block';
                 faceCanvas.width = faceVideo.videoWidth;
                 faceCanvas.height = faceVideo.videoHeight;
                 
-                updateFaceStatus('success', 'bi-camera', 'Caméra active. Positionnez votre visage.');
+                updateFaceStatus('success', 'bi-camera', 'Camera active. Position your face.');
                 
-                // Activer le bouton
+                // Enable button
                 captureFaceBtn.disabled = false;
                 
                 startFaceDetection();
             });
         } catch (error) {
-            console.error('❌ Erreur caméra:', error);
-            updateFaceStatus('danger', 'bi-exclamation-triangle', 'Impossible d\'accéder à la caméra: ' + error.message);
+            console.error('❌ Camera error:', error);
+            updateFaceStatus('danger', 'bi-exclamation-triangle', 'Unable to access camera: ' + error.message);
         }
     }
 
@@ -281,7 +281,7 @@
         const faceCanvas = document.getElementById('faceCanvas');
         const ctx = faceCanvas.getContext('2d');
         
-        console.log('🔍 Détection faciale démarrée');
+        console.log('🔍 Face detection started');
         
         detectionInterval = setInterval(async () => {
             try {
@@ -301,13 +301,13 @@
                     faceapi.draw.drawFaceLandmarks(faceCanvas, resized);
                     
                     if (detections.length === 1) {
-                        updateFaceStatus('success', 'bi-check-circle', '✓ Visage détecté ! Cliquez sur "Capturer"');
+                        updateFaceStatus('success', 'bi-check-circle', '✓ Face detected! Click "Capture"');
                     } else {
-                        updateFaceStatus('warning', 'bi-people', detections.length + ' visages détectés. Un seul requis.');
+                        updateFaceStatus('warning', 'bi-people', detections.length + ' faces detected. Only one required.');
                     }
                 }
             } catch (error) {
-                // Silencieux
+                // Silent
             }
         }, 100);
     }
@@ -316,10 +316,10 @@
         const faceVideo = document.getElementById('faceVideo');
         const captureFaceBtn = document.getElementById('captureFaceBtn');
         
-        console.log('📸 Capture en cours...');
+        console.log('📸 Capturing...');
         
         captureFaceBtn.disabled = true;
-        updateFaceStatus('info', 'bi-hourglass-split', 'Analyse biométrique...');
+        updateFaceStatus('info', 'bi-hourglass-split', 'Biometric analysis...');
         
         if (detectionInterval) clearInterval(detectionInterval);
         
@@ -330,21 +330,21 @@
                 .withFaceDescriptor();
             
             if (!detection) {
-                throw new Error('Aucun visage détecté. Veuillez réessayer.');
+                throw new Error('No face detected. Please try again.');
             }
             
-            console.log('✅ Visage détecté');
+            console.log('✅ Face detected');
             
-            // Créer l'image
+            // Create image
             const canvas = document.createElement('canvas');
             canvas.width = faceVideo.videoWidth;
             canvas.height = faceVideo.videoHeight;
             canvas.getContext('2d').drawImage(faceVideo, 0, 0);
             const imageData = canvas.toDataURL('image/jpeg', 0.8);
             
-            updateFaceStatus('info', 'bi-cloud-upload', 'Envoi au serveur...');
+            updateFaceStatus('info', 'bi-cloud-upload', 'Sending to server...');
             
-            // Envoyer au serveur
+            // Send to server
             const response = await fetch('{{ path("face_register") }}', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
@@ -357,24 +357,24 @@
             const result = await response.json();
             
             if (result.success) {
-                console.log('✅ Enregistrement réussi');
+                console.log('✅ Registration successful');
                 updateFaceStatus('success', 'bi-check-circle-fill', '✓ ' + result.message);
                 
-                // Arrêter la caméra
+                // Stop camera
                 if (faceVideo.srcObject) {
                     faceVideo.srcObject.getTracks().forEach(track => track.stop());
                 }
                 
-                // Rediriger vers le profil
+                // Redirect to profile
                 setTimeout(() => {
                     window.location.href = '{{ path("app_profile") }}';
                 }, 2000);
             } else {
-                throw new Error(result.message || 'Erreur d\'enregistrement');
+                throw new Error(result.message || 'Registration error');
             }
         } catch (error) {
-            console.error('❌ Erreur:', error);
-            updateFaceStatus('danger', 'bi-exclamation-triangle', 'Erreur: ' + error.message);
+            console.error('❌ Error:', error);
+            updateFaceStatus('danger', 'bi-exclamation-triangle', 'Error: ' + error.message);
             captureFaceBtn.disabled = false;
             startFaceDetection();
         }
@@ -388,7 +388,7 @@
         }
     }
 
-    // Nettoyage avant de quitter la page
+    // Cleanup before leaving page
     window.addEventListener('beforeunload', function() {
         if (detectionInterval) clearInterval(detectionInterval);
         const faceVideo = document.getElementById('faceVideo');
