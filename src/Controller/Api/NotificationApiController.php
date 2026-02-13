@@ -18,44 +18,47 @@ class NotificationApiController extends AbstractController
         private EntityManagerInterface $em
     ) {}
 
-    #[Route('/check', name: 'api_check_notifications', methods: ['GET'])]
-    public function check(): JsonResponse
+    #[Route('/unread', name: 'api_notifications_unread', methods: ['GET'])]
+    public function getUnread(): JsonResponse
     {
         $user = $this->getUser();
         
-        // Get unread notifications
         $unread = $this->notificationRepository->createQueryBuilder('n')
             ->where('n.user = :user')
             ->andWhere('n.isRead = false')
             ->orderBy('n.createdAt', 'DESC')
             ->setParameter('user', $user)
-            ->setMaxResults(20)
+            ->setMaxResults(10)
             ->getQuery()
             ->getResult();
-        
-        // Get recently read
-        $read = $this->notificationRepository->createQueryBuilder('n')
-            ->where('n.user = :user')
-            ->andWhere('n.isRead = true')
-            ->orderBy('n.createdAt', 'DESC')
-            ->setParameter('user', $user)
-            ->setMaxResults(5)
-            ->getQuery()
-            ->getResult();
-        
-        $all = array_merge($unread, $read);
-        
-        // Format notifications
-        $formatted = array_map(fn($n) => $this->formatNotification($n), $all);
-        
-        // Find new ones (< 1 minute old)
-        $new = array_filter($formatted, fn($n) => (time() - strtotime($n['createdAt'])) < 60);
         
         return new JsonResponse([
             'success' => true,
-            'newNotifications' => array_values($new),
+            'count' => count($unread),
+            'notifications' => array_map(fn($n) => $this->formatNotification($n), $unread)
+        ]);
+    }
+
+    #[Route('/check', name: 'api_check_notifications', methods: ['GET'])]
+    public function check(): JsonResponse
+    {
+        $user = $this->getUser();
+        
+        $unread = $this->notificationRepository->createQueryBuilder('n')
+            ->where('n.user = :user')
+            ->andWhere('n.isRead = false')
+            ->orderBy('n.createdAt', 'DESC')
+            ->setParameter('user', $user)
+            ->setMaxResults(10)
+            ->getQuery()
+            ->getResult();
+        
+        $formatted = array_map(fn($n) => $this->formatNotification($n), $unread);
+        
+        return new JsonResponse([
+            'success' => true,
             'unreadCount' => count($unread),
-            'allNotifications' => $formatted
+            'notifications' => $formatted
         ]);
     }
     
@@ -65,12 +68,30 @@ class NotificationApiController extends AbstractController
         $notification = $this->notificationRepository->find($id);
         
         if (!$notification || $notification->getUser() !== $this->getUser()) {
-            return new JsonResponse(['success' => false], 404);
+            return new JsonResponse(['success' => false, 'message' => 'Not found'], 404);
         }
         
         $notification->setIsRead(true);
         $notification->setRead(true);
         $this->em->flush();
+        
+        return new JsonResponse(['success' => true]);
+    }
+
+    #[Route('/mark-all-read', name: 'api_mark_all_read', methods: ['POST'])]
+    public function markAllRead(): JsonResponse
+    {
+        $user = $this->getUser();
+        
+        $this->notificationRepository->createQueryBuilder('n')
+            ->update()
+            ->set('n.isRead', 'true')
+            ->set('n.read', 'true')
+            ->where('n.user = :user')
+            ->andWhere('n.isRead = false')
+            ->setParameter('user', $user)
+            ->getQuery()
+            ->execute();
         
         return new JsonResponse(['success' => true]);
     }

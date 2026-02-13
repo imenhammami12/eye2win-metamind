@@ -33,8 +33,7 @@
 
 </head>
 
-<body>
-<div class="body_bg">
+<body data-user-id="{{ app.user ? app.user.id : '' }}"><div class="body_bg">
     <!--::header part start::-->
     <header class="main_menu single_page_menu">
         <div class="container">
@@ -251,8 +250,10 @@
 {% endblock %}
 
 {% if app.user %}
-    <script src="{{ asset('assets/js/notifications.js') }}"></script>
-
+    <script>
+        window.MERCURE_HUB_URL = 'http://localhost:3000/.well-known/mercure';
+    </script>
+    <script src="{{ asset('assets/js/realtime-notifications.js') }}"></script>
 {% endif %}
 
 </body>
