@@ -37,7 +37,7 @@ class MultiChannelNotificationService
         ?string $twilioAuthToken = null,
         ?string $twilioPhoneNumber = null,
         ?string $telegramBotToken = null,
-        bool $devMode = true
+        bool $devMode = false
     ) {
         $this->mailer = $mailer;
         $this->httpClient = $httpClient;
@@ -113,6 +113,20 @@ class MultiChannelNotificationService
         }
 
         try {
+            // Formater le numéro au format E.164 (ex: +21612345678)
+            $phoneNumber = $user->getPhone();
+            
+            // Si le numéro ne commence pas par +, on assume qu'il faut ajouter l'indicatif
+            if (!str_starts_with($phoneNumber, '+')) {
+                // Pour la Tunisie, ajouter +216
+                $phoneNumber = '+216' . ltrim($phoneNumber, '0');
+            }
+            
+            $this->logger->info('Attempting to send SMS', [
+                'to' => $phoneNumber,
+                'from' => $this->twilioPhoneNumber
+            ]);
+
             // Twilio API call
             $response = $this->httpClient->request('POST', 
                 "https://api.twilio.com/2010-04-01/Accounts/{$this->twilioAccountSid}/Messages.json",
@@ -120,20 +134,38 @@ class MultiChannelNotificationService
                     'auth_basic' => [$this->twilioAccountSid, $this->twilioAuthToken],
                     'body' => [
                         'From' => $this->twilioPhoneNumber,
-                        'To' => $user->getPhone(),
+                        'To' => $phoneNumber,
                         'Body' => $message
                     ]
                 ]
             );
-
-            $this->logger->info('SMS sent successfully', [
-                'status' => $response->getStatusCode()
-            ]);
+            
+            $statusCode = $response->getStatusCode();
+            $content = $response->toArray(false);
+            
+            // Vérifier le statut de l'envoi
+            if (isset($content['status'])) {
+                $this->logger->info('SMS sent with status: ' . $content['status'], [
+                    'sid' => $content['sid'] ?? 'N/A',
+                    'status' => $content['status'],
+                    'error_code' => $content['error_code'] ?? null,
+                    'error_message' => $content['error_message'] ?? null
+                ]);
+                
+                // Si le compte est en trial, vérifier si le numéro est vérifié
+                if (isset($content['error_code']) && $content['error_code'] == 21608) {
+                    throw new \RuntimeException('Numéro non vérifié. En mode Trial, vous devez vérifier votre numéro sur console.twilio.com');
+                }
+            }
+            
+            error_log("SMS Response: " . json_encode($content, JSON_PRETTY_PRINT));
+            
         } catch (\Exception $e) {
             $this->logger->error('Failed to send SMS', [
-                'error' => $e->getMessage()
+                'error' => $e->getMessage(),
+                'phone' => $phoneNumber ?? $user->getPhone()
             ]);
-            throw $e;
+            throw new \RuntimeException('Erreur lors de l\'envoi du SMS: ' . $e->getMessage());
         }
     }
 
@@ -178,9 +210,6 @@ class MultiChannelNotificationService
 
     private function sendWhatsApp(User $user, string $message): void
     {
-        // WhatsApp via Twilio (requires paid Twilio account with WhatsApp enabled)
-        // Alternative: Use free WhatsApp Business API (requires approval)
-        
         if (!$user->getPhone()) {
             throw new \RuntimeException('User does not have a phone number');
         }
@@ -199,7 +228,12 @@ class MultiChannelNotificationService
 
         try {
             // Format phone for WhatsApp (must include whatsapp: prefix)
-            $whatsappNumber = 'whatsapp:' . $user->getPhone();
+            $phoneNumber = $user->getPhone();
+            if (!str_starts_with($phoneNumber, '+')) {
+                $phoneNumber = '+216' . ltrim($phoneNumber, '0');
+            }
+            
+            $whatsappNumber = 'whatsapp:' . $phoneNumber;
             $fromWhatsapp = 'whatsapp:' . $this->twilioPhoneNumber;
 
             $response = $this->httpClient->request('POST', 

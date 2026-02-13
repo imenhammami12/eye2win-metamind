@@ -31,11 +31,8 @@ services:
             $cloudName: '%env(CLOUDINARY_CLOUD_NAME)%'
             $apiKey: '%env(CLOUDINARY_API_KEY)%'
             $apiSecret: '%env(CLOUDINARY_API_SECRET)%'
-            $defaultFolder: '%env(default::CLOUDINARY_DEFAULT_FOLDER)%'
+            $defaultFolder: 'users'
 
-    # add more service definitions when explicit configuration is needed
-    # please note that last definitions always *replace* previous ones
-    
     # Configuration du service d'email
     App\Service\CoachApplicationEmailService:
         arguments:
@@ -47,8 +44,8 @@ services:
         arguments:
             $fromEmail: '%env(MAILER_FROM_EMAIL)%'
             $fromName: '%env(MAILER_FROM_NAME)%'
-            $twilioAccountSid: '%env(default::TWILIO_ACCOUNT_SID)%'
-            $twilioAuthToken: '%env(default::TWILIO_AUTH_TOKEN)%'
-            $twilioPhoneNumber: '%env(default::TWILIO_PHONE_NUMBER)%'
-            $telegramBotToken: '%env(default::TELEGRAM_BOT_TOKEN)%'
+            $twilioAccountSid: '%env(TWILIO_ACCOUNT_SID)%'
+            $twilioAuthToken: '%env(TWILIO_AUTH_TOKEN)%'
+            $twilioPhoneNumber: '%env(TWILIO_PHONE_NUMBER)%'
+            $telegramBotToken: '%env(TELEGRAM_BOT_TOKEN)%'
             $devMode: false

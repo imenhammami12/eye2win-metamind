@@ -479,14 +479,10 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, TwoFact
     }
 
 
-    /**
- * @ORM\Column(type="string", length=20, nullable=true)
- */
+#[ORM\Column(type: 'string', length: 20, nullable: true)]
 private ?string $phone = null;
 
-/**
- * @ORM\Column(type="string", length=100, nullable=true)
- */
+#[ORM\Column(type: 'string', length: 100, nullable: true)]
 private ?string $telegramChatId = null;
 
 // Add these getter and setter methods:

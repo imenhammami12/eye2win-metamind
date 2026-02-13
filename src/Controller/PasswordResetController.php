@@ -41,7 +41,14 @@ class PasswordResetController extends AbstractController
                 ->findOneBy(['email' => $email]);
 
             if ($user) {
-                // Generate reset token
+                // Supprimer les anciens tokens de cet utilisateur
+                $oldTokens = $this->entityManager->getRepository(PasswordResetToken::class)
+                    ->findBy(['user' => $user]);
+                foreach ($oldTokens as $oldToken) {
+                    $this->entityManager->remove($oldToken);
+                }
+
+                // Générer un nouveau token
                 $token = $this->generateResetToken();
                 $resetToken = new PasswordResetToken();
                 $resetToken->setUser($user);
@@ -52,7 +59,7 @@ class PasswordResetController extends AbstractController
                 $this->entityManager->persist($resetToken);
                 $this->entityManager->flush();
 
-                // Send notification via selected channel
+                // Envoyer la notification
                 try {
                     $this->notificationService->sendPasswordResetNotification(
                         $user,
@@ -61,15 +68,20 @@ class PasswordResetController extends AbstractController
                     );
 
                     $this->addFlash('success', sprintf(
-                        'Un code de réinitialisation a été envoyé via %s.',
+                        'Un code de réinitialisation a été envoyé via %s. Cliquez sur le lien reçu ou entrez le code ci-dessous.',
                         $this->getChannelLabel($channel)
                     ));
+
+                    // 🔥 REDIRECTION VERS LA PAGE D'ENTRÉE DU CODE
+                    return $this->redirectToRoute('app_verify_reset_code', ['email' => $email]);
+
                 } catch (\Exception $e) {
-                    $this->addFlash('error', 'Erreur lors de l\'envoi du code. Veuillez réessayer.');
+                    $this->addFlash('error', 'Erreur lors de l\'envoi du code : ' . $e->getMessage());
+                    error_log('Notification Error: ' . $e->getMessage());
                 }
             } else {
-                // Security: Don't reveal if email exists
-                $this->addFlash('success', 
+                // Sécurité : ne pas révéler si l'email existe
+                $this->addFlash('info', 
                     'Si un compte existe avec cet email, vous recevrez un code de réinitialisation.'
                 );
             }
@@ -79,6 +91,31 @@ class PasswordResetController extends AbstractController
 
         return $this->render('security/forgot_password.html.twig', [
             'form' => $form->createView(),
+        ]);
+    }
+
+    // 🆕 NOUVELLE ROUTE : Page de vérification du code
+    #[Route('/verify-reset-code', name: 'app_verify_reset_code')]
+    public function verifyCode(Request $request): Response
+    {
+        $email = $request->query->get('email');
+        
+        if ($request->isMethod('POST')) {
+            $code = $request->request->get('code');
+            
+            $resetToken = $this->entityManager->getRepository(PasswordResetToken::class)
+                ->findOneBy(['token' => $code]);
+
+            if ($resetToken && !$resetToken->isExpired()) {
+                // Code valide : rediriger vers la page de réinitialisation
+                return $this->redirectToRoute('app_reset_password', ['token' => $code]);
+            } else {
+                $this->addFlash('error', 'Code invalide ou expiré.');
+            }
+        }
+
+        return $this->render('security/verify_reset_code.html.twig', [
+            'email' => $email
         ]);
     }
 
@@ -100,15 +137,15 @@ class PasswordResetController extends AbstractController
             $user = $resetToken->getUser();
             $newPassword = $form->get('plainPassword')->getData();
 
-            // Hash and set new password
+            // Hash et définir le nouveau mot de passe
             $hashedPassword = $passwordHasher->hashPassword($user, $newPassword);
             $user->setPassword($hashedPassword);
 
-            // Remove used token
+            // Supprimer le token utilisé
             $this->entityManager->remove($resetToken);
             $this->entityManager->flush();
 
-            $this->addFlash('success', 'Votre mot de passe a été réinitialisé avec succès.');
+            $this->addFlash('success', 'Votre mot de passe a été réinitialisé avec succès. Vous pouvez maintenant vous connecter.');
             return $this->redirectToRoute('app_login');
         }
 
