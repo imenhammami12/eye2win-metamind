@@ -28,15 +28,8 @@ class NotificationService
     {
         $this->log('🔔 notifyComplaintSubmitted called for complaint ID: ' . $complaint->getId());
         
-        // Notify user
-        $userNotif = $this->createNotification(
-            $complaint->getSubmittedBy(),
-            NotificationType::COMPLAINT_SUBMITTED,
-            'Your support ticket has been submitted successfully',
-            $this->urlGenerator->generate('app_complaints_show', ['id' => $complaint->getId()])
-        );
-        $this->publishNotification($userNotif);
-        $this->log('✅ User notification created: ' . $userNotif->getId());
+        // ✅ PAS de notification à l'utilisateur - il sait déjà qu'il a soumis sa réclamation
+        // Il voit déjà un message flash de succès : "Your complaint has been submitted successfully"
 
         // Notify all admins - CRITICAL SECTION
         $this->log('👥 Getting admins...');
@@ -143,14 +136,8 @@ class NotificationService
     {
         $this->log('🔔 notifyCoachApplicationSubmitted called for application ID: ' . $application->getId());
         
-        $userNotif = $this->createNotification(
-            $application->getUser(),
-            NotificationType::COACH_APPLICATION_STATUS,
-            'Your coach application has been submitted and is under review',
-            $this->urlGenerator->generate('user_profile')
-        );
-        $this->publishNotification($userNotif);
-        $this->log('✅ User notification created');
+        // ✅ PAS de notification à l'utilisateur - il sait déjà qu'il a soumis sa demande
+        // Il voit déjà un message flash de succès
 
         // Notify all admins
         $this->log('👥 Getting admins for coach application...');
