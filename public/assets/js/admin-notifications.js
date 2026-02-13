@@ -1,186 +1,311 @@
-// public/assets/js/admin-notifications.js
-// Real-time notification system for admin panel
+class AdminNotificationManager {
+    constructor() {
+        this.eventSource = null;
+        this.userId = document.body.dataset.userId;
+        this.notificationBell = document.getElementById('adminNotificationBell');
+        this.notificationBadge = document.getElementById('adminNotificationBadge');
+        this.notificationDropdown = document.getElementById('adminNotificationDropdown');
+        this.notificationList = document.getElementById('adminNotificationList');
+        this.unreadCount = 0;
+        
+        // Audio notification
+        this.notificationSound = null;
+        this.soundEnabled = false;
+        
+        if (!this.notificationBell) {
+            console.warn('Admin notification bell not found');
+            return;
+        }
+        
+        this.init();
+    }
 
-(function() {
-    'use strict';
-    
-    const POLL_INTERVAL = 20000; // 20 seconds
-    
-    // Play admin notification sound
-    function playNotificationSound() {
-        const audio = new Audio('/assets/sounds/admin-notification.mp3');
-        audio.volume = 0.6;
-        audio.play().catch(e => console.log('Audio blocked:', e));
+    init() {
+        this.initSound();
+        this.setupDropdown();
+        this.connectToMercure();
+        this.fetchNotifications();
+        this.setupMarkAllRead();
+        
+        // Poll as fallback every 30 seconds
+        setInterval(() => this.fetchNotifications(), 30000);
     }
-    
-    // Update sidebar badges
-    function updateBadges(stats) {
-        // Update complaints badge
-        const complaintsBadge = document.querySelector('.sidebar a[href*="complaints"] .badge');
-        if (complaintsBadge) {
-            if (stats.pendingComplaints > 0) {
-                complaintsBadge.textContent = stats.pendingComplaints;
-                complaintsBadge.style.display = 'inline-block';
+
+    initSound() {
+        this.notificationSound = new Audio('/assets/sounds/admin-notification.mp3');
+        this.notificationSound.volume = 0.5;
+        this.notificationSound.load();
+        
+        const activateSound = () => {
+            if (this.soundEnabled) return;
+            
+            const playPromise = this.notificationSound.play();
+            if (playPromise !== undefined) {
+                playPromise
+                    .then(() => {
+                        this.notificationSound.pause();
+                        this.notificationSound.currentTime = 0;
+                        this.soundEnabled = true;
+                        console.log('✅ Admin notification sound enabled!');
+                    })
+                    .catch(() => {
+                        console.log('⏳ Waiting for user interaction...');
+                    });
+            }
+        };
+        
+        setTimeout(activateSound, 100);
+        
+        ['click', 'touchstart', 'keydown', 'mousemove'].forEach(eventType => {
+            document.addEventListener(eventType, () => {
+                if (!this.soundEnabled) activateSound();
+            }, { once: true, passive: true });
+        });
+    }
+
+    setupDropdown() {
+        // Toggle dropdown
+        this.notificationBell.addEventListener('click', (e) => {
+            e.stopPropagation();
+            this.notificationDropdown.classList.toggle('show');
+        });
+        
+        // Close when clicking outside
+        document.addEventListener('click', (e) => {
+            if (!this.notificationDropdown.contains(e.target) && e.target !== this.notificationBell) {
+                this.notificationDropdown.classList.remove('show');
+            }
+        });
+    }
+
+    connectToMercure() {
+        if (!this.userId) {
+            console.warn('⚠️ No user ID found');
+            return;
+        }
+
+        const hubUrl = new URL(window.MERCURE_HUB_URL || 'http://localhost:3000/.well-known/mercure');
+        hubUrl.searchParams.append('topic', 'notifications/user/' + this.userId);
+        
+        console.log('🔌 Admin connecting to Mercure:', hubUrl.toString());
+        
+        this.eventSource = new EventSource(hubUrl);
+        
+        this.eventSource.onopen = () => {
+            console.log('✅ Admin connected to Mercure!');
+        };
+        
+        this.eventSource.onmessage = (event) => {
+            console.log('📬 Admin notification received:', event.data);
+            try {
+                const notification = JSON.parse(event.data);
+                this.addNotification(notification);
+                this.showToast(notification);
+                this.playNotificationSound();
+            } catch (error) {
+                console.error('❌ Error parsing notification:', error);
+            }
+        };
+
+        this.eventSource.onerror = (error) => {
+            console.error('❌ Mercure error:', error);
+            this.eventSource.close();
+            setTimeout(() => this.connectToMercure(), 5000);
+        };
+    }
+
+    async fetchNotifications() {
+        try {
+            const response = await fetch('/api/notifications/unread');
+            const data = await response.json();
+            
+            if (data.success) {
+                this.updateNotificationUI(data.notifications, data.count);
+            }
+        } catch (error) {
+            console.error('Failed to fetch notifications:', error);
+        }
+    }
+
+    updateNotificationUI(notifications, count) {
+        this.unreadCount = count;
+        
+        // Update badge
+        if (this.notificationBadge) {
+            if (count > 0) {
+                this.notificationBadge.textContent = count > 99 ? '99+' : count;
+                this.notificationBadge.style.display = 'flex';
             } else {
-                complaintsBadge.style.display = 'none';
+                this.notificationBadge.style.display = 'none';
             }
         }
         
-        // Update coach applications badge
-        const coachBadge = document.querySelector('.sidebar a[href*="coach-applications"] .badge');
-        if (coachBadge) {
-            if (stats.pendingCoachApplications > 0) {
-                coachBadge.textContent = stats.pendingCoachApplications;
-                coachBadge.style.display = 'inline-block';
+        // Update list
+        if (this.notificationList) {
+            if (notifications.length === 0) {
+                this.notificationList.innerHTML = `
+                    <div class="empty-notifications">
+                        <i class="bi bi-bell-slash"></i>
+                        <p>No new notifications</p>
+                    </div>
+                `;
             } else {
-                coachBadge.style.display = 'none';
+                this.notificationList.innerHTML = notifications.map(n => this.createNotificationHTML(n)).join('');
+                this.attachNotificationListeners();
             }
         }
     }
-    
-    // Show toast notification
-    function showToast(notification) {
-        // Determine color based on type
-        let bgColor = '#667eea';
-        if (notification.type === 'COMPLAINT_NEW' || notification.type === 'COACH_APPLICATION') {
-            bgColor = '#f5576c';
+
+    addNotification(notification) {
+        this.unreadCount++;
+        
+        // Update badge
+        if (this.notificationBadge) {
+            this.notificationBadge.textContent = this.unreadCount > 99 ? '99+' : this.unreadCount;
+            this.notificationBadge.style.display = 'flex';
         }
         
-        const toast = document.createElement('div');
-        toast.className = 'admin-notification-toast';
-        toast.style.cssText = `
-            position: fixed;
-            top: 80px;
-            right: 20px;
-            background: ${bgColor};
-            color: white;
-            padding: 15px 20px;
-            border-radius: 8px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
-            z-index: 9999;
-            max-width: 400px;
-            animation: slideIn 0.3s ease-out;
-        `;
-        
-        toast.innerHTML = `
-            <div style="display: flex; justify-content: space-between; align-items: start;">
-                <div style="flex: 1;">
-                    <div style="font-weight: 600; margin-bottom: 5px;">
-                        ${notification.icon} ${notification.title}
+        // Prepend to list
+        if (this.notificationList) {
+            const emptyState = this.notificationList.querySelector('.empty-notifications');
+            if (emptyState) {
+                this.notificationList.innerHTML = '';
+            }
+            
+            const notifElement = document.createElement('div');
+            notifElement.innerHTML = this.createNotificationHTML(notification);
+            this.notificationList.insertBefore(notifElement.firstChild, this.notificationList.firstChild);
+            
+            this.attachNotificationListeners();
+            
+            // Limit to 10 notifications
+            const allNotifs = this.notificationList.querySelectorAll('.notification-item');
+            if (allNotifs.length > 10) {
+                allNotifs[allNotifs.length - 1].remove();
+            }
+        }
+    }
+
+    createNotificationHTML(notification) {
+        return `
+            <div class="notification-item ${notification.isRead ? '' : 'unread'}" data-notification-id="${notification.id}">
+                <div class="notification-content">
+                    <div class="notification-icon">${notification.icon}</div>
+                    <div class="notification-text">
+                        <p>${notification.message}</p>
+                        <span class="notification-time">${notification.timeAgo}</span>
+                        ${notification.link && !notification.isRead ? `
+                            <div class="notification-actions">
+                                <a href="${notification.link}" class="btn btn-sm btn-outline-light">View</a>
+                                <button class="btn btn-sm btn-outline-secondary mark-read-btn" data-id="${notification.id}">Mark read</button>
+                            </div>
+                        ` : ''}
                     </div>
-                    <div style="font-size: 14px; opacity: 0.95;">
-                        ${escapeHtml(notification.message)}
-                    </div>
-                    ${notification.link ? `
-                        <a href="${escapeHtml(notification.link)}" 
-                           style="display: inline-block; margin-top: 10px; padding: 5px 12px; background: rgba(255,255,255,0.2); border-radius: 4px; color: white; text-decoration: none; font-size: 13px;">
-                            View Details
-                        </a>
-                    ` : ''}
                 </div>
-                <button onclick="this.parentElement.parentElement.remove()" 
-                        style="background: none; border: none; color: white; font-size: 20px; cursor: pointer; padding: 0; margin-left: 10px;">
-                    ×
-                </button>
             </div>
         `;
-        
-        document.body.appendChild(toast);
-        
-        // Auto remove after 8 seconds
-        setTimeout(() => {
-            toast.style.animation = 'slideOut 0.3s ease-in';
-            setTimeout(() => toast.remove(), 300);
-        }, 8000);
     }
-    
-    // Check for new notifications
-    async function checkNotifications() {
-        try {
-            const response = await fetch('/api/admin/notifications/check?t=' + Date.now(), {
-                method: 'GET',
-                headers: {
-                    'X-Requested-With': 'XMLHttpRequest'
-                },
-                credentials: 'same-origin'
+
+    attachNotificationListeners() {
+        // Mark as read buttons
+        document.querySelectorAll('.mark-read-btn').forEach(btn => {
+            btn.addEventListener('click', async (e) => {
+                e.stopPropagation();
+                await this.markAsRead(btn.dataset.id);
             });
-            
-            if (!response.ok) return;
+        });
+    }
+
+    async markAsRead(notificationId) {
+        try {
+            const response = await fetch(`/api/notifications/${notificationId}/mark-read`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' }
+            });
             
             const data = await response.json();
             
             if (data.success) {
-                // Show toasts for new notifications
-                if (data.newNotifications && data.newNotifications.length > 0) {
-                    data.newNotifications.forEach(notif => {
-                        showToast(notif);
-                        playNotificationSound();
-                    });
+                const notifElement = document.querySelector(`[data-notification-id="${notificationId}"]`);
+                if (notifElement) {
+                    notifElement.classList.remove('unread');
+                    const actions = notifElement.querySelector('.notification-actions');
+                    if (actions) actions.remove();
+                }
+                
+                this.unreadCount = Math.max(0, this.unreadCount - 1);
+                if (this.notificationBadge) {
+                    if (this.unreadCount > 0) {
+                        this.notificationBadge.textContent = this.unreadCount > 99 ? '99+' : this.unreadCount;
+                    } else {
+                        this.notificationBadge.style.display = 'none';
+                    }
                 }
             }
         } catch (error) {
-            console.error('Error checking admin notifications:', error);
+            console.error('Failed to mark notification as read:', error);
         }
     }
-    
-    // Update dashboard stats
-    async function updateStats() {
-        try {
-            const response = await fetch('/api/admin/notifications/stats?t=' + Date.now(), {
-                method: 'GET',
-                headers: {
-                    'X-Requested-With': 'XMLHttpRequest'
-                },
-                credentials: 'same-origin'
+
+    setupMarkAllRead() {
+        const markAllBtn = document.getElementById('markAllRead');
+        if (markAllBtn) {
+            markAllBtn.addEventListener('click', async () => {
+                try {
+                    const response = await fetch('/api/notifications/mark-all-read', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' }
+                    });
+                    
+                    const data = await response.json();
+                    
+                    if (data.success) {
+                        this.fetchNotifications();
+                    }
+                } catch (error) {
+                    console.error('Failed to mark all as read:', error);
+                }
             });
-            
-            if (!response.ok) return;
-            
-            const data = await response.json();
-            
-            if (data.success && data.stats) {
-                updateBadges(data.stats);
-            }
-        } catch (error) {
-            console.error('Error updating stats:', error);
         }
     }
-    
-    // Escape HTML
-    function escapeHtml(text) {
-        const div = document.createElement('div');
-        div.textContent = text;
-        return div.innerHTML;
+
+    playNotificationSound() {
+        if (!this.notificationSound) return;
+        
+        console.log('🔊 Playing admin notification sound...');
+        this.notificationSound.currentTime = 0;
+        this.notificationSound.play()
+            .then(() => console.log('✅ Admin sound played!'))
+            .catch(error => console.error('❌ Sound error:', error));
     }
-    
-    // Add CSS animations
-    const style = document.createElement('style');
-    style.textContent = `
-        @keyframes slideIn {
-            from { transform: translateX(400px); opacity: 0; }
-            to { transform: translateX(0); opacity: 1; }
-        }
-        @keyframes slideOut {
-            from { transform: translateX(0); opacity: 1; }
-            to { transform: translateX(400px); opacity: 0; }
-        }
-        .admin-notification-toast:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 16px rgba(0,0,0,0.4);
-        }
-    `;
-    document.head.appendChild(style);
-    
-    // Initialize
-    document.addEventListener('DOMContentLoaded', function() {
-        // Check immediately
-        checkNotifications();
-        updateStats();
+
+    showToast(notification) {
+        const toast = document.createElement('div');
+        toast.className = 'admin-notification-toast';
+        toast.innerHTML = `
+            <div class="toast-content">
+                <div class="toast-icon">${notification.icon}</div>
+                <div class="toast-text">
+                    <div class="toast-title">New Notification</div>
+                    <p class="toast-message">${notification.message}</p>
+                </div>
+                <button class="toast-close" onclick="this.parentElement.parentElement.remove()">&times;</button>
+            </div>
+        `;
         
-        // Then check periodically
-        setInterval(checkNotifications, POLL_INTERVAL);
-        setInterval(updateStats, 60000); // Update stats every minute
-        
-        console.log('✓ Admin notification system initialized');
-    });
-})();
+        document.body.appendChild(toast);
+        setTimeout(() => toast.classList.add('show'), 100);
+        setTimeout(() => {
+            toast.classList.remove('show');
+            setTimeout(() => toast.remove(), 400);
+        }, 5000);
+    }
+}
+
+// Initialize when DOM is ready
+document.addEventListener('DOMContentLoaded', () => {
+    const userId = document.body.dataset.userId;
+    if (userId) {
+        new AdminNotificationManager();
+    }
+});

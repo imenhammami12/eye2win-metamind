@@ -1,0 +1,376 @@
+{% extends 'admin_layout.html.twig' %}
+
+{% block title %}Mon Profil{% endblock %}
+{% block page_title %}Mon Profil{% endblock %}
+
+{% block stylesheets %}
+<style>
+    .profile-container {
+        max-width: 1200px;
+        margin: 0 auto;
+    }
+
+    .profile-header {
+        background: linear-gradient(135deg, rgba(255, 60, 100, 0.1) 0%, rgba(120, 40, 200, 0.1) 100%);
+        border-radius: 16px;
+        padding: 40px;
+        margin-bottom: 30px;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        display: flex;
+        align-items: center;
+        gap: 30px;
+    }
+
+    .profile-avatar-large {
+        width: 120px;
+        height: 120px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, #ff3c64, #7828c8);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 48px;
+        font-weight: 700;
+        color: white;
+        border: 4px solid rgba(255, 255, 255, 0.1);
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+        flex-shrink: 0;
+    }
+
+    .profile-info h2 {
+        font-size: 32px;
+        font-weight: 700;
+        margin-bottom: 8px;
+        color: #ffffff;
+    }
+
+    .profile-info p {
+        color: rgba(255, 255, 255, 0.6);
+        margin: 4px 0;
+    }
+
+    .profile-tabs {
+        display: flex;
+        gap: 15px;
+        margin-bottom: 30px;
+        border-bottom: 2px solid rgba(255, 255, 255, 0.1);
+        padding-bottom: 0;
+        overflow-x: auto;
+    }
+
+    .profile-tab {
+        padding: 12px 24px;
+        background: transparent;
+        border: none;
+        color: rgba(255, 255, 255, 0.6);
+        font-weight: 600;
+        cursor: pointer;
+        border-radius: 8px 8px 0 0;
+        transition: all 0.3s ease;
+        position: relative;
+        white-space: nowrap;
+    }
+
+    .profile-tab.active {
+        color: #ff3c64;
+        background: rgba(255, 60, 100, 0.1);
+    }
+
+    .profile-tab.active::after {
+        content: '';
+        position: absolute;
+        bottom: -2px;
+        left: 0;
+        right: 0;
+        height: 2px;
+        background: #ff3c64;
+    }
+
+    .profile-tab:hover:not(.active) {
+        color: rgba(255, 255, 255, 0.9);
+        background: rgba(255, 255, 255, 0.05);
+    }
+
+    .profile-section {
+        background: rgba(30, 15, 45, 0.6);
+        border-radius: 16px;
+        padding: 30px;
+        margin-bottom: 20px;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .section-title {
+        font-size: 20px;
+        font-weight: 700;
+        margin-bottom: 20px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        color: #ffffff;
+    }
+
+    .section-title i {
+        color: #ff3c64;
+        font-size: 24px;
+    }
+
+    .info-row {
+        display: flex;
+        justify-content: space-between;
+        padding: 15px 0;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        flex-wrap: wrap;
+        gap: 10px;
+    }
+
+    .info-row:last-child {
+        border-bottom: none;
+    }
+
+    .info-label {
+        font-weight: 600;
+        color: rgba(255, 255, 255, 0.6);
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .info-value {
+        color: #ffffff;
+        font-weight: 500;
+        text-align: right;
+    }
+
+    .badge {
+        padding: 6px 12px;
+        border-radius: 6px;
+        font-size: 12px;
+        font-weight: 600;
+        text-transform: uppercase;
+        display: inline-block;
+    }
+
+    .badge-success {
+        background: rgba(67, 233, 123, 0.2);
+        color: #43e97b;
+    }
+
+    .badge-danger {
+        background: rgba(255, 60, 100, 0.2);
+        color: #ff3c64;
+    }
+
+    .btn-action {
+        padding: 10px 20px;
+        border-radius: 8px;
+        font-weight: 600;
+        border: none;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        text-decoration: none;
+    }
+
+    .btn-primary {
+        background: linear-gradient(135deg, #ff3c64, #ff1744);
+        color: white !important;
+    }
+
+    .btn-primary:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 10px 25px rgba(255, 60, 100, 0.3);
+        color: white !important;
+    }
+
+    .btn-outline {
+        background: transparent;
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        color: rgba(255, 255, 255, 0.8);
+    }
+
+    .btn-outline:hover {
+        background: rgba(255, 255, 255, 0.05);
+        border-color: rgba(255, 255, 255, 0.3);
+        color: #ffffff;
+    }
+
+    .security-feature {
+        background: rgba(255, 255, 255, 0.03);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: 12px;
+        padding: 20px;
+        margin-bottom: 15px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        transition: all 0.3s ease;
+        gap: 15px;
+    }
+
+    .security-feature:hover {
+        background: rgba(255, 255, 255, 0.05);
+        border-color: rgba(255, 255, 255, 0.15);
+    }
+
+    .security-feature-info {
+        flex: 1;
+        min-width: 0;
+    }
+
+    .security-feature-title {
+        font-size: 16px;
+        font-weight: 700;
+        color: #ffffff;
+        margin-bottom: 5px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        flex-wrap: wrap;
+    }
+
+    .security-feature-desc {
+        font-size: 13px;
+        color: rgba(255, 255, 255, 0.6);
+    }
+
+    .security-feature-icon {
+        font-size: 32px;
+        margin-right: 15px;
+        flex-shrink: 0;
+    }
+
+    @media (max-width: 768px) {
+        .profile-header {
+            flex-direction: column;
+            text-align: center;
+        }
+        .security-feature {
+            flex-direction: column;
+            text-align: center;
+        }
+        .security-feature-icon {
+            margin-right: 0;
+            margin-bottom: 10px;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block body %}
+<div class="profile-container">
+    <div class="profile-header">
+        <div class="profile-avatar-large">
+            {{ user.username|slice(0, 2)|upper }}
+        </div>
+        <div class="profile-info">
+            <h2>{{ user.fullName ?? user.username }}</h2>
+            <p><i class="bi bi-envelope"></i> {{ user.email }}</p>
+            <p><i class="bi bi-person-badge"></i> @{{ user.username }}</p>
+            <p><i class="bi bi-calendar"></i> Membre depuis {{ user.createdAt|date('d/m/Y') }}</p>
+        </div>
+    </div>
+
+    <div class="profile-tabs">
+        <button class="profile-tab active" onclick="showTab('general')">
+            <i class="bi bi-person"></i> Informations
+        </button>
+        <button class="profile-tab" onclick="showTab('security')">
+            <i class="bi bi-shield-check"></i> Sécurité
+        </button>
+    </div>
+
+    <div id="general-tab" class="tab-content">
+        <div class="profile-section">
+            <h3 class="section-title">
+                <i class="bi bi-info-circle"></i>
+                Informations personnelles
+            </h3>
+            <div class="info-row">
+                <span class="info-label"><i class="bi bi-person"></i> Nom complet</span>
+                <span class="info-value">{{ user.fullName ?? 'Non renseigné' }}</span>
+            </div>
+            <div class="info-row">
+                <span class="info-label"><i class="bi bi-envelope"></i> Email</span>
+                <span class="info-value">{{ user.email }}</span>
+            </div>
+            <div class="info-row">
+                <span class="info-label"><i class="bi bi-person-badge"></i> Nom d'utilisateur</span>
+                <span class="info-value">{{ user.username }}</span>
+            </div>
+        </div>
+    </div>
+
+    <div id="security-tab" class="tab-content" style="display: none;">
+        <div class="profile-section">
+            <h3 class="section-title">
+                <i class="bi bi-shield-lock"></i>
+                Fonctionnalités de sécurité
+            </h3>
+
+            <div class="security-feature">
+                <div class="security-feature-icon">
+                    <i class="bi bi-camera" style="color: {{ hasFaceAuth ? '#43e97b' : 'rgba(255,255,255,0.3)' }};"></i>
+                </div>
+                <div class="security-feature-info">
+                    <div class="security-feature-title">
+                        Reconnaissance faciale
+                        {% if hasFaceAuth %}
+                            <span class="badge badge-success">Activé</span>
+                        {% else %}
+                            <span class="badge badge-danger">Désactivé</span>
+                        {% endif %}
+                    </div>
+                    <div class="security-feature-desc">
+                        Connectez-vous rapidement et en toute sécurité avec votre visage
+                    </div>
+                </div>
+                <div>
+                    {% if hasFaceAuth %}
+                        <button onclick="removeFaceAuth()" class="btn-action btn-outline">
+                            <i class="bi bi-x-circle"></i> Désactiver
+                        </button>
+                    {% else %}
+                        <a href="{{ path('app_profile_face_register') }}" class="btn-action btn-primary">
+
+                            <i class="bi bi-camera-fill"></i> Activer
+                        </a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block javascripts %}
+<script>
+    function showTab(tabName) {
+        document.querySelectorAll('.tab-content').forEach(tab => tab.style.display = 'none');
+        document.querySelectorAll('.profile-tab').forEach(btn => btn.classList.remove('active'));
+        document.getElementById(tabName + '-tab').style.display = 'block';
+        event.target.classList.add('active');
+    }
+
+    async function removeFaceAuth() {
+        if (!confirm('Êtes-vous sûr de vouloir désactiver la reconnaissance faciale ?')) return;
+        
+        try {
+            const response = await fetch('{{ path("face_remove") }}', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' }
+            });
+            const result = await response.json();
+            if (result.success) {
+                alert(result.message);
+                window.location.reload();
+            } else {
+                alert('Erreur: ' + result.message);
+            }
+        } catch (error) {
+            alert('Erreur: ' + error.message);
+        }
+    }
+</script>
+{% endblock %}

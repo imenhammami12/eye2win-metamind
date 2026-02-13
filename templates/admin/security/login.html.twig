@@ -519,6 +519,26 @@
 
                 <button type="submit" class="btn-login" id="loginBtn">
                     <i class="bi bi-shield-check"></i>
+                    <div style="text-align: center; margin-bottom: 20px;">
+    <a href="{{ path('face_login') }}" style="
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 12px 24px;
+        background: rgba(90, 103, 216, 0.1);
+        border: 1px solid rgba(90, 103, 216, 0.3);
+        border-radius: 10px;
+        color: #5a67d8;
+        text-decoration: none;
+        font-weight: 600;
+        font-size: 13px;
+        transition: all 0.3s ease;
+    " onmouseover="this.style.background='rgba(90, 103, 216, 0.2)'" 
+       onmouseout="this.style.background='rgba(90, 103, 216, 0.1)'">
+        <i class="bi bi-camera-fill"></i>
+        Connexion par reconnaissance faciale
+    </a>
+</div>
                     <span>Se connecter</span>
                 </button>
             </form>

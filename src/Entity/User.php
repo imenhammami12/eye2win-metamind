@@ -508,4 +508,35 @@ public function setTelegramChatId(?string $telegramChatId): static
     $this->telegramChatId = $telegramChatId;
     return $this;
 }
+
+// src/Entity/User.php
+
+#[ORM\Column(type: 'text', nullable: true)]
+private ?string $faceDescriptor = null;
+
+#[ORM\Column(type: 'string', length: 255, nullable: true)]
+private ?string $faceImage = null;
+
+public function getFaceDescriptor(): ?string
+{
+    return $this->faceDescriptor;
+}
+
+public function setFaceDescriptor(?string $faceDescriptor): static
+{
+    $this->faceDescriptor = $faceDescriptor;
+    return $this;
+}
+
+public function getFaceImage(): ?string
+{
+    return $this->faceImage;
+}
+
+public function setFaceImage(?string $faceImage): static
+{
+    $this->faceImage = $faceImage;
+    return $this;
+}
+
 }

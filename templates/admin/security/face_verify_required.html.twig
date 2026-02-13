@@ -1,0 +1,483 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Vérification Faciale Requise{% endblock %}
+
+{% block body %}
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+    
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #1a0e2e 0%, #2d1b3d 50%, #1a0e2e 100%);
+            color: #ffffff;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .verify-container {
+            background: rgba(20, 10, 35, 0.95);
+            backdrop-filter: blur(20px);
+            border-radius: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+            max-width: 700px;
+            width: 100%;
+            padding: 40px;
+            animation: slideUp 0.6s ease;
+        }
+
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .verify-header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .verify-header .icon {
+            font-size: 64px;
+            color: #ff3c64;
+            margin-bottom: 20px;
+        }
+
+        .verify-header h1 {
+            font-size: 28px;
+            font-weight: 700;
+            margin-bottom: 12px;
+        }
+
+        .verify-header p {
+            font-size: 14px;
+            color: rgba(255, 255, 255, 0.7);
+        }
+
+        .verify-header .username {
+            display: inline-block;
+            padding: 6px 16px;
+            background: rgba(255, 60, 100, 0.2);
+            border-radius: 20px;
+            color: #ff3c64;
+            font-weight: 600;
+            margin-top: 10px;
+        }
+
+        .video-container {
+            position: relative;
+            margin: 30px 0;
+            border-radius: 16px;
+            overflow: hidden;
+            background: #000;
+        }
+
+        #video {
+            width: 100%;
+            height: auto;
+            display: block;
+            border-radius: 16px;
+        }
+
+        #overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+        }
+
+        .status {
+            margin: 20px 0;
+            padding: 16px 18px;
+            border-radius: 12px;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            border: 1px solid;
+        }
+
+        .status.success {
+            background: rgba(67, 233, 123, 0.15);
+            border-color: rgba(67, 233, 123, 0.3);
+            color: #43e97b;
+        }
+
+        .status.error {
+            background: rgba(255, 60, 100, 0.15);
+            border-color: rgba(255, 60, 100, 0.3);
+            color: #ff3c64;
+        }
+
+        .status.info {
+            background: rgba(90, 103, 216, 0.15);
+            border-color: rgba(90, 103, 216, 0.3);
+            color: #5a67d8;
+        }
+
+        .status.warning {
+            background: rgba(255, 193, 7, 0.15);
+            border-color: rgba(255, 193, 7, 0.3);
+            color: #ffc107;
+        }
+
+        .btn-verify {
+            width: 100%;
+            padding: 16px;
+            background: linear-gradient(135deg, #ff3c64 0%, #ff1744 100%);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 15px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
+            box-shadow: 0 6px 20px rgba(255, 60, 100, 0.3);
+        }
+
+        .btn-verify:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 28px rgba(255, 60, 100, 0.4);
+        }
+
+        .btn-verify:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .btn-cancel {
+            width: 100%;
+            padding: 14px;
+            background: transparent;
+            color: rgba(255, 255, 255, 0.7);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 12px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            margin-top: 12px;
+            transition: all 0.3s ease;
+        }
+
+        .btn-cancel:hover {
+            background: rgba(255, 255, 255, 0.05);
+            color: white;
+        }
+
+        .debug-info {
+            margin-top: 20px;
+            padding: 12px;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 8px;
+            font-size: 11px;
+            font-family: monospace;
+            color: #888;
+        }
+    </style>
+</head>
+<body>
+    <div class="verify-container">
+        <div class="verify-header">
+            <div class="icon">
+                <i class="bi bi-shield-lock-fill"></i>
+            </div>
+            <h1>Vérification Faciale Requise</h1>
+            <p>Votre compte est protégé par la reconnaissance faciale</p>
+            <div class="username">
+                <i class="bi bi-person-circle"></i> {{ username }}
+            </div>
+        </div>
+
+        <div class="status info" id="status">
+            <i class="bi bi-hourglass-split"></i>
+            <span>Chargement des modèles d'IA...</span>
+        </div>
+
+        <div class="video-container" id="videoContainer" style="display: none;">
+            <video id="video" autoplay muted playsinline></video>
+            <canvas id="overlay"></canvas>
+        </div>
+
+        <button id="verifyBtn" class="btn-verify" disabled>
+            <i class="bi bi-camera-fill"></i>
+            <span>Vérifier mon visage</span>
+        </button>
+
+        <button id="cancelBtn" class="btn-cancel">
+            <i class="bi bi-x-circle"></i>
+            Annuler et se déconnecter
+        </button>
+
+        <div class="debug-info" id="debugInfo" style="display: none;"></div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/face-api.js@0.22.2/dist/face-api.min.js"></script>
+    <script>
+        const video = document.getElementById('video');
+        const canvas = document.getElementById('overlay');
+        const statusDiv = document.getElementById('status');
+        const verifyBtn = document.getElementById('verifyBtn');
+        const cancelBtn = document.getElementById('cancelBtn');
+        const videoContainer = document.getElementById('videoContainer');
+        const debugInfo = document.getElementById('debugInfo');
+
+        const MODEL_URL = 'https://cdn.jsdelivr.net/npm/@vladmandic/face-api/model';
+        let detectionInterval = null;
+        let faceDetected = false;
+
+        // Debug logger
+        function debug(message, data = null) {
+            const timestamp = new Date().toLocaleTimeString();
+            const logMsg = `[${timestamp}] ${message}`;
+            console.log(logMsg, data || '');
+            
+            if (debugInfo.style.display !== 'none') {
+                debugInfo.innerHTML += logMsg + (data ? ': ' + JSON.stringify(data) : '') + '\n';
+                debugInfo.scrollTop = debugInfo.scrollHeight;
+            }
+        }
+
+        // Bouton annuler
+        cancelBtn.addEventListener('click', () => {
+            window.location.href = '{{ path("admin_logout") }}';
+        });
+
+        // Charger les modèles
+        async function loadModels() {
+            try {
+                updateStatus('info', 'bi-hourglass-split', 'Chargement des modèles...');
+                debug('⏳ Début du chargement des modèles');
+                
+                await faceapi.nets.tinyFaceDetector.loadFromUri(MODEL_URL);
+                debug('✅ TinyFaceDetector chargé');
+                
+                await faceapi.nets.faceLandmark68Net.loadFromUri(MODEL_URL);
+                debug('✅ FaceLandmark68Net chargé');
+                
+                await faceapi.nets.faceRecognitionNet.loadFromUri(MODEL_URL);
+                debug('✅ FaceRecognitionNet chargé');
+                
+                updateStatus('success', 'bi-check-circle', 'Modèles chargés. Démarrage caméra...');
+                await startVideo();
+            } catch (error) {
+                debug('❌ Erreur chargement modèles', error.message);
+                updateStatus('error', 'bi-x-circle', 'Erreur: ' + error.message);
+            }
+        }
+
+        // Démarrer la caméra
+        async function startVideo() {
+            try {
+                const stream = await navigator.mediaDevices.getUserMedia({ 
+                    video: { 
+                        width: { ideal: 640 }, 
+                        height: { ideal: 480 }, 
+                        facingMode: 'user' 
+                    } 
+                });
+                
+                video.srcObject = stream;
+                
+                video.addEventListener('loadedmetadata', () => {
+                    videoContainer.style.display = 'block';
+                    canvas.width = video.videoWidth;
+                    canvas.height = video.videoHeight;
+                    
+                    debug('📹 Caméra démarrée', { width: video.videoWidth, height: video.videoHeight });
+                    updateStatus('success', 'bi-camera', 'Caméra active. Positionnez votre visage.');
+                    verifyBtn.disabled = false;
+                    
+                    startDetection();
+                });
+            } catch (error) {
+                debug('❌ Erreur caméra', error.message);
+                updateStatus('error', 'bi-exclamation-triangle', 'Impossible d\'accéder à la caméra');
+            }
+        }
+
+        // Détection temps réel
+        function startDetection() {
+            const ctx = canvas.getContext('2d');
+            
+            detectionInterval = setInterval(async () => {
+                try {
+                    const detections = await faceapi
+                        .detectAllFaces(video, new faceapi.TinyFaceDetectorOptions())
+                        .withFaceLandmarks();
+                    
+                    ctx.clearRect(0, 0, canvas.width, canvas.height);
+                    
+                    if (detections.length > 0) {
+                        faceDetected = true;
+                        const resized = faceapi.resizeResults(detections, { 
+                            width: canvas.width, 
+                            height: canvas.height 
+                        });
+                        
+                        faceapi.draw.drawDetections(canvas, resized);
+                        faceapi.draw.drawFaceLandmarks(canvas, resized);
+                        
+                        if (detections.length === 1) {
+                            updateStatus('success', 'bi-check-circle', 'Visage détecté ✓ Vous pouvez vérifier');
+                        } else {
+                            updateStatus('warning', 'bi-people', `${detections.length} visages détectés`);
+                        }
+                    } else {
+                        faceDetected = false;
+                    }
+                } catch (error) {
+                    debug('Erreur détection temps réel', error.message);
+                }
+            }, 100);
+        }
+
+        // Vérifier
+        verifyBtn.addEventListener('click', async () => {
+            debug('🖱️ Bouton vérifier cliqué');
+            verifyBtn.disabled = true;
+            updateStatus('info', 'bi-hourglass-split', 'Vérification en cours...');
+            
+            if (detectionInterval) {
+                clearInterval(detectionInterval);
+                debug('⏸️ Détection temps réel arrêtée');
+            }
+            
+            try {
+                // Attendre un peu pour stabiliser l'image
+                await new Promise(resolve => setTimeout(resolve, 500));
+                
+                debug('🔍 Détection du visage...');
+                const detection = await faceapi
+                    .detectSingleFace(video, new faceapi.TinyFaceDetectorOptions())
+                    .withFaceLandmarks()
+                    .withFaceDescriptor();
+                
+                if (!detection) {
+                    throw new Error('Aucun visage détecté. Assurez-vous d\'être bien visible et réessayez.');
+                }
+                
+                debug('✅ Visage détecté', { 
+                    score: detection.detection.score,
+                    descriptorLength: detection.descriptor.length 
+                });
+                
+                // Créer l'image
+                const tempCanvas = document.createElement('canvas');
+                tempCanvas.width = video.videoWidth;
+                tempCanvas.height = video.videoHeight;
+                tempCanvas.getContext('2d').drawImage(video, 0, 0);
+                const imageData = tempCanvas.toDataURL('image/jpeg', 0.8);
+                
+                debug('📷 Image capturée', { size: Math.round(imageData.length / 1024) + 'KB' });
+                updateStatus('info', 'bi-cloud-upload', 'Envoi au serveur...');
+                
+                // Préparer les données
+                const payload = {
+                    image: imageData,
+                    descriptor: Array.from(detection.descriptor)
+                };
+                
+                debug('📤 Envoi au serveur', { 
+                    descriptorLength: payload.descriptor.length,
+                    imageSize: Math.round(imageData.length / 1024) + 'KB'
+                });
+                
+                const response = await fetch('{{ path("face_verify_check") }}', {
+                    method: 'POST',
+                    headers: { 
+                        'Content-Type': 'application/json',
+                        'X-Requested-With': 'XMLHttpRequest'
+                    },
+                    body: JSON.stringify(payload)
+                });
+                
+                debug('📥 Réponse reçue', { status: response.status, ok: response.ok });
+                
+                // Lire la réponse comme texte d'abord
+                const responseText = await response.text();
+                debug('📄 Réponse brute', responseText.substring(0, 200));
+                
+                let result;
+                try {
+                    result = JSON.parse(responseText);
+                } catch (e) {
+                    debug('❌ Erreur parsing JSON', e.message);
+                    throw new Error('Erreur serveur: réponse invalide. Vérifiez les logs Symfony.');
+                }
+                
+                debug('📊 Résultat parsé', result);
+                
+                if (result.success) {
+                    updateStatus('success', 'bi-shield-check', '✓ Vérification réussie !');
+                    debug('✅ Vérification réussie, redirection vers:', result.redirect);
+                    setTimeout(() => {
+                        window.location.href = result.redirect;
+                    }, 1000);
+                } else {
+                    debug('⚠️ Vérification échouée', result.message);
+                    updateStatus('error', 'bi-x-circle', result.message || 'Visage non reconnu');
+                    verifyBtn.disabled = false;
+                    startDetection();
+                }
+            } catch (error) {
+                debug('❌ Erreur complète', error);
+                updateStatus('error', 'bi-exclamation-triangle', error.message);
+                verifyBtn.disabled = false;
+                startDetection();
+            }
+        });
+
+        function updateStatus(type, icon, message) {
+            statusDiv.className = `status ${type}`;
+            statusDiv.innerHTML = `<i class="bi ${icon}"></i><span>${message}</span>`;
+        }
+
+        // Démarrage
+        loadModels();
+
+        // Test de la route au chargement
+        fetch('{{ path("face_verify_check") }}', {
+            method: 'POST',
+            headers: { 
+                'Content-Type': 'application/json',
+                'X-Requested-With': 'XMLHttpRequest'
+            },
+            body: JSON.stringify({ test: true })
+        }).then(async response => {
+            const text = await response.text();
+            debug('✅ Route accessible', { status: response.status, preview: text.substring(0, 100) });
+        }).catch(error => {
+            debug('❌ Route inaccessible', error.message);
+        });
+
+        // Toggle debug au clic sur le titre
+        document.querySelector('.verify-header h1').addEventListener('dblclick', () => {
+            debugInfo.style.display = debugInfo.style.display === 'none' ? 'block' : 'none';
+        });
+
+        // Nettoyage
+        window.addEventListener('beforeunload', () => {
+            if (video.srcObject) video.srcObject.getTracks().forEach(track => track.stop());
+            if (detectionInterval) clearInterval(detectionInterval);
+        });
+    </script>
+</body>
+</html>
+{% endblock %}

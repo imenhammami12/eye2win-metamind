@@ -15,70 +15,82 @@ class NotificationManager {
     }
 
     init() {
-        // Initialiser le son après la première interaction
         this.initSound();
-        
-        // Connect to Mercure hub
         this.connectToMercure();
-        
-        // Fetch initial notifications
         this.fetchNotifications();
-        
-        // Poll as fallback every 30 seconds
         setInterval(() => this.fetchNotifications(), 30000);
-        
-        // Mark as read on click
         this.setupMarkAsRead();
     }
 
     initSound() {
-        // Attendre la première interaction utilisateur
-        const enableSound = () => {
-            if (!this.soundEnabled) {
-                this.notificationSound = new Audio('/assets/sounds/admin-notification.mp3');
-                this.notificationSound.volume = 0.5;
-                
-                // Précharger le son
-                this.notificationSound.load();
-                
-                this.soundEnabled = true;
-                console.log('✅ Notification sound enabled');
-                
-                // Retirer les listeners une fois activé
-                document.removeEventListener('click', enableSound);
-                document.removeEventListener('keydown', enableSound);
+        this.notificationSound = new Audio('/assets/sounds/admin-notification.mp3');
+        this.notificationSound.volume = 0.5;
+        this.notificationSound.load();
+        
+        const activateSound = () => {
+            if (this.soundEnabled) return;
+            
+            const playPromise = this.notificationSound.play();
+            if (playPromise !== undefined) {
+                playPromise
+                    .then(() => {
+                        this.notificationSound.pause();
+                        this.notificationSound.currentTime = 0;
+                        this.soundEnabled = true;
+                        console.log('✅ Notification sound enabled!');
+                    })
+                    .catch(() => {
+                        console.log('⏳ Waiting for user interaction...');
+                    });
             }
         };
         
-        // Activer le son au premier clic ou touche
-        document.addEventListener('click', enableSound);
-        document.addEventListener('keydown', enableSound);
+        // Essayer immédiatement
+        setTimeout(activateSound, 100);
+        
+        // Activer au moindre événement
+        ['click', 'touchstart', 'keydown', 'mousemove', 'scroll'].forEach(eventType => {
+            document.addEventListener(eventType, () => {
+                if (!this.soundEnabled) activateSound();
+            }, { once: true, passive: true });
+        });
     }
 
     connectToMercure() {
-        if (!this.userId) return;
+        if (!this.userId) {
+            console.warn('⚠️ No user ID found');
+            return;
+        }
 
-        const hubUrl = new URL('/notifications/user/' + this.userId, window.MERCURE_HUB_URL || 'http://localhost:3000/.well-known/mercure');
+        const hubUrl = new URL(window.MERCURE_HUB_URL || 'http://localhost:3000/.well-known/mercure');
+        hubUrl.searchParams.append('topic', 'notifications/user/' + this.userId);
+        
+        console.log('🔌 Connecting to Mercure:', hubUrl.toString());
         
         this.eventSource = new EventSource(hubUrl);
         
+        this.eventSource.onopen = () => {
+            console.log('✅ Connected to Mercure successfully!');
+        };
+        
         this.eventSource.onmessage = (event) => {
-            console.log('📬 Notification reçue:', event.data);
-            const notification = JSON.parse(event.data);
-            this.addNotification(notification);
-            this.showToast(notification);
-            this.playNotificationSound();
+            console.log('📬 Notification received:', event.data);
+            try {
+                const notification = JSON.parse(event.data);
+                this.addNotification(notification);
+                this.showToast(notification);
+                this.playNotificationSound();
+            } catch (error) {
+                console.error('❌ Error parsing notification:', error);
+            }
         };
 
         this.eventSource.onerror = (error) => {
-            console.error('Mercure connection error:', error);
+            console.error('❌ Mercure error:', error);
             this.eventSource.close();
-            
-            // Reconnect after 5 seconds
+            console.log('🔄 Reconnecting in 5 seconds...');
             setTimeout(() => this.connectToMercure(), 5000);
         };
-        
-        console.log('🔌 Connected to Mercure:', hubUrl.toString());
     }
 
     async fetchNotifications() {
@@ -97,7 +109,6 @@ class NotificationManager {
     updateNotificationUI(notifications, count) {
         this.unreadCount = count;
         
-        // Update badge
         if (this.notificationBadge) {
             if (count > 0) {
                 this.notificationBadge.textContent = count > 99 ? '99+' : count;
@@ -107,7 +118,6 @@ class NotificationManager {
             }
         }
         
-        // Update list
         if (this.notificationList) {
             if (notifications.length === 0) {
                 this.notificationList.innerHTML = '<div class="p-3 text-muted">No notifications ✅</div>';
@@ -120,13 +130,11 @@ class NotificationManager {
     addNotification(notification) {
         this.unreadCount++;
         
-        // Update badge
         if (this.notificationBadge) {
             this.notificationBadge.textContent = this.unreadCount > 99 ? '99+' : this.unreadCount;
             this.notificationBadge.style.display = 'inline-block';
         }
         
-        // Prepend to list
         if (this.notificationList) {
             if (this.notificationList.querySelector('.text-muted')) {
                 this.notificationList.innerHTML = '';
@@ -136,7 +144,6 @@ class NotificationManager {
             notifElement.innerHTML = this.createNotificationHTML(notification);
             this.notificationList.insertBefore(notifElement.firstElementChild, this.notificationList.firstChild);
             
-            // Limit to 10 notifications
             const allNotifs = this.notificationList.querySelectorAll('.px-3.py-2');
             if (allNotifs.length > 10) {
                 allNotifs[allNotifs.length - 1].remove();
@@ -153,7 +160,6 @@ class NotificationManager {
                     <span class="${notification.isRead ? 'text-muted' : ''}">${notification.message}</span>
                 </div>
                 <div class="small text-muted mt-1">${notification.timeAgo}</div>
-
                 <div class="mt-2 d-flex gap-2">
                     ${notification.link ? `<a href="${notification.link}" class="btn btn-sm btn-outline-light">View</a>` : ''}
                     ${!notification.isRead ? `<button type="button" class="btn btn-sm btn-outline-secondary mark-read-btn" data-id="${notification.id}">Mark read</button>` : ''}
@@ -165,8 +171,7 @@ class NotificationManager {
     setupMarkAsRead() {
         document.addEventListener('click', async (e) => {
             if (e.target.classList.contains('mark-read-btn')) {
-                const notificationId = e.target.dataset.id;
-                await this.markAsRead(notificationId);
+                await this.markAsRead(e.target.dataset.id);
             }
         });
     }
@@ -175,9 +180,7 @@ class NotificationManager {
         try {
             const response = await fetch(`/api/notifications/${notificationId}/mark-read`, {
                 method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                }
+                headers: { 'Content-Type': 'application/json' }
             });
             
             const data = await response.json();
@@ -205,28 +208,25 @@ class NotificationManager {
     }
 
     playNotificationSound() {
-        if (!this.soundEnabled || !this.notificationSound) {
-            console.log('🔇 Sound not enabled yet (waiting for user interaction)');
+        if (!this.notificationSound) {
+            console.log('❌ Sound not initialized');
             return;
         }
         
-        console.log('🔊 Playing notification sound...');
+        console.log(`🔊 Playing notification sound... (enabled: ${this.soundEnabled})`);
         
-        // Reset le son pour pouvoir le rejouer
         this.notificationSound.currentTime = 0;
-        
-        // Jouer le son
         this.notificationSound.play()
             .then(() => {
-                console.log('✅ Sound played successfully');
+                console.log('✅ Sound played successfully!');
+                this.soundEnabled = true; // Marquer comme activé après le premier succès
             })
             .catch(error => {
-                console.error('❌ Could not play notification sound:', error);
+                console.error('❌ Could not play sound:', error.message);
             });
     }
 
     showToast(notification) {
-        // Create toast notification
         const toast = document.createElement('div');
         toast.className = 'notification-toast';
         toast.innerHTML = `
@@ -240,9 +240,7 @@ class NotificationManager {
         `;
         
         document.body.appendChild(toast);
-        
         setTimeout(() => toast.classList.add('show'), 100);
-        
         setTimeout(() => {
             toast.classList.remove('show');
             setTimeout(() => toast.remove(), 300);
@@ -250,7 +248,6 @@ class NotificationManager {
     }
 }
 
-// Initialize when DOM is ready
 document.addEventListener('DOMContentLoaded', () => {
     if (document.body.dataset.userId) {
         new NotificationManager();
