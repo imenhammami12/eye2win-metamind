@@ -1,0 +1,5 @@
+[33m5508d1c[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mgestion-user[m[33m, [m[1;31morigin/gestion-user[m[33m)[m enhancement:enhanve the interfaces of facial recognition
+[33m1807261[m reconnaissance facial pour les admine
+[33mc9fc9a3[m notification system with mercure bundle
+[33m92d8918[m reset password (email/sms/telegram) without secrets
+[33m1fd52e4[m mailing pour forget password
