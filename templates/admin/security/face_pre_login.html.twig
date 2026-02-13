@@ -1,0 +1,406 @@
+{# templates/admin/security/face_pre_login.html.twig #}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Face Verification - EyeTwin Admin</title>
+
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #1a0e2e 0%, #2d1b3d 50%, #1a0e2e 100%);
+            color: #fff;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .container {
+            background: rgba(20, 10, 35, 0.95);
+            backdrop-filter: blur(20px);
+            border-radius: 20px;
+            border: 1px solid rgba(255,255,255,.1);
+            box-shadow: 0 20px 60px rgba(0,0,0,.5);
+            max-width: 680px;
+            width: 100%;
+            padding: 40px;
+            animation: slideUp .6s ease;
+        }
+
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Header */
+        .header { text-align: center; margin-bottom: 28px; }
+
+        .header img { max-width: 150px; margin-bottom: 18px; }
+
+        .badge-step {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 14px;
+            background: rgba(255,60,100,.15);
+            border: 1px solid rgba(255,60,100,.35);
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: .8px;
+            color: #ff3c64;
+            margin-bottom: 16px;
+        }
+
+        .header h1 {
+            font-size: 26px;
+            font-weight: 700;
+            margin-bottom: 8px;
+        }
+
+        .header p { font-size: 13px; color: rgba(255,255,255,.6); }
+
+        .email-tag {
+            display: inline-block;
+            margin-top: 10px;
+            padding: 5px 14px;
+            background: rgba(90,103,216,.2);
+            border-radius: 20px;
+            color: #818cf8;
+            font-size: 13px;
+            font-weight: 600;
+        }
+
+        /* Status */
+        .status {
+            padding: 14px 16px;
+            border-radius: 12px;
+            font-size: 13px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            border: 1px solid;
+            margin: 18px 0;
+        }
+        .status.info    { background: rgba(90,103,216,.15); border-color: rgba(90,103,216,.3); color: #818cf8; }
+        .status.success { background: rgba(67,233,123,.15); border-color: rgba(67,233,123,.3); color: #43e97b; }
+        .status.error   { background: rgba(255,60,100,.15);  border-color: rgba(255,60,100,.3);  color: #ff3c64; }
+        .status.warning { background: rgba(255,193,7,.15);   border-color: rgba(255,193,7,.3);   color: #ffc107; }
+
+        .status i { font-size: 18px; flex-shrink: 0; }
+
+        /* Video */
+        .video-wrapper {
+            position: relative;
+            border-radius: 14px;
+            overflow: hidden;
+            background: #000;
+            margin: 18px 0;
+        }
+
+        #video { width: 100%; display: block; }
+
+        #overlay {
+            position: absolute;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+        }
+
+        /* Buttons */
+        .btn-verify {
+            width: 100%;
+            padding: 15px;
+            background: linear-gradient(135deg, #ff3c64 0%, #ff1744 100%);
+            color: #fff;
+            border: none;
+            border-radius: 12px;
+            font-size: 14px;
+            font-weight: 700;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            text-transform: uppercase;
+            letter-spacing: .8px;
+            box-shadow: 0 6px 20px rgba(255,60,100,.3);
+            transition: all .3s ease;
+        }
+        .btn-verify:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 28px rgba(255,60,100,.4);
+        }
+        .btn-verify:disabled { opacity: .5; cursor: not-allowed; }
+
+        .btn-cancel {
+            width: 100%;
+            padding: 13px;
+            background: transparent;
+            color: rgba(255,255,255,.6);
+            border: 1px solid rgba(255,255,255,.15);
+            border-radius: 12px;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            margin-top: 10px;
+            transition: all .3s ease;
+        }
+        .btn-cancel:hover { background: rgba(255,255,255,.05); color: #fff; }
+
+        /* Progress steps */
+        .steps {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            margin-bottom: 24px;
+        }
+
+        .step {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .step-num {
+            width: 26px; height: 26px;
+            border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 11px;
+            font-weight: 700;
+        }
+
+        .step.active .step-num {
+            background: #ff3c64;
+            color: #fff;
+        }
+
+        .step.done .step-num {
+            background: #43e97b;
+            color: #111;
+        }
+
+        .step.pending .step-num {
+            background: rgba(255,255,255,.1);
+            color: rgba(255,255,255,.4);
+        }
+
+        .step.active  .step-label { color: #fff; }
+        .step.done    .step-label { color: #43e97b; }
+        .step.pending .step-label { color: rgba(255,255,255,.35); }
+
+        .step-divider {
+            flex: 1;
+            height: 1px;
+            background: rgba(255,255,255,.1);
+            max-width: 40px;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+
+    <div class="header">
+        <img src="{{ asset('assets/img/eyetwin-logo.png') }}" alt="EyeTwin">
+        <div class="badge-step"><i class="bi bi-shield-lock-fill"></i> Security check</div>
+        <h1>Face Verification</h1>
+        <p>Step 1 of 2 — Verify your identity before logging in</p>
+        {% if email %}
+            <div class="email-tag"><i class="bi bi-person-circle"></i> {{ email }}</div>
+        {% endif %}
+    </div>
+
+    {# Progress steps #}
+    <div class="steps">
+        <div class="step active">
+            <div class="step-num">1</div>
+            <span class="step-label">Face scan</span>
+        </div>
+        <div class="step-divider"></div>
+        <div class="step pending">
+            <div class="step-num">2</div>
+            <span class="step-label">Password</span>
+        </div>
+    </div>
+
+    <div class="status info" id="status">
+        <i class="bi bi-hourglass-split"></i>
+        <span>Loading AI models…</span>
+    </div>
+
+    <div class="video-wrapper" id="videoWrapper" style="display:none;">
+        <video id="video" autoplay muted playsinline></video>
+        <canvas id="overlay"></canvas>
+    </div>
+
+    <button id="verifyBtn" class="btn-verify" disabled>
+        <i class="bi bi-camera-fill"></i>
+        <span>Verify my face</span>
+    </button>
+
+    <button id="cancelBtn" class="btn-cancel">
+        <i class="bi bi-arrow-left"></i>
+        Back to login
+    </button>
+
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/face-api.js@0.22.2/dist/face-api.min.js"></script>
+<script>
+    const video       = document.getElementById('video');
+    const canvas      = document.getElementById('overlay');
+    const statusDiv   = document.getElementById('status');
+    const verifyBtn   = document.getElementById('verifyBtn');
+    const cancelBtn   = document.getElementById('cancelBtn');
+    const videoWrapper = document.getElementById('videoWrapper');
+
+    const MODEL_URL = 'https://cdn.jsdelivr.net/npm/@vladmandic/face-api/model';
+    let detectionInterval = null;
+
+    // ── Status helper ──────────────────────────────────────────────
+    function setStatus(type, icon, msg) {
+        statusDiv.className = `status ${type}`;
+        statusDiv.innerHTML = `<i class="bi ${icon}"></i><span>${msg}</span>`;
+    }
+
+    // ── Cancel ─────────────────────────────────────────────────────
+    cancelBtn.addEventListener('click', () => {
+        stopCamera();
+        window.location.href = '{{ path("admin_login") }}';
+    });
+
+    // ── Load models ────────────────────────────────────────────────
+    async function loadModels() {
+        try {
+            setStatus('info', 'bi-hourglass-split', 'Loading AI models…');
+            await faceapi.nets.tinyFaceDetector.loadFromUri(MODEL_URL);
+            await faceapi.nets.faceLandmark68Net.loadFromUri(MODEL_URL);
+            await faceapi.nets.faceRecognitionNet.loadFromUri(MODEL_URL);
+            setStatus('success', 'bi-check-circle', 'Models loaded. Starting camera…');
+            await startVideo();
+        } catch (e) {
+            setStatus('error', 'bi-x-circle', 'Model error: ' + e.message);
+        }
+    }
+
+    // ── Camera ─────────────────────────────────────────────────────
+    async function startVideo() {
+        try {
+            const stream = await navigator.mediaDevices.getUserMedia({
+                video: { width: { ideal: 640 }, height: { ideal: 480 }, facingMode: 'user' }
+            });
+            video.srcObject = stream;
+            video.addEventListener('loadedmetadata', () => {
+                videoWrapper.style.display = 'block';
+                canvas.width  = video.videoWidth;
+                canvas.height = video.videoHeight;
+                setStatus('success', 'bi-camera', 'Camera active — position your face and click Verify.');
+                verifyBtn.disabled = false;
+                startDetection();
+            });
+        } catch (e) {
+            setStatus('error', 'bi-exclamation-triangle', 'Cannot access camera: ' + e.message);
+        }
+    }
+
+    function stopCamera() {
+        if (detectionInterval) clearInterval(detectionInterval);
+        if (video.srcObject) video.srcObject.getTracks().forEach(t => t.stop());
+    }
+
+    // ── Real-time detection overlay ────────────────────────────────
+    function startDetection() {
+        const ctx = canvas.getContext('2d');
+        detectionInterval = setInterval(async () => {
+            try {
+                const dets = await faceapi
+                    .detectAllFaces(video, new faceapi.TinyFaceDetectorOptions())
+                    .withFaceLandmarks();
+
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+                if (dets.length > 0) {
+                    const resized = faceapi.resizeResults(dets, { width: canvas.width, height: canvas.height });
+                    faceapi.draw.drawDetections(canvas, resized);
+                    faceapi.draw.drawFaceLandmarks(canvas, resized);
+
+                    if (dets.length === 1) {
+                        setStatus('success', 'bi-person-check', 'Face detected ✓ — click Verify to continue.');
+                    } else {
+                        setStatus('warning', 'bi-people', `${dets.length} faces detected — only one allowed.`);
+                    }
+                }
+            } catch (_) {}
+        }, 100);
+    }
+
+    // ── Verify ─────────────────────────────────────────────────────
+    verifyBtn.addEventListener('click', async () => {
+        verifyBtn.disabled = true;
+        clearInterval(detectionInterval);
+        setStatus('info', 'bi-hourglass-split', 'Analysing your face…');
+
+        try {
+            await new Promise(r => setTimeout(r, 400));
+
+            const detection = await faceapi
+                .detectSingleFace(video, new faceapi.TinyFaceDetectorOptions())
+                .withFaceLandmarks()
+                .withFaceDescriptor();
+
+            if (!detection) {
+                throw new Error('No face detected. Make sure your face is clearly visible.');
+            }
+
+            setStatus('info', 'bi-cloud-upload', 'Sending to server…');
+
+            const response = await fetch('{{ path("face_pre_login_verify") }}', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-Requested-With': 'XMLHttpRequest'
+                },
+                body: JSON.stringify({
+                    descriptor: Array.from(detection.descriptor)
+                })
+            });
+
+            const result = await response.json();
+
+            if (result.success) {
+                setStatus('success', 'bi-shield-check', '✓ Face verified! Redirecting to login…');
+                stopCamera();
+                setTimeout(() => {
+                    window.location.href = result.redirect;
+                }, 1000);
+            } else {
+                setStatus('error', 'bi-x-circle', result.message || 'Face not recognised.');
+                verifyBtn.disabled = false;
+                startDetection();
+            }
+        } catch (e) {
+            setStatus('error', 'bi-exclamation-triangle', e.message);
+            verifyBtn.disabled = false;
+            startDetection();
+        }
+    });
+
+    // ── Cleanup ────────────────────────────────────────────────────
+    window.addEventListener('beforeunload', stopCamera);
+
+    // ── Boot ───────────────────────────────────────────────────────
+    loadModels();
+</script>
+</body>
+</html>
