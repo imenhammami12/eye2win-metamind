@@ -354,7 +354,9 @@
                         m: m,
                         channel: channel,
                         isMe: isMe,
-                        showActions: isMe and not m.isDeleted and not (editId is defined and editId == m.id and editForm is not null)
+                        showActions: isMe and not m.isDeleted and not (editId is defined and editId == m.id and editForm is not null),
+                        editId: editId,
+                        editForm: editForm
                     } %}
                 {% else %}
                     <div class="text-center" style="color: rgba(255,255,255,0.75); padding: 30px 10px;">
@@ -468,14 +470,6 @@
 
     </div>
 
-{#    <script>#}
-{#        // Auto-scroll to bottom#}
-{#        (function () {#}
-{#            const el = document.getElementById('chatStream');#}
-{#            if (el) el.scrollTop = el.scrollHeight;#}
-{#        })();#}
-{#    </script>#}
-
     <script>
         (function () {
             const chatStream = document.getElementById('chatStream');
@@ -500,38 +494,49 @@
             es.onopen = () => console.log("✅ Mercure connected");
             es.onerror = (e) => console.log("❌ Mercure error", e);
 
-            /*es.onmessage = (event) => {
-                try {
-                    const data = JSON.parse(event.data);
-                    if (!data || !data.id || !data.html) return;
-
-                    // Avoid duplicates (sender already inserted)
-                    if (document.querySelector('[data-msg-id="' + data.id + '"]')) return;
-
-                    chatStream.insertAdjacentHTML('beforeend', data.html);
-                    scrollToBottom();
-                } catch (e) {
-                    console.error(e);
-                }
-            };*/
-
             es.onmessage = (event) => {
-                try {
-                    const data = JSON.parse(event.data);
-                    if (!data || !data.id) return;
+                const data = JSON.parse(event.data);
+                if (!data || !data.id) return;
 
-                    // Avoid duplicates (sender already inserted)
-                    if (document.querySelector('[data-msg-id="' + data.id + '"]')) return;
+                const row = document.querySelector(`[data-msg-id="${data.id}"]`);
 
-                    const isMe = (currentUserEmail && data.senderEmail === currentUserEmail);
-
-                    const html = buildMessageHtml(data, isMe);
-                    chatStream.insertAdjacentHTML('beforeend', html);
-                    scrollToBottom();
-                } catch (e) {
-                    console.error(e);
+                // ✅ DELETE: update existing row (do not append)
+                if (data.type === 'delete') {
+                    if (!row) return;
+                    // remove actions
+                    const actions = row.querySelector('.msg-actions');
+                    if (actions) actions.remove();                    // replace content with deleted label
+                    const txt = row.querySelector('.msg-text');
+                    if (txt) {
+                        txt.className = 'msg-deleted';
+                        txt.textContent = 'this message is deleted.';
+                    } else {
+                        const del = row.querySelector('.msg-deleted');
+                        if (del) del.textContent = 'this message is deleted.';
+                        //row.querySelector('.msg-deleted')?.textContent = 'this message is deleted.';
+                    }
+                    return;
                 }
+
+                // ✅ EDIT: update existing row content
+                if (data.type === 'edit') {
+                    if (!row) return;
+                    const txt = row.querySelector('.msg-text');
+                    if (txt) txt.textContent = data.content ?? '';
+                    const time = row.querySelector('.msg-time');
+                    if (time && data.editedAt) time.textContent = data.editedAt + ' (edited)';
+                    return;
+                }
+
+                // ✅ NEW: append only if not existing
+                if (row) return;
+
+                const isMe = (currentUserEmail && data.senderEmail === currentUserEmail);
+                const html = buildMessageHtml(data, isMe);
+                chatStream.insertAdjacentHTML('beforeend', html);
+                scrollToBottom();
             };
+
 
             function escapeHtml(str) {
                 return String(str ?? '')
@@ -597,16 +602,44 @@
 
                     const json = await res.json();
                     if (json.ok && json.html) {
-                        // Insert sender version (with actions)
-                        if (!document.querySelector('[data-msg-id="' + json.id + '"]')) {
+                        const existing = document.querySelector(`[data-msg-id="${json.id}"]`);
+                        if (existing) {
+                            // Mercure inserted it first without actions -> replace with sender version (with actions)
+                            existing.outerHTML = json.html;
+                        } else {
                             chatStream.insertAdjacentHTML('beforeend', json.html);
-                            scrollToBottom();
                         }
+                        scrollToBottom();
                         textarea.value = '';
+                    }
+                });
+                textarea.addEventListener('keydown', (e) => {
+                    if (e.key === 'Enter' && !e.shiftKey) {
+                        e.preventDefault();
+                        form.requestSubmit(); // triggers your existing submit handler
                     }
                 });
             }
         })();
+
+        chatStream.addEventListener('submit', async (e) => {
+            const form = e.target;
+            if (!(form instanceof HTMLFormElement)) return;
+
+            // match delete forms
+            if (!form.action.includes('/messages/') || !form.action.endsWith('/delete')) return;
+
+            e.preventDefault();
+
+            const res = await fetch(form.action, {
+                method: 'POST',
+                body: new FormData(form),
+                headers: {'X-Requested-With': 'XMLHttpRequest'}
+            });
+
+            if (!res.ok) return;
+        });
+
     </script>
 
 {% endblock %}

@@ -39,10 +39,31 @@
             {% endif %}
         </div>
 
-        {% if m.isDeleted %}
-            <div class="msg-deleted">this message is deleted.</div>
+        {# ✅ INLINE EDIT MODE #}
+        {% if editId is defined and editForm is not null and editId == m.id %}
+            <div class="edit-panel">
+                {{ form_start(editForm) }}
+                {{ form_widget(editForm.content, {'attr': {'rows': 3}}) }}
+
+                <div class="edit-actions">
+                    <button type="submit" class="btn-send">
+                        <i class="fas fa-save"></i> Save
+                    </button>
+
+                    <a href="{{ path('community_channels_show', {id: channel.id}) }}" class="btn btn-soft">
+                        <i class="fas fa-times"></i> Cancel
+                    </a>
+                </div>
+                {{ form_end(editForm) }}
+            </div>
+
         {% else %}
-            <div class="msg-text">{{ m.content }}</div>
+            {# ✅ NORMAL VIEW MODE #}
+            {% if m.isDeleted %}
+                <div class="msg-deleted">this message is deleted.</div>
+            {% else %}
+                <div class="msg-text">{{ m.content }}</div>
+            {% endif %}
         {% endif %}
     </div>
 

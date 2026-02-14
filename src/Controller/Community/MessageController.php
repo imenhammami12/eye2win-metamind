@@ -18,6 +18,8 @@ use Symfony\Component\Mercure\HubInterface;
 use Symfony\Component\Mercure\Update;
 use Twig\Environment;
 
+
+
 #[IsGranted('ROLE_USER')]
 final class MessageController extends AbstractController
 {
@@ -30,7 +32,7 @@ final class MessageController extends AbstractController
     }
 
     #[Route('/messages/{id}/edit', name: 'community_message_edit', methods: ['GET','POST'], requirements: ['id' => '\d+'])]
-    public function edit(Message $message, Request $request, EntityManagerInterface $em): Response
+    public function edit(Message $message, Request $request, EntityManagerInterface $em, HubInterface $hub): Response
     {
         if ($message->getSenderEmail() !== $this->getUser()->getUserIdentifier()) {
             throw $this->createAccessDeniedException("you can't edit this message.");
@@ -48,6 +50,26 @@ final class MessageController extends AbstractController
             $message->setEditedAt(new \DateTimeImmutable());
             $em->flush();
 
+            $topic = 'urn:channel:'.$message->getChannel()->getId();
+
+            $hub->publish(new Update($topic, json_encode([
+                'type' => 'edit',
+                'id' => $message->getId(),
+                'senderEmail' => $message->getSenderEmail(),
+                'content' => $message->getContent(),
+                'editedAt' => $message->getEditedAt()->format('d/m/Y H:i'),
+            ])));
+
+            // ✅ if you want no refresh edit (AJAX)
+            if ($request->isXmlHttpRequest()) {
+                return new JsonResponse([
+                    'ok' => true,
+                    'id' => $message->getId(),
+                    'content' => $message->getContent(),
+                    'editedAt' => $message->getEditedAt()->format('d/m/Y H:i'),
+                ]);
+            }
+
             return $this->redirectToRoute('community_channels_show', ['id' => $message->getChannel()->getId()]);
         }
 
@@ -59,7 +81,7 @@ final class MessageController extends AbstractController
     }
 
 
-    #[Route('/messages/{id}/delete', name: 'community_message_delete', methods: ['POST'], requirements: ['id' => '\d+'])]
+    /*#[Route('/messages/{id}/delete', name: 'community_message_delete', methods: ['POST'], requirements: ['id' => '\d+'])]
     public function delete(Message $message, Request $request, EntityManagerInterface $em): Response
     {
         if ($message->getSenderEmail() !== $this->getUser()->getUserIdentifier()) {
@@ -72,7 +94,41 @@ final class MessageController extends AbstractController
         }
 
         return $this->redirectToRoute('community_channels_show', ['id' => $message->getChannel()->getId()]);
+    }*/
+
+    #[Route('/messages/{id}/delete', name: 'community_message_delete', methods: ['POST'], requirements: ['id' => '\d+'])]
+    public function delete(Message $message, Request $request, EntityManagerInterface $em, HubInterface $hub): Response
+    {
+        if ($message->getSenderEmail() !== $this->getUser()->getUserIdentifier()) {
+            throw $this->createAccessDeniedException("you can't delete message.");
+        }
+
+        if (!$this->isCsrfTokenValid('delete_message_'.$message->getId(), $request->request->get('_token'))) {
+            if ($request->isXmlHttpRequest()) {
+                return new JsonResponse(['ok' => false], 403);
+            }
+            return $this->redirectToRoute('community_channels_show', ['id' => $message->getChannel()->getId()]);
+        }
+
+        $message->setIsDeleted(true);
+        $message->setEditedAt(new \DateTimeImmutable());
+        $em->flush();
+
+        $topic = 'urn:channel:'.$message->getChannel()->getId();
+
+        $hub->publish(new Update($topic, json_encode([
+            'type' => 'delete',
+            'id' => $message->getId(),
+            'senderEmail' => $message->getSenderEmail(),
+        ])));
+
+        if ($request->isXmlHttpRequest()) {
+            return new JsonResponse(['ok' => true, 'id' => $message->getId()]);
+        }
+
+        return $this->redirectToRoute('community_channels_show', ['id' => $message->getChannel()->getId()]);
     }
+
 
     #[Route('/channels/{id}/messages', name: 'community_message_send', methods: ['POST'], requirements: ['id' => '\d+'])]
     public function send(
@@ -114,29 +170,16 @@ final class MessageController extends AbstractController
         $em->persist($message);
         $em->flush();
 
-        /*/ ✅ Render HTML for "other users" (no actions/CSRF)
-        $htmlForOthers = $twig->render('community/message/_row.html.twig', [
-            'm' => $message,
-            'channel' => $channel,
-            'isMe' => false,
-            'showActions' => false,
-        ]);*/
-
-        /*/ ✅ Publish to Mercure on a per-channel topic
-        $topic = 'urn:channel:'.$channel->getId();
-
-        $update = new Update($topic, json_encode(['id' => $message->getId(), 'html' => $htmlForOthers]));
-
-        $hub->publish($update);*/
-        // ✅ Publish to Mercure on a per-channel topic (JSON payload)
         $topic = 'urn:channel:'.$channel->getId();
 
         $payload = [
+            'type' => 'new',
             'id' => $message->getId(),
             'senderEmail' => $message->getSenderEmail(),
             'senderName' => $message->getSenderName(),
             'content' => $message->getContent(),
             'sentAt' => $message->getSentAt()->format('d/m/Y H:i'),
+            //'editedAt' => null,
             'isDeleted' => $message->isDeleted(),
         ];
 
