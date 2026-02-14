@@ -1,0 +1,11 @@
+# config/packages/session.yaml
+framework:
+    session:
+        handler_id: Symfony\Component\HttpFoundation\Session\Storage\Handler\PdoSessionHandler
+        cookie_lifetime: 0
+        gc_maxlifetime: 7200
+        cookie_secure: auto
+        cookie_httponly: true
+        cookie_samesite: lax
+        name: EYETWIN_SESSID
+        save_path: null

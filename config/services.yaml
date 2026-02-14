@@ -55,3 +55,15 @@ services:
             $twilioPhoneNumber: '%env(TWILIO_PHONE_NUMBER)%'
             $telegramBotToken: '%env(TELEGRAM_BOT_TOKEN)%'
             $devMode: false
+
+    # ════════════════════════════════════════════════════════════
+    # ✅ Session Handler - Stockage en Base de Données
+    # ════════════════════════════════════════════════════════════
+    
+    # Factory pour créer le PdoSessionHandler
+    App\Service\SessionHandlerFactory:
+        # Autowiring activé par défaut, pas besoin de spécifier les arguments
+
+    # Session Handler créé via la factory
+    Symfony\Component\HttpFoundation\Session\Storage\Handler\PdoSessionHandler:
+        factory: ['@App\Service\SessionHandlerFactory', 'createHandler']
