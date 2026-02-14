@@ -4,39 +4,23 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    
     <title>{% block title %}Admin Dashboard{% endblock %} - EyeTwin E-Sport</title>
-    
-    {# Google Fonts - Distinctive typography #}
     <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
-    
-    {# Bootstrap Icons #}
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
-    
-    {# Bootstrap 5 CSS #}
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    
-    {# Enhanced Gaming Admin CSS #}
     <link rel="stylesheet" href="{{ asset('assets/css/admincss.css') }}">
-    
-   <link rel="stylesheet" href="{{ asset('assets/css/admin-notifications.css') }}">
-<link rel="stylesheet" href="{{ asset('assets/css/admin-notification-toast.css') }}">
-
-  <script defer src="https://cdn.jsdelivr.net/npm/face-api.js@0.22.2/dist/face-api.min.js"></script>
-
+    <link rel="stylesheet" href="{{ asset('assets/css/admin-notifications.css') }}">
+    <link rel="stylesheet" href="{{ asset('assets/css/admin-notification-toast.css') }}">
+    <script defer src="https://cdn.jsdelivr.net/npm/face-api.js@0.22.2/dist/face-api.min.js"></script>
     {% block stylesheets %}{% endblock %}
 </head>
 <body data-user-id="{{ app.user ? app.user.id : '' }}">
-    {# Mobile Menu Toggle Button #}
     <button class="mobile-menu-toggle" id="mobileMenuToggle" type="button" aria-label="Toggle menu">
         <i class="bi bi-list"></i>
     </button>
-
-    {# Sidebar Overlay for Mobile #}
     <div class="sidebar-overlay" id="sidebarOverlay"></div>
 
     <div class="container">
-        {# Sidebar #}
         <aside class="sidebar" id="sidebar">
             <div class="sidebar-header">
                 <a href="{{ path('admin_dashboard') }}" style="text-decoration: none;">
@@ -44,109 +28,63 @@
                 </a>
                 <p>Admin Dashboard</p>
             </div>
-            
+
             <nav class="sidebar-menu">
-                <a href="{{ path('admin_dashboard') }}" 
-                   class="{{ app.request.attributes.get('_route') starts with 'admin_dashboard' ? 'active' : '' }}">
-                    <i class="bi bi-speedometer2"></i>
-                    <span>Dashboard</span>
+                <a href="{{ path('admin_dashboard') }}" class="{{ app.request.attributes.get('_route') starts with 'admin_dashboard' ? 'active' : '' }}">
+                    <i class="bi bi-speedometer2"></i><span>Dashboard</span>
                 </a>
-                
-                <a href="{{ path('admin_users_index') }}" 
-                   class="{{ app.request.attributes.get('_route') starts with 'admin_users' ? 'active' : '' }}">
-                    <i class="bi bi-people"></i>
-                    <span>Users</span>
+                <a href="{{ path('admin_users_index') }}" class="{{ app.request.attributes.get('_route') starts with 'admin_users' ? 'active' : '' }}">
+                    <i class="bi bi-people"></i><span>Users</span>
                 </a>
-{# Dans templates/admin/admin_layout.html.twig - Section sidebar-menu #}
-
-<a href="{{ path('app_profile') }}" 
-   class="{{ app.request.attributes.get('_route') starts with 'app_profile' ? 'active' : '' }}">
-    <i class="bi bi-person-circle"></i>
-    <span>Mon Profil</span>
-</a>
-                <a href="{{ path('admin_planning_index') }}" 
-                   class="{{ app.request.attributes.get('_route') starts with 'admin_planning' ? 'active' : '' }}">
-                    <i class="bi bi-calendar-event"></i>
-                    <span>Planning</span>
+                <a href="{{ path('app_profile') }}" class="{{ app.request.attributes.get('_route') starts with 'app_profile' ? 'active' : '' }}">
+                    <i class="bi bi-person-circle"></i><span>Mon Profil</span>
                 </a>
-                <a href="{{ path('admin_tournoi_index') }}" 
-                   class="{{ app.request.attributes.get('_route') starts with 'admin_tournoi' ? 'active' : '' }}">
-                    <i class="bi bi-trophy"></i>
-                    <span>Tournois</span>
+                <a href="{{ path('admin_planning_index') }}" class="{{ app.request.attributes.get('_route') starts with 'admin_planning' ? 'active' : '' }}">
+                    <i class="bi bi-calendar-event"></i><span>Planning</span>
                 </a>
-               <a href="{{ path('admin_videos_index') }}" 
-                   class="{{ app.request.attributes.get('_route') starts with 'admin_videos' or app.request.attributes.get('_route') starts with 'admin_video' ? 'active' : '' }}">
-                    <i class="bi bi-camera-video"></i>
-                    <span>Videos</span>
+                <a href="{{ path('admin_tournoi_index') }}" class="{{ app.request.attributes.get('_route') starts with 'admin_tournoi' ? 'active' : '' }}">
+                    <i class="bi bi-trophy"></i><span>Tournois</span>
                 </a>
-
-                <a href="{{ path('admin_coach_applications_index') }}" 
-                   class="{{ app.request.attributes.get('_route') starts with 'admin_coach_applications' ? 'active' : '' }}">
-                    <i class="bi bi-clipboard-check"></i>
-                    <span> Coach Application </span>
+                <a href="{{ path('admin_videos_index') }}" class="{{ app.request.attributes.get('_route') starts with 'admin_videos' or app.request.attributes.get('_route') starts with 'admin_video' ? 'active' : '' }}">
+                    <i class="bi bi-camera-video"></i><span>Videos</span>
+                </a>
+                <a href="{{ path('admin_coach_applications_index') }}" class="{{ app.request.attributes.get('_route') starts with 'admin_coach_applications' ? 'active' : '' }}">
+                    <i class="bi bi-clipboard-check"></i><span>Coach Application</span>
                     {% if pendingApplicationsCount|default(0) > 0 %}
                         <span class="badge bg-danger">{{ pendingApplicationsCount }}</span>
                     {% endif %}
                 </a>
-
-                <a href="{{ path('admin_channels_index') }}"
-                   class="{{ app.request.attributes.get('_route') starts with 'admin_channels' ? 'active' : '' }}">
-                    <i class="bi bi-chat-left-text"></i>
-                    <span>Channels</span>
+                <a href="{{ path('admin_channels_index') }}" class="{{ app.request.attributes.get('_route') starts with 'admin_channels' ? 'active' : '' }}">
+                    <i class="bi bi-chat-left-text"></i><span>Channels</span>
                 </a>
-                <a href="{{ path('admin_complaints_index') }}" 
-   class="{{ app.request.attributes.get('_route') starts with 'admin_complaints' ? 'active' : '' }}">
-    <i class="bi bi-headset"></i>
-    <span>Complaints</span>
-    {% if pendingComplaintsCount|default(0) > 0 %}
-        <span class="badge bg-danger">{{ pendingComplaintsCount }}</span>
-    {% endif %}
-</a>
-
-{#                <a href="{{ path('admin_channels_index') }}"#}
-{#                   class="{{ app.request.attributes.get('_route') == 'admin_channels_index' ? 'active' : '' }}">#}
-{#                    <i class="bi bi-hourglass-split"></i>#}
-{#                    <span>Channels Pending</span>#}
-{#                </a>#}
-
-                <a href="{{ path('admin_messages_index') }}"
-                   class="{{ app.request.attributes.get('_route') starts with 'admin_messages' ? 'active' : '' }}">
-                    <i class="bi bi-chat-dots"></i>
-                    <span>Messages</span>
+                <a href="{{ path('admin_complaints_index') }}" class="{{ app.request.attributes.get('_route') starts with 'admin_complaints' ? 'active' : '' }}">
+                    <i class="bi bi-headset"></i><span>Complaints</span>
+                    {% if pendingComplaintsCount|default(0) > 0 %}
+                        <span class="badge bg-danger">{{ pendingComplaintsCount }}</span>
+                    {% endif %}
                 </a>
-
-
-
-<a href="{{ path('admin_teams_index') }}" 
-   class="{{ app.request.attributes.get('_route') starts with 'admin_teams' ? 'active' : '' }}">
-    <i class="bi bi-grid-3x3"></i>
-    <span>Teams</span>
-</a>
-{% if is_granted('ROLE_SUPER_ADMIN') %}
-    <a href="{{ path('admin_audit_logs_index') }}" 
-       class="{{ app.request.attributes.get('_route') starts with 'admin_audit_logs' ? 'active' : '' }}">
-        <i class="bi bi-journal-text"></i>
-        <span>Audit Logs</span>
-    </a>
-{% endif %}
+                <a href="{{ path('admin_messages_index') }}" class="{{ app.request.attributes.get('_route') starts with 'admin_messages' ? 'active' : '' }}">
+                    <i class="bi bi-chat-dots"></i><span>Messages</span>
+                </a>
+                <a href="{{ path('admin_teams_index') }}" class="{{ app.request.attributes.get('_route') starts with 'admin_teams' ? 'active' : '' }}">
+                    <i class="bi bi-grid-3x3"></i><span>Teams</span>
+                </a>
+                {% if is_granted('ROLE_SUPER_ADMIN') %}
+                    <a href="{{ path('admin_audit_logs_index') }}" class="{{ app.request.attributes.get('_route') starts with 'admin_audit_logs' ? 'active' : '' }}">
+                        <i class="bi bi-journal-text"></i><span>Audit Logs</span>
+                    </a>
+                {% endif %}
                 <div class="sidebar-divider"></div>
-                
-                <a href="{{ path('app_home') }}" 
-                   target="_blank" 
-                   rel="noopener noreferrer">
-                    <i class="bi bi-grid-3x3"></i>
-                    <span>View Site</span>
+                <a href="{{ path('app_home') }}" target="_blank" rel="noopener noreferrer">
+                    <i class="bi bi-grid-3x3"></i><span>View Site</span>
                     <i class="bi bi-box-arrow-up-right ms-auto"></i>
                 </a>
             </nav>
-            
-            {# Online Admins Section #}
+
             <div class="online-players">
                 <div class="online-players-header">
                     <span>Online Admins</span>
-                    <span class="add-player">
-                        <i class="bi bi-plus"></i>
-                    </span>
+                    <span class="add-player"><i class="bi bi-plus"></i></span>
                 </div>
                 <div class="player-item">
                     <div class="player-avatar" style="background: linear-gradient(135deg, #ff3c64, #7828c8);">
@@ -155,104 +93,74 @@
                     <span class="player-name">{{ app.user.username|default('Admin') }}</span>
                 </div>
             </div>
-            
+
             <div class="sidebar-divider"></div>
-            
+
+            {#
+                Logout admin → security.yaml target: admin_login
+                Mais on veut que le PROCHAIN accès repasse par admin_gate
+                → le FaceAuthSubscriber (onLogout) nettoie la session face
+                → admin_gate redirigera vers face ou login selon la config
+            #}
             <a href="{{ path('admin_logout') }}" class="logout-btn">
                 <i class="bi bi-box-arrow-right"></i>
                 Logout
             </a>
         </aside>
-        
-        {# Main Content #}
+
         <main class="main-content">
-            {# Top Bar #}
             <header class="top-bar">
-                <h1 class="page-title">{% block page_title %}Channels Management{% endblock %}</h1>
-                
+                <h1 class="page-title">{% block page_title %}Dashboard{% endblock %}</h1>
                 <div class="header-actions">
-    {# Notification Bell #}
-    <div class="notification-bell" id="adminNotificationBell">
-        <i class="bi bi-bell-fill"></i>
-        <span class="notification-badge" id="adminNotificationBadge" style="display: none;">0</span>
-        
-        {# Dropdown #}
-        <div class="notification-dropdown" id="adminNotificationDropdown">
-            <div class="notification-header">
-                <h3>Notifications</h3>
-                <button class="mark-all-read" id="markAllRead">Mark all read</button>
-            </div>
-            <div class="notification-list" id="adminNotificationList">
-                <div class="empty-notifications">
-                    <i class="bi bi-bell-slash"></i>
-                    <p>No new notifications</p>
+                    <div class="notification-bell" id="adminNotificationBell">
+                        <i class="bi bi-bell-fill"></i>
+                        <span class="notification-badge" id="adminNotificationBadge" style="display: none;">0</span>
+                        <div class="notification-dropdown" id="adminNotificationDropdown">
+                            <div class="notification-header">
+                                <h3>Notifications</h3>
+                                <button class="mark-all-read" id="markAllRead">Mark all read</button>
+                            </div>
+                            <div class="notification-list" id="adminNotificationList">
+                                <div class="empty-notifications">
+                                    <i class="bi bi-bell-slash"></i>
+                                    <p>No new notifications</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="user-info dropdown">
+                        <div class="dropdown-toggle" id="userDropdown" data-bs-toggle="dropdown" aria-expanded="false" style="cursor: pointer;">
+                            <span class="text-muted d-none d-md-inline" style="color: rgba(255,255,255,0.6);">
+                                {{ app.user.username|default('Admin') }}
+                            </span>
+                            <div class="user-avatar" title="{{ app.user.username|default('Admin') }}">
+                                {{ app.user.username|default('AD')|slice(0, 2)|upper }}
+                            </div>
+                        </div>
+                        <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown" style="background: rgba(20,10,35,.98); border: 1px solid rgba(255,255,255,.1); border-radius: 12px; padding: 8px; margin-top: 10px;">
+                            <li>
+                                <a class="dropdown-item" href="{{ path('app_profile') }}" style="color: rgba(255,255,255,.85); border-radius: 8px; padding: 10px 15px; display: flex; align-items: center; gap: 10px;">
+                                    <i class="bi bi-person-circle"></i> Mon Profil
+                                </a>
+                            </li>
+                            <li>
+                                <a class="dropdown-item" href="{{ path('app_profile_security') }}" style="color: rgba(255,255,255,.85); border-radius: 8px; padding: 10px 15px; display: flex; align-items: center; gap: 10px;">
+                                    <i class="bi bi-shield-check"></i> Sécurité
+                                </a>
+                            </li>
+                            <li><hr class="dropdown-divider" style="border-color: rgba(255,255,255,.1);"></li>
+                            <li>
+                                <a class="dropdown-item" href="{{ path('admin_logout') }}" style="color: #ff3c64; border-radius: 8px; padding: 10px 15px; display: flex; align-items: center; gap: 10px;">
+                                    <i class="bi bi-box-arrow-right"></i> Déconnexion
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
                 </div>
-            </div>
-        </div>
-    </div>
-    
-{# Remplacer la section user-info dans le header #}
-<div class="user-info dropdown">
-    <div class="dropdown-toggle" id="userDropdown" data-bs-toggle="dropdown" aria-expanded="false" style="cursor: pointer;">
-        <span class="text-muted d-none d-md-inline" style="color: rgba(255,255,255,0.6);">
-            {{ app.user.username|default('Admin') }}
-        </span>
-        <div class="user-avatar" title="{{ app.user.username|default('Admin') }}">
-            {{ app.user.username|default('AD')|slice(0, 2)|upper }}
-        </div>
-    </div>
-    <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown" style="
-        background: rgba(20, 10, 35, 0.98);
-        border: 1px solid rgba(255, 255, 255, 0.1);
-        border-radius: 12px;
-        padding: 8px;
-        margin-top: 10px;
-    ">
-        <li>
-            <a class="dropdown-item" href="{{ path('app_profile') }}" style="
-                color: rgba(255, 255, 255, 0.85);
-                border-radius: 8px;
-                padding: 10px 15px;
-                display: flex;
-                align-items: center;
-                gap: 10px;
-            ">
-                <i class="bi bi-person-circle"></i> Mon Profil
-            </a>
-        </li>
-        <li>
-            <a class="dropdown-item" href="{{ path('app_profile_security') }}" style="
-                color: rgba(255, 255, 255, 0.85);
-                border-radius: 8px;
-                padding: 10px 15px;
-                display: flex;
-                align-items: center;
-                gap: 10px;
-            ">
-                <i class="bi bi-shield-check"></i> Sécurité
-            </a>
-        </li>
-        <li><hr class="dropdown-divider" style="border-color: rgba(255, 255, 255, 0.1);"></li>
-        <li>
-            <a class="dropdown-item" href="{{ path('admin_logout') }}" style="
-                color: #ff3c64;
-                border-radius: 8px;
-                padding: 10px 15px;
-                display: flex;
-                align-items: center;
-                gap: 10px;
-            ">
-                <i class="bi bi-box-arrow-right"></i> Déconnexion
-            </a>
-        </li>
-    </ul>
-</div>
-</div>
             </header>
-            
-            {# Content Area #}
+
             <div class="content-area">
-                {# Flash Messages #}
                 {% for label, messages in app.flashes %}
                     {% for message in messages %}
                         <div class="alert alert-{{ label }} alert-dismissible fade show" role="alert">
@@ -262,50 +170,33 @@
                         </div>
                     {% endfor %}
                 {% endfor %}
-                
                 {% block body %}{% endblock %}
             </div>
-            
-            {# Footer #}
-            
         </main>
     </div>
 
-    {# Modals Container #}
     {% block modal_container %}{% endblock %}
-    
-    {# Bootstrap JS Bundle #}
+
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-    
-    {# Chart.js #}
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
-    
-    {# Enhanced Admin Scripts #}
+
     <script>
-        // Mobile Menu Toggle
         document.addEventListener('DOMContentLoaded', function() {
             const mobileMenuToggle = document.getElementById('mobileMenuToggle');
             const sidebar = document.getElementById('sidebar');
             const sidebarOverlay = document.getElementById('sidebarOverlay');
-            
             if (mobileMenuToggle && sidebar && sidebarOverlay) {
-                // Toggle sidebar
                 mobileMenuToggle.addEventListener('click', function() {
                     sidebar.classList.toggle('show');
                     sidebarOverlay.classList.toggle('show');
                     document.body.classList.toggle('sidebar-open');
                 });
-                
-                // Close sidebar when clicking overlay
                 sidebarOverlay.addEventListener('click', function() {
                     sidebar.classList.remove('show');
                     sidebarOverlay.classList.remove('show');
                     document.body.classList.remove('sidebar-open');
                 });
-                
-                // Close sidebar on link click (mobile)
-                const sidebarLinks = sidebar.querySelectorAll('a');
-                sidebarLinks.forEach(link => {
+                sidebar.querySelectorAll('a').forEach(link => {
                     link.addEventListener('click', function() {
                         if (window.innerWidth < 992) {
                             sidebar.classList.remove('show');
@@ -315,96 +206,33 @@
                     });
                 });
             }
-            
-            // Auto-dismiss alerts
-            const alerts = document.querySelectorAll('.alert:not(.alert-permanent)');
-            alerts.forEach(alert => {
-                setTimeout(() => {
-                    const bsAlert = new bootstrap.Alert(alert);
-                    bsAlert.close();
-                }, 8000);
-            });
-            
-            // Staggered fade-in animations
-            const fadeElements = document.querySelectorAll('.fade-in');
-            fadeElements.forEach((el, index) => {
-                el.style.animationDelay = `${index * 0.1}s`;
-            });
-            
-            // Enhanced hover effects for interactive elements
-            document.querySelectorAll('.stat-card, .table-card').forEach(card => {
-                card.addEventListener('mouseenter', function() {
-                    this.style.transition = 'all 0.4s cubic-bezier(0.4, 0, 0.2, 1)';
-                });
-            });
-            
-            // Smooth scroll to top
-            window.addEventListener('scroll', function() {
-                const scrollTop = document.querySelector('.scroll-to-top');
-                if (scrollTop) {
-                    if (window.pageYOffset > 300) {
-                        scrollTop.style.display = 'flex';
-                    } else {
-                        scrollTop.style.display = 'none';
-                    }
-                }
+            document.querySelectorAll('.alert:not(.alert-permanent)').forEach(alert => {
+                setTimeout(() => { new bootstrap.Alert(alert).close(); }, 8000);
             });
         });
-        
-        // Enhanced confirmation with better UX
+
         function confirmAction(url, token, message) {
             if (confirm(message)) {
-                // Show loading state
-                const loadingOverlay = document.createElement('div');
-                loadingOverlay.style.cssText = `
-                    position: fixed;
-                    top: 0;
-                    left: 0;
-                    width: 100%;
-                    height: 100%;
-                    background: rgba(0, 0, 0, 0.7);
-                    display: flex;
-                    align-items: center;
-                    justify-content: center;
-                    z-index: 9999;
-                `;
-                loadingOverlay.innerHTML = `
-                    <div style="text-align: center; color: white;">
-                        <div class="spinner-border" role="status">
-                            <span class="visually-hidden">Processing...</span>
-                        </div>
-                        <p class="mt-3">Processing...</p>
-                    </div>
-                `;
-                document.body.appendChild(loadingOverlay);
-                
                 const form = document.createElement('form');
                 form.method = 'POST';
                 form.action = url;
-                
                 const tokenInput = document.createElement('input');
                 tokenInput.type = 'hidden';
                 tokenInput.name = '_token';
                 tokenInput.value = token;
-                
                 form.appendChild(tokenInput);
                 document.body.appendChild(form);
                 form.submit();
             }
         }
     </script>
-    
+
     {% block javascripts %}{% endblock %}
     {% block modals %}{% endblock %}
 
-
-
-{% if app.user %}
- <script>
-    window.MERCURE_HUB_URL = 'http://localhost:3000/.well-known/mercure';
-</script>
-<script src="{{ asset('assets/js/admin-notifications.js') }}"></script>
-{% endif %}
-
+    {% if app.user %}
+        <script>window.MERCURE_HUB_URL = 'http://localhost:3000/.well-known/mercure';</script>
+        <script src="{{ asset('assets/js/admin-notifications.js') }}"></script>
+    {% endif %}
 </body>
 </html>

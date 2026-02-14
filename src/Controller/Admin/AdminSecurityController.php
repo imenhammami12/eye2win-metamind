@@ -12,6 +12,10 @@ class AdminSecurityController extends AbstractController
     #[Route('/admin/login', name: 'admin_login')]
     public function login(AuthenticationUtils $authenticationUtils): Response
     {
+        if ($this->isGranted('ROLE_ADMIN')) {
+            return $this->redirectToRoute('admin_dashboard');
+        }
+
         return $this->render('admin/security/login.html.twig', [
             'last_username' => $authenticationUtils->getLastUsername(),
             'error'         => $authenticationUtils->getLastAuthenticationError(),
