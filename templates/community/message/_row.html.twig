@@ -1,0 +1,54 @@
+{# templates/community/message/_row.html.twig #}
+{% set isMe = isMe|default(false) %}
+{% set showActions = showActions|default(false) %}
+
+<div class="msg-row {{ isMe ? 'me' : 'other' }}" data-msg-id="{{ m.id }}">
+    {% if not isMe %}
+        <div class="avatar" title="{{ m.senderName }}">
+            {{ m.senderName|slice(0,1)|upper }}
+        </div>
+    {% endif %}
+
+    <div class="bubble">
+        <div class="msg-top">
+            <div class="d-flex align-items-center gap-2" style="gap:10px;">
+                <div class="msg-name">{{ m.senderName }}</div>
+                <div class="msg-time">{{ m.sentAt|date('d/m/Y H:i') }}</div>
+            </div>
+
+            {% if showActions and not m.isDeleted %}
+                <div class="msg-actions dropdown">
+                    <button class="dots-btn" type="button" data-toggle="dropdown">
+                        <i class="fas fa-ellipsis-v"></i>
+                    </button>
+
+                    <div class="dropdown-menu dropdown-menu-right dots-menu">
+                        <a class="dots-item"
+                           href="{{ path('community_channels_show', {id: channel.id, edit: m.id}) }}">
+                            <i class="fas fa-pen"></i> Edit
+                        </a>
+
+                        <form method="post" action="{{ path('community_message_delete', {id: m.id}) }}" style="margin:0;">
+                            <input type="hidden" name="_token" value="{{ csrf_token('delete_message_' ~ m.id) }}">
+                            <button class="dots-item dots-danger" type="submit">
+                                <i class="fas fa-trash"></i> Delete
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            {% endif %}
+        </div>
+
+        {% if m.isDeleted %}
+            <div class="msg-deleted">this message is deleted.</div>
+        {% else %}
+            <div class="msg-text">{{ m.content }}</div>
+        {% endif %}
+    </div>
+
+    {% if isMe %}
+        <div class="avatar" title="You" style="background: rgba(255,45,85,0.18); border-color: rgba(255,45,85,0.20);">
+            <i class="fas fa-user"></i>
+        </div>
+    {% endif %}
+</div>

@@ -93,15 +93,21 @@ class ChannelRepository extends ServiceEntityRepository
         $sortExpr = $sortMap[$sort] ?? 'c.createdAt';
         $dirSql   = strtoupper($dir) === 'asc' ? 'ASC' : 'DESC';
 
-        $qb->orderBy($sortExpr, $dirSql);
+        $qb->orderBy('LOWER(' . $sortExpr . ')', $dirSql);
 
-        if($sortExpr !== 'c.id'){
+        if($sortExpr !== "c.id"){
+            $qb->addOrderBy("c.id", $dirSql);
+        }
+
+        return $qb->getQuery()->getResult();
+
+        /*if($sortExpr !== 'c.id'){
             $qb->addOrderBy('c.id','DESC');
         }
         return $qb->getQuery()->getResult();
 
-        /*return $qb
-            ->orderBy('c.createdAt', 'DESC')
+        return $qb
+            //->orderBy('c.id', 'DESC')
             ->addOrderBy($sortExpr, $dirSql)
             ->getQuery()
             ->getResult();*/

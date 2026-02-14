@@ -350,90 +350,104 @@
 
                 {% for m in messages %}
                     {% set isMe = app.user and (m.senderEmail == app.user.userIdentifier) %}
-
-                    <div class="msg-row {{ isMe ? 'me' : 'other' }}">
-
-                        {# avatar left for others, right hidden for me #}
-                        {% if not isMe %}
-                            <div class="avatar" title="{{ m.senderName }}">
-                                {{ m.senderName|slice(0,1)|upper }}
-                            </div>
-                        {% endif %}
-
-                        <div class="bubble">
-
-                            <div class="msg-top">
-                                <div class="d-flex align-items-center gap-2" style="gap:10px;">
-                                    <div class="msg-name">{{ m.senderName }}</div>
-                                    <div class="msg-time">{{ m.sentAt|date('d/m/Y H:i') }}</div>
-                                </div>
-
-                                {# 3 dots actions only for owner and not deleted and not in edit mode #}
-                                {% if isMe and not m.isDeleted and not (editId is defined and editId == m.id and editForm is not null) %}
-                                    <div class="msg-actions dropdown">
-                                        <button class="dots-btn" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                            <i class="fas fa-ellipsis-v"></i>
-                                        </button>
-
-                                        <div class="dropdown-menu dropdown-menu-right dots-menu">
-                                            <a class="dots-item"
-                                               href="{{ path('community_channels_show', {id: channel.id, edit: m.id}) }}">
-                                                <i class="fas fa-pen"></i> Edit
-                                            </a>
-
-                                            <form method="post"
-                                                  action="{{ path('community_message_delete', {id: m.id}) }}"
-                                                  style="margin:0;">
-                                                <input type="hidden" name="_token" value="{{ csrf_token('delete_message_' ~ m.id) }}">
-                                                <button class="dots-item dots-danger" type="submit">
-                                                    <i class="fas fa-trash"></i> Delete
-                                                </button>
-                                            </form>
-                                        </div>
-                                    </div>
-                                {% endif %}
-                            </div>
-
-                            {# ✅ INLINE EDIT MODE #}
-                            {% if editId is defined and editId == m.id and editForm is not null %}
-                                <div class="edit-panel">
-                                    {{ form_start(editForm) }}
-                                    {{ form_widget(editForm.content) }}
-
-                                    <div class="edit-actions">
-                                        <button class="btn btn-danger btn-sm">
-                                            <i class="fas fa-save"></i> Save
-                                        </button>
-                                        <a class="btn btn-secondary btn-sm"
-                                           href="{{ path('community_channels_show', {id: channel.id}) }}">
-                                            Cancel
-                                        </a>
-                                    </div>
-
-                                    {{ form_end(editForm) }}
-                                </div>
-
-                            {% else %}
-                                {% if m.isDeleted %}
-                                    <div class="msg-deleted">this message is deleted.</div>
-                                {% else %}
-                                    <div class="msg-text">{{ m.content }}</div>
-                                {% endif %}
-                            {% endif %}
-
-                        </div>
-
-                        {% if isMe %}
-                            <div class="avatar" title="You" style="background: rgba(255,45,85,0.18); border-color: rgba(255,45,85,0.20);">
-                                <i class="fas fa-user"></i>
-                            </div>
-                        {% endif %}
-                    </div>
+                    {% include 'community/message/_row.html.twig' with {
+                        m: m,
+                        channel: channel,
+                        isMe: isMe,
+                        showActions: isMe and not m.isDeleted and not (editId is defined and editId == m.id and editForm is not null)
+                    } %}
                 {% else %}
                     <div class="text-center" style="color: rgba(255,255,255,0.75); padding: 30px 10px;">
                         No message at the moment. Start a conversation 🔥
                     </div>
                 {% endfor %}
+
+                {#                {% for m in messages %}#}
+{#                    {% set isMe = app.user and (m.senderEmail == app.user.userIdentifier) %}#}
+
+{#                    <div class="msg-row {{ isMe ? 'me' : 'other' }}">#}
+
+{#                        #}{# avatar left for others, right hidden for me #}
+{#                        {% if not isMe %}#}
+{#                            <div class="avatar" title="{{ m.senderName }}">#}
+{#                                {{ m.senderName|slice(0,1)|upper }}#}
+{#                            </div>#}
+{#                        {% endif %}#}
+
+{#                        <div class="bubble">#}
+
+{#                            <div class="msg-top">#}
+{#                                <div class="d-flex align-items-center gap-2" style="gap:10px;">#}
+{#                                    <div class="msg-name">{{ m.senderName }}</div>#}
+{#                                    <div class="msg-time">{{ m.sentAt|date('d/m/Y H:i') }}</div>#}
+{#                                </div>#}
+
+{#                                #}{# 3 dots actions only for owner and not deleted and not in edit mode #}
+{#                                {% if isMe and not m.isDeleted and not (editId is defined and editId == m.id and editForm is not null) %}#}
+{#                                    <div class="msg-actions dropdown">#}
+{#                                        <button class="dots-btn" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">#}
+{#                                            <i class="fas fa-ellipsis-v"></i>#}
+{#                                        </button>#}
+
+{#                                        <div class="dropdown-menu dropdown-menu-right dots-menu">#}
+{#                                            <a class="dots-item"#}
+{#                                               href="{{ path('community_channels_show', {id: channel.id, edit: m.id}) }}">#}
+{#                                                <i class="fas fa-pen"></i> Edit#}
+{#                                            </a>#}
+
+{#                                            <form method="post"#}
+{#                                                  action="{{ path('community_message_delete', {id: m.id}) }}"#}
+{#                                                  style="margin:0;">#}
+{#                                                <input type="hidden" name="_token" value="{{ csrf_token('delete_message_' ~ m.id) }}">#}
+{#                                                <button class="dots-item dots-danger" type="submit">#}
+{#                                                    <i class="fas fa-trash"></i> Delete#}
+{#                                                </button>#}
+{#                                            </form>#}
+{#                                        </div>#}
+{#                                    </div>#}
+{#                                {% endif %}#}
+{#                            </div>#}
+
+{#                            #}{# ✅ INLINE EDIT MODE #}
+{#                            {% if editId is defined and editId == m.id and editForm is not null %}#}
+{#                                <div class="edit-panel">#}
+{#                                    {{ form_start(editForm) }}#}
+{#                                    {{ form_widget(editForm.content) }}#}
+
+{#                                    <div class="edit-actions">#}
+{#                                        <button class="btn btn-danger btn-sm">#}
+{#                                            <i class="fas fa-save"></i> Save#}
+{#                                        </button>#}
+{#                                        <a class="btn btn-secondary btn-sm"#}
+{#                                           href="{{ path('community_channels_show', {id: channel.id}) }}">#}
+{#                                            Cancel#}
+{#                                        </a>#}
+{#                                    </div>#}
+
+{#                                    {{ form_end(editForm) }}#}
+{#                                </div>#}
+
+{#                            {% else %}#}
+{#                                {% if m.isDeleted %}#}
+{#                                    <div class="msg-deleted">this message is deleted.</div>#}
+{#                                {% else %}#}
+{#                                    <div class="msg-text">{{ m.content }}</div>#}
+{#                                {% endif %}#}
+{#                            {% endif %}#}
+
+{#                        </div>#}
+
+{#                        {% if isMe %}#}
+{#                            <div class="avatar" title="You" style="background: rgba(255,45,85,0.18); border-color: rgba(255,45,85,0.20);">#}
+{#                                <i class="fas fa-user"></i>#}
+{#                            </div>#}
+{#                        {% endif %}#}
+{#                    </div>#}
+{#                {% else %}#}
+{#                    <div class="text-center" style="color: rgba(255,255,255,0.75); padding: 30px 10px;">#}
+{#                        No message at the moment. Start a conversation 🔥#}
+{#                    </div>#}
+{#                {% endfor %}#}
             </div>
 
             <div class="chat-compose">
@@ -454,11 +468,145 @@
 
     </div>
 
+{#    <script>#}
+{#        // Auto-scroll to bottom#}
+{#        (function () {#}
+{#            const el = document.getElementById('chatStream');#}
+{#            if (el) el.scrollTop = el.scrollHeight;#}
+{#        })();#}
+{#    </script>#}
+
     <script>
-        // Auto-scroll to bottom
         (function () {
-            const el = document.getElementById('chatStream');
-            if (el) el.scrollTop = el.scrollHeight;
+            const chatStream = document.getElementById('chatStream');
+            const form = document.querySelector('.chat-compose form');
+            const textarea = form ? form.querySelector('textarea') : null;
+
+            function scrollToBottom() {
+                if (chatStream) chatStream.scrollTop = chatStream.scrollHeight;
+            }
+
+            scrollToBottom();
+            const currentUserEmail = "{{ app.user ? app.user.userIdentifier : '' }}";
+
+            // ✅ Mercure topic per channel
+            const topic = "urn:channel:{{ channel.id }}";
+            // ✅ This generates the URL AND sets the auth cookie for subscribing
+            // Docs: use withCredentials:true so cookie is sent to the hub. :contentReference[oaicite:5]{index=5}
+            const hub = "http://127.0.0.1:3000/.well-known/mercure";
+            const url = hub + "?topic=" + encodeURIComponent(topic);
+
+            const es = new EventSource(url); // ✅ no cookies needed
+            es.onopen = () => console.log("✅ Mercure connected");
+            es.onerror = (e) => console.log("❌ Mercure error", e);
+
+            /*es.onmessage = (event) => {
+                try {
+                    const data = JSON.parse(event.data);
+                    if (!data || !data.id || !data.html) return;
+
+                    // Avoid duplicates (sender already inserted)
+                    if (document.querySelector('[data-msg-id="' + data.id + '"]')) return;
+
+                    chatStream.insertAdjacentHTML('beforeend', data.html);
+                    scrollToBottom();
+                } catch (e) {
+                    console.error(e);
+                }
+            };*/
+
+            es.onmessage = (event) => {
+                try {
+                    const data = JSON.parse(event.data);
+                    if (!data || !data.id) return;
+
+                    // Avoid duplicates (sender already inserted)
+                    if (document.querySelector('[data-msg-id="' + data.id + '"]')) return;
+
+                    const isMe = (currentUserEmail && data.senderEmail === currentUserEmail);
+
+                    const html = buildMessageHtml(data, isMe);
+                    chatStream.insertAdjacentHTML('beforeend', html);
+                    scrollToBottom();
+                } catch (e) {
+                    console.error(e);
+                }
+            };
+
+            function escapeHtml(str) {
+                return String(str ?? '')
+                    .replaceAll("&", "&amp;")
+                    .replaceAll("<", "&lt;")
+                    .replaceAll(">", "&gt;")
+                    .replaceAll('"', "&quot;")
+                    .replaceAll("'", "&#039;");
+            }
+
+            function buildMessageHtml(m, isMe) {
+                const senderName = escapeHtml(m.senderName);
+                const sentAt = escapeHtml(m.sentAt);
+
+                const avatarLeft = `
+        <div class="avatar" title="${senderName}">
+            ${senderName.slice(0,1).toUpperCase()}
+        </div>
+    `;
+
+                const avatarRight = `
+        <div class="avatar" title="You" style="background: rgba(255,45,85,0.18); border-color: rgba(255,45,85,0.20);">
+            <i class="fas fa-user"></i>
+        </div>
+    `;
+
+                const body = m.isDeleted
+                    ? `<div class="msg-deleted">this message is deleted.</div>`
+                    : `<div class="msg-text">${escapeHtml(m.content)}</div>`;
+
+                // ⚠️ No actions dropdown in realtime inserted messages
+                return `
+        <div class="msg-row ${isMe ? 'me' : 'other'}" data-msg-id="${m.id}">
+            ${isMe ? '' : avatarLeft}
+            <div class="bubble">
+                <div class="msg-top">
+                    <div class="d-flex align-items-center gap-2" style="gap:10px;">
+                        <div class="msg-name">${senderName}</div>
+                        <div class="msg-time">${sentAt}</div>
+                    </div>
+                </div>
+                ${body}
+            </div>
+            ${isMe ? avatarRight : ''}
+        </div>
+    `;
+            }
+
+
+            // ✅ Send message without refresh
+            if (form && textarea) {
+                form.addEventListener('submit', async (e) => {
+                    e.preventDefault();
+
+                    const fd = new FormData(form);
+                    const res = await fetch(form.action, {
+                        method: 'POST',
+                        body: fd,
+                        headers: { 'X-Requested-With': 'XMLHttpRequest' }
+                    });
+
+                    if (!res.ok) return;
+
+                    const json = await res.json();
+                    if (json.ok && json.html) {
+                        // Insert sender version (with actions)
+                        if (!document.querySelector('[data-msg-id="' + json.id + '"]')) {
+                            chatStream.insertAdjacentHTML('beforeend', json.html);
+                            scrollToBottom();
+                        }
+                        textarea.value = '';
+                    }
+                });
+            }
         })();
     </script>
+
 {% endblock %}

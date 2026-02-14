@@ -46,7 +46,7 @@
 #}
 
 {% macro sort_link(label, field, q, status, type, active, sort, dir) %}
-    {% set nextDir = (sort == field and dir == 'asc') ? 'desc' : 'asc' %}
+    {% set nextDir = (sort == field and dir == 'asc') ? 'ASC' : 'DESC' %}
     <a class="text-decoration-none" style="color: inherit;"
        href="{{ path('admin_channels_index', {
            q: q,
@@ -58,7 +58,7 @@
        }) }}">
         {{ label }}
         {% if sort == field %}
-            <i class="bi {{ dir == 'asc' ? 'bi-caret-up-fill' : 'bi-caret-down-fill' }} ms-1"></i>
+            <i class="bi {{ dir == 'ASC' ? 'bi-caret-up-fill' : 'bi-caret-down-fill' }} ms-1"></i>
         {% else %}
             <i class="bi bi-arrow-down-up ms-1" style="opacity: .4;"></i>
         {% endif %}

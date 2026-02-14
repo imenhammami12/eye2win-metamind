@@ -62,12 +62,7 @@ class ChannelController extends AbstractController
     }
 
     #[Route('/channels/{id}', name: 'community_channels_show', requirements: ['id' => '\d+'])]
-    public function show(
-        Channel $channel,
-        MessageRepository $messageRepo,
-        Request $request,
-        EntityManagerInterface $em,
-        ChannelRepository $channelRepo
+    public function show(Channel $channel, MessageRepository $messageRepo, Request $request, EntityManagerInterface $em, ChannelRepository $channelRepo
     ): Response
     {
         // Access control: only APPROVED+active+allowed (same logic as index)
@@ -102,7 +97,7 @@ class ChannelController extends AbstractController
         }
 
 
-        // Message form only if logged in
+        /*/ Message form only if logged in
         $message = new Message();
         $form = $this->createForm(MessageType::class, $message);
         $form->handleRequest($request);
@@ -123,8 +118,13 @@ class ChannelController extends AbstractController
             $em->flush();
 
             return $this->redirectToRoute('community_channels_show', ['id' => $channel->getId()]);
-        }
-
+        }*/
+// Message form only if logged in  FOR REAL TIME CHAT
+        $message = new Message();
+        $form = $this->createForm(MessageType::class, $message, [
+            'action' => $this->generateUrl('community_message_send', ['id' => $channel->getId()]),
+            'method' => 'POST',
+        ]);
 
         return $this->render('community/channel/show.html.twig', [
             'channel' => $channel,
