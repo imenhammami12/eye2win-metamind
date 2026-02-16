@@ -37,7 +37,7 @@
                     <i class="bi bi-people"></i><span>Users</span>
                 </a>
                 <a href="{{ path('app_profile') }}" class="{{ app.request.attributes.get('_route') starts with 'app_profile' ? 'active' : '' }}">
-                    <i class="bi bi-person-circle"></i><span>Mon Profil</span>
+                    <i class="bi bi-person-circle"></i><span>My Profil</span>
                 </a>
                 <a href="{{ path('admin_planning_index') }}" class="{{ app.request.attributes.get('_route') starts with 'admin_planning' ? 'active' : '' }}">
                     <i class="bi bi-calendar-event"></i><span>Planning</span>
@@ -141,18 +141,18 @@
                         <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown" style="background: rgba(20,10,35,.98); border: 1px solid rgba(255,255,255,.1); border-radius: 12px; padding: 8px; margin-top: 10px;">
                             <li>
                                 <a class="dropdown-item" href="{{ path('app_profile') }}" style="color: rgba(255,255,255,.85); border-radius: 8px; padding: 10px 15px; display: flex; align-items: center; gap: 10px;">
-                                    <i class="bi bi-person-circle"></i> Mon Profil
+                                    <i class="bi bi-person-circle"></i> My Profil
                                 </a>
                             </li>
                             <li>
                                 <a class="dropdown-item" href="{{ path('app_profile_security') }}" style="color: rgba(255,255,255,.85); border-radius: 8px; padding: 10px 15px; display: flex; align-items: center; gap: 10px;">
-                                    <i class="bi bi-shield-check"></i> Sécurité
+                                    <i class="bi bi-shield-check"></i> Security
                                 </a>
                             </li>
                             <li><hr class="dropdown-divider" style="border-color: rgba(255,255,255,.1);"></li>
                             <li>
                                 <a class="dropdown-item" href="{{ path('admin_logout') }}" style="color: #ff3c64; border-radius: 8px; padding: 10px 15px; display: flex; align-items: center; gap: 10px;">
-                                    <i class="bi bi-box-arrow-right"></i> Déconnexion
+                                    <i class="bi bi-box-arrow-right"></i> Logout
                                 </a>
                             </li>
                         </ul>

@@ -3,6 +3,72 @@
 {% block title %}Audit Log #{{ auditLog.id }} - Administration{% endblock %}
 {% block page_title %}Audit Log Details{% endblock %}
 
+{% block stylesheets %}
+<style>
+/* Info Item Styles */
+.info-item {
+    padding: 0.75rem;
+    border-radius: 8px;
+    background: rgba(255, 255, 255, 0.02);
+    transition: all 0.3s ease;
+}
+
+.info-item:hover {
+    background: rgba(255, 255, 255, 0.04);
+    transform: translateX(5px);
+}
+
+.info-icon {
+    width: 40px;
+    height: 40px;
+    min-width: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 10px;
+    background: rgba(255, 255, 255, 0.05);
+    font-size: 1.25rem;
+    transition: all 0.3s ease;
+}
+
+.info-item:hover .info-icon {
+    transform: scale(1.1);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+/* Icon color variants */
+.info-icon.text-primary {
+    background: rgba(79, 172, 254, 0.15);
+    color: #4facfe !important;
+}
+
+.info-icon.text-secondary {
+    background: rgba(108, 117, 125, 0.15);
+    color: #6c757d !important;
+}
+
+.info-icon.text-success {
+    background: rgba(67, 233, 123, 0.15);
+    color: #43e97b !important;
+}
+
+.info-icon.text-info {
+    background: rgba(23, 162, 184, 0.15);
+    color: #17a2b8 !important;
+}
+
+.info-icon.text-warning {
+    background: rgba(255, 193, 7, 0.15);
+    color: #ffc107 !important;
+}
+
+.info-icon.text-danger {
+    background: rgba(220, 53, 69, 0.15);
+    color: #dc3545 !important;
+}
+</style>
+{% endblock %}
+
 {% block body %}
 
 <div class="mb-3 fade-in">
@@ -15,26 +81,42 @@
     <div class="col-lg-8">
         <div class="table-card fade-in">
             <div class="table-header">
-                <h5><i class="bi bi-info-circle me-2"></i>Log Information</h5>
+                <h5>
+                    <i class="bi bi-info-circle me-2"></i>
+                    Log Information
+                </h5>
             </div>
             <div class="p-4">
-                <div class="table-responsive">
-                    <table class="table table-dark mb-0">
-                        <tbody>
-                            <tr>
-                                <th style="width: 200px;">Log ID</th>
-                                <td><span class="badge bg-secondary fs-6">#{{ auditLog.id }}</span></td>
-                            </tr>
-                            <tr>
-                                <th>Date & Time</th>
-                                <td>
-                                    <strong>{{ auditLog.createdAt|date('d/m/Y H:i:s') }}</strong>
+                <div class="row g-4">
+                    
+                    {# Log ID #}
+
+
+                    {# Date & Time #}
+                    <div class="col-md-6">
+                        <div class="d-flex align-items-start gap-3 info-item">
+                            <div class="info-icon text-primary">
+                                <i class="bi bi-calendar-event"></i>
+                            </div>
+                            <div>
+                                <small class="text-muted">Date & Time</small>
+                                <div class="fw-semibold">
+                                    {{ auditLog.createdAt|date('M d, Y · h:i A') }}
                                     <small class="text-muted ms-2">({{ auditLog.createdAt|date('e') }})</small>
-                                </td>
-                            </tr>
-                            <tr>
-                                <th>User</th>
-                                <td>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    {# User #}
+                    <div class="col-md-6">
+                        <div class="d-flex align-items-start gap-3 info-item">
+                            <div class="info-icon text-success">
+                                <i class="bi bi-person-circle"></i>
+                            </div>
+                            <div>
+                                <small class="text-muted">User</small>
+                                <div class="fw-semibold">
                                     {% if auditLog.user %}
                                         <a href="{{ path('admin_users_show', {id: auditLog.user.id}) }}" class="text-decoration-none" style="color: #43e97b;">
                                             <i class="bi bi-person-circle me-1"></i>{{ auditLog.user.username }}
@@ -44,11 +126,20 @@
                                     {% else %}
                                         <span class="text-muted"><i class="bi bi-gear me-1"></i>System</span>
                                     {% endif %}
-                                </td>
-                            </tr>
-                            <tr>
-                                <th>Action</th>
-                                <td>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    {# Action #}
+                    <div class="col-md-6">
+                        <div class="d-flex align-items-start gap-3 info-item">
+                            <div class="info-icon text-warning">
+                                <i class="bi bi-lightning-charge"></i>
+                            </div>
+                            <div>
+                                <small class="text-muted">Action</small>
+                                <div class="fw-semibold">
                                     {% if auditLog.action starts with 'DELETE' or auditLog.action starts with 'BAN' %}
                                         <span class="badge bg-danger fs-6">{{ auditLog.action|replace({'_': ' '}) }}</span>
                                     {% elseif auditLog.action starts with 'CREATE' or auditLog.action starts with 'APPROVE' %}
@@ -58,36 +149,48 @@
                                     {% else %}
                                         <span class="badge bg-info fs-6">{{ auditLog.action|replace({'_': ' '}) }}</span>
                                     {% endif %}
-                                </td>
-                            </tr>
-                            <tr>
-                                <th>Entity Type</th>
-                                <td>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    {# Entity Type #}
+                    <div class="col-md-6">
+                        <div class="d-flex align-items-start gap-3 info-item">
+                            <div class="info-icon text-info">
+                                <i class="bi bi-diagram-3"></i>
+                            </div>
+                            <div>
+                                <small class="text-muted">Entity Type</small>
+                                <div class="fw-semibold">
                                     {% if auditLog.entityType %}
                                         <span class="badge bg-secondary">{{ auditLog.entityType }}</span>
                                     {% else %}
                                         <span class="text-muted">N/A</span>
                                     {% endif %}
-                                </td>
-                            </tr>
-                            <tr>
-                                <th>Entity ID</th>
-                                <td>
-                                    {% if auditLog.entityId %}
-                                        <span class="badge bg-secondary">#{{ auditLog.entityId }}</span>
-                                    {% else %}
-                                        <span class="text-muted">N/A</span>
-                                    {% endif %}
-                                </td>
-                            </tr>
-                            <tr>
-                                <th>IP Address</th>
-                                <td>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    {# Entity ID #}
+
+
+                    {# IP Address #}
+                    <div class="col-md-6">
+                        <div class="d-flex align-items-start gap-3 info-item">
+                            <div class="info-icon text-danger">
+                                <i class="bi bi-geo-alt"></i>
+                            </div>
+                            <div>
+                                <small class="text-muted">IP Address</small>
+                                <div class="fw-semibold">
                                     <code style="font-family: 'JetBrains Mono', monospace; color: #4facfe;">{{ auditLog.ipAddress ?? 'N/A' }}</code>
-                                </td>
-                            </tr>
-                        </tbody>
-                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
                 </div>
             </div>
         </div>
@@ -144,4 +247,32 @@
     </div>
 </div>
 
+{% endblock %}
+
+{% block javascripts %}
+<script>
+// Initialize Bootstrap tooltips
+document.addEventListener('DOMContentLoaded', function() {
+    const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+    tooltipTriggerList.map(function (tooltipTriggerEl) {
+        return new bootstrap.Tooltip(tooltipTriggerEl, {
+            delay: { show: 300, hide: 100 }
+        });
+    });
+});
+
+// Enhanced hover effects for info items
+document.querySelectorAll('.info-item').forEach((item, index) => {
+    item.style.animationDelay = `${index * 0.05}s`;
+    
+    item.addEventListener('mouseenter', function() {
+        this.style.transform = 'translateX(5px)';
+        this.style.transition = 'transform 0.2s ease';
+    });
+    
+    item.addEventListener('mouseleave', function() {
+        this.style.transform = 'translateX(0)';
+    });
+});
+</script>
 {% endblock %}

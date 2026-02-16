@@ -56,9 +56,7 @@ services:
             $telegramBotToken: '%env(TELEGRAM_BOT_TOKEN)%'
             $devMode: false
 
-    # ════════════════════════════════════════════════════════════
-    # ✅ Session Handler - Stockage en Base de Données
-    # ════════════════════════════════════════════════════════════
+
     
     # Factory pour créer le PdoSessionHandler
     App\Service\SessionHandlerFactory:
