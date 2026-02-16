@@ -95,6 +95,9 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\OneToMany(mappedBy: 'user', targetEntity: TrainingSession::class)]
     private Collection $trainingSessions;
 
+    #[ORM\ManyToMany(targetEntity: Tournoi::class, mappedBy: 'participants')]
+    private Collection $tournaments;
+
     public function __construct()
     {
         $this->ownedTeams = new ArrayCollection();
@@ -103,6 +106,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         $this->notifications = new ArrayCollection();
         $this->auditLogs = new ArrayCollection();
         $this->trainingSessions = new ArrayCollection();
+        $this->tournaments = new ArrayCollection();
         $this->createdAt = new \DateTime();
         $this->lastLogin = new \DateTime();
         $this->accountStatus = AccountStatus::ACTIVE;
@@ -286,5 +290,32 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function getTrainingSessions(): Collection
     {
         return $this->trainingSessions;
+    }
+
+    /**
+     * @return Collection<int, Tournoi>
+     */
+    public function getTournaments(): Collection
+    {
+        return $this->tournaments;
+    }
+
+    public function addTournament(Tournoi $tournament): static
+    {
+        if (!$this->tournaments->contains($tournament)) {
+            $this->tournaments->add($tournament);
+            $tournament->addParticipant($this);
+        }
+
+        return $this;
+    }
+
+    public function removeTournament(Tournoi $tournament): static
+    {
+        if ($this->tournaments->removeElement($tournament)) {
+            $tournament->removeParticipant($this);
+        }
+
+        return $this;
     }
 }

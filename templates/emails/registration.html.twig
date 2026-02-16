@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Confirmation d'inscription</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            color: #333;
+            line-height: 1.6;
+            margin: 0;
+            padding: 20px;
+        }
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            background: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+        .header {
+            text-align: center;
+            border-bottom: 2px solid #007bff;
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+        }
+        .header h1 {
+            color: #007bff;
+            margin: 0;
+        }
+        .content {
+            padding: 10px;
+        }
+        .footer {
+            text-align: center;
+            margin-top: 20px;
+            font-size: 0.8em;
+            color: #777;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Confirmation d'inscription</h1>
+        </div>
+        <div class="content">
+            <p>Bonjour {{ user.username }},</p>
+            <p>Nous avons le plaisir de vous confirmer votre inscription au tournoi <strong>{{ tournoi.nom }}</strong>.</p>
+            
+            <div style="background-color: #f9f9f9; padding: 15px; border-radius: 5px; margin: 20px 0;">
+                <h3 style="margin-top: 0; color: #007bff;">Détails du tournoi</h3>
+                <ul style="list-style: none; padding: 0;">
+                    <li><strong>Date de début :</strong> {{ tournoi.dateDebut|date('d/m/Y') }}</li>
+                    <li><strong>Date de fin :</strong> {{ tournoi.dateFin|date('d/m/Y') }}</li>
+                    <li><strong>Type :</strong> {{ tournoi.typeTournoi ? tournoi.typeTournoi.value : 'Non spécifié' }}</li>
+                    {% if tournoi.description %}
+                    <li><strong>Description :</strong> {{ tournoi.description }}</li>
+                    {% endif %}
+                </ul>
+            </div>
+
+            {% if tournoi.matchs|length > 0 %}
+            <h3 style="color: #007bff; border-bottom: 2px solid #eee; padding-bottom: 10px;">Programme des matchs</h3>
+            <table style="width: 100%; border-collapse: collapse; margin-top: 15px;">
+                <thead>
+                    <tr style="background-color: #f2f2f2;">
+                        <th style="padding: 10px; border: 1px solid #ddd; text-align: left;">Date</th>
+                        <th style="padding: 10px; border: 1px solid #ddd; text-align: left;">Équipe 1</th>
+                        <th style="padding: 10px; border: 1px solid #ddd; text-align: center;">VS</th>
+                        <th style="padding: 10px; border: 1px solid #ddd; text-align: left;">Équipe 2</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for match in tournoi.matchs %}
+                    <tr>
+                        <td style="padding: 10px; border: 1px solid #ddd;">
+                            {{ match.dateMatch ? match.dateMatch|date('d/m/Y H:i') : 'À définir' }}
+                        </td>
+                        <td style="padding: 10px; border: 1px solid #ddd;">{{ match.equipe1 }}</td>
+                        <td style="padding: 10px; border: 1px solid #ddd; text-align: center;">-</td>
+                        <td style="padding: 10px; border: 1px solid #ddd;">{{ match.equipe2 }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            {% else %}
+            <p style="font-style: italic; color: #777;">Les matchs n'ont pas encore été planifiés.</p>
+            {% endif %}
+
+            <p style="margin-top: 20px;">Préparez-vous et bonne chance !</p>
+        </div>
+        <div class="footer">
+            <p>Cet email a été envoyé automatiquement. Merci de ne pas répondre.</p>
+        </div>
+    </div>
+</body>
+</html>

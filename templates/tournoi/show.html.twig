@@ -55,6 +55,27 @@
                                     <span class="badge rounded-pill" style="background-color: #0f3460; border: 1px solid #2d2d44;">{{ matches|length }}</span>
                                 </li>
                             </ul>
+                            </ul>
+
+                            <div class="mt-4 text-center">
+                                {% if app.user %}
+                                    {% if tournament.participants.contains(app.user) %}
+                                        <button class="btn btn-success w-100" disabled>
+                                            <i class="fas fa-check-circle me-2"></i> Déjà à inscrit
+                                        </button>
+                                    {% else %}
+                                        <form action="{{ path('app_tournoi_inscription', {'id': tournament.id}) }}" method="post">
+                                            <button type="submit" class="btn btn-primary w-100" style="background-color: #e94560; border-color: #e94560;">
+                                                <i class="fas fa-user-plus me-2"></i> S'inscrire
+                                            </button>
+                                        </form>
+                                    {% endif %}
+                                {% else %}
+                                    <a href="{{ path('app_login') }}" class="btn btn-outline-light w-100">
+                                        <i class="fas fa-sign-in-alt me-2"></i> Connectez-vous pour vous inscrire
+                                    </a>
+                                {% endif %}
+                            </div>
                         </div>
                     </div>
                 </div>
