@@ -1,166 +1,36 @@
 {% extends 'admin_layout.html.twig' %}
+{# Fichier : templates/admin/profile/face_register.html.twig #}
 
 {% block title %}Facial Registration{% endblock %}
 {% block page_title %}Facial Registration{% endblock %}
 
 {% block stylesheets %}
 <style>
-    .face-reg-container {
-        max-width: 900px;
-        margin: 50px auto;
-        padding: 30px;
-    }
-
-    .face-reg-card {
-        background: rgba(30, 15, 45, 0.8);
-        border-radius: 20px;
-        padding: 40px;
-        border: 1px solid rgba(255, 255, 255, 0.1);
-        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
-    }
-
-    .face-reg-header {
-        text-align: center;
-        margin-bottom: 30px;
-    }
-
-    .face-reg-header h2 {
-        font-size: 28px;
-        font-weight: 700;
-        color: #ffffff;
-        margin-bottom: 10px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        gap: 12px;
-    }
-
-    .face-reg-header p {
-        color: rgba(255, 255, 255, 0.6);
-        font-size: 14px;
-    }
-
-    #faceVideoContainer {
-        position: relative;
-        border-radius: 16px;
-        overflow: hidden;
-        background: #000;
-        margin: 20px 0;
-        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
-    }
-
-    #faceVideo {
-        width: 100%;
-        display: block;
-        border-radius: 16px;
-    }
-
-    #faceCanvas {
-        position: absolute;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        pointer-events: none;
-    }
-
-    .face-controls {
-        display: flex;
-        gap: 15px;
-        justify-content: center;
-        margin-top: 30px;
-    }
-
-    .btn-action {
-        padding: 14px 28px;
-        border-radius: 10px;
-        font-weight: 600;
-        border: none;
-        cursor: pointer;
-        transition: all 0.3s ease;
-        display: inline-flex;
-        align-items: center;
-        gap: 10px;
-        font-size: 15px;
-    }
-
-    .btn-primary {
-        background: linear-gradient(135deg, #ff3c64, #ff1744);
-        color: white;
-    }
-
-    .btn-primary:hover:not(:disabled) {
-        transform: translateY(-2px);
-        box-shadow: 0 12px 30px rgba(255, 60, 100, 0.4);
-    }
-
-    .btn-primary:disabled {
-        opacity: 0.5;
-        cursor: not-allowed;
-    }
-
-    .btn-secondary {
-        background: rgba(255, 255, 255, 0.1);
-        color: white;
-        border: 1px solid rgba(255, 255, 255, 0.2);
-    }
-
-    .btn-secondary:hover {
-        background: rgba(255, 255, 255, 0.15);
-    }
-
-    .alert {
-        padding: 16px 20px;
-        border-radius: 12px;
-        margin-bottom: 20px;
-        display: flex;
-        align-items: center;
-        gap: 12px;
-        font-size: 14px;
-    }
-
-    .alert-info {
-        background: rgba(33, 150, 243, 0.2);
-        color: #64b5f6;
-        border: 1px solid rgba(33, 150, 243, 0.3);
-    }
-
-    .alert-success {
-        background: rgba(67, 233, 123, 0.2);
-        color: #43e97b;
-        border: 1px solid rgba(67, 233, 123, 0.3);
-    }
-
-    .alert-danger {
-        background: rgba(255, 60, 100, 0.2);
-        color: #ff3c64;
-        border: 1px solid rgba(255, 60, 100, 0.3);
-    }
-
-    .alert-warning {
-        background: rgba(255, 193, 7, 0.2);
-        color: #ffc107;
-        border: 1px solid rgba(255, 193, 7, 0.3);
-    }
-
+    .face-reg-container { max-width: 900px; margin: 50px auto; padding: 30px; }
+    .face-reg-card { background: rgba(30, 15, 45, 0.8); border-radius: 20px; padding: 40px; border: 1px solid rgba(255,255,255,0.1); box-shadow: 0 20px 60px rgba(0,0,0,0.5); }
+    .face-reg-header { text-align: center; margin-bottom: 30px; }
+    .face-reg-header h2 { font-size: 28px; font-weight: 700; color: #fff; margin-bottom: 10px; display: flex; align-items: center; justify-content: center; gap: 12px; }
+    .face-reg-header p { color: rgba(255,255,255,0.6); font-size: 14px; }
+    #faceVideoContainer { position: relative; border-radius: 16px; overflow: hidden; background: #000; margin: 20px 0; box-shadow: 0 10px 30px rgba(0,0,0,0.3); }
+    #faceVideo { width: 100%; display: block; border-radius: 16px; }
+    #faceCanvas { position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; }
+    .face-controls { display: flex; gap: 15px; justify-content: center; margin-top: 30px; }
+    .btn-action { padding: 14px 28px; border-radius: 10px; font-weight: 600; border: none; cursor: pointer; transition: all 0.3s ease; display: inline-flex; align-items: center; gap: 10px; font-size: 15px; text-decoration: none; }
+    .btn-primary { background: linear-gradient(135deg, #ff3c64, #ff1744); color: white; }
+    .btn-primary:hover:not(:disabled) { transform: translateY(-2px); box-shadow: 0 12px 30px rgba(255,60,100,0.4); color: white; }
+    .btn-primary:disabled { opacity: 0.5; cursor: not-allowed; }
+    .btn-secondary { background: rgba(255,255,255,0.1); color: white; border: 1px solid rgba(255,255,255,0.2); }
+    .btn-secondary:hover { background: rgba(255,255,255,0.15); color: white; }
+    .alert { padding: 16px 20px; border-radius: 12px; margin-bottom: 20px; display: flex; align-items: center; gap: 12px; font-size: 14px; }
+    .alert-info    { background: rgba(33,150,243,0.2); color: #64b5f6; border: 1px solid rgba(33,150,243,0.3); }
+    .alert-success { background: rgba(67,233,123,0.2); color: #43e97b; border: 1px solid rgba(67,233,123,0.3); }
+    .alert-danger  { background: rgba(255,60,100,0.2);  color: #ff3c64; border: 1px solid rgba(255,60,100,0.3); }
+    .alert-warning { background: rgba(255,193,7,0.2);   color: #ffc107; border: 1px solid rgba(255,193,7,0.3); }
     @media (max-width: 768px) {
-        .face-reg-container {
-            padding: 15px;
-            margin: 20px auto;
-        }
-
-        .face-reg-card {
-            padding: 25px 20px;
-        }
-
-        .face-controls {
-            flex-direction: column;
-        }
-
-        .btn-action {
-            width: 100%;
-            justify-content: center;
-        }
+        .face-reg-container { padding: 15px; margin: 20px auto; }
+        .face-reg-card { padding: 25px 20px; }
+        .face-controls { flex-direction: column; }
+        .btn-action { width: 100%; justify-content: center; }
     }
 </style>
 {% endblock %}
@@ -169,11 +39,8 @@
 <div class="face-reg-container">
     <div class="face-reg-card">
         <div class="face-reg-header">
-            <h2>
-                <i class="bi bi-camera-fill"></i>
-                Facial Registration
-            </h2>
-            <p>Position your face in the frame and click "Capture"</p>
+            <h2><i class="bi bi-camera-fill"></i> Facial Registration</h2>
+            <p>Position your face in the frame and click "Capture" to enable face login</p>
         </div>
 
         <div id="faceRegStatus" class="alert alert-info">
@@ -191,7 +58,6 @@
                 <i class="bi bi-camera"></i>
                 <span>Capture my face</span>
             </button>
-            
             <a href="{{ path('app_profile') }}" class="btn-action btn-secondary">
                 <i class="bi bi-x-circle"></i>
                 <span>Cancel</span>
@@ -204,176 +70,125 @@
 {% block javascripts %}
 <script src="https://cdn.jsdelivr.net/npm/face-api.js@0.22.2/dist/face-api.min.js"></script>
 <script>
-    let modelsLoaded = false;
     let detectionInterval = null;
     const MODEL_URL = 'https://cdn.jsdelivr.net/npm/@vladmandic/face-api/model';
 
-    document.addEventListener('DOMContentLoaded', async function() {
-        console.log('✅ Starting facial registration...');
-        
-        // Attach event to button
-        document.getElementById('captureFaceBtn').addEventListener('click', function() {
+    document.addEventListener('DOMContentLoaded', async function () {
+        document.getElementById('captureFaceBtn').addEventListener('click', function () {
             if (!this.disabled) captureAndRegister();
         });
-
-        // Load models and start camera
         await loadFaceModels();
     });
 
     async function loadFaceModels() {
         try {
             updateFaceStatus('info', 'bi-hourglass-split', 'Loading AI models...');
-            
             await Promise.all([
                 faceapi.nets.tinyFaceDetector.loadFromUri(MODEL_URL),
                 faceapi.nets.faceLandmark68Net.loadFromUri(MODEL_URL),
                 faceapi.nets.faceRecognitionNet.loadFromUri(MODEL_URL)
             ]);
-            
-            modelsLoaded = true;
-            console.log('✅ Models loaded');
             await startFaceVideo();
         } catch (error) {
-            console.error('❌ Models error:', error);
             updateFaceStatus('danger', 'bi-x-circle', 'Loading error: ' + error.message);
         }
     }
 
     async function startFaceVideo() {
-        const faceVideo = document.getElementById('faceVideo');
-        const faceCanvas = document.getElementById('faceCanvas');
+        const faceVideo    = document.getElementById('faceVideo');
+        const faceCanvas   = document.getElementById('faceCanvas');
         const captureFaceBtn = document.getElementById('captureFaceBtn');
-        
         try {
             updateFaceStatus('info', 'bi-camera', 'Accessing camera...');
-            
-            const stream = await navigator.mediaDevices.getUserMedia({ 
-                video: { 
-                    width: { ideal: 640 }, 
-                    height: { ideal: 480 }, 
-                    facingMode: 'user' 
-                } 
+            const stream = await navigator.mediaDevices.getUserMedia({
+                video: { width: { ideal: 640 }, height: { ideal: 480 }, facingMode: 'user' }
             });
-            
             faceVideo.srcObject = stream;
-            
             faceVideo.addEventListener('loadedmetadata', () => {
-                console.log('✅ Camera active');
                 document.getElementById('faceVideoContainer').style.display = 'block';
-                faceCanvas.width = faceVideo.videoWidth;
+                faceCanvas.width  = faceVideo.videoWidth;
                 faceCanvas.height = faceVideo.videoHeight;
-                
                 updateFaceStatus('success', 'bi-camera', 'Camera active. Position your face.');
-                
-                // Enable button
                 captureFaceBtn.disabled = false;
-                
                 startFaceDetection();
             });
         } catch (error) {
-            console.error('❌ Camera error:', error);
             updateFaceStatus('danger', 'bi-exclamation-triangle', 'Unable to access camera: ' + error.message);
         }
     }
 
     function startFaceDetection() {
-        const faceVideo = document.getElementById('faceVideo');
+        const faceVideo  = document.getElementById('faceVideo');
         const faceCanvas = document.getElementById('faceCanvas');
         const ctx = faceCanvas.getContext('2d');
-        
-        console.log('🔍 Face detection started');
-        
+
         detectionInterval = setInterval(async () => {
             try {
                 const detections = await faceapi
                     .detectAllFaces(faceVideo, new faceapi.TinyFaceDetectorOptions())
                     .withFaceLandmarks();
-                
                 ctx.clearRect(0, 0, faceCanvas.width, faceCanvas.height);
-                
                 if (detections.length > 0) {
-                    const resized = faceapi.resizeResults(detections, { 
-                        width: faceCanvas.width, 
-                        height: faceCanvas.height 
-                    });
-                    
+                    const resized = faceapi.resizeResults(detections, { width: faceCanvas.width, height: faceCanvas.height });
                     faceapi.draw.drawDetections(faceCanvas, resized);
                     faceapi.draw.drawFaceLandmarks(faceCanvas, resized);
-                    
                     if (detections.length === 1) {
                         updateFaceStatus('success', 'bi-check-circle', '✓ Face detected! Click "Capture"');
                     } else {
                         updateFaceStatus('warning', 'bi-people', detections.length + ' faces detected. Only one required.');
                     }
+                } else {
+                    updateFaceStatus('info', 'bi-search', 'Searching for your face…');
                 }
-            } catch (error) {
-                // Silent
-            }
+            } catch (_) {}
         }, 100);
     }
 
     async function captureAndRegister() {
-        const faceVideo = document.getElementById('faceVideo');
+        const faceVideo    = document.getElementById('faceVideo');
         const captureFaceBtn = document.getElementById('captureFaceBtn');
-        
-        console.log('📸 Capturing...');
-        
+
         captureFaceBtn.disabled = true;
         updateFaceStatus('info', 'bi-hourglass-split', 'Biometric analysis...');
-        
         if (detectionInterval) clearInterval(detectionInterval);
-        
+
         try {
             const detection = await faceapi
                 .detectSingleFace(faceVideo, new faceapi.TinyFaceDetectorOptions())
                 .withFaceLandmarks()
                 .withFaceDescriptor();
-            
-            if (!detection) {
-                throw new Error('No face detected. Please try again.');
-            }
-            
-            console.log('✅ Face detected');
-            
-            // Create image
+
+            if (!detection) throw new Error('No face detected. Please try again.');
+
+            // Capture image
             const canvas = document.createElement('canvas');
-            canvas.width = faceVideo.videoWidth;
+            canvas.width  = faceVideo.videoWidth;
             canvas.height = faceVideo.videoHeight;
             canvas.getContext('2d').drawImage(faceVideo, 0, 0);
             const imageData = canvas.toDataURL('image/jpeg', 0.8);
-            
-            updateFaceStatus('info', 'bi-cloud-upload', 'Sending to server...');
-            
-            // Send to server
+
+            updateFaceStatus('info', 'bi-cloud-upload', 'Saving to server...');
+
             const response = await fetch('{{ path("face_register") }}', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
+                credentials: 'include',
                 body: JSON.stringify({
                     image: imageData,
                     descriptor: Array.from(detection.descriptor)
                 })
             });
-            
+
             const result = await response.json();
-            
+
             if (result.success) {
-                console.log('✅ Registration successful');
                 updateFaceStatus('success', 'bi-check-circle-fill', '✓ ' + result.message);
-                
-                // Stop camera
-                if (faceVideo.srcObject) {
-                    faceVideo.srcObject.getTracks().forEach(track => track.stop());
-                }
-                
-                // Redirect to profile
-                setTimeout(() => {
-                    window.location.href = '{{ path("app_profile") }}';
-                }, 2000);
+                if (faceVideo.srcObject) faceVideo.srcObject.getTracks().forEach(t => t.stop());
+                setTimeout(() => { window.location.href = '{{ path("app_profile") }}'; }, 2000);
             } else {
                 throw new Error(result.message || 'Registration error');
             }
         } catch (error) {
-            console.error('❌ Error:', error);
             updateFaceStatus('danger', 'bi-exclamation-triangle', 'Error: ' + error.message);
             captureFaceBtn.disabled = false;
             startFaceDetection();
@@ -388,13 +203,10 @@
         }
     }
 
-    // Cleanup before leaving page
-    window.addEventListener('beforeunload', function() {
+    window.addEventListener('beforeunload', function () {
         if (detectionInterval) clearInterval(detectionInterval);
         const faceVideo = document.getElementById('faceVideo');
-        if (faceVideo?.srcObject) {
-            faceVideo.srcObject.getTracks().forEach(track => track.stop());
-        }
+        if (faceVideo?.srcObject) faceVideo.srcObject.getTracks().forEach(t => t.stop());
     });
 </script>
 {% endblock %}

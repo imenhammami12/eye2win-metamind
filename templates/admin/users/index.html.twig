@@ -4,7 +4,7 @@
 {% block page_title %}User Management{% endblock %}
 
 {% block body %}
-{# Quick Stats - MOVED TO TOP #}
+{# Quick Stats #}
 {% if stats.total > 0 %}
 <div class="row g-3 mb-4 fade-in">
     <div class="col-xl-3 col-lg-6 col-md-6">
@@ -16,7 +16,6 @@
             <div class="stat-card-value">{{ stats.total }}</div>
         </div>
     </div>
-    
     <div class="col-xl-3 col-lg-6 col-md-6">
         <div class="stat-card">
             <div class="stat-card-icon" style="background: linear-gradient(135deg, #43e97b, #38f9d7);">
@@ -26,7 +25,6 @@
             <div class="stat-card-value">{{ stats.active }}</div>
         </div>
     </div>
-    
     <div class="col-xl-3 col-lg-6 col-md-6">
         <div class="stat-card">
             <div class="stat-card-icon" style="background: linear-gradient(135deg, #f093fb, #f5576c);">
@@ -36,7 +34,6 @@
             <div class="stat-card-value">{{ stats.coaches }}</div>
         </div>
     </div>
-    
     <div class="col-xl-3 col-lg-6 col-md-6">
         <div class="stat-card">
             <div class="stat-card-icon" style="background: linear-gradient(135deg, #fa709a, #fee140);">
@@ -54,36 +51,54 @@
     <div class="table-header">
         <h5><i class="bi bi-funnel me-2"></i>Filters & Search</h5>
     </div>
-    
-    <form method="get" action="{{ path('admin_users_index') }}" class="p-3">
+
+    <form method="get" action="{{ path('admin_users_index') }}" class="p-3" id="searchForm">
         <div class="row g-3">
             <div class="col-md-4">
                 <label class="form-label">
                     <i class="bi bi-search me-1"></i>Search
                 </label>
-                <div class="search-bar">
+
+                {# ── Voice search bar ── #}
+                <div class="search-bar voice-search-bar">
                     <i class="search-icon bi bi-search"></i>
-                    <input type="text" 
-                           name="search" 
-                           class="form-control" 
-                           placeholder="Name, email, username..." 
+                    <input type="text"
+                           name="search"
+                           id="voiceSearchInput"
+                           class="form-control"
+                           placeholder="Name, email, username..."
                            value="{{ search }}"
                            autocomplete="off">
+
+                    {# Mic button — shown only if browser supports it #}
+                    <button type="button"
+                            id="voiceMicBtn"
+                            class="voice-mic-btn"
+                            title="Search by voice"
+                            style="display:none;">
+                        <i class="bi bi-mic-fill"></i>
+                    </button>
+                </div>
+
+                {# Listening indicator #}
+                <div id="voiceStatus" class="voice-status d-none">
+                    <span class="voice-pulse"></span>
+                    <span id="voiceStatusText">Listening… speak now</span>
                 </div>
             </div>
-            
+
             <div class="col-md-3">
                 <label class="form-label">
                     <i class="bi bi-shield me-1"></i>Role
                 </label>
                 <select name="role" class="form-select">
                     <option value="">All Roles</option>
-                    <option value="ROLE_USER" {{ roleFilter == 'ROLE_USER' ? 'selected' : '' }}>User</option>
+                    <option value="ROLE_USER"  {{ roleFilter == 'ROLE_USER'  ? 'selected' : '' }}>User</option>
                     <option value="ROLE_COACH" {{ roleFilter == 'ROLE_COACH' ? 'selected' : '' }}>Coach</option>
                     <option value="ROLE_ADMIN" {{ roleFilter == 'ROLE_ADMIN' ? 'selected' : '' }}>Admin</option>
                 </select>
             </div>
-            
+
             <div class="col-md-3">
                 <label class="form-label">
                     <i class="bi bi-toggle-on me-1"></i>Status
@@ -97,7 +112,7 @@
                     {% endfor %}
                 </select>
             </div>
-            
+
             <div class="col-md-2 d-flex align-items-end gap-2">
                 <button type="submit" class="btn btn-primary flex-grow-1">
                     <i class="bi bi-search me-1"></i>Filter
@@ -130,7 +145,7 @@
     <div class="table-header">
         <h5><i class="bi bi-people me-2"></i>Users List ({{ pagination.getTotalItemCount }})</h5>
     </div>
-    
+
     <div class="table-responsive">
         <table class="custom-table table">
             <thead>
@@ -150,12 +165,12 @@
                     {% set isCurrentUser = user.id == app.user.id %}
                     {% set isTargetAdmin = 'ROLE_ADMIN' in user.roles %}
                     {% set canModify = not isCurrentUser and (not isTargetAdmin or is_granted('ROLE_SUPER_ADMIN')) %}
-                    
+
                     <tr class="fade-in" style="animation-delay: {{ loop.index * 0.05 }}s;">
                         <td style="width: 70px; text-align: center;">
                             {% if user.profilePicture %}
-                                <img src="{{ asset('uploads/profiles/' ~ user.profilePicture) }}" 
-                                     alt="{{ user.username }}" 
+                                <img src="{{ asset('uploads/profiles/' ~ user.profilePicture) }}"
+                                     alt="{{ user.username }}"
                                      class="user-avatar-table"
                                      loading="lazy">
                             {% else %}
@@ -184,22 +199,16 @@
                         </td>
                         <td style="width: 110px;">
                             {% if 'ROLE_ADMIN' in user.roles %}
-                                <span class="badge bg-danger">
-                                    <i class="bi bi-shield-fill me-1"></i>Admin
-                                </span>
+                                <span class="badge bg-danger"><i class="bi bi-shield-fill me-1"></i>Admin</span>
                             {% elseif 'ROLE_COACH' in user.roles %}
-                                <span class="badge bg-warning">
-                                    <i class="bi bi-award-fill me-1"></i>Coach
-                                </span>
+                                <span class="badge bg-warning"><i class="bi bi-award-fill me-1"></i>Coach</span>
                             {% else %}
-                                <span class="badge bg-info">
-                                    <i class="bi bi-person-fill me-1"></i>User
-                                </span>
+                                <span class="badge bg-info"><i class="bi bi-person-fill me-1"></i>User</span>
                             {% endif %}
                         </td>
                         <td style="width: 110px;">
-                            <span class="badge bg-{{ user.accountStatus.badgeClass }}" 
-                                  data-bs-toggle="tooltip" 
+                            <span class="badge bg-{{ user.accountStatus.badgeClass }}"
+                                  data-bs-toggle="tooltip"
                                   title="{{ user.accountStatus.description }}">
                                 {{ user.accountStatus.label }}
                             </span>
@@ -211,38 +220,32 @@
                             </small>
                         </td>
                         <td style="width: 180px;">
-                            <div class="btn-group" role="group" aria-label="User actions">
-                                <a href="{{ path('admin_users_show', {id: user.id}) }}" 
-                                   class="btn btn-sm btn-info"
-                                   title="View Details"
-                                   data-bs-toggle="tooltip">
+                            <div class="btn-group" role="group">
+                                <a href="{{ path('admin_users_show', {id: user.id}) }}"
+                                   class="btn btn-sm btn-info" title="View Details" data-bs-toggle="tooltip">
                                     <i class="bi bi-eye"></i>
                                 </a>
-                                
+
                                 {% if user.accountStatus.value == 'ACTIVE' %}
-                                    <button type="button" 
-                                            class="btn btn-sm btn-warning"
-                                            onclick="confirmAction('{{ path('admin_users_suspend', {id: user.id}) }}', '{{ csrf_token('suspend-' ~ user.id) }}', 'Suspend this user? They will not be able to log in until reactivated.')"
-                                            title="{% if not canModify %}{{ isTargetAdmin ? 'Only Super Admins can suspend Admins' : 'Cannot suspend yourself' }}{% else %}Suspend User (Temporary){% endif %}"
+                                    <button type="button" class="btn btn-sm btn-warning"
+                                            onclick="confirmAction('{{ path('admin_users_suspend', {id: user.id}) }}', '{{ csrf_token('suspend-' ~ user.id) }}', 'Suspend this user?')"
+                                            title="{% if not canModify %}Cannot suspend{% else %}Suspend User{% endif %}"
                                             data-bs-toggle="tooltip"
                                             {% if not canModify %}disabled{% endif %}>
                                         <i class="bi bi-exclamation-triangle"></i>
                                     </button>
                                 {% else %}
-                                    <button type="button" 
-                                            class="btn btn-sm btn-success"
+                                    <button type="button" class="btn btn-sm btn-success"
                                             onclick="confirmAction('{{ path('admin_users_activate', {id: user.id}) }}', '{{ csrf_token('activate-' ~ user.id) }}', 'Reactivate this user?')"
-                                            title="{% if not canModify and user.accountStatus.value == 'BANNED' %}Only Super Admins can reactivate banned Admins{% else %}Reactivate User{% endif %}"
-                                            data-bs-toggle="tooltip"
+                                            title="Reactivate User" data-bs-toggle="tooltip"
                                             {% if not canModify and user.accountStatus.value == 'BANNED' and isTargetAdmin %}disabled{% endif %}>
                                         <i class="bi bi-check-circle"></i>
                                     </button>
                                 {% endif %}
-                                
-                                <button type="button" 
-                                        class="btn btn-sm btn-danger"
-                                        onclick="confirmAction('{{ path('admin_users_delete', {id: user.id}) }}', '{{ csrf_token('delete-' ~ user.id) }}', 'Permanently delete this user? This action cannot be undone!')"
-                                        title="{% if not canModify %}{{ isTargetAdmin ? 'Only Super Admins can delete Admins' : 'Cannot delete yourself' }}{% else %}Delete User{% endif %}"
+
+                                <button type="button" class="btn btn-sm btn-danger"
+                                        onclick="confirmAction('{{ path('admin_users_delete', {id: user.id}) }}', '{{ csrf_token('delete-' ~ user.id) }}', 'Permanently delete this user?')"
+                                        title="{% if not canModify %}Cannot delete{% else %}Delete User{% endif %}"
                                         data-bs-toggle="tooltip"
                                         {% if not canModify %}disabled{% endif %}>
                                     <i class="bi bi-trash"></i>
@@ -273,22 +276,18 @@
 {% if pagination.getTotalItemCount > 20 %}
 <div class="d-flex justify-content-between align-items-center mt-4 fade-in" style="animation-delay: 0.3s;">
     <div class="text-muted">
-        Showing {{ ((pagination.currentPageNumber - 1) * 20) + 1 }} 
-        to {{ min(pagination.currentPageNumber * 20, pagination.getTotalItemCount) }} 
+        Showing {{ ((pagination.currentPageNumber - 1) * 20) + 1 }}
+        to {{ min(pagination.currentPageNumber * 20, pagination.getTotalItemCount) }}
         of {{ pagination.getTotalItemCount }} entries
     </div>
-    
     <div class="pagination-wrapper">
         {{ knp_pagination_render(pagination, '@KnpPaginator/Pagination/bootstrap_v5_pagination.html.twig', {}, {
-            'search': search,
-            'role': roleFilter,
-            'status': statusFilter
+            'search': search, 'role': roleFilter, 'status': statusFilter
         }) }}
     </div>
 </div>
 {% endif %}
 
-{# Permission Info Alert #}
 {% if not is_granted('ROLE_SUPER_ADMIN') %}
 <div class="alert alert-info mt-4 fade-in" style="animation-delay: 0.4s;">
     <i class="bi bi-info-circle me-2"></i>
@@ -298,41 +297,261 @@
 {% endblock %}
 
 {% block javascripts %}
+<style>
+/* ── Voice search bar ── */
+.voice-search-bar {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.voice-mic-btn {
+    position: absolute;
+    right: 0.5rem;
+    background: none;
+    border: none;
+    color: rgba(255,255,255,0.35);
+    font-size: 0.95rem;
+    padding: 0.3rem 0.4rem;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: color .2s, background .2s;
+    line-height: 1;
+    z-index: 5;
+}
+.voice-mic-btn:hover { color: #fff; background: rgba(255,255,255,0.08); }
+
+/* Listening state */
+.voice-mic-btn.is-listening {
+    color: #ff4d4d;
+    background: rgba(255,77,77,0.12);
+    animation: mic_glow 1.2s ease-in-out infinite;
+}
+@keyframes mic_glow {
+    0%,100% { box-shadow: 0 0 0 0   rgba(255,77,77,.5); }
+    50%      { box-shadow: 0 0 0 7px rgba(255,77,77,0);  }
+}
+
+/* Input padding when mic is visible */
+.voice-search-bar input { padding-right: 2.4rem; }
+
+/* Status row */
+.voice-status {
+    display: flex;
+    align-items: center;
+    gap: .45rem;
+    margin-top: .3rem;
+    font-size: .75rem;
+    color: #ff7070;
+}
+.voice-pulse {
+    display: inline-block;
+    width: 7px; height: 7px;
+    border-radius: 50%;
+    background: #ff4d4d;
+    animation: v_blink 1s ease-in-out infinite;
+}
+@keyframes v_blink { 0%,100%{opacity:1} 50%{opacity:.1} }
+</style>
+
 <script>
-// Initialize Bootstrap tooltips
-document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', function () {
+
+    /* ── Tooltips ── */
     const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
-    tooltipTriggerList.map(function (tooltipTriggerEl) {
-        return new bootstrap.Tooltip(tooltipTriggerEl, {
-            delay: { show: 300, hide: 100 }
-        });
-    });
-    
-    // Enhanced search with live feedback
-    const searchInput = document.querySelector('input[name="search"]');
+    tooltipTriggerList.map(el => new bootstrap.Tooltip(el, { delay: { show: 300, hide: 100 } }));
+
+    /* ── Search bar border highlight ── */
+    const searchInput = document.getElementById('voiceSearchInput');
     if (searchInput) {
-        searchInput.addEventListener('input', function(e) {
-            const value = e.target.value;
-            const parent = e.target.closest('.search-bar');
-            
-            if (value.length > 0) {
-                parent.style.borderColor = 'rgba(102, 126, 234, 0.5)';
-            } else {
-                parent.style.borderColor = '';
-            }
+        searchInput.addEventListener('input', function () {
+            this.closest('.search-bar').style.borderColor =
+                this.value.length > 0 ? 'rgba(102,126,234,0.5)' : '';
         });
     }
-    
-    // Row highlight on hover
+
+    /* ── Row hover ── */
     document.querySelectorAll('.custom-table tbody tr').forEach(row => {
-        row.addEventListener('mouseenter', function() {
-            this.style.transform = 'translateX(2px)';
-        });
-        
-        row.addEventListener('mouseleave', function() {
-            this.style.transform = 'translateX(0)';
-        });
+        row.addEventListener('mouseenter', () => row.style.transform = 'translateX(2px)');
+        row.addEventListener('mouseleave', () => row.style.transform = 'translateX(0)');
     });
+
+    /* ════════════════════════════════════════════════════
+       Voice Search
+       Strategy:
+         1. Try Web Speech API (Chrome, Edge, Opera GX)
+         2. Fallback: MediaRecorder → Symfony → Whisper HF
+       ════════════════════════════════════════════════════ */
+    const micBtn      = document.getElementById('voiceMicBtn');
+    const statusDiv   = document.getElementById('voiceStatus');
+    const statusText  = document.getElementById('voiceStatusText');
+    const searchForm  = document.getElementById('searchForm');
+
+    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    const hasNativeSTT      = !!SpeechRecognition;
+    const hasMediaRecorder  = !!(navigator.mediaDevices && window.MediaRecorder);
+
+    // Show mic only if at least one method is available
+    if (hasNativeSTT || hasMediaRecorder) {
+        micBtn.style.display = 'flex';
+    }
+
+    let isListening    = false;
+    let recognition    = null;
+    let mediaRecorder  = null;
+    let audioChunks    = [];
+    let micStream      = null;
+
+    function setListening(on) {
+        isListening = on;
+        if (on) {
+            micBtn.classList.add('is-listening');
+            micBtn.innerHTML = '<i class="bi bi-stop-fill"></i>';
+            statusDiv.classList.remove('d-none');
+            statusText.textContent = 'Listening… speak now';
+        } else {
+            micBtn.classList.remove('is-listening');
+            micBtn.innerHTML = '<i class="bi bi-mic-fill"></i>';
+            statusDiv.classList.add('d-none');
+        }
+    }
+
+    function applyTranscript(text) {
+        const clean = text.trim();
+        if (!clean) return;
+        searchInput.value = clean;
+        // Auto-submit after short delay so user sees the text
+        setTimeout(() => searchForm.submit(), 600);
+    }
+
+    /* ── Method 1: Native Web Speech API ── */
+    function startNativeSTT() {
+        recognition = new SpeechRecognition();
+        recognition.lang            = 'en-US';
+        recognition.continuous      = false;
+        recognition.interimResults  = true;
+        recognition.maxAlternatives = 1;
+
+        recognition.onstart  = () => setListening(true);
+
+        recognition.onresult = (e) => {
+            let interim = '', final = '';
+            for (let i = e.resultIndex; i < e.results.length; i++) {
+                const t = e.results[i][0].transcript;
+                e.results[i].isFinal ? (final += t) : (interim += t);
+            }
+            searchInput.value = final || interim;
+            if (final) recognition.stop();
+        };
+
+        recognition.onerror = (e) => {
+            console.warn('Web Speech error:', e.error);
+            setListening(false);
+            if (e.error === 'not-allowed') {
+                alert('Microphone access denied.');
+            }
+        };
+
+        recognition.onend = () => {
+            const val = searchInput.value.trim();
+            setListening(false);
+            if (val) setTimeout(() => searchForm.submit(), 500);
+        };
+
+        recognition.start();
+    }
+
+    /* ── Method 2: MediaRecorder → Symfony → Whisper ── */
+    const TRANSCRIBE_URL = '{{ path("app_speech_transcribe") }}';
+
+    async function startMediaSTT() {
+        try {
+            micStream = await navigator.mediaDevices.getUserMedia({ audio: true });
+        } catch {
+            alert('Microphone access denied.');
+            return;
+        }
+
+        audioChunks = [];
+        const mime  = ['audio/webm;codecs=opus', 'audio/webm', 'audio/ogg', '']
+            .find(t => t === '' || MediaRecorder.isTypeSupported(t));
+
+        mediaRecorder = new MediaRecorder(micStream, mime ? { mimeType: mime } : {});
+        mediaRecorder.ondataavailable = e => { if (e.data?.size > 0) audioChunks.push(e.data); };
+
+        mediaRecorder.onstop = async () => {
+            micStream.getTracks().forEach(t => t.stop());
+            micStream = null;
+            setListening(false);
+
+            statusDiv.classList.remove('d-none');
+            statusText.textContent = 'Transcribing…';
+            statusDiv.querySelector('.voice-pulse').style.background = '#ffc107';
+
+            const blob     = new Blob(audioChunks, { type: mediaRecorder.mimeType || 'audio/webm' });
+            const formData = new FormData();
+            formData.append('audio', blob, 'search.webm');
+
+            try {
+                const res  = await fetch(TRANSCRIBE_URL, {
+                    method     : 'POST',
+                    body       : formData,
+                    credentials: 'same-origin',
+                    headers    : { 'X-Requested-With': 'XMLHttpRequest' },
+                });
+
+                const ct = res.headers.get('content-type') || '';
+                if (!ct.includes('application/json')) {
+                    alert('Session expired. Please refresh the page.');
+                    statusDiv.classList.add('d-none');
+                    return;
+                }
+
+                const data = await res.json();
+                statusDiv.classList.add('d-none');
+
+                if (res.ok && data.text) {
+                    applyTranscript(data.text);
+                } else {
+                    alert('Could not transcribe. Please try again.');
+                }
+            } catch (err) {
+                statusDiv.classList.add('d-none');
+                console.error(err);
+                alert('Server error. Check your connection.');
+            }
+
+            audioChunks   = [];
+            mediaRecorder = null;
+        };
+
+        mediaRecorder.start(250);
+        setListening(true);
+    }
+
+    function stopMediaSTT() {
+        if (mediaRecorder && mediaRecorder.state !== 'inactive') {
+            mediaRecorder.stop();
+        }
+    }
+
+    /* ── Mic button click ── */
+    micBtn.addEventListener('click', () => {
+        if (isListening) {
+            // Stop whatever is running
+            if (recognition) recognition.stop();
+            stopMediaSTT();
+            setListening(false);
+            return;
+        }
+
+        if (hasNativeSTT) {
+            startNativeSTT();           
+        } else if (hasMediaRecorder) {
+            startMediaSTT();            // Fallback via Whisper
+        }
+    });
+
 });
 </script>
 {% endblock %}

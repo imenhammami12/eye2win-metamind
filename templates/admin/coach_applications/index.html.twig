@@ -18,7 +18,6 @@
             </a>
         </div>
     </div>
-    
     <div class="col-md-4">
         <div class="stat-card">
             <div class="stat-card-icon" style="background: linear-gradient(135deg, #43e97b, #38f9d7);">
@@ -31,7 +30,6 @@
             </a>
         </div>
     </div>
-    
     <div class="col-md-4">
         <div class="stat-card">
             <div class="stat-card-icon" style="background: linear-gradient(135deg, #ff6b6b, #ee5a6f);">
@@ -54,34 +52,53 @@
             <i class="bi bi-chevron-down"></i>
         </button>
     </div>
-    
+
     <div class="collapse show" id="filterCollapse">
         <form method="get" class="p-3" id="filterForm">
             <div class="row g-3">
-                {# Search Bar #}
+
+                {# ── Search Bar with Voice Button ── #}
                 <div class="col-md-6">
                     <label class="form-label">
                         <i class="bi bi-search me-1"></i>Search
                     </label>
-                    <div class="input-group">
+                    <div class="input-group voice-input-group">
                         <span class="input-group-text"><i class="bi bi-search"></i></span>
-                        <input type="text" 
-                               name="search" 
-                               class="form-control" 
+                        <input type="text"
+                               name="search"
+                               class="form-control"
                                placeholder="Name, username, email, certifications..."
                                value="{{ search }}"
                                id="searchInput">
+
+                        {# Mic button — shown via JS if supported #}
+                        <button type="button"
+                                id="voiceMicBtn"
+                                class="btn btn-outline-secondary voice-mic-btn"
+                                title="Search by voice"
+                                style="display:none;">
+                            <i class="bi bi-mic-fill"></i>
+                        </button>
+
                         {% if search %}
-                            <button type="button" class="btn btn-outline-secondary" onclick="document.getElementById('searchInput').value=''; document.getElementById('filterForm').submit();">
+                            <button type="button" class="btn btn-outline-secondary"
+                                    onclick="document.getElementById('searchInput').value=''; document.getElementById('filterForm').submit();">
                                 <i class="bi bi-x"></i>
                             </button>
                         {% endif %}
                     </div>
+
+                    {# Listening indicator #}
+                    <div id="voiceStatus" class="voice-status d-none">
+                        <span class="voice-pulse"></span>
+                        <span id="voiceStatusText">Listening… speak now</span>
+                    </div>
+
                     <small class="text-muted">
                         <i class="bi bi-info-circle me-1"></i>Search in name, username, email, certifications, and experience
                     </small>
                 </div>
-                
+
                 {# Status Filter #}
                 <div class="col-md-3">
                     <label class="form-label">
@@ -96,7 +113,7 @@
                         {% endfor %}
                     </select>
                 </div>
-                
+
                 {# Sort By #}
                 <div class="col-md-3">
                     <label class="form-label">
@@ -105,16 +122,16 @@
                     <div class="input-group">
                         <select name="sort_by" class="form-select" onchange="this.form.submit()">
                             <option value="submittedAt" {{ sortBy == 'submittedAt' ? 'selected' : '' }}>Submitted Date</option>
-                            <option value="reviewedAt" {{ sortBy == 'reviewedAt' ? 'selected' : '' }}>Reviewed Date</option>
-                            <option value="status" {{ sortBy == 'status' ? 'selected' : '' }}>Status</option>
+                            <option value="reviewedAt"  {{ sortBy == 'reviewedAt'  ? 'selected' : '' }}>Reviewed Date</option>
+                            <option value="status"      {{ sortBy == 'status'      ? 'selected' : '' }}>Status</option>
                         </select>
                         <select name="sort_order" class="form-select" style="max-width: 100px;" onchange="this.form.submit()">
                             <option value="DESC" {{ sortOrder == 'DESC' ? 'selected' : '' }}>↓ DESC</option>
-                            <option value="ASC" {{ sortOrder == 'ASC' ? 'selected' : '' }}>↑ ASC</option>
+                            <option value="ASC"  {{ sortOrder == 'ASC'  ? 'selected' : '' }}>↑ ASC</option>
                         </select>
                     </div>
                 </div>
-                
+
                 {# Date Range #}
                 <div class="col-md-6">
                     <label class="form-label">
@@ -122,20 +139,12 @@
                     </label>
                     <div class="input-group">
                         <span class="input-group-text">From</span>
-                        <input type="date" 
-                               name="date_from" 
-                               class="form-control" 
-                               value="{{ dateFrom }}"
-                               onchange="this.form.submit()">
+                        <input type="date" name="date_from" class="form-control" value="{{ dateFrom }}" onchange="this.form.submit()">
                         <span class="input-group-text">To</span>
-                        <input type="date" 
-                               name="date_to" 
-                               class="form-control" 
-                               value="{{ dateTo }}"
-                               onchange="this.form.submit()">
+                        <input type="date" name="date_to"   class="form-control" value="{{ dateTo }}"   onchange="this.form.submit()">
                     </div>
                 </div>
-                
+
                 {# Action Buttons #}
                 <div class="col-md-6 d-flex align-items-end gap-2">
                     {% if statusFilter or search or dateFrom or dateTo %}
@@ -143,11 +152,9 @@
                             <i class="bi bi-x-lg me-1"></i>Clear All Filters
                         </a>
                     {% endif %}
-                    
                     <button type="submit" class="btn btn-primary flex-fill">
                         <i class="bi bi-funnel me-2"></i>Apply Filters
                     </button>
-                    
                     <a href="{{ path('admin_coaches_list') }}" class="btn btn-success flex-fill">
                         <i class="bi bi-award me-2"></i>View Coaches
                     </a>
@@ -173,7 +180,7 @@
     <div class="table-header">
         <h5><i class="bi bi-clipboard-check me-2"></i>Applications List ({{ pagination.getTotalItemCount }})</h5>
     </div>
-    
+
     <div class="table-responsive">
         <table class="custom-table table">
             <thead>
@@ -192,10 +199,9 @@
                     <tr class="fade-in" style="animation-delay: {{ loop.index * 0.05 }}s;">
                         <td>
                             {% if application.user.profilePicture %}
-                                <img src="{{ asset('uploads/profiles/' ~ application.user.profilePicture) }}" 
-                                     alt="{{ application.user.username }}" 
-                                     class="user-avatar-table"
-                                     loading="lazy">
+                                <img src="{{ asset('uploads/profiles/' ~ application.user.profilePicture) }}"
+                                     alt="{{ application.user.username }}"
+                                     class="user-avatar-table" loading="lazy">
                             {% else %}
                                 <div class="user-avatar-placeholder">
                                     {{ application.user.username|slice(0, 2)|upper }}
@@ -207,71 +213,50 @@
                                 <strong>{{ application.user.fullName ?? application.user.username }}</strong>
                             </a>
                             <br>
-                            <small class="text-muted">
-                                <i class="bi bi-at"></i>{{ application.user.username }}
-                            </small>
+                            <small class="text-muted"><i class="bi bi-at"></i>{{ application.user.username }}</small>
                         </td>
                         <td>
                             <a href="mailto:{{ application.user.email }}" class="text-decoration-none" style="color: #4facfe;">
                                 <i class="bi bi-envelope me-1"></i>
-                                <span style="display: inline-block; max-width: 180px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; vertical-align: middle;">{{ application.user.email }}</span>
+                                <span style="display:inline-block; max-width:180px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; vertical-align:middle;">{{ application.user.email }}</span>
                             </a>
                         </td>
                         <td>
                             <small class="text-muted">
-                                <i class="bi bi-calendar3 me-1"></i>
-                                {{ application.submittedAt|date('M d, Y') }}
-                                <br>
-                                <i class="bi bi-clock me-1"></i>
-                                {{ application.submittedAt|date('h:i A') }}
+                                <i class="bi bi-calendar3 me-1"></i>{{ application.submittedAt|date('M d, Y') }}<br>
+                                <i class="bi bi-clock me-1"></i>{{ application.submittedAt|date('h:i A') }}
                             </small>
                         </td>
                         <td>
-                            <span class="badge bg-{{ application.status.badgeClass }}">
-                                {{ application.status.label }}
-                            </span>
+                            <span class="badge bg-{{ application.status.badgeClass }}">{{ application.status.label }}</span>
                         </td>
                         <td>
                             {% if application.reviewedAt %}
                                 <small class="text-muted">
-                                    <i class="bi bi-check2 me-1"></i>
-                                    {{ application.reviewedAt|date('M d, Y') }}
-                                    <br>
-                                    <i class="bi bi-clock me-1"></i>
-                                    {{ application.reviewedAt|date('h:i A') }}
+                                    <i class="bi bi-check2 me-1"></i>{{ application.reviewedAt|date('M d, Y') }}<br>
+                                    <i class="bi bi-clock me-1"></i>{{ application.reviewedAt|date('h:i A') }}
                                 </small>
                             {% else %}
-                                <small class="text-muted">
-                                    <i class="bi bi-dash-circle me-1"></i>
-                                    Not reviewed
-                                </small>
+                                <small class="text-muted"><i class="bi bi-dash-circle me-1"></i>Not reviewed</small>
                             {% endif %}
                         </td>
                         <td>
                             <div class="btn-group" role="group">
-                                <a href="{{ path('admin_coach_applications_show', {id: application.id}) }}" 
-                                   class="btn btn-sm btn-info"
-                                   title="View Details"
-                                   data-bs-toggle="tooltip">
+                                <a href="{{ path('admin_coach_applications_show', {id: application.id}) }}"
+                                   class="btn btn-sm btn-info" title="View Details" data-bs-toggle="tooltip">
                                     <i class="bi bi-eye"></i>
                                 </a>
-                                
                                 {% if application.status.value != 'APPROVED' %}
-                                    <button type="button" 
-                                            class="btn btn-sm btn-success"
+                                    <button type="button" class="btn btn-sm btn-success"
                                             onclick="window.location.href='{{ path('admin_coach_applications_show', {id: application.id}) }}#approve-section'"
-                                            title="Approve"
-                                            data-bs-toggle="tooltip">
+                                            title="Approve" data-bs-toggle="tooltip">
                                         <i class="bi bi-check-circle"></i>
                                     </button>
                                 {% endif %}
-                                
                                 {% if application.status.value != 'REJECTED' %}
-                                    <button type="button" 
-                                            class="btn btn-sm btn-danger"
+                                    <button type="button" class="btn btn-sm btn-danger"
                                             onclick="window.location.href='{{ path('admin_coach_applications_show', {id: application.id}) }}#reject-section'"
-                                            title="Reject"
-                                            data-bs-toggle="tooltip">
+                                            title="Reject" data-bs-toggle="tooltip">
                                         <i class="bi bi-x-circle"></i>
                                     </button>
                                 {% endif %}
@@ -305,19 +290,15 @@
 {% if pagination.getTotalItemCount > 20 %}
 <div class="d-flex justify-content-between align-items-center mt-4 fade-in" style="animation-delay: 0.3s;">
     <div class="text-muted">
-        Showing {{ ((pagination.currentPageNumber - 1) * 20) + 1 }} 
-        to {{ min(pagination.currentPageNumber * 20, pagination.getTotalItemCount) }} 
+        Showing {{ ((pagination.currentPageNumber - 1) * 20) + 1 }}
+        to {{ min(pagination.currentPageNumber * 20, pagination.getTotalItemCount) }}
         of {{ pagination.getTotalItemCount }} entries
     </div>
-    
     <div class="pagination-wrapper">
         {{ knp_pagination_render(pagination, '@KnpPaginator/Pagination/bootstrap_v5_pagination.html.twig', {}, {
-            'status': statusFilter,
-            'search': search,
-            'date_from': dateFrom,
-            'date_to': dateTo,
-            'sort_by': sortBy,
-            'sort_order': sortOrder
+            'status': statusFilter, 'search': search,
+            'date_from': dateFrom, 'date_to': dateTo,
+            'sort_by': sortBy, 'sort_order': sortOrder
         }) }}
     </div>
 </div>
@@ -325,40 +306,213 @@
 {% endblock %}
 
 {% block javascripts %}
+<style>
+/* ── Voice mic button inside input-group ── */
+.voice-mic-btn {
+    transition: color .2s, background .2s, border-color .2s;
+}
+.voice-mic-btn.is-listening {
+    color: #ff4d4d !important;
+    border-color: #ff4d4d !important;
+    background: rgba(255,77,77,0.1) !important;
+    animation: mic_glow 1.2s ease-in-out infinite;
+}
+@keyframes mic_glow {
+    0%,100% { box-shadow: 0 0 0 0   rgba(255,77,77,.4); }
+    50%      { box-shadow: 0 0 0 6px rgba(255,77,77,0);  }
+}
+
+/* Status row */
+.voice-status {
+    display: flex;
+    align-items: center;
+    gap: .4rem;
+    margin-top: .3rem;
+    font-size: .75rem;
+    color: #ff7070;
+}
+.voice-pulse {
+    display: inline-block;
+    width: 7px; height: 7px;
+    border-radius: 50%;
+    background: #ff4d4d;
+    animation: v_blink 1s ease-in-out infinite;
+    flex-shrink: 0;
+}
+@keyframes v_blink { 0%,100%{opacity:1} 50%{opacity:.1} }
+</style>
+
 <script>
-document.addEventListener('DOMContentLoaded', function() {
-    // Initialize Bootstrap tooltips
-    const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
-    tooltipTriggerList.map(function (tooltipTriggerEl) {
-        return new bootstrap.Tooltip(tooltipTriggerEl, {
-            delay: { show: 300, hide: 100 }
-        });
-    });
-    
-    // Row highlight on hover
+document.addEventListener('DOMContentLoaded', function () {
+
+    /* ── Tooltips ── */
+    [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
+        .forEach(el => new bootstrap.Tooltip(el, { delay: { show: 300, hide: 100 } }));
+
+    /* ── Row hover ── */
     document.querySelectorAll('.custom-table tbody tr').forEach(row => {
-        row.addEventListener('mouseenter', function() {
-            this.style.transform = 'translateX(2px)';
-        });
-        
-        row.addEventListener('mouseleave', function() {
-            this.style.transform = 'translateX(0)';
-        });
+        row.addEventListener('mouseenter', () => row.style.transform = 'translateX(2px)');
+        row.addEventListener('mouseleave', () => row.style.transform = 'translateX(0)');
     });
-    
-    // Real-time search (optional - debounced)
-    const searchInput = document.getElementById('searchInput');
-    if (searchInput) {
-        let timeout;
-        searchInput.addEventListener('input', function() {
-            clearTimeout(timeout);
-            timeout = setTimeout(() => {
-                // Auto-submit after 500ms of no typing
-                // Uncomment the line below if you want auto-submit
-                // document.getElementById('filterForm').submit();
-            }, 500);
-        });
+
+    /* ════════════════════════════════════════════════════
+       Voice Search
+       1. Web Speech API  (Chrome / Edge / Opera GX)
+       2. Fallback: MediaRecorder → Symfony → Whisper HF
+       ════════════════════════════════════════════════════ */
+    const micBtn     = document.getElementById('voiceMicBtn');
+    const statusDiv  = document.getElementById('voiceStatus');
+    const statusText = document.getElementById('voiceStatusText');
+    const searchInp  = document.getElementById('searchInput');
+    const filterForm = document.getElementById('filterForm');
+
+    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    const hasNativeSTT      = !!SpeechRecognition;
+    const hasMediaRecorder  = !!(navigator.mediaDevices && window.MediaRecorder);
+
+    if (hasNativeSTT || hasMediaRecorder) {
+        micBtn.style.display = 'inline-flex';
     }
+
+    let isListening   = false;
+    let recognition   = null;
+    let mediaRecorder = null;
+    let audioChunks   = [];
+    let micStream     = null;
+
+    function setListening(on) {
+        isListening = on;
+        if (on) {
+            micBtn.classList.add('is-listening');
+            micBtn.innerHTML = '<i class="bi bi-stop-fill"></i>';
+            statusDiv.classList.remove('d-none');
+            statusDiv.querySelector('.voice-pulse').style.background = '#ff4d4d';
+            statusText.textContent = 'Listening… speak now';
+        } else {
+            micBtn.classList.remove('is-listening');
+            micBtn.innerHTML = '<i class="bi bi-mic-fill"></i>';
+            statusDiv.classList.add('d-none');
+        }
+    }
+
+    function applyAndSubmit(text) {
+        const clean = text.trim();
+        if (!clean) return;
+        searchInp.value = clean;
+        setTimeout(() => filterForm.submit(), 600);
+    }
+
+    /* ── Method 1: Native Web Speech API ── */
+    function startNativeSTT() {
+        recognition      = new SpeechRecognition();
+        recognition.lang = 'en-US';
+        recognition.continuous     = false;
+        recognition.interimResults = true;
+
+        recognition.onstart = () => setListening(true);
+
+        recognition.onresult = (e) => {
+            let interim = '', final = '';
+            for (let i = e.resultIndex; i < e.results.length; i++) {
+                const t = e.results[i][0].transcript;
+                e.results[i].isFinal ? (final += t) : (interim += t);
+            }
+            searchInp.value = final || interim;
+            if (final) recognition.stop();
+        };
+
+        recognition.onerror = (e) => {
+            setListening(false);
+            if (e.error === 'not-allowed') alert('Microphone access denied.');
+        };
+
+        recognition.onend = () => {
+            const val = searchInp.value.trim();
+            setListening(false);
+            if (val) setTimeout(() => filterForm.submit(), 500);
+        };
+
+        recognition.start();
+    }
+
+    /* ── Method 2: MediaRecorder → Symfony → Whisper ── */
+    const TRANSCRIBE_URL = '{{ path("app_speech_transcribe") }}';
+
+    async function startMediaSTT() {
+        try {
+            micStream = await navigator.mediaDevices.getUserMedia({ audio: true });
+        } catch {
+            alert('Microphone access denied.');
+            return;
+        }
+
+        audioChunks = [];
+        const mime  = ['audio/webm;codecs=opus', 'audio/webm', 'audio/ogg', '']
+            .find(t => t === '' || MediaRecorder.isTypeSupported(t));
+
+        mediaRecorder = new MediaRecorder(micStream, mime ? { mimeType: mime } : {});
+        mediaRecorder.ondataavailable = e => { if (e.data?.size > 0) audioChunks.push(e.data); };
+
+        mediaRecorder.onstop = async () => {
+            micStream.getTracks().forEach(t => t.stop());
+            micStream = null;
+            setListening(false);
+
+            // Show transcribing state
+            statusDiv.classList.remove('d-none');
+            statusDiv.querySelector('.voice-pulse').style.background = '#ffc107';
+            statusText.textContent = 'Transcribing…';
+
+            const blob = new Blob(audioChunks, { type: mediaRecorder.mimeType || 'audio/webm' });
+            audioChunks   = [];
+            mediaRecorder = null;
+
+            const formData = new FormData();
+            formData.append('audio', blob, 'search.webm');
+
+            try {
+                const res = await fetch(TRANSCRIBE_URL, {
+                    method     : 'POST',
+                    body       : formData,
+                    credentials: 'same-origin',
+                    headers    : { 'X-Requested-With': 'XMLHttpRequest' },
+                });
+
+                statusDiv.classList.add('d-none');
+
+                const ct = res.headers.get('content-type') || '';
+                if (!ct.includes('application/json')) {
+                    alert('Session expired. Please refresh the page.');
+                    return;
+                }
+
+                const data = await res.json();
+                if (res.ok && data.text) {
+                    applyAndSubmit(data.text);
+                } else {
+                    alert('Could not transcribe. Please try again.');
+                }
+            } catch (err) {
+                statusDiv.classList.add('d-none');
+                console.error(err);
+                alert('Server error. Check your connection.');
+            }
+        };
+
+        mediaRecorder.start(250);
+        setListening(true);
+    }
+
+    /* ── Mic button click ── */
+    micBtn.addEventListener('click', () => {
+        if (isListening) {
+            if (recognition)   recognition.stop();
+            if (mediaRecorder && mediaRecorder.state !== 'inactive') mediaRecorder.stop();
+            setListening(false);
+            return;
+        }
+        hasNativeSTT ? startNativeSTT() : startMediaSTT();
+    });
 });
 </script>
 {% endblock %}

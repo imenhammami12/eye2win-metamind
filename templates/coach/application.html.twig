@@ -8,9 +8,6 @@
 {% endblock %}
 
 {% block body %}
-<!-- Breadcrumb -->
-
-
 
 <section class="coach_application_section section_padding">
     <div class="container">
@@ -32,8 +29,6 @@
                 <div class="row">
                     <!-- Sidebar Info -->
                     <div class="col-lg-4">
-                  
-
                         <div class="benefits_card">
                             <h4><i class="fas fa-star"></i> Coach Benefits</h4>
                             <ul class="benefits_list">
@@ -52,10 +47,10 @@
                             <div class="form_header">
                                 <h3><i class="fas fa-file-alt"></i> APPLICATION FORM</h3>
                             </div>
-                            
+
                             <div class="form_body">
                                 {{ form_start(form, {'attr': {'id': 'coachApplicationForm', 'novalidate': 'novalidate'}}) }}
-                                
+
                                 <!-- Certifications Section -->
                                 <div class="form_section">
                                     <h4 class="section_title">
@@ -63,18 +58,36 @@
                                     </h4>
                                     <div class="form_group">
                                         {{ form_label(form.certifications, null, {'label_attr': {'class': 'form_label'}}) }}
-                                        <div class="textarea_wrapper">
-                                            {{ form_widget(form.certifications, {'attr': {'class': 'form_textarea', 'placeholder': '• Rank achieved: Diamond/Master/Grand Master
+                                        <div class="textarea_wrapper stt_wrapper">
+                                            {{ form_widget(form.certifications, {'attr': {
+                                                'class': 'form_textarea stt_field',
+                                                'data-stt': 'certifications',
+                                                'placeholder': '• Rank achieved: Diamond/Master/Grand Master
 • Tournaments: ESL, DreamHack, etc.
 • Certifications: Riot Games Certified Coach
-• Achievements: Top 100 EU, Regional Champion...'}}) }}
+• Achievements: Top 100 EU, Regional Champion...'
+                                            }}) }}
+
+                                            <button type="button"
+                                                    class="stt_mic_btn"
+                                                    data-stt-target="certifications"
+                                                    title="Click to dictate">
+                                                <i class="fas fa-microphone"></i>
+                                            </button>
+
                                             <span class="char_counter">
                                                 <span id="certifCount">0</span> / 50 min
                                             </span>
                                         </div>
+
+                                        <div class="stt_feedback d-none" id="stt-feedback-certifications">
+                                            <span class="stt_pulse"></span>
+                                            <span class="stt_label">Recording… click again to stop</span>
+                                        </div>
+
                                         {{ form_errors(form.certifications) }}
                                         <div class="input_hint">
-                                            <i class="fas fa-lightbulb"></i> 
+                                            <i class="fas fa-lightbulb"></i>
                                             Mention your ranks, official certifications, tournament participations, major achievements
                                         </div>
                                     </div>
@@ -87,19 +100,37 @@
                                     </h4>
                                     <div class="form_group">
                                         {{ form_label(form.experience, null, {'label_attr': {'class': 'form_label'}}) }}
-                                        <div class="textarea_wrapper">
-                                            {{ form_widget(form.experience, {'attr': {'class': 'form_textarea', 'placeholder': '• Years of experience: 3 years of esports coaching
+                                        <div class="textarea_wrapper stt_wrapper">
+                                            {{ form_widget(form.experience, {'attr': {
+                                                'class': 'form_textarea stt_field',
+                                                'data-stt': 'experience',
+                                                'placeholder': '• Years of experience: 3 years of esports coaching
 • Teams coached: Team X (2020-2022), solo players (50+)
 • Results: LEC qualification, average improvement +2 ranks
 • Methodology: VOD analysis, custom drills, mental coaching
-• Specialties: Mid lane, macro game, draft strategy...'}}) }}
+• Specialties: Mid lane, macro game, draft strategy...'
+                                            }}) }}
+
+                                            <button type="button"
+                                                    class="stt_mic_btn"
+                                                    data-stt-target="experience"
+                                                    title="Click to dictate">
+                                                <i class="fas fa-microphone"></i>
+                                            </button>
+
                                             <span class="char_counter">
                                                 <span id="expCount">0</span> / 100 min
                                             </span>
                                         </div>
+
+                                        <div class="stt_feedback d-none" id="stt-feedback-experience">
+                                            <span class="stt_pulse"></span>
+                                            <span class="stt_label">Recording… click again to stop</span>
+                                        </div>
+
                                         {{ form_errors(form.experience) }}
                                         <div class="input_hint">
-                                            <i class="fas fa-lightbulb"></i> 
+                                            <i class="fas fa-lightbulb"></i>
                                             Detail your background, methodology, concrete results, gaming specialties
                                         </div>
                                     </div>
@@ -135,7 +166,7 @@
                                         </div>
                                         {{ form_errors(form.cvFileUpload) }}
                                         <div class="input_hint">
-                                            <i class="fas fa-info-circle"></i> 
+                                            <i class="fas fa-info-circle"></i>
                                             Increase your chances by adding your CV with your gaming and coaching experience
                                         </div>
                                     </div>
@@ -161,7 +192,7 @@
                                         <i class="fas fa-paper-plane"></i> Submit my application
                                     </button>
                                 </div>
-                                
+
                                 {{ form_end(form) }}
                             </div>
                         </div>
@@ -176,71 +207,281 @@
 
 {% block javascripts %}
     {{ parent() }}
+    <style>
+    .stt_wrapper { position: relative; }
+
+    .stt_mic_btn {
+        position: absolute;
+        top: 0.6rem;
+        right: 0.6rem;
+        background: none;
+        border: none;
+        color: rgba(255,255,255,0.4);
+        font-size: 1rem;
+        padding: 0.35rem 0.45rem;
+        border-radius: 6px;
+        cursor: pointer;
+        transition: color .2s, background .2s;
+        line-height: 1;
+        z-index: 5;
+    }
+    .stt_mic_btn:hover    { color: #fff; background: rgba(255,255,255,0.08); }
+    .stt_mic_btn:disabled { opacity: 0.35; cursor: not-allowed; }
+
+    .stt_mic_btn.is-recording {
+        color: #ff4d4d;
+        background: rgba(255,77,77,0.12);
+        animation: stt_glow 1.4s ease-in-out infinite;
+    }
+    @keyframes stt_glow {
+        0%,100% { box-shadow: 0 0 0 0   rgba(255,77,77,.5); }
+        50%      { box-shadow: 0 0 0 8px rgba(255,77,77,0);  }
+    }
+    .stt_mic_btn.is-transcribing { color: #ffc107; background: rgba(255,193,7,0.1); animation: none; }
+
+    .stt_field.is-listening {
+        border-color: rgba(255,77,77,0.5) !important;
+        box-shadow: 0 0 0 2px rgba(255,77,77,0.12) !important;
+    }
+
+    .stt_feedback {
+        display: flex; align-items: center; gap: .5rem;
+        margin-top: .35rem; font-size: .78rem; color: #ff7070;
+    }
+    .stt_feedback.transcribing .stt_label { color: #ffc107; }
+    .stt_pulse {
+        display: inline-block; width: 8px; height: 8px;
+        border-radius: 50%; background: #ff4d4d; flex-shrink: 0;
+        animation: stt_blink 1s ease-in-out infinite;
+    }
+    .stt_feedback.transcribing .stt_pulse { background: #ffc107; animation: none; }
+    @keyframes stt_blink { 0%,100%{opacity:1} 50%{opacity:.1} }
+    </style>
+
     <script>
-        // Character counters
-        const certifTextarea = document.querySelector('textarea[name*="certifications"]');
-        const certifCount = document.getElementById('certifCount');
-        const expTextarea = document.querySelector('textarea[name*="experience"]');
-        const expCount = document.getElementById('expCount');
-        
-        if (certifTextarea && certifCount) {
-            certifTextarea.addEventListener('input', function() {
-                certifCount.textContent = this.value.length;
-                if (this.value.length < 50) {
-                    certifCount.parentElement.style.color = '#f44a40';
-                } else {
-                    certifCount.parentElement.style.color = '#4cd3e3';
-                }
+    /* ── Character counters ── */
+    const certifTextarea = document.querySelector('textarea[data-stt="certifications"]');
+    const certifCount    = document.getElementById('certifCount');
+    const expTextarea    = document.querySelector('textarea[data-stt="experience"]');
+    const expCount       = document.getElementById('expCount');
+
+    if (certifTextarea && certifCount) {
+        certifTextarea.addEventListener('input', function() {
+            certifCount.textContent = this.value.length;
+            certifCount.parentElement.style.color = this.value.length < 50 ? '#f44a40' : '#4cd3e3';
+        });
+        certifCount.textContent = certifTextarea.value.length;
+    }
+    if (expTextarea && expCount) {
+        expTextarea.addEventListener('input', function() {
+            expCount.textContent = this.value.length;
+            expCount.parentElement.style.color = this.value.length < 100 ? '#f44a40' : '#4cd3e3';
+        });
+        expCount.textContent = expTextarea.value.length;
+    }
+
+    /* ── CV file upload ── */
+    const fileInput    = document.getElementById('cvFileInput');
+    const fileSelected = document.getElementById('fileSelected');
+    const fileName     = document.getElementById('fileName');
+    const removeFile   = document.getElementById('removeFile');
+    const uploadLabel  = document.querySelector('.cv_upload_label');
+
+    if (fileInput) {
+        fileInput.addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (file) {
+                fileName.textContent = file.name;
+                fileSelected.style.display = 'flex';
+                uploadLabel.style.display  = 'none';
+            }
+        });
+        if (removeFile) {
+            removeFile.addEventListener('click', function() {
+                fileInput.value = '';
+                fileSelected.style.display = 'none';
+                uploadLabel.style.display  = 'flex';
             });
-            certifCount.textContent = certifTextarea.value.length;
         }
-        
-        if (expTextarea && expCount) {
-            expTextarea.addEventListener('input', function() {
-                expCount.textContent = this.value.length;
-                if (this.value.length < 100) {
-                    expCount.parentElement.style.color = '#f44a40';
-                } else {
-                    expCount.parentElement.style.color = '#4cd3e3';
-                }
-            });
-            expCount.textContent = expTextarea.value.length;
+    }
+
+    /* ── Form submit spinner ── */
+    const coachForm = document.getElementById('coachApplicationForm');
+    if (coachForm) {
+        coachForm.addEventListener('submit', function() {
+            const submitBtn = coachForm.querySelector('.btn_submit');
+            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Sending...';
+            submitBtn.disabled  = true;
+        });
+    }
+
+    /* ════════════════════════════════════════════════════════
+       Speech-to-Text
+       Utilise data-stt="certifications" / "experience"
+       au lieu des IDs générés par Symfony → toujours trouvé
+       ════════════════════════════════════════════════════════ */
+    (function () {
+        'use strict';
+
+        const TRANSCRIBE_URL = '{{ path("app_speech_transcribe") }}';
+
+        if (!navigator.mediaDevices || !window.MediaRecorder) {
+            document.querySelectorAll('.stt_mic_btn').forEach(b => b.remove());
+            return;
         }
-        
-        // CV File upload handler
-        const fileInput = document.getElementById('cvFileInput');
-        const fileSelected = document.getElementById('fileSelected');
-        const fileName = document.getElementById('fileName');
-        const removeFile = document.getElementById('removeFile');
-        const uploadLabel = document.querySelector('.cv_upload_label');
-        
-        if (fileInput) {
-            fileInput.addEventListener('change', function(e) {
-                const file = e.target.files[0];
-                if (file) {
-                    fileName.textContent = file.name;
-                    fileSelected.style.display = 'flex';
-                    uploadLabel.style.display = 'none';
-                }
-            });
-            
-            if (removeFile) {
-                removeFile.addEventListener('click', function() {
-                    fileInput.value = '';
-                    fileSelected.style.display = 'none';
-                    uploadLabel.style.display = 'flex';
-                });
+
+        let mediaRecorder = null;
+        let audioChunks   = [];
+        let activeTarget  = null;
+        let micStream     = null;
+
+        // ── Helpers — cherche par data-stt, pas par id ──
+        const getField    = key => document.querySelector(`textarea[data-stt="${key}"]`);
+        const getMicBtn   = key => document.querySelector(`.stt_mic_btn[data-stt-target="${key}"]`);
+        const getFeedback = key => document.getElementById('stt-feedback-' + key);
+
+        function setRecordingUI(key, on) {
+            const btn   = getMicBtn(key);
+            const field = getField(key);
+            const fb    = getFeedback(key);
+            if (on) {
+                btn.classList.add('is-recording');
+                btn.innerHTML = '<i class="fas fa-stop"></i>';
+                field.classList.add('is-listening');
+                fb.classList.remove('d-none', 'transcribing');
+                fb.querySelector('.stt_label').textContent = 'Recording… click again to stop';
+            } else {
+                btn.classList.remove('is-recording');
+                btn.innerHTML = '<i class="fas fa-microphone"></i>';
+                field.classList.remove('is-listening');
             }
         }
-        
-        // Form submission
-        const form = document.getElementById('coachApplicationForm');
-        if (form) {
-            form.addEventListener('submit', function(e) {
-                const submitBtn = form.querySelector('.btn_submit');
-                submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Sending...';
-                submitBtn.disabled = true;
-            });
+
+        function setTranscribingUI(key) {
+            const btn = getMicBtn(key);
+            const fb  = getFeedback(key);
+            btn.classList.remove('is-recording');
+            btn.classList.add('is-transcribing');
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+            btn.disabled  = true;
+            fb.classList.add('transcribing');
+            fb.querySelector('.stt_label').textContent = 'Transcribing…';
         }
+
+        function resetUI(key) {
+            const btn = getMicBtn(key);
+            const fb  = getFeedback(key);
+            btn.classList.remove('is-recording', 'is-transcribing');
+            btn.innerHTML = '<i class="fas fa-microphone"></i>';
+            btn.disabled  = false;
+            fb.classList.add('d-none');
+            fb.classList.remove('transcribing');
+        }
+
+        async function startRecording(key) {
+            try {
+                micStream = await navigator.mediaDevices.getUserMedia({ audio: true });
+            } catch {
+                alert('Microphone access denied. Please allow it in your browser settings.');
+                return;
+            }
+
+            audioChunks  = [];
+            activeTarget = key;
+
+            const mime = ['audio/webm;codecs=opus', 'audio/webm', 'audio/ogg', '']
+                .find(t => t === '' || MediaRecorder.isTypeSupported(t));
+
+            mediaRecorder = new MediaRecorder(micStream, mime ? { mimeType: mime } : {});
+            mediaRecorder.ondataavailable = e => { if (e.data?.size > 0) audioChunks.push(e.data); };
+
+            mediaRecorder.onstop = async () => {
+                micStream.getTracks().forEach(t => t.stop());
+                micStream = null;
+
+                const blob = new Blob(audioChunks, { type: mediaRecorder.mimeType || 'audio/webm' });
+                audioChunks = [];
+
+                setTranscribingUI(key);
+                await sendToServer(blob, key);
+                resetUI(key);
+                activeTarget  = null;
+                mediaRecorder = null;
+            };
+
+            mediaRecorder.start(250);
+            setRecordingUI(key, true);
+        }
+
+        function stopRecording(key) {
+            if (!mediaRecorder || mediaRecorder.state === 'inactive') return;
+            setRecordingUI(key, false);
+            mediaRecorder.stop();
+        }
+
+        async function sendToServer(blob, key, retryCount = 0) {
+            const field    = getField(key);
+            const formData = new FormData();
+            formData.append('audio', blob, 'recording.webm');
+
+            try {
+                const res = await fetch(TRANSCRIBE_URL, {
+                    method     : 'POST',
+                    body       : formData,
+                    credentials: 'same-origin',
+                    headers    : { 'X-Requested-With': 'XMLHttpRequest' },
+                });
+
+                const contentType = res.headers.get('content-type') || '';
+                if (!contentType.includes('application/json')) {
+                    alert('Session expired. Please refresh the page and log in again.');
+                    return;
+                }
+
+                const data = await res.json();
+
+                if (res.status === 503 && retryCount < 1) {
+                    const wait = (data.retry_after ?? 20) * 1000;
+                    getFeedback(key).querySelector('.stt_label').textContent =
+                        `Model loading, retrying in ${Math.ceil(wait / 1000)}s…`;
+                    await new Promise(r => setTimeout(r, wait));
+                    return sendToServer(blob, key, retryCount + 1);
+                }
+
+                if (!res.ok) {
+                    alert('Server error: ' + JSON.stringify(data.error || data));
+                    return;
+                }
+
+                const transcript = (data.text || '').trim();
+                if (transcript) {
+                    const current   = field.value.trimEnd();
+                    field.value     = current ? current + ' ' + transcript : transcript;
+                    field.scrollTop = field.scrollHeight;
+                    field.dispatchEvent(new Event('input', { bubbles: true }));
+                } else {
+                    alert('No speech detected. Please try again.');
+                }
+
+            } catch (err) {
+                console.error(err);
+                alert('Could not reach the server. Check your connection.');
+            }
+        }
+
+        document.querySelectorAll('.stt_mic_btn').forEach(btn => {
+            btn.addEventListener('click', async () => {
+                const key = btn.dataset.sttTarget;
+                if (activeTarget === key) {
+                    stopRecording(key);
+                } else if (activeTarget !== null) {
+                    stopRecording(activeTarget);
+                    setTimeout(() => startRecording(key), 400);
+                } else {
+                    await startRecording(key);
+                }
+            });
+        });
+    })();
     </script>
 {% endblock %}
