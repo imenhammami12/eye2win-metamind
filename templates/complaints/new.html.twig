@@ -19,7 +19,7 @@
     <div class="container">
         <div class="row justify-content-center">
             <div class="col-lg-8">
-                <div class="card" style="background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 12px;">
+                <div class="card" style="background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 12px;">
                     <div class="card-body p-4">
                         <div class="text-center mb-4">
                             <h3>Submit a Support Ticket</h3>
@@ -36,17 +36,17 @@
                                     {% for category in categories %}
                                     <div class="col-md-6">
                                         <div class="category-option">
-                                            <input type="radio" 
-                                                   class="btn-check" 
-                                                   name="category" 
-                                                   id="category_{{ category.value }}" 
+                                            <input type="radio"
+                                                   class="btn-check"
+                                                   name="category"
+                                                   id="category_{{ category.value }}"
                                                    value="{{ category.value }}"
                                                    required>
-                                            <label class="btn btn-outline-light w-100 text-start" 
+                                            <label class="btn btn-outline-light w-100 text-start"
                                                    for="category_{{ category.value }}"
-                                                   style="border: 2px solid rgba(255, 255, 255, 0.1); border-radius: 8px; padding: 1rem;">
+                                                   style="border: 2px solid rgba(255,255,255,0.1); border-radius: 8px; padding: 1rem;">
                                                 <div class="d-flex align-items-start">
-                                                    <i class="{{ category.icon }} me-3" style="font-size: 1.5rem; color: rgba(255, 255, 255, 0.6);"></i>
+                                                    <i class="{{ category.icon }} me-3" style="font-size:1.5rem; color:rgba(255,255,255,0.6);"></i>
                                                     <div>
                                                         <strong class="d-block mb-1">{{ category.label }}</strong>
                                                         <small class="text-muted">{{ category.description }}</small>
@@ -62,55 +62,71 @@
                             <!-- Subject -->
                             <div class="mb-4">
                                 <label for="subject" class="form-label">Subject *</label>
-                                <input type="text" 
-                                       class="form-control" 
-                                       id="subject" 
-                                       name="subject" 
-                                       placeholder="Brief summary of your issue"
-                                       minlength="5"
-                                       maxlength="200"
-                                       required>
+                                <div class="input-mic-wrapper">
+                                    <input type="text"
+                                           class="form-control form-control-mic"
+                                           id="subject"
+                                           name="subject"
+                                           placeholder="Brief summary of your issue"
+                                           minlength="5"
+                                           maxlength="200"
+                                           required>
+                                    <button type="button" class="mic-btn" data-target="subject" title="Click to dictate">
+                                        <i class="fas fa-microphone"></i>
+                                    </button>
+                                </div>
+                                <div class="stt-feedback d-none" id="stt-feedback-subject">
+                                    <span class="stt-pulse"></span>
+                                    <span class="stt-label">Recording… click again to stop</span>
+                                </div>
                                 <small class="form-text text-muted">Minimum 5 characters, maximum 200 characters</small>
                             </div>
 
                             <!-- Description -->
                             <div class="mb-4">
                                 <label for="description" class="form-label">Description *</label>
-                                <textarea class="form-control" 
-                                          id="description" 
-                                          name="description" 
-                                          rows="6" 
-                                          placeholder="Please provide detailed information about your issue..."
-                                          minlength="10"
-                                          required></textarea>
+                                <div class="input-mic-wrapper textarea-mic-wrapper">
+                                    <textarea class="form-control form-control-mic"
+                                              id="description"
+                                              name="description"
+                                              rows="6"
+                                              placeholder="Please provide detailed information about your issue..."
+                                              minlength="10"
+                                              required></textarea>
+                                    <button type="button" class="mic-btn mic-btn-textarea" data-target="description" title="Click to dictate">
+                                        <i class="fas fa-microphone"></i>
+                                    </button>
+                                </div>
+                                <div class="stt-feedback d-none" id="stt-feedback-description">
+                                    <span class="stt-pulse"></span>
+                                    <span class="stt-label">Recording… click again to stop</span>
+                                </div>
                                 <small class="form-text text-muted">Be as detailed as possible to help us resolve your issue quickly</small>
                             </div>
 
                             <!-- Attachment -->
                             <div class="mb-4">
                                 <label for="attachment" class="form-label">Attachment (Optional)</label>
-                                <input type="file" 
-                                       class="form-control" 
-                                       id="attachment" 
+                                <input type="file"
+                                       class="form-control"
+                                       id="attachment"
                                        name="attachment"
                                        accept="image/*,.pdf,.doc,.docx">
-                                <small class="form-text text-muted">You can attach screenshots or documents to help explain your issue (Max 5MB)</small>
+                                <small class="form-text text-muted">Screenshots or documents — Max 5MB</small>
                             </div>
 
-                            <!-- Information Box -->
-                            <div class="alert alert-info" style="background: rgba(13, 110, 253, 0.1); border: 1px solid rgba(13, 110, 253, 0.3);">
-                                <h6 class="alert-heading">
-                                    <i class="fas fa-info-circle"></i> What happens next?
-                                </h6>
-                                <ul class="mb-0" style="padding-left: 1.5rem;">
+                            <!-- Info box -->
+                            <div class="alert alert-info" style="background:rgba(13,110,253,0.1); border:1px solid rgba(13,110,253,0.3);">
+                                <h6 class="alert-heading"><i class="fas fa-info-circle"></i> What happens next?</h6>
+                                <ul class="mb-0" style="padding-left:1.5rem;">
                                     <li>Your complaint will be reviewed by our support team</li>
-                                    <li>You'll receive a response within 24-48 hours</li>
+                                    <li>You'll receive a response within 24–48 hours</li>
                                     <li>You can track the status of your complaint anytime</li>
                                     <li>You'll be notified when there's an update</li>
                                 </ul>
                             </div>
 
-                            <!-- Submit Buttons -->
+                            <!-- Buttons -->
                             <div class="d-flex gap-2 justify-content-end">
                                 <a href="{{ path('app_complaints_index') }}" class="btn btn-outline-light">
                                     <i class="fas fa-times"></i> Cancel
@@ -123,15 +139,13 @@
                     </div>
                 </div>
 
-                <!-- Help Section -->
-                <div class="card mt-4" style="background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.05); border-radius: 12px;">
+                <!-- Help -->
+                <div class="card mt-4" style="background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.05); border-radius:12px;">
                     <div class="card-body">
                         <h5><i class="fas fa-question-circle"></i> Need Help?</h5>
                         <p class="text-muted mb-0">
-                            Before submitting a complaint, you might want to check our 
-                            <a href="#" class="text-decoration-none">FAQ section</a> or 
-                            <a href="#" class="text-decoration-none">Knowledge Base</a> 
-                            for quick answers to common questions.
+                            Check our <a href="#" class="text-decoration-none">FAQ</a> or
+                            <a href="#" class="text-decoration-none">Knowledge Base</a> for quick answers.
                         </p>
                     </div>
                 </div>
@@ -141,54 +155,222 @@
 </section>
 
 <style>
-.category-option {
-    height: 100%;
+.category-option { height: 100%; }
+.category-option .btn-check:checked + .btn { background-color: rgba(255,255,255,0.1); border-color: #007bff; }
+.form-control { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); color: white; }
+.form-control:focus { background: rgba(255,255,255,0.08); border-color: #007bff; color: white; box-shadow: none; }
+.form-control::placeholder { color: rgba(255,255,255,0.4); }
+.form-label { font-weight: 600; color: rgba(255,255,255,0.9); }
+
+/* Mic layout */
+.input-mic-wrapper { position: relative; display: flex; align-items: center; }
+.input-mic-wrapper .form-control-mic { padding-right: 3rem; }
+.textarea-mic-wrapper { align-items: flex-start; }
+
+/* Mic button */
+.mic-btn {
+    position: absolute; right: 0.6rem; top: 50%; transform: translateY(-50%);
+    background: none; border: none; color: rgba(255,255,255,0.45);
+    font-size: 1rem; padding: 0.35rem 0.45rem; border-radius: 6px;
+    cursor: pointer; transition: color .2s, background .2s; line-height: 1; z-index: 5;
+}
+.mic-btn-textarea { top: 0.6rem; transform: none; }
+.mic-btn:hover { color: #fff; background: rgba(255,255,255,0.08); }
+.mic-btn:disabled { opacity: 0.35; cursor: not-allowed; }
+
+/* States */
+.mic-btn.is-recording {
+    color: #ff4d4d; background: rgba(255,77,77,0.12);
+    animation: mic-glow 1.4s ease-in-out infinite;
+}
+@keyframes mic-glow {
+    0%,100% { box-shadow: 0 0 0 0   rgba(255,77,77,.5); }
+    50%      { box-shadow: 0 0 0 8px rgba(255,77,77,0);  }
+}
+.mic-btn.is-transcribing { color: #ffc107; background: rgba(255,193,7,0.1); animation: none; }
+.form-control.is-listening {
+    border-color: rgba(255,77,77,0.5) !important;
+    box-shadow: 0 0 0 2px rgba(255,77,77,0.12) !important;
 }
 
-.category-option .btn-check:checked + .btn {
-    background-color: rgba(255, 255, 255, 0.1);
-    border-color: #007bff;
-}
-
-.form-control {
-    background: rgba(255, 255, 255, 0.05);
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    color: white;
-}
-
-.form-control:focus {
-    background: rgba(255, 255, 255, 0.08);
-    border-color: #007bff;
-    color: white;
-}
-
-.form-control::placeholder {
-    color: rgba(255, 255, 255, 0.4);
-}
-
-.form-label {
-    font-weight: 600;
-    color: rgba(255, 255, 255, 0.9);
-}
+/* Feedback row */
+.stt-feedback { display:flex; align-items:center; gap:.5rem; margin-top:.35rem; font-size:.78rem; color:#ff7070; }
+.stt-feedback.transcribing .stt-label { color: #ffc107; }
+.stt-pulse { display:inline-block; width:8px; height:8px; border-radius:50%; background:#ff4d4d; flex-shrink:0; animation:dot-blink 1s ease-in-out infinite; }
+.stt-feedback.transcribing .stt-pulse { background:#ffc107; animation:none; }
+@keyframes dot-blink { 0%,100%{opacity:1} 50%{opacity:.1} }
 </style>
 
 <script>
-// File size validation
-document.getElementById('attachment').addEventListener('change', function(e) {
-    const file = e.target.files[0];
-    if (file && file.size > 5 * 1024 * 1024) { // 5MB
-        alert('File size must be less than 5MB');
-        e.target.value = '';
-    }
-});
+(function () {
+    'use strict';
 
-// Character counter for description
-const descriptionField = document.getElementById('description');
-if (descriptionField) {
-    descriptionField.addEventListener('input', function() {
-        const length = this.value.length;
-        // You can add a character counter here if needed
+    const TRANSCRIBE_URL = '{{ path("app_speech_transcribe") }}';
+
+    if (!navigator.mediaDevices || !window.MediaRecorder) {
+        document.querySelectorAll('.mic-btn').forEach(b => b.remove());
+        document.querySelectorAll('.form-control-mic').forEach(f => f.style.paddingRight = '');
+        return;
+    }
+
+    let mediaRecorder = null;
+    let audioChunks   = [];
+    let activeTarget  = null;
+    let micStream     = null;
+
+    const getFeedback = id => document.getElementById('stt-feedback-' + id);
+    const getMicBtn   = id => document.querySelector(`.mic-btn[data-target="${id}"]`);
+    const getField    = id => document.getElementById(id);
+
+    function setRecordingUI(id, on) {
+        const btn = getMicBtn(id), field = getField(id), fb = getFeedback(id);
+        if (on) {
+            btn.classList.add('is-recording');
+            btn.innerHTML = '<i class="fas fa-stop"></i>';
+            field.classList.add('is-listening');
+            fb.classList.remove('d-none', 'transcribing');
+            fb.querySelector('.stt-label').textContent = 'Recording… click again to stop';
+        } else {
+            btn.classList.remove('is-recording');
+            btn.innerHTML = '<i class="fas fa-microphone"></i>';
+            field.classList.remove('is-listening');
+        }
+    }
+
+    function setTranscribingUI(id) {
+        const btn = getMicBtn(id), fb = getFeedback(id);
+        btn.classList.remove('is-recording');
+        btn.classList.add('is-transcribing');
+        btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+        btn.disabled  = true;
+        fb.classList.add('transcribing');
+        fb.querySelector('.stt-label').textContent = 'Transcribing…';
+    }
+
+    function resetUI(id) {
+        const btn = getMicBtn(id), fb = getFeedback(id);
+        btn.classList.remove('is-recording', 'is-transcribing');
+        btn.innerHTML = '<i class="fas fa-microphone"></i>';
+        btn.disabled  = false;
+        fb.classList.add('d-none');
+        fb.classList.remove('transcribing');
+    }
+
+    async function startRecording(targetId) {
+        try {
+            micStream = await navigator.mediaDevices.getUserMedia({ audio: true });
+        } catch {
+            alert('Microphone access denied. Please allow it in your browser settings.');
+            return;
+        }
+
+        audioChunks  = [];
+        activeTarget = targetId;
+
+        const mime = ['audio/webm;codecs=opus', 'audio/webm', 'audio/ogg', '']
+            .find(t => t === '' || MediaRecorder.isTypeSupported(t));
+
+        mediaRecorder = new MediaRecorder(micStream, mime ? { mimeType: mime } : {});
+        mediaRecorder.ondataavailable = e => { if (e.data?.size > 0) audioChunks.push(e.data); };
+
+        mediaRecorder.onstop = async () => {
+            micStream.getTracks().forEach(t => t.stop());
+            micStream = null;
+
+            const blob = new Blob(audioChunks, { type: mediaRecorder.mimeType || 'audio/webm' });
+            audioChunks = [];
+
+            setTranscribingUI(targetId);
+            await sendToServer(blob, targetId);
+            resetUI(targetId);
+            activeTarget = null;
+            mediaRecorder = null;
+        };
+
+        mediaRecorder.start(250);
+        setRecordingUI(targetId, true);
+    }
+
+    function stopRecording(targetId) {
+        if (!mediaRecorder || mediaRecorder.state === 'inactive') return;
+        setRecordingUI(targetId, false);
+        mediaRecorder.stop();
+    }
+
+async function sendToServer(blob, targetId, retryCount = 0) {
+        const field    = getField(targetId);
+        const formData = new FormData();
+        formData.append('audio', blob, 'recording.webm');
+
+        try {
+            const res = await fetch(TRANSCRIBE_URL, {
+                method     : 'POST',
+                body       : formData,
+                credentials: 'same-origin',   // ← envoie le cookie de session Symfony
+                headers    : {
+                    'X-Requested-With': 'XMLHttpRequest',  // ← identifie la requête comme AJAX
+                },
+            });
+
+            // Si Symfony retourne du HTML (page login), ce n'est pas du JSON
+            const contentType = res.headers.get('content-type') || '';
+            if (!contentType.includes('application/json')) {
+                alert('Session expirée. Veuillez rafraîchir la page et vous reconnecter.');
+                return;
+            }
+
+            const data = await res.json();
+
+            if (res.status === 503 && retryCount < 1) {
+                const wait = (data.retry_after ?? 20) * 1000;
+                getFeedback(targetId).querySelector('.stt-label').textContent =
+                    `Model loading, retrying in ${Math.ceil(wait / 1000)}s…`;
+                await new Promise(r => setTimeout(r, wait));
+                return sendToServer(blob, targetId, retryCount + 1);
+            }
+
+            if (!res.ok) {
+                alert('Server error: ' + JSON.stringify(data.error || data));
+                return;
+            }
+
+            const transcript = (data.text || '').trim();
+            if (transcript) {
+                const current = field.value.trimEnd();
+                field.value   = current ? current + ' ' + transcript : transcript;
+                if (field.tagName === 'TEXTAREA') field.scrollTop = field.scrollHeight;
+                field.dispatchEvent(new Event('input', { bubbles: true }));
+            } else {
+                alert('No speech detected. Please try again.');
+            }
+
+        } catch (err) {
+            console.error(err);
+            alert('Could not reach the server. Check your connection.');
+        }
+    }
+
+    document.querySelectorAll('.mic-btn').forEach(btn => {
+        btn.addEventListener('click', async () => {
+            const targetId = btn.dataset.target;
+            if (activeTarget === targetId) {
+                stopRecording(targetId);
+            } else if (activeTarget !== null) {
+                stopRecording(activeTarget);
+                setTimeout(() => startRecording(targetId), 400);
+            } else {
+                await startRecording(targetId);
+            }
+        });
     });
-}
+
+    document.getElementById('attachment').addEventListener('change', function (e) {
+        const file = e.target.files[0];
+        if (file && file.size > 5 * 1024 * 1024) {
+            alert('File size must be less than 5MB');
+            e.target.value = '';
+        }
+    });
+})();
 </script>
 {% endblock %}

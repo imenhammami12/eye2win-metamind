@@ -11,6 +11,7 @@ parameters:
     tournois_directory: '%kernel.project_dir%/public/uploads/tournois'
     complaints_directory: '%kernel.project_dir%/public/uploads/complaints'
     faces_directory: '%kernel.project_dir%/public/uploads/faces'  # 👈 Reconnaissance faciale
+    app.huggingface_token: '%env(HUGGINGFACE_TOKEN)%'
 
 services:
     # default configuration for services in *this* file
