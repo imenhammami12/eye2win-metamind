@@ -5,7 +5,183 @@
 {% block stylesheets %}
     {{ parent() }}
     <link rel="stylesheet" href="{{ asset('assets/css/gaming-auth.css') }}">
-    <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;600;700&family=Orbitron:wght@400;700;900&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --c-bg:      #080c14;
+            --c-card:    #0d1320;
+            --c-border:  #1a2a4a;
+            --c-cyan:    #00d4ff;
+            --c-green:   #00ff88;
+            --c-red:     #ff003c;
+            --c-purple:  #7b2fff;
+            --c-orange:  #ff8c00;
+            --c-text:    #c8e0f0;
+            --c-muted:   #4a6080;
+            --font-hud:  'Orbitron', monospace;
+            --font-body: 'Rajdhani', sans-serif;
+        }
+
+        #captcha-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(4, 8, 16, 0.92);
+            z-index: 9999;
+            backdrop-filter: blur(6px);
+            align-items: center;
+            justify-content: center;
+        }
+        #captcha-overlay.active { display: flex; }
+
+        #captcha-modal {
+            background: var(--c-card);
+            border: 1px solid var(--c-border);
+            border-top: 3px solid var(--c-cyan);
+            border-radius: 8px;
+            width: 480px;
+            max-width: 95vw;
+            padding: 0;
+            position: relative;
+            box-shadow: 0 0 60px rgba(0, 212, 255, 0.15), 0 0 120px rgba(0,0,0,0.8);
+            animation: modalIn 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+        @keyframes modalIn {
+            from { transform: scale(0.8) translateY(20px); opacity: 0; }
+            to   { transform: scale(1) translateY(0);      opacity: 1; }
+        }
+        #captcha-modal::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, var(--c-cyan), transparent);
+            animation: scanTop 2s linear infinite;
+        }
+        @keyframes scanTop {
+            0%   { background-position: -200% 0; }
+            100% { background-position: 200% 0; }
+        }
+        #captcha-modal .hc-tl,
+        #captcha-modal .hc-br { position: absolute; width: 16px; height: 16px; }
+        #captcha-modal .hc-tl { top: 8px;    left: 8px;    border-top: 2px solid var(--c-cyan); border-left: 2px solid var(--c-cyan); }
+        #captcha-modal .hc-br { bottom: 8px; right: 8px;   border-bottom: 2px solid var(--c-cyan); border-right: 2px solid var(--c-cyan); }
+
+        .cm-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem 1.5rem 0.75rem;
+            border-bottom: 1px solid var(--c-border);
+        }
+        .cm-title {
+            font-family: var(--font-hud);
+            font-size: 0.75rem;
+            letter-spacing: 0.2em;
+            color: var(--c-cyan);
+        }
+        .cm-timer {
+            font-family: var(--font-hud);
+            font-size: 1rem;
+            color: var(--c-orange);
+            letter-spacing: 0.1em;
+        }
+        .cm-timer.danger { color: var(--c-red); animation: timerPulse 0.5s ease-in-out infinite; }
+        @keyframes timerPulse { 0%,100%{opacity:1} 50%{opacity:0.4} }
+
+        .cm-progress-wrap { height: 3px; background: var(--c-border); }
+        .cm-progress-bar  { height: 100%; background: linear-gradient(90deg, var(--c-cyan), var(--c-purple)); transition: width 0.4s ease; }
+
+        .cm-body { padding: 1.5rem; }
+        .cm-counter {
+            font-family: var(--font-hud);
+            font-size: 0.6rem;
+            letter-spacing: 0.15em;
+            color: var(--c-muted);
+            margin-bottom: 0.75rem;
+        }
+        .cm-question {
+            font-family: var(--font-body);
+            font-size: 1.15rem;
+            color: var(--c-text);
+            font-weight: 600;
+            margin-bottom: 1.25rem;
+            line-height: 1.4;
+            min-height: 3rem;
+        }
+        .cm-icon { font-size: 2rem; text-align: center; margin-bottom: 0.75rem; filter: drop-shadow(0 0 8px var(--c-cyan)); }
+
+        .cm-options { display: grid; grid-template-columns: 1fr 1fr; gap: 0.6rem; }
+        .cm-opt {
+            background: rgba(0,212,255,0.04);
+            border: 1px solid var(--c-border);
+            border-radius: 6px;
+            padding: 0.65rem 0.85rem;
+            font-family: var(--font-body);
+            font-size: 0.95rem;
+            color: var(--c-text);
+            cursor: pointer;
+            text-align: left;
+            transition: all 0.18s ease;
+        }
+        .cm-opt:hover  { border-color: var(--c-cyan); background: rgba(0,212,255,0.08); color:#fff; transform:translateX(3px); }
+        .cm-opt.correct{ border-color: var(--c-green)!important; background:rgba(0,255,136,0.12)!important; color:var(--c-green)!important; }
+        .cm-opt.wrong  { border-color: var(--c-red)!important;   background:rgba(255,0,60,0.12)!important;  color:var(--c-red)!important; }
+        .opt-key { font-family:var(--font-hud); font-size:0.55rem; color:var(--c-muted); margin-right:0.4rem; }
+
+        .cm-result { text-align:center; padding:1rem 0 0.5rem; display:none; }
+        .cm-result-icon  { font-size:3rem; margin-bottom:0.5rem; }
+        .cm-result-title { font-family:var(--font-hud); font-size:1rem; letter-spacing:0.2em; margin-bottom:0.4rem; }
+        .cm-result-title.success { color:var(--c-green); text-shadow:0 0 20px var(--c-green); }
+        .cm-result-title.fail    { color:var(--c-red);   text-shadow:0 0 20px var(--c-red); }
+        .cm-result-sub  { font-family:var(--font-body); font-size:0.9rem; color:var(--c-muted); }
+
+        .cm-score-row { display:flex; justify-content:center; gap:0.4rem; margin-top:1rem; }
+        .cm-score-dot { width:12px; height:12px; border-radius:50%; border:1px solid var(--c-muted); background:transparent; transition:all 0.3s; }
+        .cm-score-dot.ok   { background:var(--c-green); border-color:var(--c-green); box-shadow:0 0 6px var(--c-green); }
+        .cm-score-dot.fail { background:var(--c-red);   border-color:var(--c-red);   box-shadow:0 0 6px var(--c-red); }
+
+        .cm-footer {
+            display:flex; align-items:center; justify-content:space-between;
+            padding:0.75rem 1.5rem;
+            border-top:1px solid var(--c-border);
+            font-family:var(--font-hud); font-size:0.55rem; letter-spacing:0.12em; color:var(--c-muted);
+        }
+        .cm-dot-blink { display:inline-block; width:6px; height:6px; border-radius:50%; background:var(--c-purple); margin-right:0.4rem; animation:dotBlink 1.2s infinite; }
+        @keyframes dotBlink { 0%,100%{opacity:1} 50%{opacity:0.2} }
+
+        .cm-btn-retry {
+            font-family:var(--font-hud); font-size:0.65rem; letter-spacing:0.15em;
+            background:transparent; border:1px solid var(--c-cyan); color:var(--c-cyan);
+            border-radius:4px; padding:0.4rem 0.9rem; cursor:pointer; transition:all 0.2s; margin-top:0.75rem;
+        }
+        .cm-btn-retry:hover { background:rgba(0,212,255,0.1); box-shadow:0 0 10px rgba(0,212,255,0.3); }
+
+        .captcha-trigger-zone {
+            border: 1px solid var(--c-border);
+            border-left: 3px solid var(--c-cyan);
+            border-radius: 6px;
+            background: rgba(0,212,255,0.03);
+            padding: 0.75rem 1rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            cursor: pointer;
+            transition: all 0.2s;
+            margin-bottom: 1rem;
+        }
+        .captcha-trigger-zone:hover      { background:rgba(0,212,255,0.07); border-color:var(--c-cyan); }
+        .captcha-trigger-zone.verified   { border-left-color:var(--c-green); background:rgba(0,255,136,0.06); cursor:default; }
+        .ctz-left    { display:flex; align-items:center; gap:0.75rem; }
+        .ctz-checkbox{
+            width:22px; height:22px; border:2px solid var(--c-cyan); border-radius:4px;
+            display:flex; align-items:center; justify-content:center; font-size:0.9rem; transition:all 0.3s; flex-shrink:0;
+        }
+        .captcha-trigger-zone.verified .ctz-checkbox { background:var(--c-green); border-color:var(--c-green); box-shadow:0 0 10px rgba(0,255,136,0.4); }
+        .ctz-label   { font-family:var(--font-body); font-size:0.95rem; color:var(--c-text); }
+        .captcha-trigger-zone.verified .ctz-label { color:var(--c-green); }
+        .ctz-right   { font-family:var(--font-hud); font-size:0.5rem; letter-spacing:0.1em; color:var(--c-muted); text-align:right; line-height:1.6; }
+    </style>
 {% endblock %}
 
 {% block body %}
@@ -15,12 +191,8 @@
             <div class="col-12">
                 <div class="auth-container">
 
-                    <!-- Left column - Gaming image -->
-                    <div class="auth-image-section">
-                        <!-- Background image handled via CSS -->
-                    </div>
+                    <div class="auth-image-section"></div>
 
-                    <!-- Right column - Login form -->
                     <div class="auth-form-section">
                         <div class="gaming-card card shadow-lg">
                             <div class="card-body p-5">
@@ -37,7 +209,18 @@
                                     </div>
                                 {% endif %}
 
-                                <form method="post" action="{{ path('app_login') }}">
+                                {% if app.request.query.get('captcha_error') %}
+                                    <div class="alert alert-danger">
+                                        <i class="fas fa-exclamation-triangle"></i>
+                                        {% if app.request.query.get('captcha_error') == 'captcha_missing' %}
+                                            Please complete the gaming verification challenge.
+                                        {% else %}
+                                            Verification failed. Please try again.
+                                        {% endif %}
+                                    </div>
+                                {% endif %}
+
+                                <form method="post" action="{{ path('app_login') }}" id="loginForm">
 
                                     <div class="form-group">
                                         <label for="inputEmail">Email Address</label>
@@ -47,8 +230,7 @@
                                                id="inputEmail"
                                                class="form-control form-control-lg"
                                                autocomplete="email"
-                                               required
-                                               autofocus
+                                               required autofocus
                                                placeholder="your@email.com">
                                     </div>
 
@@ -63,13 +245,23 @@
                                                placeholder="••••••••">
                                     </div>
 
-<div class="d-flex justify-content-between align-items-center mb-3">
-    <div class="form-check">
-        <input class="form-check-input" type="checkbox" name="_remember_me" id="remember_me">
-        <label class="form-check-label" for="remember_me">Remember me</label>
-    </div>
-    <a href="{{ path('app_forgot_password') }}" class="text-end">Forgot password?</a>
-</div>
+                                    <div class="d-flex justify-content-between align-items-center mb-3">
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="checkbox" name="_remember_me" id="remember_me">
+                                            <label class="form-check-label" for="remember_me">Remember me</label>
+                                        </div>
+                                        <a href="{{ path('app_forgot_password') }}" class="text-end">Forgot password?</a>
+                                    </div>
+
+                                    <!-- GAMING CAPTCHA -->
+                                    <div class="captcha-trigger-zone" id="captchaTrigger" onclick="openCaptcha()">
+                                        <div class="ctz-left">
+                                            <div class="ctz-checkbox" id="ctzCheck"></div>
+                                            <span class="ctz-label" id="ctzLabel">I'm a real gamer</span>
+                                        </div>
+                                        <div class="ctz-right">GAMING<br>VERIFY</div>
+                                    </div>
+                                    <input type="hidden" name="gaming_captcha_token" id="gamingCaptchaToken" value="">
 
                                     <input type="hidden" name="_csrf_token" value="{{ csrf_token('authenticate') }}">
 
@@ -90,10 +282,275 @@
                             </div>
                         </div>
                     </div>
-
                 </div>
             </div>
         </div>
     </div>
 </section>
+
+<!-- GAMING CAPTCHA MODAL -->
+<div id="captcha-overlay">
+    <div id="captcha-modal">
+        <div class="hc-tl"></div>
+        <div class="hc-br"></div>
+        <div class="cm-header">
+            <span class="cm-title">⬡ Gaming Verification</span>
+            <span class="cm-timer" id="cmTimer">20s</span>
+        </div>
+        <div class="cm-progress-wrap">
+            <div class="cm-progress-bar" id="cmProgress" style="width:0%"></div>
+        </div>
+        <div class="cm-body">
+            <div class="cm-icon" id="cmIcon"></div>
+            <div class="cm-counter" id="cmCounter">QUESTION 1 / 3</div>
+            <div class="cm-question" id="cmQuestion"></div>
+            <div class="cm-options"  id="cmOptions"></div>
+            <div class="cm-score-row" id="cmScoreRow"></div>
+            <div class="cm-result" id="cmResult">
+                <div class="cm-result-icon"  id="cmResultIcon"></div>
+                <div class="cm-result-title" id="cmResultTitle"></div>
+                <div class="cm-result-sub"   id="cmResultSub"></div>
+                <button class="cm-btn-retry" id="cmBtnRetry" onclick="restartCaptcha()">↺ RETRY</button>
+            </div>
+        </div>
+        <div class="cm-footer">
+            <span><span class="cm-dot-blink"></span>EYETWIN SECURITY SYSTEM</span>
+            <span>ANTI-BOT PROTOCOL v2.0</span>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block javascripts %}
+{{ parent() }}
+<script>
+const QUESTIONS = [
+    {
+        icon: '🎮',
+        q: 'What do you use to play a video game?',
+        opts: ['A controller', 'A frying pan', 'A telescope', 'A calculator'],
+        answer: 0
+    },
+    {
+        icon: '👾',
+        q: 'In Minecraft, what do you need to build things?',
+        opts: ['Sand only', 'Blocks', 'Water', 'Fire'],
+        answer: 1
+    },
+    {
+        icon: '🏆',
+        q: 'What does "GG" mean in gaming?',
+        opts: ['Go Go', 'Good Game', 'Get Gold', 'Great Goal'],
+        answer: 1
+    },
+    {
+        icon: '🔫',
+        q: 'In a Battle Royale game, what is the goal?',
+        opts: ['Build a house', 'Cook food', 'Be the last player alive', 'Collect coins'],
+        answer: 2
+    },
+    {
+        icon: '❤️',
+        q: 'In most games, what does a red heart represent?',
+        opts: ['Speed', 'Money', 'Health / Lives', 'Ammo'],
+        answer: 2
+    },
+    {
+        icon: '⭐',
+        q: 'In Mario games, what does collecting a star usually do?',
+        opts: ['Makes you slower', 'Makes you invincible', 'Removes your coins', 'Ends the level'],
+        answer: 1
+    },
+    {
+        icon: '🗺️',
+        q: 'What is a "map" used for in video games?',
+        opts: ['To change graphics', 'To navigate the game world', 'To save the game', 'To change language'],
+        answer: 1
+    },
+    {
+        icon: '💀',
+        q: 'What happens when a player\'s health reaches zero?',
+        opts: ['They win', 'They level up', 'They die / game over', 'Nothing happens'],
+        answer: 2
+    },
+    {
+        icon: '🎯',
+        q: 'What is a "respawn" in multiplayer games?',
+        opts: ['Quitting the game', 'Coming back to life after dying', 'Winning a round', 'Changing character'],
+        answer: 1
+    },
+    {
+        icon: '🛡️',
+        q: 'What does armor do in most RPG games?',
+        opts: ['Makes you faster', 'Protects you from damage', 'Gives you coins', 'Makes you invisible'],
+        answer: 1
+    },
+    {
+        icon: '🎲',
+        q: 'What is a "level up" in a game?',
+        opts: ['Losing the game', 'Your character gets stronger', 'The game gets easier', 'You lose a life'],
+        answer: 1
+    },
+    {
+        icon: '🔑',
+        q: 'In adventure games, keys are usually used to...',
+        opts: ['Attack enemies', 'Open doors or chests', 'Heal yourself', 'Buy items'],
+        answer: 1
+    }
+];
+
+const TOTAL_Q    = 3;
+const TIME_LIMIT = 20;
+
+let currentQ = 0, score = 0, answered = false;
+let timerInt = null, timeLeft = TIME_LIMIT;
+let sessionQ = [], results = [];
+
+function pickQuestions() {
+    sessionQ = [...QUESTIONS].sort(() => Math.random() - 0.5).slice(0, TOTAL_Q);
+}
+
+function openCaptcha() {
+    if (document.getElementById('captchaTrigger').classList.contains('verified')) return;
+    pickQuestions();
+    currentQ = 0; score = 0; results = [];
+    document.getElementById('captcha-overlay').classList.add('active');
+    buildScoreDots();
+    loadQuestion();
+}
+
+function closeCaptchaModal() {
+    document.getElementById('captcha-overlay').classList.remove('active');
+    clearInterval(timerInt);
+}
+
+function buildScoreDots() {
+    const row = document.getElementById('cmScoreRow');
+    row.innerHTML = '';
+    for (let i = 0; i < TOTAL_Q; i++) {
+        const d = document.createElement('div');
+        d.className = 'cm-score-dot';
+        d.id = 'dot-' + i;
+        row.appendChild(d);
+    }
+}
+
+function loadQuestion() {
+    const q = sessionQ[currentQ];
+    answered = false;
+    document.getElementById('cmResult').style.display  = 'none';
+    document.getElementById('cmOptions').style.display = 'grid';
+    document.getElementById('cmIcon').textContent      = q.icon;
+    document.getElementById('cmCounter').textContent   = `QUESTION ${currentQ + 1} / ${TOTAL_Q}`;
+    document.getElementById('cmQuestion').textContent  = q.q;
+    document.getElementById('cmProgress').style.width  = `${(currentQ / TOTAL_Q) * 100}%`;
+
+    const keys = ['A','B','C','D'];
+    const opts = document.getElementById('cmOptions');
+    opts.innerHTML = '';
+    q.opts.forEach((opt, i) => {
+        const btn = document.createElement('button');
+        btn.type = 'button';
+        btn.className = 'cm-opt';
+        btn.innerHTML = `<span class="opt-key">[${keys[i]}]</span>${opt}`;
+        btn.onclick = () => selectAnswer(i, btn);
+        opts.appendChild(btn);
+    });
+    startTimer();
+}
+
+function startTimer() {
+    clearInterval(timerInt);
+    timeLeft = TIME_LIMIT;
+    updateTimerDisplay();
+    timerInt = setInterval(() => {
+        timeLeft--;
+        updateTimerDisplay();
+        if (timeLeft <= 0) { clearInterval(timerInt); if (!answered) timeoutAnswer(); }
+    }, 1000);
+}
+
+function updateTimerDisplay() {
+    const el = document.getElementById('cmTimer');
+    el.textContent = timeLeft + 's';
+    el.className   = 'cm-timer' + (timeLeft <= 5 ? ' danger' : '');
+}
+
+function timeoutAnswer() {
+    answered = true;
+    results.push(false);
+    markDot(currentQ, false);
+    document.querySelectorAll('.cm-opt')[sessionQ[currentQ].answer].classList.add('correct');
+    setTimeout(() => nextOrResult(), 1000);
+}
+
+function selectAnswer(index, btn) {
+    if (answered) return;
+    answered = true;
+    clearInterval(timerInt);
+    const correct = sessionQ[currentQ].answer;
+    const isRight = index === correct;
+    btn.classList.add(isRight ? 'correct' : 'wrong');
+    if (!isRight) document.querySelectorAll('.cm-opt')[correct].classList.add('correct');
+    if (isRight) score++;
+    results.push(isRight);
+    markDot(currentQ, isRight);
+    setTimeout(() => nextOrResult(), 900);
+}
+
+function markDot(index, ok) {
+    const dot = document.getElementById('dot-' + index);
+    if (dot) dot.classList.add(ok ? 'ok' : 'fail');
+}
+
+function nextOrResult() {
+    currentQ++;
+    currentQ < TOTAL_Q ? loadQuestion() : showResult();
+}
+
+function showResult() {
+    document.getElementById('cmProgress').style.width  = '100%';
+    document.getElementById('cmOptions').style.display = 'none';
+    const success = score >= 2;
+    const result  = document.getElementById('cmResult');
+    result.style.display = 'block';
+    document.getElementById('cmResultIcon').textContent  = success ? '🏆' : '💀';
+    document.getElementById('cmResultTitle').textContent = success ? 'ACCESS GRANTED' : 'ACCESS DENIED';
+    document.getElementById('cmResultTitle').className   = 'cm-result-title ' + (success ? 'success' : 'fail');
+    document.getElementById('cmResultSub').textContent   = success
+        ? `${score}/${TOTAL_Q} correct — You're a real gamer!`
+        : `${score}/${TOTAL_Q} correct — Try again, rookie!`;
+    document.getElementById('cmBtnRetry').style.display  = success ? 'none' : 'inline-block';
+
+    if (success) {
+        const token = 'GC_' + Date.now() + '_' + score + '_ok';
+        document.getElementById('gamingCaptchaToken').value = token;
+        const trigger = document.getElementById('captchaTrigger');
+        trigger.classList.add('verified');
+        document.getElementById('ctzCheck').textContent = '✓';
+        document.getElementById('ctzLabel').textContent = 'Verified gamer!';
+        setTimeout(() => closeCaptchaModal(), 1800);
+    }
+}
+
+function restartCaptcha() {
+    pickQuestions();
+    currentQ = 0; score = 0; results = [];
+    buildScoreDots();
+    loadQuestion();
+}
+
+document.getElementById('loginForm').addEventListener('submit', function(e) {
+    if (!document.getElementById('gamingCaptchaToken').value) {
+        e.preventDefault();
+        document.getElementById('captchaTrigger').style.borderColor = '#ff003c';
+        setTimeout(() => { document.getElementById('captchaTrigger').style.borderColor = ''; }, 1500);
+        openCaptcha();
+    }
+});
+
+document.getElementById('captcha-overlay').addEventListener('click', function(e) {
+    if (e.target === this) closeCaptchaModal();
+});
+</script>
 {% endblock %}

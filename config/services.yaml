@@ -25,6 +25,11 @@ services:
         tags:
             - { name: kernel.event_subscriber }
 
+    # 🎮 CAPTCHA gaming — vérification login front office
+    App\EventSubscriber\CaptchaLoginSubscriber:
+        tags:
+            - { name: kernel.event_subscriber }
+
     App\Service\CloudinaryUploader:
         arguments:
             $cloudName: '%env(CLOUDINARY_CLOUD_NAME)%'
@@ -37,7 +42,7 @@ services:
         arguments:
             $fromEmail: '%env(MAILER_FROM_EMAIL)%'
             $fromName: '%env(MAILER_FROM_NAME)%'
-            $projectDir: '%kernel.project_dir%'   # ← AJOUT pour le logo
+            $projectDir: '%kernel.project_dir%'
 
     # Configuration du service de notification multi-canal pour reset password
     App\Service\MultiChannelNotificationService:
