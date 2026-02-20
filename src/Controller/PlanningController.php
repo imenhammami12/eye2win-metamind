@@ -2,6 +2,7 @@
 
 namespace App\Controller;
 
+use App\Entity\Review;
 use App\Entity\Planning;
 use App\Entity\TrainingSession;
 use App\Repository\PlanningRepository;
@@ -120,5 +121,38 @@ class PlanningController extends AbstractController
         }
         
         return $this->redirectToRoute('app_my_sessions');
+    }
+
+    #[Route('/planning/review/{id}', name: 'app_planning_review', methods: ['POST'])]
+    public function submitReview(
+        Planning $planning,
+        Request $request,
+        EntityManagerInterface $em
+    ): Response {
+        $this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
+        
+        $content = $request->request->get('content');
+        $rating = (int) $request->request->get('rating', 0);
+        
+        if (empty($content)) {
+            $this->addFlash('error', 'Please provide a comment.');
+            return $this->redirectToRoute('app_planning_index');
+        }
+
+        $review = new Review();
+        $review->setPlanning($planning);
+        $review->setUser($this->getUser());
+        $review->setContent($content);
+        $review->setRating($rating);
+        
+        $em->persist($review);
+        $em->flush();
+        
+        if ($request->isXmlHttpRequest()) {
+            return $this->json(['success' => true, 'message' => 'Your review has been submitted. Thank you!']);
+        }
+
+        $this->addFlash('success', 'Your review has been submitted. Thank you for your feedback!');
+        return $this->redirectToRoute('app_planning_index');
     }
 }

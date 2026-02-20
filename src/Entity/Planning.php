@@ -49,9 +49,11 @@ class Planning
     #[ORM\OneToMany(mappedBy: 'planning', targetEntity: TrainingSession::class)]
     private Collection $trainingSessions;
 
+
     public function __construct()
     {
         $this->trainingSessions = new ArrayCollection();
+        $this->reviews = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -184,4 +186,5 @@ class Planning
 
         return $this;
     }
+
 }

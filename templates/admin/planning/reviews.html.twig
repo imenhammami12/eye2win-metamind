@@ -1,0 +1,150 @@
+{% extends 'admin_layout.html.twig' %}
+
+{% block title %}User Reviews - EyeTwin{% endblock %}
+{% block page_title %}User Reviews Management{% endblock %}
+
+{% block body %}
+<style>
+    /* Forcer le thème sombre sur cette page spécifique */
+    .content-area {
+        background: #0f172a !important;
+    }
+    .table-card {
+        background: #1e293b !important;
+        border: 1px solid rgba(99, 102, 241, 0.2) !important;
+        color: #e2e8f0 !important;
+    }
+    .table {
+        --bs-table-bg: transparent !important;
+        --bs-table-hover-bg: rgba(255, 255, 255, 0.05) !important;
+        color: #e2e8f0 !important;
+    }
+    .table thead th {
+        background: rgba(30, 41, 59, 0.8) !important;
+        color: #ffffff !important;
+        border-bottom: 2px solid rgba(99, 102, 241, 0.3) !important;
+    }
+    .table td {
+        border-bottom: 1px solid rgba(255, 255, 255, 0.05) !important;
+        color: #cbd5e1 !important;
+    }
+    .review-content {
+        background: rgba(255, 255, 255, 0.05) !important;
+        border: 1px solid rgba(255, 255, 255, 0.1) !important;
+    }
+    .text-indigo { color: #818cf8 !important; }
+</style>
+
+<div class="container-fluid fade-in">
+    <div class="table-card shadow-lg" style="border-radius: 12px; overflow: hidden;">
+        <div class="p-4 d-flex justify-content-between align-items-center" style="background: rgba(30, 41, 59, 0.5); border-bottom: 1px solid rgba(255, 255, 255, 0.1);">
+            <div class="d-flex align-items-center">
+                <a href="{{ path('admin_planning_index') }}" class="btn btn-sm btn-outline-light me-3 border-0" title="Back to Planning List">
+                    <i class="bi bi-arrow-left-circle-fill fs-5"></i>
+                </a>
+                <h5 class="text-white mb-0">
+                    <i class="bi bi-chat-left-dots-fill me-2" style="color: #818cf8;"></i>All Received Reviews
+                </h5>
+            </div>
+            <span class="badge" id="review-count" style="background: #6366f1;">{{ reviews|length }} reviews in total</span>
+        </div>
+
+        <div class="table-responsive p-3" id="reviews-container">
+            <table class="table table-hover align-middle mb-0">
+                <thead>
+                    <tr>
+                        <th class="py-3 px-4">User</th>
+                        <th class="py-3">Planning / Session</th>
+                        <th class="py-3 text-center">Rating</th>
+                        <th class="py-3">Comment</th>
+                        <th class="py-3">Date</th>
+                        <th class="py-3 text-center">Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for review in reviews %}
+                        <tr class="review-row" id="review-{{ review.id }}">
+                            <td class="py-3 px-4">
+                                <div class="d-flex align-items-center">
+                                    <div class="avatar-circle me-3" style="background: linear-gradient(135deg, #6366f1 0%, #a855f7 100%); width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: bold; color: white;">
+                                        {{ review.user.username|first|upper }}
+                                    </div>
+                                    <span class="fw-bold text-white">{{ review.user.username }}</span>
+                                </div>
+                            </td>
+                            <td>
+                                <div class="small">
+                                    <span class="text-indigo fw-bold d-block">{{ review.planning.type.value }}</span>
+                                    <span style="color: #94a3b8;">{{ review.planning.description|slice(0, 30) }}...</span>
+                                </div>
+                            </td>
+                            <td class="text-center">
+                                <div class="stars text-warning">
+                                    {% for i in 1..5 %}
+                                        <i class="bi bi-star-fill {{ i <= review.rating ? '' : 'text-muted' }}" style="font-size: 0.8rem;"></i>
+                                    {% endfor %}
+                                </div>
+                            </td>
+                            <td>
+                                <div class="review-content p-2 rounded">
+                                    {{ review.content }}
+                                </div>
+                            </td>
+                            <td>
+                                <span class="small text-white-50">
+                                    <i class="bi bi-clock me-1"></i>{{ review.createdAt|date('d/m/Y H:i') }}
+                                </span>
+                            </td>
+                            <td class="text-center">
+                                <form action="{{ path('admin_review_delete', {id: review.id}) }}" method="POST" onsubmit="return confirm('Are you sure you want to delete this review?');" style="display:inline-block;">
+                                    <input type="hidden" name="_token" value="{{ csrf_token('delete-review-' ~ review.id) }}">
+                                    <button type="submit" class="btn btn-sm btn-outline-danger border-0">
+                                        <i class="bi bi-trash3-fill"></i>
+                                    </button>
+                                </form>
+                            </td>
+                        </tr>
+                    {% else %}
+                        <tr>
+                            <td colspan="6" class="text-center py-5">
+                                <div class="text-white-50">No reviews have been published yet.</div>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block javascripts %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const reviewsContainer = document.getElementById('reviews-container');
+    const reviewCountBadge = document.getElementById('review-count');
+    
+    function refreshReviews() {
+        fetch(window.location.href, {
+            headers: { 'X-Requested-With': 'XMLHttpRequest' }
+        })
+        .then(response => response.text())
+        .then(html => {
+            const parser = new DOMParser();
+            const doc = parser.parseFromString(html, 'text/html');
+            const newContentNode = doc.getElementById('reviews-container');
+            const newCountNode = doc.getElementById('review-count');
+            
+            if (newContentNode && newCountNode && reviewsContainer.innerHTML !== newContentNode.innerHTML) {
+                reviewsContainer.innerHTML = newContentNode.innerHTML;
+                reviewCountBadge.innerHTML = newCountNode.innerHTML;
+                reviewsContainer.style.opacity = '0.5';
+                setTimeout(() => reviewsContainer.style.opacity = '1', 200);
+            }
+        })
+        .catch(error => console.error('Error polling:', error));
+    }
+    setInterval(refreshReviews, 2000);
+});
+</script>
+{% endblock %}

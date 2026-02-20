@@ -99,9 +99,14 @@
             <i class="bi bi-info-circle me-2"></i>
             Found <strong>{{ plannings|length }}</strong> planning{{ plannings|length != 1 ? 's' : '' }}
         </h6>
-        <a href="{{ path('admin_planning_create') }}" class="btn btn-success">
-            <i class="bi bi-plus-circle me-2"></i>Ajouter un planning
-        </a>
+        <div class="d-flex gap-2">
+            <a href="{{ path('admin_planning_reviews') }}" class="btn btn-primary" style="background: linear-gradient(135deg, #6366f1 0%, #a855f7 100%); border: none;">
+                <i class="bi bi-chat-left-text me-2"></i>View Reviews
+            </a>
+            <a href="{{ path('admin_planning_create') }}" class="btn btn-success">
+                <i class="bi bi-plus-circle me-2"></i>Add Planning
+            </a>
+        </div>
     </div>
 </div>
 

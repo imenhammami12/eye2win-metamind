@@ -2,10 +2,12 @@
 
 namespace App\Controller\Admin;
 
+use App\Entity\Review;
 use App\Entity\Planning;
 use App\Entity\PlanningLevel;
 use App\Entity\PlanningType;
 use App\Repository\PlanningRepository;
+use App\Repository\ReviewRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -204,5 +206,38 @@ class AdminPlanningController extends AbstractController
             'planning' => $planning,
             'sessions' => $planning->getTrainingSessions(),
         ]);
+    }
+
+    #[Route('/reviews', name: 'admin_planning_reviews', methods: ['GET'])]
+    public function listReviews(ReviewRepository $reviewRepository): Response
+    {
+        return $this->render('admin/planning/reviews.html.twig', [
+            'reviews' => $reviewRepository->findBy([], ['createdAt' => 'DESC']),
+        ]);
+    }
+
+    #[Route('/review/{id}/delete', name: 'admin_review_delete', methods: ['POST'])]
+    public function deleteReview(
+        Request $request,
+        int $id,
+        ReviewRepository $reviewRepository,
+        EntityManagerInterface $em
+    ): Response {
+        $review = $reviewRepository->find($id);
+        
+        if (!$review) {
+            $this->addFlash('error', 'The review no longer exists.');
+            return $this->redirectToRoute('admin_planning_reviews');
+        }
+
+        if (!$this->isCsrfTokenValid('delete-review-' . $review->getId(), $request->request->get('_token'))) {
+            throw $this->createAccessDeniedException('Token CSRF invalide');
+        }
+        
+        $em->remove($review);
+        $em->flush();
+        
+        $this->addFlash('success', 'The review has been deleted.');
+        return $this->redirectToRoute('admin_planning_reviews');
     }
 }

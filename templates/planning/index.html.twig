@@ -26,30 +26,22 @@
             <!-- Sort Controls -->
             <div class="mb-4">
                 <div class="row align-items-center">
-                    <div class="col-md-6">
+                    <div class="col-12 d-flex justify-content-between align-items-center flex-wrap gap-3">
                         <h4 style="color: #f8fafc; margin-bottom: 0;">
                             <i class="bi bi-calendar-event me-2"></i>Available Sessions
                         </h4>
-                    </div>
-                    <div class="col-md-6">
-                        <form method="get" action="{{ path('app_planning_index') }}" class="d-flex gap-2 justify-content-md-end">
-                            <div style="flex: 1; max-width: 250px;">
-                                <select name="sort" class="form-select form-select-sm" onchange="this.form.submit();" style="background-color: #1e293b; color: #f8fafc; border-color: rgba(255,255,255,0.1);">
-                                    <option value="date" {{ sortBy == 'date' ? 'selected' : '' }}>Sort by Date</option>
-                                    <option value="time" {{ sortBy == 'time' ? 'selected' : '' }}>Sort by Time</option>
-                                </select>
+                        {% if app.user %}
+                            <div class="d-flex gap-4">
+                                <a href="javascript:void(0)" id="open-coaching-ai" class="btn-coaching-premium" style="margin-right: 20px;" title="Get AI-powered coaching advice">
+                                    <i class="fas fa-brain me-2"></i>
+                                    <span>AI Coaching Advisor</span>
+                                </a>
+                                <a href="{{ path('app_my_sessions') }}" class="btn-history-premium" title="View my joined sessions">
+                                    <i class="fas fa-history me-2"></i>
+                                    <span>My History</span>
+                                </a>
                             </div>
-                            <div style="flex: 1; max-width: 200px;">
-                                <select name="order" class="form-select form-select-sm" onchange="this.form.submit();" style="background-color: #1e293b; color: #f8fafc; border-color: rgba(255,255,255,0.1);">
-                                    <option value="DESC" {{ sortOrder == 'DESC' ? 'selected' : '' }}>
-                                        <i class="bi bi-arrow-down"></i> Newest First
-                                    </option>
-                                    <option value="ASC" {{ sortOrder == 'ASC' ? 'selected' : '' }}>
-                                        <i class="bi bi-arrow-up"></i> Oldest First
-                                    </option>
-                                </select>
-                            </div>
-                        </form>
+                        {% endif %}
                     </div>
                 </div>
             </div>
@@ -92,6 +84,36 @@
                                         <i class="fas fa-map-marker-alt"></i>
                                         <span>{{ planning.localisation }}</span>
                                     </div>
+                                </div>
+
+                                <hr class="divider">
+
+                                <!-- Review & Rating Form -->
+                                <div class="rating-container" data-planning-id="{{ planning.id }}">
+                                    <div class="rating-label">Rate this session:</div>
+                                    <div class="stars mb-3">
+                                        <i class="star far fa-star" data-rating="1"></i>
+                                        <i class="star far fa-star" data-rating="2"></i>
+                                        <i class="star far fa-star" data-rating="3"></i>
+                                        <i class="star far fa-star" data-rating="4"></i>
+                                        <i class="star far fa-star" data-rating="5"></i>
+                                    </div>
+                                    
+                                    <form action="{{ path('app_planning_review', {id: planning.id}) }}" method="POST" class="review-form d-none" id="form-review-{{ planning.id }}">
+                                        <input type="hidden" name="rating" id="rating-input-{{ planning.id }}" value="0">
+                                        <div class="mb-3">
+                                            <textarea name="content" class="form-control" rows="2" placeholder="Tell us what you thought..." style="background: rgba(0,0,0,0.2); border: 1px solid rgba(255,255,255,0.1); color: white; border-radius: 10px;"></textarea>
+                                        </div>
+                                        <div class="d-flex gap-2">
+                                            <button type="submit" class="btn btn-sm btn-primary flex-grow-1" style="background: var(--primary-accent); border: none; border-radius: 8px;">
+                                                Send Feedback
+                                            </button>
+                                            <button type="button" class="btn btn-sm btn-outline-secondary btn-cancel-review" style="border-radius: 8px; color: #94a3b8; border-color: rgba(255,255,255,0.1);">
+                                                Cancel
+                                            </button>
+                                        </div>
+                                    </form>
+                                    <div class="rating-feedback"></div>
                                 </div>
 
                                 <hr class="divider">
@@ -298,6 +320,59 @@
             filter: brightness(1.1);
         }
 
+        /* Star Rating Styles */
+        .rating-container {
+            text-align: center;
+            padding: 15px 0;
+        }
+
+        .rating-label {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            margin-bottom: 10px;
+            font-weight: 500;
+        }
+
+        .stars {
+            display: flex;
+            justify-content: center;
+            gap: 8px;
+            margin-bottom: 8px;
+        }
+
+        .star {
+            font-size: 1.5rem;
+            color: #fbbf24; /* Amber 400 */
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .star:hover {
+            transform: scale(1.2);
+            filter: drop-shadow(0 0 8px rgba(251, 191, 36, 0.6));
+        }
+
+        .star.filled {
+            font-weight: 900; /* fas (solid) */
+        }
+
+        .star.far {
+            font-weight: 400; /* far (regular/outline) */
+        }
+
+        .rating-feedback {
+            font-size: 0.75rem;
+            color: var(--primary-accent);
+            min-height: 18px;
+            font-weight: 600;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .rating-feedback.show {
+            opacity: 1;
+        }
+
         /* Empty State */
         .empty-state-card {
             background: var(--card-bg);
@@ -317,5 +392,831 @@
             color: var(--text-muted);
             font-size: 2rem;
         }
+
+        /* Chatbot Styles */
+        .chatbot-button {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(135deg, #6366f1, #4f46e5);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            box-shadow: 0 8px 25px rgba(99, 102, 241, 0.4);
+            transition: all 0.3s ease;
+            z-index: 1000;
+            border: none;
+        }
+
+        .chatbot-button:hover {
+            transform: scale(1.1);
+            box-shadow: 0 12px 35px rgba(99, 102, 241, 0.6);
+        }
+
+        .chatbot-button i {
+            color: white;
+            font-size: 1.5rem;
+        }
+
+        /* Premium History Button Integrated */
+        .btn-history-premium {
+            background: rgba(99, 102, 241, 0.1);
+            color: #818cf8;
+            border: 1px solid rgba(99, 102, 241, 0.3);
+            padding: 10px 25px;
+            border-radius: 12px;
+            font-weight: 700;
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            display: inline-flex;
+            align-items: center;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            backdrop-filter: blur(10px);
+        }
+
+        .btn-history-premium:hover {
+            background: rgba(99, 102, 241, 0.2);
+            color: #ffffff;
+            border-color: #6366f1;
+            transform: translateY(-3px);
+            box-shadow: 0 10px 20px rgba(99, 102, 241, 0.2);
+        }
+
+        .btn-history-premium i {
+            font-size: 1.1rem;
+            transition: transform 0.4s ease;
+        }
+
+        .btn-history-premium:hover i {
+            transform: rotate(-30deg);
+        }
+
+        /* Coaching AI Button - Harmonized to Indigo */
+        .btn-coaching-premium {
+            background: rgba(99, 102, 241, 0.1);
+            color: #818cf8;
+            border: 1px solid rgba(99, 102, 241, 0.3);
+            padding: 10px 25px;
+            border-radius: 12px;
+            font-weight: 700;
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            display: inline-flex;
+            align-items: center;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            backdrop-filter: blur(10px);
+        }
+
+        .btn-coaching-premium:hover {
+            background: rgba(99, 102, 241, 0.2);
+            color: #ffffff;
+            border-color: #6366f1;
+            transform: translateY(-3px);
+            box-shadow: 0 10px 20px rgba(99, 102, 241, 0.2);
+        }
+
+        /* Coaching Modal Styling */
+        .coaching-modal {
+            display: none;
+            position: fixed;
+            z-index: 10000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.7);
+            backdrop-filter: blur(5px);
+        }
+
+        .coaching-content {
+            background: #111827;
+            border: 1px solid rgba(139, 92, 246, 0.3);
+            margin: 10% auto;
+            padding: 30px;
+            width: 80%;
+            max-width: 700px;
+            border-radius: 20px;
+            color: #f8fafc;
+            box-shadow: 0 25px 50px -12px rgba(139, 92, 246, 0.5);
+            position: relative;
+        }
+
+        .coaching-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            padding-bottom: 15px;
+        }
+
+        .coaching-close {
+            color: #94a3b8;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: color 0.3s;
+        }
+
+        .coaching-close:hover {
+            color: #ef4444;
+        }
+
+        #coaching-result {
+            line-height: 1.6;
+            max-height: 400px;
+            overflow-y: auto;
+            padding-right: 10px;
+        }
+
+        #coaching-result h3, #coaching-result h4 {
+            color: #a78bfa;
+            margin-top: 15px;
+        }
+
+        .loading-spinner {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100px;
+        }
+
+        .chatbot-window {
+            position: fixed;
+            bottom: 100px;
+            right: 30px;
+            width: 380px;
+            height: 550px;
+            background: #1e293b;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+            display: none;
+            flex-direction: column;
+            z-index: 999;
+            border: 1px solid rgba(99, 102, 241, 0.3);
+            overflow: hidden;
+        }
+
+        .chatbot-window.active {
+            display: flex;
+            animation: slideUp 0.3s ease;
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .chatbot-header {
+            background: linear-gradient(135deg, #6366f1, #4f46e5);
+            padding: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-radius: 20px 20px 0 0;
+        }
+
+        .chatbot-header h3 {
+            margin: 0;
+            color: white;
+            font-size: 1.1rem;
+            font-weight: 700;
+        }
+
+        .chatbot-close {
+            background: rgba(255,255,255,0.2);
+            border: none;
+            color: white;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+        }
+
+        .chatbot-close:hover {
+            background: rgba(255,255,255,0.3);
+        }
+
+        .chatbot-messages {
+            flex: 1;
+            padding: 20px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .chatbot-messages::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .chatbot-messages::-webkit-scrollbar-track {
+            background: rgba(255,255,255,0.05);
+        }
+
+        .chatbot-messages::-webkit-scrollbar-thumb {
+            background: rgba(99, 102, 241, 0.5);
+            border-radius: 3px;
+        }
+
+        .chat-message {
+            display: flex;
+            gap: 10px;
+            animation: fadeIn 0.3s ease;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .chat-message.user {
+            flex-direction: row-reverse;
+        }
+
+        .message-avatar {
+            width: 35px;
+            height: 35px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            font-size: 1rem;
+        }
+
+        .message-avatar.bot {
+            background: linear-gradient(135deg, #6366f1, #4f46e5);
+            color: white;
+        }
+
+        .message-avatar.user {
+            background: rgba(255,255,255,0.1);
+            color: #94a3b8;
+        }
+
+        .message-content {
+            max-width: 70%;
+            padding: 12px 16px;
+            border-radius: 15px;
+            font-size: 0.9rem;
+            line-height: 1.5;
+            white-space: pre-wrap;
+        }
+
+        .chat-message.bot .message-content {
+            background: rgba(99, 102, 241, 0.15);
+            color: #f8fafc;
+            border: 1px solid rgba(99, 102, 241, 0.2);
+        }
+
+        .chat-message.user .message-content {
+            background: rgba(255,255,255,0.1);
+            color: #f8fafc;
+        }
+
+        .typing-indicator {
+            display: none;
+            gap: 4px;
+            padding: 12px 16px;
+        }
+
+        .typing-indicator.active {
+            display: flex;
+        }
+
+        .typing-dot {
+            width: 8px;
+            height: 8px;
+            background: #6366f1;
+            border-radius: 50%;
+            animation: typing 1.4s infinite;
+        }
+
+        .typing-dot:nth-child(2) {
+            animation-delay: 0.2s;
+        }
+
+        .typing-dot:nth-child(3) {
+            animation-delay: 0.4s;
+        }
+
+        @keyframes typing {
+            0%, 60%, 100% {
+                transform: translateY(0);
+                opacity: 0.7;
+            }
+            30% {
+                transform: translateY(-10px);
+                opacity: 1;
+            }
+        }
+
+        .chatbot-quick-questions {
+            padding: 10px 20px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            border-top: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .quick-question-btn {
+            background: rgba(99, 102, 241, 0.15);
+            border: 1px solid rgba(99, 102, 241, 0.3);
+            color: #cbd5e1;
+            padding: 6px 12px;
+            border-radius: 15px;
+            font-size: 0.8rem;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .quick-question-btn:hover {
+            background: rgba(99, 102, 241, 0.25);
+            border-color: rgba(99, 102, 241, 0.5);
+        }
+
+        .chatbot-input-area {
+            padding: 15px 20px;
+            border-top: 1px solid rgba(255,255,255,0.1);
+            display: flex;
+            gap: 10px;
+        }
+
+        .chatbot-input {
+            flex: 1;
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 25px;
+            padding: 12px 18px;
+            color: #f8fafc;
+            font-size: 0.9rem;
+            outline: none;
+            transition: all 0.2s;
+        }
+
+        .chatbot-input:focus {
+            background: rgba(255,255,255,0.08);
+            border-color: rgba(99, 102, 241, 0.5);
+        }
+
+        .chatbot-input::placeholder {
+            color: #64748b;
+        }
+
+        .chatbot-send {
+            background: linear-gradient(135deg, #6366f1, #4f46e5);
+            border: none;
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            color: white;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+        }
+
+        .chatbot-send:hover {
+            transform: scale(1.05);
+            box-shadow: 0 5px 15px rgba(99, 102, 241, 0.4);
+        }
+
+        .chatbot-send:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        @media (max-width: 768px) {
+            .chatbot-window {
+                width: calc(100% - 40px);
+                right: 20px;
+                left: 20px;
+                height: 500px;
+            }
+
+            .chatbot-button {
+                bottom: 20px;
+                right: 20px;
+            }
+        }
     </style>
+
+    {% if app.user %}
+    {% endif %}
+
+    <!-- Chatbot UI -->
+    <button class="chatbot-button" id="chatbotButton">
+        <i class="fas fa-comments"></i>
+    </button>
+
+    <div class="chatbot-window" id="chatbotWindow">
+        <div class="chatbot-header">
+            <h3><i class="fas fa-robot me-2"></i>Assistant E-Sport</h3>
+            <button class="chatbot-close" id="chatbotClose">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+
+        <div class="chatbot-messages" id="chatbotMessages">
+            <div class="chat-message bot">
+                <div class="message-avatar bot">
+                    <i class="fas fa-robot"></i>
+                </div>
+                <div class="message-content">
+                    Bonjour ! 👋 Je suis votre assistant virtuel. Je peux vous aider avec des questions sur nos sessions d'entraînement et l'e-sport en général. Comment puis-je vous aider ?
+                </div>
+            </div>
+        </div>
+
+        <div class="chatbot-quick-questions">
+            <button class="quick-question-btn" data-question="Quelles sessions sont disponibles ?">📅 Sessions disponibles</button>
+            <button class="quick-question-btn" data-question="Quand est la prochaine session ?">⏰ Prochaine session</button>,StartLine:722,TargetContent:
+            <button class="quick-question-btn" data-question="C'est quoi l'e-sport ?">🎮 C'est quoi l'e-sport ?</button>
+        </div>
+
+        <div class="chatbot-input-area">
+            <input type="text" class="chatbot-input" id="chatbotInput" placeholder="Posez votre question...">
+            <button class="chatbot-send" id="chatbotSend">
+                <i class="fas fa-paper-plane"></i>
+            </button>
+        </div>
+    </div>
+
+    {# Coaching Modal Structure #}
+    <div id="coachingModal" class="coaching-modal">
+        <div class="coaching-content">
+            <div class="coaching-header">
+                <h2 style="margin: 0; font-size: 1.5rem; color: #818cf8;">
+                    <i class="fas fa-brain me-2"></i>EyeTwin Coaching AI
+                </h2>
+                <span class="coaching-close">&times;</span>
+            </div>
+            <div id="coaching-result">
+                <!-- Recommendations will be loaded here -->
+            </div>
+            <div class="mt-4 text-center">
+                <button class="btn btn-sm btn-outline-secondary coaching-close">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Chatbot functionality
+            const chatbotButton = document.getElementById('chatbotButton');
+            const chatbotWindow = document.getElementById('chatbotWindow');
+            const chatbotClose = document.getElementById('chatbotClose');
+            const chatbotMessages = document.getElementById('chatbotMessages');
+            const chatbotInput = document.getElementById('chatbotInput');
+            const chatbotSend = document.getElementById('chatbotSend');
+            const quickQuestionBtns = document.querySelectorAll('.quick-question-btn');
+
+            if (chatbotButton) {
+                // Toggle chatbot window
+                chatbotButton.addEventListener('click', () => {
+                    chatbotWindow.classList.add('active');
+                    chatbotInput.focus();
+                });
+            }
+
+            if (chatbotClose) {
+                chatbotClose.addEventListener('click', () => {
+                    chatbotWindow.classList.remove('active');
+                });
+            }
+
+            // Add message to chat
+            function addMessage(text, isUser = false) {
+                const messageDiv = document.createElement('div');
+                messageDiv.className = `chat-message ${isUser ? 'user' : 'bot'}`;
+                
+                const avatar = document.createElement('div');
+                avatar.className = `message-avatar ${isUser ? 'user' : 'bot'}`;
+                avatar.innerHTML = isUser ? '<i class="fas fa-user"></i>' : '<i class="fas fa-robot"></i>';
+                
+                const content = document.createElement('div');
+                content.className = 'message-content';
+                content.textContent = text;
+                
+                messageDiv.appendChild(avatar);
+                messageDiv.appendChild(content);
+                chatbotMessages.appendChild(messageDiv);
+                
+                // Scroll to bottom
+                chatbotMessages.scrollTop = chatbotMessages.scrollHeight;
+            }
+
+            // Show typing indicator
+            function showTypingIndicator() {
+                const typingDiv = document.createElement('div');
+                typingDiv.className = 'chat-message bot';
+                typingDiv.id = 'typingIndicator';
+                
+                const avatar = document.createElement('div');
+                avatar.className = 'message-avatar bot';
+                avatar.innerHTML = '<i class="fas fa-robot"></i>';
+                
+                const indicator = document.createElement('div');
+                indicator.className = 'typing-indicator active';
+                indicator.innerHTML = '<div class="typing-dot"></div><div class="typing-dot"></div><div class="typing-dot"></div>';
+                
+                typingDiv.appendChild(avatar);
+                typingDiv.appendChild(indicator);
+                chatbotMessages.appendChild(typingDiv);
+                chatbotMessages.scrollTop = chatbotMessages.scrollHeight;
+            }
+
+            function hideTypingIndicator() {
+                const typingIndicator = document.getElementById('typingIndicator');
+                if (typingIndicator) {
+                    typingIndicator.remove();
+                }
+            }
+
+            // Send message to chatbot
+            async function sendMessage(question) {
+                if (!question.trim()) return;
+                
+                // Add user message
+                addMessage(question, true);
+                chatbotInput.value = '';
+                chatbotSend.disabled = true;
+                
+                // Show typing indicator
+                showTypingIndicator();
+                
+                try {
+                    const response = await fetch('/api/chatbot/ask', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({ question })
+                    });
+                    
+                    const data = await response.json();
+                    
+                    // Hide typing indicator
+                    hideTypingIndicator();
+                    
+                    if (data.success) {
+                        addMessage(data.response, false);
+                    } else {
+                        addMessage('Désolé, une erreur est survenue. Veuillez réessayer.', false);
+                    }
+                } catch (error) {
+                    hideTypingIndicator();
+                    addMessage('Erreur de connexion. Veuillez vérifier votre connexion internet.', false);
+                } finally {
+                    chatbotSend.disabled = false;
+                }
+            }
+
+            if (chatbotSend) {
+                // Send button click
+                chatbotSend.addEventListener('click', () => {
+                    sendMessage(chatbotInput.value);
+                });
+            }
+
+            if (chatbotInput) {
+                // Enter key to send
+                chatbotInput.addEventListener('keypress', (e) => {
+                    if (e.key === 'Enter') {
+                        sendMessage(chatbotInput.value);
+                    }
+                });
+            }
+
+            // Quick question buttons
+            quickQuestionBtns.forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const question = btn.getAttribute('data-question');
+                    sendMessage(question);
+                });
+            });
+
+            // ========== STAR RATING FUNCTIONALITY ==========
+            
+            function updateStars(container, rating) {
+                const stars = container.querySelectorAll('.star');
+                stars.forEach((star, index) => {
+                    if (index < rating) {
+                        star.classList.remove('far');
+                        star.classList.add('fas', 'filled');
+                    } else {
+                        star.classList.remove('fas', 'filled');
+                        star.classList.add('far');
+                    }
+                });
+            }
+
+            function showFeedback(container, message) {
+                const feedback = container.querySelector('.rating-feedback');
+                if (feedback) {
+                    feedback.textContent = message;
+                    feedback.classList.add('show');
+                    setTimeout(() => {
+                        feedback.classList.remove('show');
+                    }, 2000);
+                }
+            }
+
+            function saveRating(planningId, rating) {
+                localStorage.setItem(`planning_rating_${planningId}`, rating);
+            }
+
+            function loadRating(planningId) {
+                return localStorage.getItem(`planning_rating_${planningId}`);
+            }
+
+            document.querySelectorAll('.rating-container').forEach(container => {
+                const planningId = container.getAttribute('data-planning-id');
+                const stars = container.querySelectorAll('.star');
+                
+                const savedRating = loadRating(planningId);
+                if (savedRating) {
+                    updateStars(container, parseInt(savedRating));
+                }
+                
+                stars.forEach((star, index) => {
+                    star.addEventListener('mouseenter', () => {
+                        updateStars(container, index + 1);
+                    });
+                });
+                
+                const starsContainer = container.querySelector('.stars');
+                if (starsContainer) {
+                    starsContainer.addEventListener('mouseleave', () => {
+                        const currentRating = loadRating(planningId) || 0;
+                        updateStars(container, parseInt(currentRating));
+                    });
+                }
+                
+                stars.forEach((star, index) => {
+                    star.addEventListener('click', () => {
+                        const rating = index + 1;
+                        saveRating(planningId, rating);
+                        updateStars(container, rating);
+
+                        // Show the review form
+                        const reviewForm = document.getElementById(`form-review-${planningId}`);
+                        const ratingInput = document.getElementById(`rating-input-${planningId}`);
+                        if (reviewForm && ratingInput) {
+                            reviewForm.classList.remove('d-none');
+                            reviewForm.style.animation = 'fadeIn 0.5s ease';
+                            ratingInput.value = rating;
+                        }
+
+                        showFeedback(container, `✓ Évaluation : ${rating} étoile${rating > 1 ? 's' : ''}`);
+                    });
+                });
+
+                // Cancel button logic
+                const cancelBtn = container.querySelector('.btn-cancel-review');
+                if (cancelBtn) {
+                    cancelBtn.addEventListener('click', () => {
+                        const reviewForm = document.getElementById(`form-review-${planningId}`);
+                        if (reviewForm) {
+                            reviewForm.classList.add('d-none');
+                            const textarea = reviewForm.querySelector('textarea');
+                            if (textarea) textarea.value = '';
+                        }
+                    });
+                }
+
+                // AJAX submission logic
+                const reviewForm = document.getElementById(`form-review-${planningId}`);
+                if (reviewForm) {
+                    reviewForm.addEventListener('submit', function(e) {
+                        e.preventDefault();
+                        const formData = new FormData(this);
+                        const submitBtn = this.querySelector('button[type="submit"]');
+                        const originalBtnText = submitBtn.innerHTML;
+                        
+                        submitBtn.disabled = true;
+                        submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Sending...';
+
+                        fetch(this.action, {
+                            method: 'POST',
+                            body: formData,
+                            headers: {
+                                'X-Requested-With': 'XMLHttpRequest'
+                            }
+                        })
+                        .then(response => response.json())
+                        .then(data => {
+                            if (data.success) {
+                                reviewForm.classList.add('v-none'); // Hide form
+                                setTimeout(() => reviewForm.classList.add('d-none'), 300);
+                                showFeedback(container, `✓ ${data.message}`);
+                                // Clear textarea
+                                const textarea = reviewForm.querySelector('textarea');
+                                if (textarea) textarea.value = '';
+                            } else {
+                                showFeedback(container, `✗ Erreur: ${data.message || 'Error'}`);
+                                submitBtn.disabled = false;
+                                submitBtn.innerHTML = originalBtnText;
+                            }
+                        })
+                        .catch(error => {
+                            console.error('Error:', error);
+                            showFeedback(container, '✗ Connection error. Please try again.');
+                            submitBtn.disabled = false;
+                            submitBtn.innerHTML = originalBtnText;
+                        });
+                    });
+                }
+            });
+
+            /* --- Coaching AI Logic --- */
+            const coachingModal = document.getElementById('coachingModal');
+            const openCoachingBtn = document.getElementById('open-coaching-ai');
+            const closeCoachingBtns = document.querySelectorAll('.coaching-close');
+            const coachingResult = document.getElementById('coaching-result');
+
+            if (openCoachingBtn && coachingModal) {
+                openCoachingBtn.addEventListener('click', function() {
+                    coachingModal.style.display = "block";
+                    coachingResult.innerHTML = `
+                        <div class="loading-spinner">
+                            <div class="spinner-border text-primary" role="status">
+                                <span class="visually-hidden">Analyse en cours...</span>
+                            </div>
+                            <span class="ms-3">Your AI Coach is analyzing your history...</span>
+                        </div>
+                    `;
+
+                    fetch('/api/recommander-sessions')
+                        .then(response => response.json())
+                        .then(data => {
+                            if (data.content) {
+                                let formattedText = data.content.replace(/\n/g, '<br>');
+                                
+                                // Basic Markdown bold/list conversion if marked is not present
+                                formattedText = formattedText.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+                                formattedText = formattedText.replace(/^\*\s(.*)/gm, '<li>$1</li>');
+                                if (formattedText.includes('<li>')) {
+                                    formattedText = formattedText.replace(/(<li>.*<\/li>)/s, '<ul>$1</ul>');
+                                }
+
+                                coachingResult.innerHTML = `
+                                    <div class="coach-intro mb-3">
+                                        <i class="fas fa-quote-left text-primary me-2"></i>
+                                        <span class="fw-bold">Tips from your EyeTwin Coach:</span>
+                                    </div>
+                                    <div class="recommendations-text p-3" style="background: rgba(255,255,255,0.03); border-radius: 10px; border: 1px solid rgba(139, 92, 246, 0.2);">
+                                        ${formattedText}
+                                    </div>
+                                `;
+                            } else {
+                                throw new Error("Empty response from AI");
+                            }
+                        })
+                        .catch(error => {
+                            coachingResult.innerHTML = "<p class='text-danger'>Sorry, an error occurred while generating your recommendations.</p>";
+                        });
+                });
+            }
+
+            closeCoachingBtns.forEach(btn => {
+                btn.onclick = function() {
+                    coachingModal.style.display = "none";
+                }
+            });
+
+            window.onclick = function(event) {
+                if (event.target == coachingModal) {
+                    coachingModal.style.display = "none";
+                }
+            }
+        });
+    </script>
 {% endblock %}
+
