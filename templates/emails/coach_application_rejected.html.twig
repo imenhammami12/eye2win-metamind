@@ -1,92 +1,206 @@
 {# templates/emails/coach_application_rejected.html.twig #}
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
     <meta charset="UTF-8">
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            line-height: 1.6;
-            color: #333;
-            max-width: 600px;
-            margin: 0 auto;
-            padding: 20px;
-        }
-        .header {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            padding: 30px;
-            text-align: center;
-            border-radius: 10px 10px 0 0;
-        }
-        .content {
-            background: #f9f9f9;
-            padding: 30px;
-            border-radius: 0 0 10px 10px;
-        }
-        .button {
-            display: inline-block;
-            background: #667eea;
-            color: white;
-            padding: 12px 30px;
-            text-decoration: none;
-            border-radius: 5px;
-            margin: 20px 0;
-        }
-        .info-box {
-            background: #fff3cd;
-            border-left: 4px solid #ffc107;
-            padding: 15px;
-            margin: 20px 0;
-        }
-        .footer {
-            text-align: center;
-            margin-top: 30px;
-            color: #666;
-            font-size: 14px;
-        }
-    </style>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Coach Application Update — EyeTwin</title>
+    <link href="https://fonts.googleapis.com/css2?family=Aclonica&family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 </head>
-<body>
-    <div class="header">
-        <h1>📋 Application Update</h1>
-    </div>
-    
-    <div class="content">
-        <p>Hello <strong>{{ user.username }}</strong>,</p>
-        
-        <p>Thank you for your interest in becoming a coach on Eye2Win.</p>
-        
-        <p>After careful review of your application, we regret to inform you that your application has not been approved at this time.</p>
-        
-        <div class="info-box">
-            <strong>📝 Reason:</strong>
-            <p>{{ reviewComment }}</p>
-        </div>
-        
-        <p><strong>What's next?</strong></p>
-        <ul>
-            <li>📚 Continue developing your skills</li>
-            <li>🎮 Actively participate in the community</li>
-            <li>🏆 Obtain new certifications or achievements</li>
-            <li>🔄 You may submit a new application in the future</li>
-        </ul>
-        
-        <p>This decision does not reflect on your value as a player. We encourage you to keep improving and try again in the future.</p>
-        
-        <div style="text-align: center;">
-            <a href="{{ url('app_dashboard') }}" class="button">Access Dashboard</a>
-        </div>
-        
-        <p>We remain available for any questions.</p>
-        
-        <p>Best regards,<br>
-        <strong>The Eye2Win Team</strong></p>
-    </div>
-    
-    <div class="footer">
-        <p>This email was sent automatically, please do not reply.</p>
-        <p>&copy; {{ "now"|date("Y") }} Eye2Win Platform - All rights reserved</p>
-    </div>
+<body style="margin:0;padding:0;background-color:#07080f;font-family:'Poppins',Arial,sans-serif;">
+
+<table width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color:#07080f;padding:40px 16px;">
+  <tr>
+    <td align="center">
+      <table width="620" cellpadding="0" cellspacing="0" border="0" style="max-width:620px;width:100%;">
+
+        <!-- TOP GRADIENT BAR -->
+        <tr>
+          <td style="height:4px;background-image:linear-gradient(to left,#ff0000 0%,#c6019a 51%,#ff0000 100%);background-size:200% auto;border-radius:4px 4px 0 0;"></td>
+        </tr>
+
+        <!-- HEADER -->
+        <tr>
+          <td align="center" style="background-color:#0b111f;border-left:1px solid rgba(255,255,255,0.07);border-right:1px solid rgba(255,255,255,0.07);padding:52px 48px 48px;">
+
+            <!-- Logo -->
+            <img src="cid:logo" alt="EyeTwin" height="52" style="display:block;margin:0 auto 6px;height:52px;width:auto;" />
+
+            <!-- Icon circle -->
+            <table cellpadding="0" cellspacing="0" border="0" style="margin:0 auto 22px;">
+              <tr>
+                <td align="center" style="width:76px;height:76px;border-radius:50%;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.15);font-size:30px;line-height:76px;text-align:center;">📋</td>
+              </tr>
+            </table>
+
+            <!-- Title -->
+            <h1 style="margin:0 0 10px;font-size:30px;font-weight:400;color:#ffffff;letter-spacing:3px;text-transform:uppercase;line-height:1;font-family:'Aclonica',Arial,sans-serif;">Application Update</h1>
+            <p style="margin:0;font-size:11px;color:#6a6a88;text-transform:uppercase;letter-spacing:3px;font-weight:500;font-family:'Poppins',Arial,sans-serif;">Coach Application — Decision Notification</p>
+
+          </td>
+        </tr>
+
+        <!-- STATUS STRIPE -->
+        <tr>
+          <td align="center" style="background-color:#0d1020;border-top:1px solid rgba(255,255,255,0.06);border-bottom:1px solid rgba(255,255,255,0.06);border-left:1px solid rgba(255,255,255,0.07);border-right:1px solid rgba(255,255,255,0.07);padding:15px 48px;">
+            <table cellpadding="0" cellspacing="0" border="0">
+              <tr>
+                <td style="width:28px;height:28px;border-radius:50%;border:1px solid rgba(255,100,100,0.4);text-align:center;line-height:28px;font-size:11px;color:rgba(255,100,100,0.7);">✕</td>
+                <td style="padding-left:12px;font-size:11px;font-weight:700;letter-spacing:4px;text-transform:uppercase;color:#6a6a88;font-family:'Aclonica',Arial,sans-serif;">NOT APPROVED</td>
+              </tr>
+            </table>
+          </td>
+        </tr>
+
+        <!-- BODY -->
+        <tr>
+          <td style="background-color:#0b111f;border-left:1px solid rgba(255,255,255,0.06);border-right:1px solid rgba(255,255,255,0.06);padding:44px 48px 40px;">
+
+            <!-- Greeting -->
+            <p style="margin:0 0 10px;font-size:18px;color:#d8dce8;font-weight:500;line-height:1.4;font-family:'Poppins',Arial,sans-serif;">
+              Hello, <span style="color:#ffffff;font-weight:700;font-family:'Aclonica',Arial,sans-serif;">{{ user.username }}</span>
+            </p>
+            <p style="margin:0 0 12px;font-size:14px;color:#b0b4c4;line-height:1.9;font-weight:300;font-family:'Poppins',Arial,sans-serif;">
+              Thank you for your interest in becoming a coach on
+              <span style="color:#d8dce8;font-weight:500;">EyeTwin E-Sport Platform</span> and for taking the time to submit your application.
+            </p>
+            <p style="margin:0 0 32px;font-size:14px;color:#b0b4c4;line-height:1.9;font-weight:300;font-family:'Poppins',Arial,sans-serif;">
+              After careful review by our team, we regret to inform you that your application has
+              <span style="color:#ffffff;font-weight:600;">not been approved</span> at this time.
+            </p>
+
+            <!-- Divider -->
+            <table width="100%" cellpadding="0" cellspacing="0" border="0" style="margin-bottom:30px;">
+              <tr><td style="height:1px;background:linear-gradient(to right,rgba(255,0,0,0.35),rgba(198,1,154,0.35),rgba(255,0,0,0.35));"></td></tr>
+            </table>
+
+            {% if reviewComment %}
+            <!-- Reason box -->
+            <table width="100%" cellpadding="0" cellspacing="0" border="0" style="margin-bottom:36px;">
+              <tr>
+                <td style="background:#0f1525;border-left:3px solid #ff0000;border-top:1px solid rgba(255,0,0,0.2);border-right:1px solid rgba(255,0,0,0.2);border-bottom:1px solid rgba(255,0,0,0.2);border-radius:0 6px 6px 0;padding:18px 22px;">
+                  <p style="margin:0 0 9px;font-size:9px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:#ff5555;font-family:'Aclonica',Arial,sans-serif;">📝 Reason from our team</p>
+                  <p style="margin:0;font-size:14px;color:#c8ccdc;line-height:1.8;font-weight:300;font-family:'Poppins',Arial,sans-serif;">{{ reviewComment }}</p>
+                </td>
+              </tr>
+            </table>
+            {% endif %}
+
+            <!-- Next steps label -->
+            <p style="margin:0 0 16px;font-size:14px;font-weight:400;color:#ffffff;text-transform:uppercase;letter-spacing:1px;font-family:'Aclonica',Arial,sans-serif;">What you can do next:</p>
+
+            <!-- Step 1 -->
+            <table width="100%" cellpadding="0" cellspacing="0" border="0" style="margin-bottom:8px;">
+              <tr>
+                <td style="background-color:#0d1020;border:1px solid rgba(255,255,255,0.08);border-radius:4px;padding:14px 18px;">
+                  <table cellpadding="0" cellspacing="0" border="0" width="100%"><tr>
+                    <td width="34" valign="middle" style="font-size:18px;">📚</td>
+                    <td valign="middle" style="font-size:14px;color:#c8ccdc;font-weight:300;line-height:1.6;font-family:'Poppins',Arial,sans-serif;">Continue developing and refining your gaming skills</td>
+                  </tr></table>
+                </td>
+              </tr>
+            </table>
+
+            <!-- Step 2 -->
+            <table width="100%" cellpadding="0" cellspacing="0" border="0" style="margin-bottom:8px;">
+              <tr>
+                <td style="background-color:#0d1020;border:1px solid rgba(255,255,255,0.08);border-radius:4px;padding:14px 18px;">
+                  <table cellpadding="0" cellspacing="0" border="0" width="100%"><tr>
+                    <td width="34" valign="middle" style="font-size:18px;">🎮</td>
+                    <td valign="middle" style="font-size:14px;color:#c8ccdc;font-weight:300;line-height:1.6;font-family:'Poppins',Arial,sans-serif;">Actively participate and engage in the EyeTwin community</td>
+                  </tr></table>
+                </td>
+              </tr>
+            </table>
+
+            <!-- Step 3 -->
+            <table width="100%" cellpadding="0" cellspacing="0" border="0" style="margin-bottom:8px;">
+              <tr>
+                <td style="background-color:#0d1020;border:1px solid rgba(255,255,255,0.08);border-radius:4px;padding:14px 18px;">
+                  <table cellpadding="0" cellspacing="0" border="0" width="100%"><tr>
+                    <td width="34" valign="middle" style="font-size:18px;">🏆</td>
+                    <td valign="middle" style="font-size:14px;color:#c8ccdc;font-weight:300;line-height:1.6;font-family:'Poppins',Arial,sans-serif;">Obtain new certifications, rankings, or achievements</td>
+                  </tr></table>
+                </td>
+              </tr>
+            </table>
+
+            <!-- Step 4 -->
+            <table width="100%" cellpadding="0" cellspacing="0" border="0" style="margin-bottom:36px;">
+              <tr>
+                <td style="background-color:#0d1020;border:1px solid rgba(255,255,255,0.08);border-radius:4px;padding:14px 18px;">
+                  <table cellpadding="0" cellspacing="0" border="0" width="100%"><tr>
+                    <td width="34" valign="middle" style="font-size:18px;">🔄</td>
+                    <td valign="middle" style="font-size:14px;color:#c8ccdc;font-weight:300;line-height:1.6;font-family:'Poppins',Arial,sans-serif;">Submit a new application in the future with updated experience</td>
+                  </tr></table>
+                </td>
+              </tr>
+            </table>
+
+            <!-- Encouragement box -->
+            <table width="100%" cellpadding="0" cellspacing="0" border="0" style="margin-bottom:36px;">
+              <tr>
+                <td style="background:#0d1020;border-left:3px solid #c6019a;border-top:1px solid rgba(198,1,154,0.15);border-right:1px solid rgba(198,1,154,0.15);border-bottom:1px solid rgba(198,1,154,0.15);border-radius:0 6px 6px 0;padding:18px 24px;">
+                  <p style="margin:0;font-size:14px;color:#c8ccdc;line-height:1.9;font-weight:300;font-style:italic;font-family:'Poppins',Arial,sans-serif;">
+                    💡 This decision does not reflect on your value as a player or your potential.
+                    We genuinely encourage you to keep improving — many of our best coaches
+                    were not approved on their first application.
+                  </p>
+                </td>
+              </tr>
+            </table>
+
+            <!-- CTA Button (btn_2 style: gradient border) -->
+            <table width="100%" cellpadding="0" cellspacing="0" border="0" style="margin-bottom:36px;">
+              <tr>
+                <td align="center">
+                  <a href="{{ url('app_dashboard') }}"
+                     style="display:inline-block;padding:17px 44px;background-color:transparent;color:#ffffff;text-decoration:none;font-size:13px;font-weight:400;letter-spacing:2px;text-transform:uppercase;font-family:'Aclonica',Arial,sans-serif;border:2px solid;border-image:linear-gradient(to left,#ff0000 0%,#c6019a 100%);border-image-slice:1;">
+                    Back to Dashboard →
+                  </a>
+                </td>
+              </tr>
+            </table>
+
+            <!-- Divider -->
+            <table width="100%" cellpadding="0" cellspacing="0" border="0" style="margin-bottom:24px;">
+              <tr><td style="height:1px;background:rgba(255,255,255,0.07);"></td></tr>
+            </table>
+
+            <!-- Closing -->
+            <p style="margin:0 0 14px;font-size:14px;color:#b0b4c4;line-height:1.9;font-weight:300;font-family:'Poppins',Arial,sans-serif;">
+              We remain available if you have any questions about this decision or about future applications.
+            </p>
+            <p style="margin:0;font-size:14px;color:#b0b4c4;line-height:1.7;font-weight:300;font-family:'Poppins',Arial,sans-serif;">
+              Best regards,<br>
+              <span style="color:#ffffff;font-weight:500;font-family:'Aclonica',Arial,sans-serif;">The EyeTwin Team</span>
+            </p>
+
+          </td>
+        </tr>
+
+        <!-- FOOTER -->
+        <tr>
+          <td align="center" style="background-color:#060810;border:1px solid rgba(255,255,255,0.045);border-top:none;border-radius:0 0 4px 4px;padding:24px 48px 28px;">
+            <table width="100%" cellpadding="0" cellspacing="0" border="0" style="margin-bottom:16px;">
+              <tr><td style="height:1px;background:linear-gradient(to right,rgba(255,0,0,0.25),rgba(198,1,154,0.25),rgba(255,0,0,0.25));"></td></tr>
+            </table>
+            <p style="margin:0 0 4px;font-size:11px;color:#6a6a7a;line-height:1.8;font-weight:300;font-family:'Poppins',Arial,sans-serif;">This email was sent automatically — please do not reply.</p>
+            <p style="margin:0;font-size:11px;color:#6a6a7a;line-height:1.8;font-weight:300;font-family:'Poppins',Arial,sans-serif;">
+              &copy; {{ "now"|date("Y") }} <span style="color:#ff0000;font-weight:500;">EyeTwin E-Sport Platform</span> — All rights reserved
+            </p>
+          </td>
+        </tr>
+
+        <!-- BOTTOM GRADIENT BAR -->
+        <tr>
+          <td style="height:3px;background-image:linear-gradient(to left,#ff0000 0%,#c6019a 51%,#ff0000 100%);background-size:200% auto;border-radius:0 0 4px 4px;"></td>
+        </tr>
+
+      </table>
+    </td>
+  </tr>
+</table>
+
 </body>
 </html>

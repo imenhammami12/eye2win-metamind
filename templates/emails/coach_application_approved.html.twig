@@ -1,99 +1,180 @@
 {# templates/emails/coach_application_approved.html.twig #}
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
     <meta charset="UTF-8">
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            line-height: 1.6;
-            color: #333;
-            max-width: 600px;
-            margin: 0 auto;
-            padding: 20px;
-        }
-        .header {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            padding: 30px;
-            text-align: center;
-            border-radius: 10px 10px 0 0;
-        }
-        .content {
-            background: #f9f9f9;
-            padding: 30px;
-            border-radius: 0 0 10px 10px;
-        }
-        .badge {
-            display: inline-block;
-            background: #28a745;
-            color: white;
-            padding: 8px 16px;
-            border-radius: 20px;
-            font-weight: bold;
-            margin: 20px 0;
-        }
-        .button {
-            display: inline-block;
-            background: #667eea;
-            color: white;
-            padding: 12px 30px;
-            text-decoration: none;
-            border-radius: 5px;
-            margin: 20px 0;
-        }
-        .info-box {
-            background: white;
-            border-left: 4px solid #667eea;
-            padding: 15px;
-            margin: 20px 0;
-        }
-        .footer {
-            text-align: center;
-            margin-top: 30px;
-            color: #666;
-            font-size: 14px;
-        }
-    </style>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Coach Application Approved — EyeTwin</title>
+    <link href="https://fonts.googleapis.com/css2?family=Aclonica&family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 </head>
-<body>
-    <div class="header">
-        <h1>🎉 Congratulations!</h1>
-    </div>
-    
-    <div class="content">
-        <p>Hello <strong>{{ user.username }}</strong>,</p>
-        
-        <p>We are pleased to inform you that your application to become a coach on Eye2Win has been <span class="badge">APPROVED</span>!</p>
-        
-        <p>You can now:</p>
-        <ul>
-            <li>✅ Create and offer coaching sessions</li>
-            <li>✅ Share your expertise with the community</li>
-            <li>✅ Help other players improve</li>
-            <li>✅ Access coach-exclusive tools</li>
-        </ul>
-        
-        {% if reviewComment %}
-        <div class="info-box">
-            <strong>📝 Comment from our team:</strong>
-            <p>{{ reviewComment }}</p>
-        </div>
-        {% endif %}
-        
-        <div style="text-align: center;">
-            <a href="{{ url('app_dashboard') }}" class="button">Access Dashboard</a>
-        </div>
-        
-        <p>We are excited to have you among our coaches and wish you great success in this new adventure!</p>
-        
-        <p>See you soon on the platform,<br>
-        <strong>The Eye2Win Team</strong></p>
-    </div>
-    
-    <div class="footer">
-        <p>This email was sent automatically, please do not reply.</p>
-        <p>&copy; {{ "now"|date("Y") }} Eye2Win Platform - All rights reserved</p>
-    </div>
+<body style="margin:0;padding:0;background-color:#07080f;font-family:'Poppins',Arial,sans-serif;">
+
+<table width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color:#07080f;padding:40px 16px;">
+  <tr>
+    <td align="center">
+      <table width="620" cellpadding="0" cellspacing="0" border="0" style="max-width:620px;width:100%;">
+
+        <!-- TOP GRADIENT BAR (btn_1 style from site) -->
+        <tr>
+          <td style="height:4px;background-image:linear-gradient(to left,#ff0000 0%,#c6019a 51%,#ff0000 100%);background-size:200% auto;border-radius:4px 4px 0 0;"></td>
+        </tr>
+
+        <!-- HEADER (pricing_bg style: #0b111f) -->
+        <tr>
+          <td align="center" style="background-color:#0b111f;background-image:url(../img/pricing_bg.png);background-position:top;background-size:contain;background-repeat:no-repeat;border-left:1px solid rgba(255,0,0,0.15);border-right:1px solid rgba(255,0,0,0.15);padding:52px 48px 48px;">
+
+            <!-- Logo -->
+            <img src="cid:logo" alt="EyeTwin" height="52" style="display:block;margin:0 auto 6px;height:52px;width:auto;" />
+
+            <!-- Icon circle -->
+            <table cellpadding="0" cellspacing="0" border="0" style="margin:0 auto 22px;">
+              <tr>
+                <td align="center" style="width:76px;height:76px;border-radius:50%;background:linear-gradient(135deg,rgba(255,0,0,0.12),rgba(198,1,154,0.08));border:1px solid rgba(255,0,0,0.3);font-size:30px;line-height:76px;text-align:center;">🎉</td>
+              </tr>
+            </table>
+
+            <!-- Title (Aclonica like site h1/h2) -->
+            <h1 style="margin:0 0 10px;font-size:34px;font-weight:400;color:#ffffff;letter-spacing:3px;text-transform:uppercase;line-height:1;font-family:'Aclonica',Arial,sans-serif;">Congratulations!</h1>
+            <p style="margin:0;font-size:11px;color:rgba(255,0,0,0.6);text-transform:uppercase;letter-spacing:3px;font-weight:500;font-family:'Poppins',Arial,sans-serif;">Your coach application has been reviewed</p>
+
+          </td>
+        </tr>
+
+        <!-- APPROVED BANNER (btn_1 gradient) -->
+        <tr>
+          <td align="center" style="background-image:linear-gradient(to left,#ff0000 0%,#c6019a 51%,#ff0000 100%);background-size:200% auto;padding:16px 48px;border-left:1px solid rgba(255,0,0,0.15);border-right:1px solid rgba(255,0,0,0.15);">
+            <p style="margin:0;font-size:11px;font-weight:700;letter-spacing:4px;text-transform:uppercase;color:#ffffff;font-family:'Aclonica',Arial,sans-serif;">✓ &nbsp;&nbsp; APPLICATION APPROVED</p>
+          </td>
+        </tr>
+
+        <!-- BODY -->
+        <tr>
+          <td style="background-color:#0b111f;border-left:1px solid rgba(255,255,255,0.06);border-right:1px solid rgba(255,255,255,0.06);padding:44px 48px 40px;">
+
+            <!-- Greeting -->
+            <p style="margin:0 0 8px;font-size:18px;color:#e0e4ef;font-weight:500;line-height:1.4;font-family:'Poppins',Arial,sans-serif;">
+              Hello, <span style="color:#ffffff;font-weight:700;font-family:'Aclonica',Arial,sans-serif;">{{ user.username }}</span> 👋
+            </p>
+            <p style="margin:0 0 32px;font-size:14px;color:#7f7f7f;line-height:1.9;font-weight:300;font-family:'Poppins',Arial,sans-serif;">
+              We are thrilled to inform you that your application to become a coach on
+              <span style="color:#c0c8d8;font-weight:500;">EyeTwin E-Sport Platform</span> has been officially reviewed and
+              <span style="background:linear-gradient(to right,#ff0000,#c6019a);-webkit-background-clip:text;-webkit-text-fill-color:transparent;font-weight:700;">approved</span>.
+              Welcome to our elite coaching roster!
+            </p>
+
+            <!-- Divider (like site hr) -->
+            <table width="100%" cellpadding="0" cellspacing="0" border="0" style="margin-bottom:30px;">
+              <tr><td style="height:1px;background:linear-gradient(to right,rgba(255,0,0,0.4),rgba(198,1,154,0.4),rgba(255,0,0,0.4));"></td></tr>
+            </table>
+
+            <!-- Section label (Aclonica style) -->
+            <p style="margin:0 0 16px;font-size:14px;font-weight:400;color:#ffffff;text-transform:uppercase;letter-spacing:1px;font-family:'Aclonica',Arial,sans-serif;">As a coach, you can now:</p>
+
+            <!-- Perks (single_pricing_part style) -->
+            <table width="100%" cellpadding="0" cellspacing="0" border="0" style="margin-bottom:10px;">
+              <tr>
+                <td style="background-color:#0f1628;border:1px solid rgba(255,0,0,0.12);border-left:3px solid #ff0000;border-radius:0 6px 6px 0;padding:14px 20px;">
+                  <table cellpadding="0" cellspacing="0" border="0" width="100%"><tr>
+                    <td width="30" valign="middle" style="font-size:14px;color:#c6019a;font-family:'Aclonica',Arial,sans-serif;">✦</td>
+                    <td valign="middle" style="font-size:13px;color:#bebebe;font-weight:300;line-height:1.6;font-family:'Poppins',Arial,sans-serif;">Create and publish coaching sessions for players</td>
+                  </tr></table>
+                </td>
+              </tr>
+            </table>
+            <table width="100%" cellpadding="0" cellspacing="0" border="0" style="margin-bottom:10px;">
+              <tr>
+                <td style="background-color:#0f1628;border:1px solid rgba(255,0,0,0.12);border-left:3px solid #c6019a;border-radius:0 6px 6px 0;padding:14px 20px;">
+                  <table cellpadding="0" cellspacing="0" border="0" width="100%"><tr>
+                    <td width="30" valign="middle" style="font-size:14px;color:#ff0000;font-family:'Aclonica',Arial,sans-serif;">✦</td>
+                    <td valign="middle" style="font-size:13px;color:#bebebe;font-weight:300;line-height:1.6;font-family:'Poppins',Arial,sans-serif;">Share your expertise and strategies with the community</td>
+                  </tr></table>
+                </td>
+              </tr>
+            </table>
+            <table width="100%" cellpadding="0" cellspacing="0" border="0" style="margin-bottom:10px;">
+              <tr>
+                <td style="background-color:#0f1628;border:1px solid rgba(255,0,0,0.12);border-left:3px solid #ff0000;border-radius:0 6px 6px 0;padding:14px 20px;">
+                  <table cellpadding="0" cellspacing="0" border="0" width="100%"><tr>
+                    <td width="30" valign="middle" style="font-size:14px;color:#c6019a;font-family:'Aclonica',Arial,sans-serif;">✦</td>
+                    <td valign="middle" style="font-size:13px;color:#bebebe;font-weight:300;line-height:1.6;font-family:'Poppins',Arial,sans-serif;">Help other players level up their gameplay</td>
+                  </tr></table>
+                </td>
+              </tr>
+            </table>
+            <table width="100%" cellpadding="0" cellspacing="0" border="0" style="margin-bottom:36px;">
+              <tr>
+                <td style="background-color:#0f1628;border:1px solid rgba(255,0,0,0.12);border-left:3px solid #c6019a;border-radius:0 6px 6px 0;padding:14px 20px;">
+                  <table cellpadding="0" cellspacing="0" border="0" width="100%"><tr>
+                    <td width="30" valign="middle" style="font-size:14px;color:#ff0000;font-family:'Aclonica',Arial,sans-serif;">✦</td>
+                    <td valign="middle" style="font-size:13px;color:#bebebe;font-weight:300;line-height:1.6;font-family:'Poppins',Arial,sans-serif;">Access exclusive coach tools and analytics</td>
+                  </tr></table>
+                </td>
+              </tr>
+            </table>
+
+            {% if reviewComment %}
+            <!-- Review comment box (btn_2 border style from pricing) -->
+            <table width="100%" cellpadding="0" cellspacing="0" border="0" style="margin-bottom:36px;">
+              <tr>
+                <td style="background:rgba(198,1,154,0.06);border:1px solid rgba(198,1,154,0.2);border-left:3px solid #c6019a;border-radius:0 8px 8px 0;padding:18px 22px;">
+                  <p style="margin:0 0 8px;font-size:9px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:#c6019a;font-family:'Aclonica',Arial,sans-serif;">📝 Note from our team</p>
+                  <p style="margin:0;font-size:13px;color:#bebebe;line-height:1.8;font-weight:300;font-family:'Poppins',Arial,sans-serif;">{{ reviewComment }}</p>
+                </td>
+              </tr>
+            </table>
+            {% endif %}
+
+            <!-- CTA Button (btn_1 class style exactly) -->
+            <table width="100%" cellpadding="0" cellspacing="0" border="0" style="margin-bottom:36px;">
+              <tr>
+                <td align="center">
+                  <a href="{{ url('app_dashboard') }}"
+                     style="display:inline-block;padding:18px 48px;background-image:linear-gradient(to left,#ff0000 0%,#c6019a 51%,#ff0000 100%);background-size:200% auto;color:#ffffff;text-decoration:none;font-size:14px;font-weight:400;letter-spacing:2px;text-transform:uppercase;font-family:'Aclonica',Arial,sans-serif;">
+                    Access My Dashboard →
+                  </a>
+                </td>
+              </tr>
+            </table>
+
+            <!-- Divider -->
+            <table width="100%" cellpadding="0" cellspacing="0" border="0" style="margin-bottom:24px;">
+              <tr><td style="height:1px;background:rgba(255,255,255,0.06);"></td></tr>
+            </table>
+
+            <!-- Closing -->
+            <p style="margin:0 0 14px;font-size:14px;color:#7f7f7f;line-height:1.9;font-weight:300;font-family:'Poppins',Arial,sans-serif;">
+              We're excited to have you as part of our coaching team and look forward to the value you'll bring to our community. Welcome aboard!
+            </p>
+            <p style="margin:0;font-size:14px;color:#7f7f7f;line-height:1.7;font-weight:300;font-family:'Poppins',Arial,sans-serif;">
+              See you on the platform,<br>
+              <span style="color:#ffffff;font-weight:500;font-family:'Aclonica',Arial,sans-serif;">The EyeTwin Team</span>
+            </p>
+
+          </td>
+        </tr>
+
+        <!-- FOOTER (copygight_text style: #0b111f) -->
+        <tr>
+          <td align="center" style="background-color:#060810;border:1px solid rgba(255,255,255,0.05);border-top:none;border-radius:0 0 4px 4px;padding:24px 48px 28px;">
+            <table width="100%" cellpadding="0" cellspacing="0" border="0" style="margin-bottom:16px;">
+              <tr><td style="height:1px;background:linear-gradient(to right,rgba(255,0,0,0.3),rgba(198,1,154,0.3),rgba(255,0,0,0.3));"></td></tr>
+            </table>
+            <p style="margin:0 0 4px;font-size:11px;color:#555555;line-height:1.8;font-weight:300;font-family:'Poppins',Arial,sans-serif;">This email was sent automatically — please do not reply.</p>
+            <p style="margin:0;font-size:11px;color:#555555;line-height:1.8;font-weight:300;font-family:'Poppins',Arial,sans-serif;">
+              &copy; {{ "now"|date("Y") }} <span style="color:#ff0000;font-weight:500;">EyeTwin E-Sport Platform</span> — All rights reserved
+            </p>
+          </td>
+        </tr>
+
+        <!-- BOTTOM GRADIENT BAR -->
+        <tr>
+          <td style="height:3px;background-image:linear-gradient(to left,#ff0000 0%,#c6019a 51%,#ff0000 100%);background-size:200% auto;border-radius:0 0 4px 4px;"></td>
+        </tr>
+
+      </table>
+    </td>
+  </tr>
+</table>
+
 </body>
 </html>
