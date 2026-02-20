@@ -268,116 +268,178 @@ class MultiChannelNotificationService
                "Si vous n'avez pas demandé cette réinitialisation, ignorez ce message.";
     }
 
-    private function generateEmailTemplate(string $username, string $resetUrl, string $token): string
+private function generateEmailTemplate(string $username, string $resetUrl, string $token): string
     {
+        $verifyUrl = "http://localhost:8000/verify-reset-code";
+        $year = date('Y');
+
         return <<<HTML
-        <!DOCTYPE html>
-        <html>
-        <head>
-            <meta charset="UTF-8">
-            <style>
-                body {
-                    font-family: 'Inter', Arial, sans-serif;
-                    background: linear-gradient(135deg, #1a0e2e 0%, #2d1b3d 100%);
-                    margin: 0;
-                    padding: 40px 20px;
-                }
-                .container {
-                    max-width: 600px;
-                    margin: 0 auto;
-                    background: rgba(255, 255, 255, 0.95);
-                    border-radius: 16px;
-                    overflow: hidden;
-                    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
-                }
-                .header {
-                    background: linear-gradient(135deg, #ff3c64 0%, #5a67d8 100%);
-                    padding: 40px;
-                    text-align: center;
-                    color: white;
-                }
-                .header h1 {
-                    margin: 0;
-                    font-size: 28px;
-                }
-                .content {
-                    padding: 40px;
-                    color: #333;
-                }
-                .token-box {
-                    background: #f8f9fa;
-                    border: 2px dashed #5a67d8;
-                    border-radius: 12px;
-                    padding: 20px;
-                    text-align: center;
-                    margin: 30px 0;
-                }
-                .token {
-                    font-size: 24px;
-                    font-weight: bold;
-                    color: #ff3c64;
-                    letter-spacing: 2px;
-                    word-break: break-all;
-                }
-                .button {
-                    display: inline-block;
-                    background: linear-gradient(135deg, #ff3c64 0%, #ff1744 100%);
-                    color: white !important;
-                    padding: 16px 40px;
-                    border-radius: 12px;
-                    text-decoration: none;
-                    font-weight: bold;
-                    margin: 20px 0;
-                    text-transform: uppercase;
-                }
-                .footer {
-                    background: #f8f9fa;
-                    padding: 30px;
-                    text-align: center;
-                    color: #666;
-                    font-size: 13px;
-                }
-                .warning {
-                    background: #fff3cd;
-                    border-left: 4px solid #ffc107;
-                    padding: 15px;
-                    margin: 20px 0;
-                    border-radius: 4px;
-                }
-            </style>
-        </head>
-        <body>
-            <div class="container">
-                <div class="header">
-                    <h1>🔐 Réinitialisation de mot de passe</h1>
-                </div>
-                <div class="content">
-                    <p>Bonjour <strong>{$username}</strong>,</p>
-                    
-                    <p>Vous avez demandé la réinitialisation de votre mot de passe EyeTwin E-Sport Platform.</p>
-                    
-                    <div class="token-box">
-                        <p style="margin: 0 0 10px 0; font-size: 14px; color: #666;">Votre code de réinitialisation:</p>
-                        <div class="token">{$token}</div>
-                    </div>
-                    
-                    <p style="text-align: center;">
-                        <a href="{$resetUrl}" class="button">Réinitialiser mon mot de passe</a>
-                    </p>
-                    
-                    <div class="warning">
-                        <strong>⏱ Important:</strong> Ce lien expire dans <strong>1 heure</strong>.
-                    </div>
-                    
-                    <p>Si vous n'avez pas demandé cette réinitialisation, vous pouvez ignorer cet email en toute sécurité.</p>
-                </div>
-                <div class="footer">
-                    <p><strong>EyeTwin E-Sport Platform</strong></p>
-                    <p>Cet email a été envoyé automatiquement, merci de ne pas y répondre.</p>
-                </div>
-            </div>
-        </body>
-        </html>
-        HTML;
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reset Password — EyeTwin</title>
+</head>
+<body style="margin:0;padding:0;background-color:#07080f;font-family:'Poppins',Arial,sans-serif;">
+
+<table width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color:#07080f;padding:40px 16px;">
+  <tr>
+    <td align="center">
+      <table width="620" cellpadding="0" cellspacing="0" border="0" style="max-width:620px;width:100%;">
+
+        <!-- TOP GRADIENT BAR -->
+        <tr>
+          <td style="height:4px;background-image:linear-gradient(to left,#ff0000 0%,#c6019a 51%,#ff0000 100%);background-size:200% auto;border-radius:4px 4px 0 0;"></td>
+        </tr>
+
+        <!-- HEADER -->
+        <tr>
+          <td align="center" style="background-color:#0b111f;border-left:1px solid rgba(255,255,255,0.07);border-right:1px solid rgba(255,255,255,0.07);padding:52px 48px 44px;">
+            <p style="margin:0 0 36px;font-size:8px;font-weight:700;letter-spacing:6px;text-transform:uppercase;color:#3a3a55;font-family:Arial,sans-serif;">E-SPORT PLATFORM</p>
+
+            <!-- Icon circle -->
+            <table cellpadding="0" cellspacing="0" border="0" style="margin:0 auto 22px;">
+              <tr>
+                <td align="center" style="width:80px;height:80px;border-radius:50%;background:rgba(255,0,0,0.07);border:1px solid rgba(255,0,0,0.25);font-size:32px;line-height:80px;text-align:center;">🔐</td>
+              </tr>
+            </table>
+
+            <h1 style="margin:0 0 10px;font-size:28px;font-weight:700;color:#ffffff;letter-spacing:3px;text-transform:uppercase;line-height:1;font-family:Arial,sans-serif;">Reset Password</h1>
+            <p style="margin:0;font-size:11px;color:#6a6a88;text-transform:uppercase;letter-spacing:3px;font-weight:500;font-family:Arial,sans-serif;">Security · Account Recovery</p>
+          </td>
+        </tr>
+
+        <!-- ACCENT STRIPE -->
+        <tr>
+          <td style="height:2px;background-image:linear-gradient(to left,#ff0000 0%,#c6019a 51%,#ff0000 100%);background-size:200% auto;border-left:1px solid rgba(255,255,255,0.07);border-right:1px solid rgba(255,255,255,0.07);"></td>
+        </tr>
+
+        <!-- BODY -->
+        <tr>
+          <td style="background-color:#0b111f;border-left:1px solid rgba(255,255,255,0.06);border-right:1px solid rgba(255,255,255,0.06);padding:44px 48px 40px;">
+
+            <!-- Greeting -->
+            <p style="margin:0 0 10px;font-size:18px;color:#d8dce8;font-weight:500;line-height:1.4;font-family:Arial,sans-serif;">
+              Hello, <span style="color:#ffffff;font-weight:700;">{$username}</span> 👋
+            </p>
+            <p style="margin:0 0 32px;font-size:14px;color:#b0b4c4;line-height:1.9;font-weight:300;font-family:Arial,sans-serif;">
+              We received a request to reset the password for your
+              <span style="color:#d8dce8;font-weight:500;">EyeTwin</span> account.
+              Click the button below to set a new password. This link is valid for
+              <span style="color:#ffffff;font-weight:600;">1 hour</span>.
+            </p>
+
+            <!-- Divider -->
+            <table width="100%" cellpadding="0" cellspacing="0" border="0" style="margin-bottom:32px;">
+              <tr><td style="height:1px;background:linear-gradient(to right,rgba(255,0,0,0.35),rgba(198,1,154,0.35),rgba(255,0,0,0.35));"></td></tr>
+            </table>
+
+            <!-- CTA BUTTON -->
+            <table width="100%" cellpadding="0" cellspacing="0" border="0" style="margin-bottom:32px;">
+              <tr>
+                <td align="center">
+                  <a href="{$resetUrl}"
+                     style="display:inline-block;padding:18px 52px;background-image:linear-gradient(to left,#ff0000 0%,#c6019a 51%,#ff0000 100%);background-size:200% auto;color:#ffffff;text-decoration:none;font-size:14px;font-weight:700;letter-spacing:2px;text-transform:uppercase;font-family:Arial,sans-serif;">
+                    🔑 &nbsp; Reset My Password
+                  </a>
+                </td>
+              </tr>
+            </table>
+
+            <!-- Expiry info strip -->
+            <table width="100%" cellpadding="0" cellspacing="0" border="0" style="margin-bottom:32px;">
+              <tr>
+                <td style="background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.07);border-radius:10px;padding:14px 18px;">
+                  <table cellpadding="0" cellspacing="0" border="0" width="100%">
+                    <tr>
+                      <td width="28" valign="top" style="font-size:16px;padding-top:1px;">⏱️</td>
+                      <td style="padding-left:10px;font-size:13px;color:#b0b4c4;line-height:1.7;font-weight:300;font-family:Arial,sans-serif;">
+                        This link expires in <span style="color:#ffffff;font-weight:600;">60 minutes</span>.
+                        If you didn't request this, you can safely ignore this email — your account will not be affected.
+                      </td>
+                    </tr>
+                  </table>
+                </td>
+              </tr>
+            </table>
+
+            <!-- Divider -->
+            <table width="100%" cellpadding="0" cellspacing="0" border="0" style="margin-bottom:28px;">
+              <tr><td style="height:1px;background:rgba(255,255,255,0.06);"></td></tr>
+            </table>
+
+            <!-- Fallback token section -->
+            <p style="margin:0 0 12px;font-size:13px;font-weight:700;color:#ffffff;text-transform:uppercase;letter-spacing:1px;font-family:Arial,sans-serif;">Button not working?</p>
+            <p style="margin:0 0 14px;font-size:13px;color:#b0b4c4;line-height:1.8;font-weight:300;font-family:Arial,sans-serif;">
+              Copy and paste the full reset code below into the verification page:
+            </p>
+
+            <!-- Token box (code-input style) -->
+            <table width="100%" cellpadding="0" cellspacing="0" border="0" style="margin-bottom:14px;">
+              <tr>
+                <td style="background:rgba(255,255,255,0.06);border:2px solid rgba(255,255,255,0.12);border-radius:10px;padding:14px 18px;">
+                  <p style="margin:0;font-size:12px;color:#c8ccdc;font-family:'Courier New',monospace;word-break:break-all;letter-spacing:1px;line-height:1.6;">{$token}</p>
+                </td>
+              </tr>
+            </table>
+
+
+
+            <!-- Security warning box -->
+            <table width="100%" cellpadding="0" cellspacing="0" border="0" style="margin-bottom:36px;">
+              <tr>
+                <td style="background:#0d1020;border:1.5px solid rgba(255,0,0,0.2);border-left:3px solid #ff0000;border-radius:0 8px 8px 0;padding:16px 20px;">
+                  <table cellpadding="0" cellspacing="0" border="0" width="100%">
+                    <tr>
+                      <td width="30" valign="top" style="font-size:16px;padding-top:1px;">🛡️</td>
+                      <td style="padding-left:10px;">
+                        <p style="margin:0 0 4px;font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:#ff5555;font-family:Arial,sans-serif;">Security Notice</p>
+                        <p style="margin:0;font-size:13px;color:#b0b4c4;line-height:1.7;font-weight:300;font-family:Arial,sans-serif;">Never share this link or code with anyone. EyeTwin staff will never ask you for your reset link.</p>
+                      </td>
+                    </tr>
+                  </table>
+                </td>
+              </tr>
+            </table>
+
+            <!-- Closing -->
+            <p style="margin:0 0 14px;font-size:14px;color:#b0b4c4;line-height:1.9;font-weight:300;font-family:Arial,sans-serif;">
+              If you have any issues, please contact our support team.
+            </p>
+            <p style="margin:0;font-size:14px;color:#b0b4c4;line-height:1.7;font-weight:300;font-family:Arial,sans-serif;">
+              Stay secure,<br>
+              <span style="color:#ffffff;font-weight:700;font-family:Arial,sans-serif;">The EyeTwin Team</span>
+            </p>
+
+          </td>
+        </tr>
+
+        <!-- FOOTER -->
+        <tr>
+          <td align="center" style="background-color:#060810;border:1px solid rgba(255,255,255,0.045);border-top:none;border-radius:0 0 4px 4px;padding:24px 48px 28px;">
+            <table width="100%" cellpadding="0" cellspacing="0" border="0" style="margin-bottom:16px;">
+              <tr><td style="height:1px;background:linear-gradient(to right,rgba(255,0,0,0.25),rgba(198,1,154,0.25),rgba(255,0,0,0.25));"></td></tr>
+            </table>
+            <p style="margin:0 0 4px;font-size:11px;color:#6a6a7a;line-height:1.8;font-weight:300;font-family:Arial,sans-serif;">This email was sent automatically — please do not reply.</p>
+            <p style="margin:0;font-size:11px;color:#6a6a7a;line-height:1.8;font-weight:300;font-family:Arial,sans-serif;">
+              &copy; {$year} <span style="color:#ff0000;font-weight:500;">EyeTwin E-Sport Platform</span> — All rights reserved
+            </p>
+          </td>
+        </tr>
+
+        <!-- BOTTOM GRADIENT BAR -->
+        <tr>
+          <td style="height:3px;background-image:linear-gradient(to left,#ff0000 0%,#c6019a 51%,#ff0000 100%);background-size:200% auto;border-radius:0 0 4px 4px;"></td>
+        </tr>
+
+      </table>
+    </td>
+  </tr>
+</table>
+
+</body>
+</html>
+HTML;
     }
 }
