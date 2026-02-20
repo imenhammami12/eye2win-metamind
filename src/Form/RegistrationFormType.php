@@ -8,12 +8,14 @@ use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
 use Symfony\Component\Form\Extension\Core\Type\EmailType;
 use Symfony\Component\Form\Extension\Core\Type\PasswordType;
 use Symfony\Component\Form\Extension\Core\Type\RepeatedType;
+use Symfony\Component\Form\Extension\Core\Type\TelType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Validator\Constraints\IsTrue;
 use Symfony\Component\Validator\Constraints\Length;
 use Symfony\Component\Validator\Constraints\NotBlank;
+use Symfony\Component\Validator\Constraints\Regex;
 
 class RegistrationFormType extends AbstractType
 {
@@ -21,68 +23,83 @@ class RegistrationFormType extends AbstractType
     {
         $builder
             ->add('username', TextType::class, [
-                'label' => 'Nom d\'utilisateur',
+                'label' => 'Username',
                 'attr' => [
-                    'placeholder' => 'Choisissez un pseudo',
+                    'placeholder' => 'Choose a username',
                     'class' => 'form-control'
                 ],
             ])
             ->add('email', EmailType::class, [
                 'label' => 'Email',
                 'attr' => [
-                    'placeholder' => 'votre@email.com',
+                    'placeholder' => 'your.email@example.com',
                     'class' => 'form-control'
                 ],
             ])
             ->add('fullName', TextType::class, [
-                'label' => 'Nom complet',
+                'label' => 'Full Name',
                 'required' => false,
                 'attr' => [
-                    'placeholder' => 'Votre nom complet (optionnel)',
+                    'placeholder' => 'First Name Last Name',
                     'class' => 'form-control'
+                ],
+            ])
+            ->add('phone', TelType::class, [
+                'label'    => 'Phone Number',
+                'required' => false,
+                'attr' => [
+                    'placeholder' => '+216 XX XXX XXX',
+                    'class'       => 'form-control',
+                    'autocomplete'=> 'tel',
+                ],
+                'constraints' => [
+                    new Regex([
+                        'pattern' => '/^\+?[0-9\s\-().]{7,20}$/',
+                        'message' => 'Please enter a valid phone number.',
+                    ]),
                 ],
             ])
             ->add('plainPassword', RepeatedType::class, [
                 'type' => PasswordType::class,
                 'mapped' => false,
                 'first_options' => [
-                    'label' => 'Mot de passe',
+                    'label' => 'Password',
                     'attr' => [
                         'autocomplete' => 'new-password',
                         'class' => 'form-control',
-                        'placeholder' => 'Minimum 6 caractères'
+                        'placeholder' => 'Minimum 6 characters'
                     ],
                 ],
                 'second_options' => [
-                    'label' => 'Confirmez le mot de passe',
+                    'label' => 'Confirm Password',
                     'attr' => [
                         'autocomplete' => 'new-password',
                         'class' => 'form-control',
-                        'placeholder' => 'Répétez votre mot de passe'
+                        'placeholder' => 'Repeat your password'
                     ],
                 ],
-                'invalid_message' => 'Les mots de passe doivent correspondre.',
+                'invalid_message' => 'Passwords must match.',
                 'constraints' => [
                     new NotBlank([
-                        'message' => 'Veuillez entrer un mot de passe',
+                        'message' => 'Please enter a password',
                     ]),
                     new Length([
                         'min' => 6,
-                        'minMessage' => 'Votre mot de passe doit contenir au moins {{ limit }} caractères',
+                        'minMessage' => 'Your password must be at least {{ limit }} characters',
                         'max' => 4096,
                     ]),
                 ],
             ])
             ->add('agreeTerms', CheckboxType::class, [
-                'mapped' => false,
-                'label' => 'J\'accepte les conditions d\'utilisation',
+                'mapped'  => false,
+                'label'   => false,   // ← Supprime TOUT label Symfony
                 'constraints' => [
                     new IsTrue([
-                        'message' => 'Vous devez accepter les conditions.',
+                        'message' => 'You must accept the terms and conditions.',
                     ]),
                 ],
                 'attr' => [
-                    'class' => 'form-check-input'
+                    'class' => 'terms-checkbox'
                 ],
             ])
         ;

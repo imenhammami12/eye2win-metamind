@@ -6,33 +6,499 @@
     {{ parent() }}
     <link rel="stylesheet" href="{{ asset('assets/css/gaming-auth.css') }}">
     <link rel="stylesheet" href="{{ asset('assets/css/registration-validation.css') }}">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
     <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        /* ── Terms checkbox row ── */
+        .terms-row {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            padding: 14px 16px;
+            background: rgba(255,255,255,0.03);
+            border: 1.5px solid rgba(255,255,255,0.09);
+            border-radius: 11px;
+            transition: border-color 0.2s ease;
+            cursor: pointer;
+        }
+
+        .terms-row:hover {
+            border-color: rgba(255, 60, 100, 0.3);
+        }
+
+        /* Custom checkbox — fully styled, inside the box */
+        .terms-row input[type="checkbox"],
+        .terms-row .terms-checkbox {
+            -webkit-appearance: none !important;
+            appearance: none !important;
+            width: 22px !important;
+            height: 22px !important;
+            min-width: 22px !important;
+            border-radius: 7px !important;
+            border: 2px solid rgba(255,255,255,0.25) !important;
+            background: transparent !important;
+            cursor: pointer !important;
+            position: relative !important;
+            flex-shrink: 0 !important;
+            transition: all 0.2s ease !important;
+            margin: 0 !important;
+            padding: 0 !important;
+            display: inline-block !important;
+        }
+
+        .terms-row input[type="checkbox"]:checked,
+        .terms-row .terms-checkbox:checked {
+            background: #ff3c64 !important;
+            border-color: #ff3c64 !important;
+            box-shadow: 0 0 0 3px rgba(255,60,100,0.2) !important;
+        }
+
+        .terms-row input[type="checkbox"]:checked::after,
+        .terms-row .terms-checkbox:checked::after {
+            content: '' !important;
+            position: absolute !important;
+            left: 6px !important;
+            top: 3px !important;
+            width: 6px !important;
+            height: 10px !important;
+            border: 2px solid #fff !important;
+            border-top: none !important;
+            border-left: none !important;
+            transform: rotate(45deg) !important;
+        }
+
+        .terms-label {
+            font-size: 13.5px;
+            color: #c0c5d0;
+            line-height: 1.5;
+            cursor: pointer;
+            margin: 0;
+        }
+
+        .terms-label a {
+            color: #ff3c64;
+            font-weight: 600;
+            text-decoration: none;
+            border-bottom: 1px solid rgba(255,60,100,0.3);
+            transition: all 0.2s ease;
+        }
+
+        .terms-label a:hover {
+            color: #ff6b8a;
+            border-bottom-color: #ff3c64;
+        }
+
+        /* ── Terms Modal ── */
+        .terms-modal-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.85);
+            backdrop-filter: blur(6px);
+            z-index: 9999;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .terms-modal-overlay.active {
+            display: flex;
+        }
+
+        .terms-modal {
+            background: #0f0f14;
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 20px;
+            width: 100%;
+            max-width: 680px;
+            max-height: 85vh;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 32px 80px rgba(0,0,0,0.7);
+            animation: modalIn 0.3s ease;
+        }
+
+        @keyframes modalIn {
+            from { opacity: 0; transform: translateY(24px) scale(0.97); }
+            to   { opacity: 1; transform: translateY(0) scale(1); }
+        }
+
+        .terms-modal-header {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            padding: 28px 32px 20px;
+            border-bottom: 1px solid rgba(255,255,255,0.07);
+            flex-shrink: 0;
+        }
+
+        .terms-modal-logo {
+            height: 36px;
+            width: auto;
+        }
+
+        .terms-modal-header-text h3 {
+            font-family: 'Rajdhani', sans-serif;
+            font-size: 20px;
+            font-weight: 700;
+            color: #fff;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin: 0 0 2px;
+        }
+
+        .terms-modal-header-text span {
+            font-size: 12px;
+            color: #6a7080;
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
+        }
+
+        .terms-modal-close {
+            margin-left: auto;
+            width: 36px;
+            height: 36px;
+            border-radius: 10px;
+            border: 1px solid rgba(255,255,255,0.1);
+            background: rgba(255,255,255,0.05);
+            color: #8a9090;
+            font-size: 18px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s ease;
+            flex-shrink: 0;
+        }
+
+        .terms-modal-close:hover {
+            background: rgba(255,60,100,0.1);
+            border-color: rgba(255,60,100,0.3);
+            color: #ff3c64;
+        }
+
+        .terms-modal-body {
+            overflow-y: auto;
+            padding: 28px 32px;
+            flex: 1;
+            scrollbar-width: thin;
+            scrollbar-color: rgba(255,60,100,0.3) transparent;
+        }
+
+        .terms-modal-body::-webkit-scrollbar { width: 4px; }
+        .terms-modal-body::-webkit-scrollbar-track { background: transparent; }
+        .terms-modal-body::-webkit-scrollbar-thumb { background: rgba(255,60,100,0.3); border-radius: 2px; }
+
+        .terms-section {
+            margin-bottom: 28px;
+        }
+
+        .terms-section-title {
+            font-family: 'Rajdhani', sans-serif;
+            font-size: 14px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: #ff3c64;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .terms-section-title i {
+            font-size: 15px;
+        }
+
+        .terms-section p {
+            font-size: 13.5px;
+            color: #9aa0b0;
+            line-height: 1.7;
+            margin: 0;
+        }
+
+        .terms-section ul {
+            margin: 8px 0 0;
+            padding-left: 18px;
+        }
+
+        .terms-section ul li {
+            font-size: 13.5px;
+            color: #9aa0b0;
+            line-height: 1.7;
+            margin-bottom: 4px;
+        }
+
+        .terms-modal-footer {
+            padding: 20px 32px 28px;
+            border-top: 1px solid rgba(255,255,255,0.07);
+            display: flex;
+            gap: 12px;
+            flex-shrink: 0;
+        }
+
+        .btn-terms-accept {
+            flex: 1;
+            padding: 13px;
+            border-radius: 11px;
+            border: none;
+            background: linear-gradient(135deg, #ff3c64 0%, #ff6b6b 100%);
+            color: #fff;
+            font-family: 'Rajdhani', sans-serif;
+            font-size: 14px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            cursor: pointer;
+            transition: all 0.25s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .btn-terms-accept:hover:not(:disabled) {
+            transform: translateY(-1px);
+            box-shadow: 0 6px 20px rgba(255,60,100,0.3);
+        }
+
+        .btn-terms-accept:disabled {
+            background: rgba(255,255,255,0.07);
+            color: #404550;
+            cursor: not-allowed;
+            box-shadow: none;
+        }
+
+        /* scroll progress bar */
+        .terms-read-bar {
+            height: 3px;
+            background: rgba(255,255,255,0.05);
+            flex-shrink: 0;
+        }
+
+        .terms-read-fill {
+            height: 100%;
+            width: 0%;
+            background: linear-gradient(90deg, #ff3c64, #ff6b6b);
+            border-radius: 0 2px 2px 0;
+            transition: width 0.12s ease;
+        }
+
+        /* scroll hint */
+        .scroll-hint {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            font-size: 11px;
+            color: #5a6070;
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
+            padding: 6px 0 2px;
+            transition: opacity 0.3s ease;
+        }
+
+        .scroll-hint i {
+            font-size: 13px;
+            animation: bounceDown 1.4s infinite;
+        }
+
+        @keyframes bounceDown {
+            0%, 100% { transform: translateY(0); }
+            50%       { transform: translateY(4px); }
+        }
+
+        .btn-terms-decline {
+            padding: 13px 20px;
+            border-radius: 11px;
+            border: 1px solid rgba(255,255,255,0.1);
+            background: rgba(255,255,255,0.04);
+            color: #8a9090;
+            font-family: 'Rajdhani', sans-serif;
+            font-size: 14px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .btn-terms-decline:hover {
+            border-color: rgba(255,255,255,0.2);
+            color: #c0c5d0;
+        }
+
+        /* ── Divider in form ── */
+        .auth-divider {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin: 20px 0;
+        }
+        .auth-divider::before,
+        .auth-divider::after {
+            content: '';
+            flex: 1;
+            height: 1px;
+            background: rgba(255,255,255,0.08);
+        }
+        .auth-divider span {
+            color: #5a6070;
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            white-space: nowrap;
+        }
+
+        /* ── Phone field ── */
+        .phone-wrapper {
+            position: relative;
+            display: flex;
+            align-items: center;
+        }
+
+        .phone-flag-prefix {
+            position: absolute;
+            left: 16px;
+            z-index: 2;
+            color: #6a7080;
+            font-size: 15px;
+            pointer-events: none;
+            display: flex;
+            align-items: center;
+        }
+
+        .phone-input {
+            padding-left: 44px !important;
+        }
+
+        .phone-input:focus {
+            border-color: #ff3c64 !important;
+            box-shadow: 0 0 0 3px rgba(255,60,100,0.1) !important;
+        }
+
+    </style>
 {% endblock %}
 
 {% block body %}
+
+{# ── Terms & Conditions Modal ── #}
+<div class="terms-modal-overlay" id="termsModal">
+    <div class="terms-modal">
+
+        <div class="terms-modal-header">
+            <img src="{{ asset('assets/img/eyetwin-logo.png') }}" alt="EyeTwin" class="terms-modal-logo">
+            <div class="terms-modal-header-text">
+                <h3>Terms &amp; Conditions</h3>
+                <span>Last updated — 2025</span>
+            </div>
+            <button class="terms-modal-close" id="closeModal" type="button" aria-label="Close">
+                <i class="bi bi-x-lg"></i>
+            </button>
+        </div>
+
+        <div class="terms-read-bar"><div class="terms-read-fill" id="readFill"></div></div>
+
+        <div class="terms-modal-body" id="termsBody">
+
+            <div class="terms-section">
+                <div class="terms-section-title"><i class="bi bi-info-circle-fill"></i> 1. Acceptance of Terms</div>
+                <p>By creating an account on EyeTwin E-Sport Platform, you agree to be bound by these Terms and Conditions. If you do not agree with any part of these terms, you may not access the platform.</p>
+            </div>
+
+            <div class="terms-section">
+                <div class="terms-section-title"><i class="bi bi-person-fill"></i> 2. Eligibility</div>
+                <p>You must be at least 13 years of age to use EyeTwin. By registering, you confirm that you meet this age requirement and that the information you provide is accurate and complete.</p>
+            </div>
+
+            <div class="terms-section">
+                <div class="terms-section-title"><i class="bi bi-shield-fill-check"></i> 3. Account Responsibility</div>
+                <p>You are solely responsible for:</p>
+                <ul>
+                    <li>Maintaining the confidentiality of your account credentials</li>
+                    <li>All activity that occurs under your account</li>
+                    <li>Notifying us immediately of any unauthorized use of your account</li>
+                </ul>
+            </div>
+
+            <div class="terms-section">
+                <div class="terms-section-title"><i class="bi bi-controller"></i> 4. Platform Use</div>
+                <p>EyeTwin is an e-sport platform. You agree not to:</p>
+                <ul>
+                    <li>Use the platform for any unlawful purpose</li>
+                    <li>Harass, threaten, or abuse other users</li>
+                    <li>Attempt to gain unauthorized access to any part of the platform</li>
+                    <li>Upload malicious code, spam, or any harmful content</li>
+                    <li>Impersonate other users or EyeTwin staff</li>
+                </ul>
+            </div>
+
+            <div class="terms-section">
+                <div class="terms-section-title"><i class="bi bi-lock-fill"></i> 5. Privacy &amp; Data</div>
+                <p>We collect and process personal data in accordance with our Privacy Policy. By using EyeTwin, you consent to the collection of data necessary to provide our services, including account information and usage analytics.</p>
+            </div>
+
+            <div class="terms-section">
+                <div class="terms-section-title"><i class="bi bi-trophy-fill"></i> 6. Competitions &amp; Events</div>
+                <p>Participation in tournaments and events hosted on EyeTwin may be subject to additional rules published at the time of each event. EyeTwin reserves the right to disqualify any participant for violation of fair play standards.</p>
+            </div>
+
+            <div class="terms-section">
+                <div class="terms-section-title"><i class="bi bi-exclamation-triangle-fill"></i> 7. Termination</div>
+                <p>EyeTwin reserves the right to suspend or permanently ban any account that violates these Terms and Conditions, without prior notice and at our sole discretion.</p>
+            </div>
+
+            <div class="terms-section">
+                <div class="terms-section-title"><i class="bi bi-patch-check-fill"></i> 8. Changes to Terms</div>
+                <p>We may update these Terms at any time. Continued use of the platform after changes constitutes acceptance of the updated terms. We will notify users of significant changes via email or in-platform notification.</p>
+            </div>
+
+        </div>
+
+        <div class="scroll-hint" id="scrollHint">
+            <i class="bi bi-chevron-double-down"></i>
+            Scroll down to read all terms
+        </div>
+
+        <div class="terms-modal-footer">
+            <button class="btn-terms-decline" id="declineTerms" type="button">
+                Decline
+            </button>
+            <button class="btn-terms-accept" id="acceptTerms" type="button" disabled>
+                <i class="bi bi-check-circle-fill"></i>
+                I Accept These Terms
+            </button>
+        </div>
+
+    </div>
+</div>
+
+{# ── Main Page ── #}
 <section class="contact-section section_padding">
     <div class="container-fluid p-0">
         <div class="row g-0">
             <div class="col-12">
                 <div class="auth-container">
-                    <!-- Left column - Gaming image -->
-                    <div class="auth-image-section">
-                        <!-- Background image is defined in CSS -->
-                    </div>
 
-                    <!-- Right column - Form -->
+                    <!-- Left — gaming image -->
+                    <div class="auth-image-section"></div>
+
+                    <!-- Right — registration form -->
                     <div class="auth-form-section">
                         <div class="gaming-card card shadow-lg">
                             <div class="card-body p-5">
+
                                 <div class="auth-header text-center mb-4">
+                                    <img src="{{ asset('assets/img/eyetwin-logo.png') }}"
+                                         alt="EyeTwin"
+                                         style="height:48px; width:auto; margin-bottom:16px; display:block; margin-left:auto; margin-right:auto;">
                                     <h2>Create Account</h2>
                                     <p>Join EyeTwin Community</p>
                                 </div>
 
-                                {# Display flash messages #}
                                 {% for message in app.flashes('success') %}
                                     <div class="alert alert-success alert-dismissible fade show" role="alert">
-                                        <i class="fas fa-check-circle"></i>
+                                        <i class="bi bi-check-circle-fill"></i>
                                         <strong>Success:</strong> {{ message }}
                                         <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                                     </div>
@@ -40,14 +506,14 @@
 
                                 {% for message in app.flashes('error') %}
                                     <div class="alert alert-danger alert-dismissible fade show" role="alert">
-                                        <i class="fas fa-exclamation-triangle"></i>
+                                        <i class="bi bi-exclamation-triangle-fill"></i>
                                         <strong>Error:</strong> {{ message }}
                                         <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                                     </div>
                                 {% endfor %}
 
                                 {{ form_start(registrationForm, {'attr': {'novalidate': 'novalidate', 'id': 'registration-form'}}) }}
-                                
+
                                 {# Username #}
                                 <div class="form-group mb-3">
                                     <label for="{{ registrationForm.username.vars.id }}">
@@ -55,10 +521,7 @@
                                     </label>
                                     <div class="input-wrapper">
                                         {{ form_widget(registrationForm.username, {
-                                            'attr': {
-                                                'class': 'form-control form-control-lg',
-                                                'placeholder': 'Choose a username'
-                                            }
+                                            'attr': { 'class': 'form-control form-control-lg', 'placeholder': 'Choose a username' }
                                         }) }}
                                         <i class="live-validation-icon fas" id="username-icon"></i>
                                         <div class="spinner-border spinner-border-sm validation-spinner" id="username-spinner" role="status">
@@ -66,8 +529,7 @@
                                         </div>
                                     </div>
                                     <div class="form-feedback" id="username-feedback">
-                                        <i class="fas"></i>
-                                        <span id="username-message"></span>
+                                        <i class="fas"></i><span id="username-message"></span>
                                     </div>
                                 </div>
 
@@ -78,10 +540,7 @@
                                     </label>
                                     <div class="input-wrapper">
                                         {{ form_widget(registrationForm.email, {
-                                            'attr': {
-                                                'class': 'form-control form-control-lg',
-                                                'placeholder': 'your.email@example.com'
-                                            }
+                                            'attr': { 'class': 'form-control form-control-lg', 'placeholder': 'your.email@example.com' }
                                         }) }}
                                         <i class="live-validation-icon fas" id="email-icon"></i>
                                         <div class="spinner-border spinner-border-sm validation-spinner" id="email-spinner" role="status">
@@ -89,8 +548,7 @@
                                         </div>
                                     </div>
                                     <div class="form-feedback" id="email-feedback">
-                                        <i class="fas"></i>
-                                        <span id="email-message"></span>
+                                        <i class="fas"></i><span id="email-message"></span>
                                     </div>
                                 </div>
 
@@ -101,16 +559,37 @@
                                     </label>
                                     <div class="input-wrapper">
                                         {{ form_widget(registrationForm.fullName, {
-                                            'attr': {
-                                                'class': 'form-control form-control-lg',
-                                                'placeholder': 'First Name Last Name'
-                                            }
+                                            'attr': { 'class': 'form-control form-control-lg', 'placeholder': 'First Name Last Name' }
                                         }) }}
                                         <i class="live-validation-icon fas" id="fullname-icon"></i>
                                     </div>
                                     <div class="form-feedback" id="fullname-feedback">
-                                        <i class="fas"></i>
-                                        <span id="fullname-message"></span>
+                                        <i class="fas"></i><span id="fullname-message"></span>
+                                    </div>
+                                </div>
+
+                                {# Phone Number #}
+                                <div class="form-group mb-3">
+                                    <label for="{{ registrationForm.phone.vars.id }}">
+                                        Phone Number <span class="text-muted" style="font-size:11px; font-weight:400; text-transform:none; letter-spacing:0;">(optional)</span>
+                                    </label>
+                                    <div class="input-wrapper phone-wrapper">
+                                        <span class="phone-flag-prefix">
+                                            <i class="bi bi-telephone-fill"></i>
+                                        </span>
+                                        {{ form_widget(registrationForm.phone, {
+                                            'attr': {
+                                                'class': 'form-control form-control-lg phone-input',
+                                                'placeholder': '+216 XX XXX XXX',
+                                                'autocomplete': 'tel',
+                                                'id': 'phone-input'
+                                            }
+                                        }) }}
+                                        <i class="live-validation-icon fas" id="phone-icon"></i>
+                                    </div>
+                                    {{ form_errors(registrationForm.phone) }}
+                                    <div class="form-feedback" id="phone-feedback">
+                                        <i class="fas"></i><span id="phone-message"></span>
                                     </div>
                                 </div>
 
@@ -121,35 +600,16 @@
                                     </label>
                                     <div class="input-wrapper">
                                         {{ form_widget(registrationForm.plainPassword.first, {
-                                            'attr': {
-                                                'class': 'form-control form-control-lg',
-                                                'placeholder': 'Minimum 6 characters'
-                                            }
+                                            'attr': { 'class': 'form-control form-control-lg', 'placeholder': 'Minimum 6 characters' }
                                         }) }}
                                         <i class="live-validation-icon fas" id="password-icon"></i>
                                     </div>
-                                    
-                                    {# Password Requirements Indicator #}
                                     <div class="password-requirements">
                                         <h6>Password Requirements:</h6>
-                                        <div class="requirement-item" id="req-length">
-                                            <i class="fas fa-circle"></i>
-                                            <span>At least 6 characters</span>
-                                        </div>
-                                        <div class="requirement-item" id="req-uppercase">
-                                            <i class="fas fa-circle"></i>
-                                            <span>One uppercase letter (A-Z)</span>
-                                        </div>
-                                        <div class="requirement-item" id="req-lowercase">
-                                            <i class="fas fa-circle"></i>
-                                            <span>One lowercase letter (a-z)</span>
-                                        </div>
-                                        <div class="requirement-item" id="req-number">
-                                            <i class="fas fa-circle"></i>
-                                            <span>One number (0-9)</span>
-                                        </div>
-                                        
-                                        {# Password Strength Bar #}
+                                        <div class="requirement-item" id="req-length"><i class="fas fa-circle"></i><span>At least 6 characters</span></div>
+                                        <div class="requirement-item" id="req-uppercase"><i class="fas fa-circle"></i><span>One uppercase letter (A-Z)</span></div>
+                                        <div class="requirement-item" id="req-lowercase"><i class="fas fa-circle"></i><span>One lowercase letter (a-z)</span></div>
+                                        <div class="requirement-item" id="req-number"><i class="fas fa-circle"></i><span>One number (0-9)</span></div>
                                         <div class="password-strength-bar">
                                             <div class="password-strength-fill" id="strength-fill"></div>
                                         </div>
@@ -164,60 +624,185 @@
                                     </label>
                                     <div class="input-wrapper">
                                         {{ form_widget(registrationForm.plainPassword.second, {
-                                            'attr': {
-                                                'class': 'form-control form-control-lg',
-                                                'placeholder': 'Repeat your password'
-                                            }
+                                            'attr': { 'class': 'form-control form-control-lg', 'placeholder': 'Repeat your password' }
                                         }) }}
                                         <i class="live-validation-icon fas" id="confirm-icon"></i>
                                     </div>
                                     <div class="form-feedback" id="confirm-feedback">
-                                        <i class="fas"></i>
-                                        <span id="confirm-message"></span>
+                                        <i class="fas"></i><span id="confirm-message"></span>
                                     </div>
                                 </div>
 
-                                {# Agree Terms #}
-                                <div class="form-group mb-3">
-                                    <div class="form-check">
+                                {# Terms — label=false in FormType, form_widget renders ONLY <input type="checkbox"> #}
+                                <div class="form-group mb-4" id="termsFormGroup">
+                                    <label class="terms-row" for="{{ registrationForm.agreeTerms.vars.id }}">
                                         {{ form_widget(registrationForm.agreeTerms, {
-                                            'attr': {
-                                                'class': 'form-check-input'
-                                            }
+                                            'attr': { 'class': 'terms-checkbox' }
                                         }) }}
-                                        <label class="form-check-label" for="{{ registrationForm.agreeTerms.vars.id }}">
-                                            I accept the <a href="#" target="_blank">terms and conditions</a>
+                                        <span class="terms-label">
+                                            I have read and agree to the
+                                            <a href="#" id="openTermsLink">Terms &amp; Conditions</a>
                                             <span class="text-danger">*</span>
-                                        </label>
-                                    </div>
+                                        </span>
+                                    </label>
+                                    {{ form_errors(registrationForm.agreeTerms) }}
                                     <div class="form-feedback" id="terms-feedback">
-                                        <i class="fas"></i>
-                                        <span id="terms-message"></span>
+                                        <i class="fas"></i><span id="terms-message"></span>
                                     </div>
                                 </div>
 
                                 <button type="submit" class="btn btn_1 btn-lg btn-block w-100 mb-3" id="submit-btn">
-                                    <i class="fas fa-check-circle"></i> Sign Up
+                                    <i class="bi bi-check-circle-fill"></i> Sign Up
                                 </button>
 
-                                <hr>
+                                <div class="auth-divider"><span>Already have an account?</span></div>
 
-                                <div class="text-center">
-                                    <p class="mb-2">Already have an account?</p>
-                                    <a href="{{ path('app_login') }}" class="btn btn_2 w-100">
-                                        <i class="fas fa-sign-in-alt"></i> Log In
-                                    </a>
-                                </div>
+                                <a href="{{ path('app_login') }}" class="btn btn_2 w-100">
+                                    <i class="bi bi-box-arrow-in-right"></i> Log In
+                                </a>
 
                                 {{ form_end(registrationForm) }}
                             </div>
                         </div>
                     </div>
+
                 </div>
             </div>
         </div>
     </div>
 </section>
+
+<script>
+    /* ── Grab elements ── */
+    const modal      = document.getElementById('termsModal');
+    const openLink   = document.getElementById('openTermsLink');
+    const closeBtn   = document.getElementById('closeModal');
+    const acceptBtn  = document.getElementById('acceptTerms');
+    const declineBtn = document.getElementById('declineTerms');
+    const termsBody  = document.getElementById('termsBody');
+    const readFill   = document.getElementById('readFill');
+    const scrollHint = document.getElementById('scrollHint');
+
+    /*
+     * Find the checkbox using multiple strategies — Symfony generates its own ID
+     * (e.g. registration_form_agreeTerms) so we cannot hardcode it.
+     * Strategy 1: class we added via form_widget attr
+     * Strategy 2: input[type=checkbox] inside #termsFormGroup
+     */
+    const checkbox = document.querySelector('.terms-checkbox')
+                  || document.querySelector('#termsFormGroup input[type="checkbox"]');
+
+    const LOGIN_URL = '{{ path('app_login') }}';
+
+    let hasReadAll = false;
+
+    /* ── Scroll progress ── */
+    function onBodyScroll() {
+        const maxScroll = termsBody.scrollHeight - termsBody.clientHeight;
+        const pct = maxScroll > 0
+            ? Math.min(100, (termsBody.scrollTop / maxScroll) * 100)
+            : 100;
+
+        readFill.style.width = pct + '%';
+
+        if (pct >= 98 && !hasReadAll) {
+            hasReadAll = true;
+            acceptBtn.disabled = false;
+            acceptBtn.style.cursor = 'pointer';
+            scrollHint.style.opacity = '0';
+            scrollHint.style.pointerEvents = 'none';
+        }
+    }
+
+    /* ── Open ── */
+    function openModal(e) {
+        e.preventDefault();
+        modal.classList.add('active');
+        document.body.style.overflow = 'hidden';
+        termsBody.scrollTop = 0;
+        readFill.style.width = '0%';
+        scrollHint.style.opacity = '1';
+        scrollHint.style.pointerEvents = '';
+        if (!hasReadAll) {
+            acceptBtn.disabled = true;
+            acceptBtn.style.cursor = 'not-allowed';
+        }
+    }
+
+    /* ── Close ── */
+    function closeModal() {
+        modal.classList.remove('active');
+        document.body.style.overflow = '';
+    }
+
+    /* ── Listeners ── */
+    termsBody.addEventListener('scroll', onBodyScroll);
+    openLink.addEventListener('click', openModal);
+    closeBtn.addEventListener('click', closeModal);
+
+    /* Accept → tick checkbox → close */
+    acceptBtn.addEventListener('click', function () {
+        if (this.disabled) return;
+        if (checkbox) {
+            checkbox.checked = true;
+            checkbox.dispatchEvent(new Event('change', { bubbles: true }));
+            checkbox.dispatchEvent(new Event('input',  { bubbles: true }));
+        }
+        closeModal();
+    });
+
+    /* Decline → untick → redirect to login */
+    declineBtn.addEventListener('click', function () {
+        if (checkbox) {
+            checkbox.checked = false;
+            checkbox.dispatchEvent(new Event('change', { bubbles: true }));
+        }
+        closeModal();
+        window.location.href = LOGIN_URL;
+    });
+
+    /* Overlay click / Escape key */
+    modal.addEventListener('click', e => { if (e.target === modal) closeModal(); });
+    document.addEventListener('keydown', e => {
+        if (e.key === 'Escape' && modal.classList.contains('active')) closeModal();
+    });
+
+    /* ── Phone number live validation ── */
+    const phoneInput  = document.getElementById('phone-input');
+    const phoneIcon   = document.getElementById('phone-icon');
+    const phoneFeedback = document.getElementById('phone-feedback');
+    const phoneMsg    = document.getElementById('phone-message');
+
+    if (phoneInput) {
+        phoneInput.addEventListener('input', function () {
+            const val = this.value.trim();
+
+            if (val === '') {
+                // Optional field — clear state
+                this.style.borderColor = '';
+                phoneIcon.className = 'live-validation-icon fas';
+                phoneFeedback.style.display = 'none';
+                return;
+            }
+
+            const valid = /^\+?[0-9\s\-().]{7,20}$/.test(val);
+
+            if (valid) {
+                this.style.borderColor = '#28a745';
+                phoneIcon.className = 'live-validation-icon fas fa-check-circle';
+                phoneIcon.style.color = '#28a745';
+                phoneFeedback.style.display = 'none';
+            } else {
+                this.style.borderColor = '#dc3545';
+                phoneIcon.className = 'live-validation-icon fas fa-times-circle';
+                phoneIcon.style.color = '#dc3545';
+                phoneMsg.textContent = 'Enter a valid phone number (e.g. +216 XX XXX XXX)';
+                phoneFeedback.style.display = 'flex';
+                phoneFeedback.style.color = '#dc3545';
+            }
+        });
+    }
+</script>
 {% endblock %}
 
 {% block javascripts %}

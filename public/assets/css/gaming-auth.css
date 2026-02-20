@@ -462,3 +462,95 @@ body {
 .auth-container {
     animation: fadeInScale 0.4s ease;
 }
+.channel-option { all: unset; }
+
+.channel-selector {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 10px !important;
+    margin-top: 12px !important;
+}
+
+.channel-row {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 14px 18px;
+    border-radius: 11px;
+    border: 1.5px solid rgba(255, 255, 255, 0.12);
+    background: rgba(255, 255, 255, 0.04);
+    cursor: pointer;
+    transition: border-color 0.2s ease, background 0.2s ease;
+    box-sizing: border-box;
+}
+
+.channel-row:hover {
+    border-color: rgba(255, 60, 100, 0.4);
+    background: rgba(255, 60, 100, 0.06);
+}
+
+/* Fully custom radio button */
+.channel-row input[type="radio"] {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    background: transparent;
+    cursor: pointer;
+    flex-shrink: 0;
+    position: relative;
+    margin: 0;
+    transition: border-color 0.2s ease, background 0.2s ease, box-shadow 0.2s ease;
+}
+
+.channel-row input[type="radio"]:checked {
+    border-color: #ff3c64;
+    background: #ff3c64;
+    box-shadow: 0 0 0 3px rgba(255, 60, 100, 0.2);
+}
+
+/* White inner dot */
+.channel-row input[type="radio"]::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%) scale(0);
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: #fff;
+    transition: transform 0.15s ease;
+}
+
+.channel-row input[type="radio"]:checked::after {
+    transform: translate(-50%, -50%) scale(1);
+}
+
+.channel-row-icon {
+    font-size: 17px;
+    color: #7a8090;
+    flex-shrink: 0;
+    transition: color 0.2s ease;
+}
+
+.channel-row-text {
+    font-size: 13px;
+    font-weight: 600;
+    color: #c0c5d0;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    transition: color 0.2s ease;
+}
+
+.channel-row:has(input:checked) {
+    border-color: #ff3c64;
+    background: rgba(255, 60, 100, 0.08);
+}
+
+.channel-row:has(input:checked) .channel-row-icon,
+.channel-row:has(input:checked) .channel-row-text {
+    color: #ff3c64 !important;
+}

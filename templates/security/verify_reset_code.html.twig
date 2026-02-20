@@ -1,6 +1,6 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Enter Code - EyeTwin{% endblock %}
+{% block title %}Enter Code — EyeTwin{% endblock %}
 
 {% block stylesheets %}
     {{ parent() }}
@@ -8,114 +8,112 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
     <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;600;700&display=swap" rel="stylesheet">
     <style>
-        .code-input-wrapper {
-            position: relative;
-            margin-bottom: 1.5rem;
-        }
-        
-        .form-label {
-            font-weight: 600;
-            margin-bottom: 10px;
-            color: #fff;
-            font-size: 14px;
-            display: block;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
-        
+        /* ── Code input — accepts full SHA token ── */
         .code-input {
-            letter-spacing: 4px;
-            font-size: 24px;
-            font-weight: 600;
-            text-align: center;
-            padding: 18px 20px;
-            background: rgba(255, 255, 255, 0.08);
-            border: 2px solid rgba(255, 255, 255, 0.15);
-            border-radius: 12px;
-            color: #fff;
+            letter-spacing: 1.5px;
+            font-size: 13px;
+            font-weight: 500;
+            text-align: left;
+            padding: 16px 18px;
+            background: rgba(255, 255, 255, 0.06);
+            border: 2px solid rgba(255, 255, 255, 0.12);
+            border-radius: 14px;
+            color: #e0e0e0;
+            width: 100%;
             transition: all 0.3s ease;
+            font-family: 'Courier New', monospace;
+            word-break: break-all;
         }
-        
+
         .code-input:focus {
-            background: rgba(255, 255, 255, 0.12);
+            background: rgba(255, 255, 255, 0.09);
             border-color: #ff3c64;
-            box-shadow: 0 0 0 3px rgba(255, 60, 100, 0.1);
+            box-shadow: 0 0 0 3px rgba(255, 60, 100, 0.12);
+            outline: none;
         }
-        
+
         .code-input::placeholder {
-            letter-spacing: 2px;
-            font-size: 16px;
+            color: rgba(255, 255, 255, 0.25);
+            letter-spacing: 0.5px;
+            font-size: 13px;
             font-weight: 400;
         }
-        
-        .info-box {
-            background: rgba(90, 103, 216, 0.1);
-            border-left: 4px solid #5a67d8;
-            padding: 15px 18px;
-            border-radius: 8px;
-            margin: 20px 0;
-            font-size: 14px;
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            border: 1px solid rgba(90, 103, 216, 0.3);
+
+        /* ── Field label ── */
+        .field-label {
+            display: block;
+            font-size: 11.5px;
+            font-weight: 700;
+            color: #6a7080;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 10px;
         }
-        
-        .info-box i {
-            font-size: 18px;
-            color: #5a67d8;
-            flex-shrink: 0;
-        }
-        
-        .info-box span {
-            color: #e0e0e0;
-            line-height: 1.5;
-        }
-        
-        .resend-section {
-            text-align: center;
-            margin-top: 30px;
-            padding-top: 25px;
-            border-top: 1px solid rgba(255, 255, 255, 0.1);
-        }
-        
-        .resend-section p {
-            color: #adb5bd;
-        }
-        
-        .resend-section a {
-            color: #fff;
-            text-decoration: none;
+
+        /* ── Email display ── */
+        .email-display {
+            background: rgba(255, 60, 100, 0.08);
+            border: 1px solid rgba(255, 60, 100, 0.25);
+            padding: 10px 20px;
+            border-radius: 50px;
             display: inline-flex;
             align-items: center;
             gap: 8px;
-            transition: all 0.3s ease;
-            font-weight: 500;
-            padding: 8px 16px;
-            border-radius: 8px;
-            background: rgba(255, 255, 255, 0.05);
-        }
-        
-        .resend-section a:hover {
-            background: rgba(255, 60, 100, 0.1);
-            color: #ff3c64;
-            transform: translateX(-3px);
-        }
-        
-        .email-display {
-            background: rgba(255, 60, 100, 0.1);
-            border: 1px solid rgba(255, 60, 100, 0.3);
-            padding: 8px 16px;
-            border-radius: 8px;
-            display: inline-block;
-            margin-top: 8px;
+            margin-top: 10px;
             font-weight: 600;
+            font-size: 14px;
             color: #ff3c64;
+            word-break: break-all;
         }
-        
+
+        .email-display i { font-size: 14px; flex-shrink: 0; }
+
+        /* ── Info strip ── */
+        .info-strip {
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.07);
+            border-radius: 10px;
+            padding: 13px 16px;
+            margin: 18px 0 20px;
+            font-size: 13px;
+            color: #8a9090;
+            line-height: 1.5;
+        }
+
+        .info-strip i {
+            color: #5a67d8;
+            font-size: 15px;
+            flex-shrink: 0;
+            margin-top: 1px;
+        }
+
+        /* ── Countdown timer ── */
+        .expiry-timer {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            font-size: 12px;
+            color: #6a7080;
+            margin-bottom: 22px;
+        }
+
+        .expiry-timer i { font-size: 13px; }
+
+        #countdown {
+            color: #ffc107;
+            font-weight: 700;
+            font-family: 'Rajdhani', monospace;
+            font-size: 14px;
+        }
+
+        /* ── Alerts ── */
         .alert {
             border-radius: 12px;
-            padding: 15px 18px;
+            padding: 14px 18px;
             margin-bottom: 20px;
             display: flex;
             align-items: center;
@@ -123,27 +121,58 @@
             font-size: 14px;
             font-weight: 500;
         }
-        
-        .alert i {
-            font-size: 20px;
-            flex-shrink: 0;
-        }
-        
-        .alert span {
-            flex: 1;
-        }
-        
+        .alert i { font-size: 18px; flex-shrink: 0; }
+        .alert span { flex: 1; }
         .alert-success {
-            background: rgba(40, 167, 69, 0.1);
-            border: 1px solid rgba(40, 167, 69, 0.3);
-            color: #28a745;
+            background: rgba(40, 167, 69, 0.08);
+            border: 1px solid rgba(40, 167, 69, 0.25);
+            color: #4caf7d;
         }
-        
         .alert-danger {
-            background: rgba(220, 53, 69, 0.1);
-            border: 1px solid rgba(220, 53, 69, 0.3);
-            color: #dc3545;
+            background: rgba(220, 53, 69, 0.08);
+            border: 1px solid rgba(220, 53, 69, 0.25);
+            color: #e05c6a;
         }
+
+        /* ── Resend section ── */
+        .resend-section {
+            text-align: center;
+            margin-top: 28px;
+            padding-top: 24px;
+            border-top: 1px solid rgba(255, 255, 255, 0.07);
+        }
+
+        .resend-section p {
+            color: #6a7080;
+            font-size: 13px;
+            margin-bottom: 10px;
+        }
+
+        .resend-section a {
+            color: #c0c5d0;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 13px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            padding: 9px 18px;
+            border-radius: 9px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            transition: all 0.25s ease;
+        }
+
+        .resend-section a:hover {
+            background: rgba(255, 60, 100, 0.08);
+            border-color: rgba(255, 60, 100, 0.3);
+            color: #ff3c64;
+        }
+
+        .auth-header h2 { color: #fff !important; font-weight: 700; }
+        .auth-header p  { color: #7a8090 !important; font-size: 13px; text-transform: uppercase; letter-spacing: 0.8px; }
     </style>
 {% endblock %}
 
@@ -153,23 +182,29 @@
         <div class="row g-0">
             <div class="col-12">
                 <div class="auth-container">
-                    <!-- Left column - Gaming image -->
-                    <div class="auth-image-section">
-                        <!-- Background image handled via CSS -->
-                    </div>
 
-                    <!-- Right column - Verification form -->
+                    <!-- Left — gaming image panel -->
+                    <div class="auth-image-section"></div>
+
+                    <!-- Right — verification form -->
                     <div class="auth-form-section">
                         <div class="gaming-card card shadow-lg">
                             <div class="card-body p-5">
 
+                                <!-- Header -->
                                 <div class="auth-header text-center mb-4">
-                                    <i class="bi bi-shield-check" style="font-size: 48px; color: #ff3c64; margin-bottom: 15px;"></i>
+                                    <i class="bi bi-shield-check" style="font-size: 48px; color: #ff3c64; margin-bottom: 15px; display: block;"></i>
                                     <h2>Enter Your Code</h2>
                                     <p>A verification code has been sent to</p>
-                                    <span class="email-display">{{ email }}</span>
+                                    <div style="display:flex; justify-content:center; margin-top:10px;">
+                                        <div class="email-display">
+                                            <i class="bi bi-envelope-fill"></i>
+                                            {{ email }}
+                                        </div>
+                                    </div>
                                 </div>
 
+                                <!-- Flash messages -->
                                 {% for message in app.flashes('success') %}
                                     <div class="alert alert-success">
                                         <i class="bi bi-check-circle-fill"></i>
@@ -184,43 +219,45 @@
                                     </div>
                                 {% endfor %}
 
+                                <!-- Form — plain HTML form, no Symfony form_label() -->
                                 <form method="post">
                                     <div class="form-group mb-4">
-        .form-label {
-            font-weight: 600;
-            margin-bottom: 10px;
-            color: #fff;
-            font-size: 14px;
-            display: block;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
-                                        <div class="code-input-wrapper">
-                                            <input type="text" 
-                                                   name="code" 
-                                                   id="code" 
-                                                   class="form-control code-input" 
-                                                   placeholder="Enter code"
-                                                   required
-                                                   autofocus
-                                                   autocomplete="off">
-                                        </div>
-                                        
-                                        <div class="info-box">
+
+                                        <label for="code" class="field-label">
+                                            Verification Code
+                                        </label>
+
+                                        <input type="text"
+                                               name="code"
+                                               id="code"
+                                               class="form-control code-input"
+                                               placeholder="Paste your reset code here"
+                                               autocomplete="off"
+                                               spellcheck="false"
+                                               required
+                                               autofocus>
+
+                                        <div class="info-strip">
                                             <i class="bi bi-info-circle-fill"></i>
-                                            <span>Check your SMS/Email/Telegram according to the channel you selected</span>
+                                            <span>Copy the full reset code from your email and paste it in the field above. The code is a long string of characters.</span>
                                         </div>
+
+                                        <div class="expiry-timer">
+                                            <i class="bi bi-clock"></i>
+                                            Code expires in <span id="countdown">10:00</span>
+                                        </div>
+
                                     </div>
 
                                     <button class="btn btn_1 btn-lg btn-block w-100" type="submit">
-                                        <i class="bi bi-check-circle-fill"></i> Verify Code
+                                        <i class="bi bi-check-circle-fill"></i>&nbsp; Verify Code
                                     </button>
                                 </form>
 
                                 <div class="resend-section">
-                                    <p class="text-muted mb-2" style="font-size: 14px;">Didn't receive the code?</p>
+                                    <p>Didn't receive the code?</p>
                                     <a href="{{ path('app_forgot_password') }}">
-                                        <i class="bi bi-arrow-counterclockwise"></i>
+                                        <i class="bi bi-arrow-clockwise"></i>
                                         Send New Code
                                     </a>
                                 </div>
@@ -228,9 +265,39 @@
                             </div>
                         </div>
                     </div>
+
                 </div>
             </div>
         </div>
     </div>
 </section>
+
+<script>
+    // ── Countdown timer ──
+    (function () {
+        const el = document.getElementById('countdown');
+        if (!el) return;
+        let total = 10 * 60;
+        const pad = n => String(n).padStart(2, '0');
+        function tick() {
+            if (total <= 0) { el.textContent = '00:00'; el.style.color = '#dc3545'; return; }
+            total--;
+            el.textContent = pad(Math.floor(total / 60)) + ':' + pad(total % 60);
+            if (total < 120) el.style.color = '#ff6b35';
+            setTimeout(tick, 1000);
+        }
+        setTimeout(tick, 1000);
+    })();
+
+    // ── No auto-submit: token is a long hex string, user pastes and clicks submit ──
+    const codeInput = document.getElementById('code');
+    if (codeInput) {
+        // Trim whitespace on paste (common when copying from email)
+        codeInput.addEventListener('paste', function (e) {
+            e.preventDefault();
+            const pasted = (e.clipboardData || window.clipboardData).getData('text').trim();
+            this.value = pasted;
+        });
+    }
+</script>
 {% endblock %}
