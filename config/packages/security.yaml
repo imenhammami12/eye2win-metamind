@@ -61,14 +61,16 @@ security:
 
     access_control:
         - { path: ^/2fa,                   roles: IS_AUTHENTICATED_2FA_IN_PROGRESS }
-        # Face login (public - pas encore connecté)
+        # Face login (public)
         - { path: ^/admin/face-verify,     roles: PUBLIC_ACCESS }
         - { path: ^/admin/face-check,      roles: PUBLIC_ACCESS }
         # Routes publiques
         - { path: ^/login,                 roles: PUBLIC_ACCESS }
         - { path: ^/register,              roles: PUBLIC_ACCESS }
         - { path: ^/admin/login,           roles: PUBLIC_ACCESS }
-        # Back office - tout le reste sous /admin nécessite ROLE_ADMIN
+        # NOUVEAU — webhook Stripe doit être public (Stripe appelle sans session)
+        - { path: ^/coins/webhook,         roles: PUBLIC_ACCESS }
+        # Back office
         - { path: ^/admin/audit,           roles: ROLE_SUPER_ADMIN }
         - { path: ^/admin/complaints,      roles: ROLE_ADMIN }
         - { path: ^/admin,                 roles: ROLE_ADMIN }
@@ -78,6 +80,9 @@ security:
         - { path: ^/video,                 roles: ROLE_USER }
         - { path: ^/dashboard,             roles: ROLE_USER }
         - { path: ^/complaints,            roles: ROLE_USER }
+        # NOUVEAU — Live streams et achat de coins
+        - { path: ^/live,                  roles: ROLE_USER }
+        - { path: ^/coins,                 roles: ROLE_USER }
 
 when@test:
     security:

@@ -54,3 +54,9 @@ services:
             $twilioPhoneNumber: '%env(TWILIO_PHONE_NUMBER)%'
             $telegramBotToken: '%env(TELEGRAM_BOT_TOKEN)%'
             $devMode: false
+
+    # 💰 NOUVEAU — CoinController a besoin des clés Stripe injectées manuellement
+    App\Controller\CoinController:
+        arguments:
+            $stripeSecretKey: '%env(STRIPE_SECRET_KEY)%'
+            $stripeWebhookSecret: '%env(STRIPE_WEBHOOK_SECRET)%'

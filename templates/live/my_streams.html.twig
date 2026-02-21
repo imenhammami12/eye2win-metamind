@@ -1,0 +1,78 @@
+{# templates/live/my_streams.html.twig #}
+{% extends 'base.html.twig' %}
+
+{% block title %}My Live Streams - EyeTwin{% endblock %}
+
+{% block body %}
+<section class="profile_section section_padding">
+    <div class="container">
+
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h2 class="statistics_title mb-0">📡 MY LIVE STREAMS</h2>
+            <a href="{{ path('live_create') }}" class="btn_profile btn_apply" style="text-decoration:none;">
+                <i class="fas fa-plus"></i> New Stream
+            </a>
+        </div>
+
+        {% if streams is empty %}
+            <div class="profile_card text-center py-5">
+                <i class="fas fa-broadcast-tower" style="font-size: 64px; color: #667eea; display:block; margin-bottom: 20px;"></i>
+                <h4 style="color: #fff;">You haven't created any live streams yet</h4>
+                <p style="color: #a0a0b0;">Start coaching your audience with your first live stream!</p>
+                <a href="{{ path('live_create') }}" class="btn_profile btn_apply" style="text-decoration:none; display:inline-block; margin-top: 15px;">
+                    <i class="fas fa-video"></i> Create your first stream
+                </a>
+            </div>
+        {% else %}
+            <div class="profile_card">
+                <div class="table-responsive">
+                    <table class="table table-dark mb-0" style="color: #c0c0d0;">
+                        <thead>
+                            <tr style="border-color: #3a3a5a; color: #888;">
+                                <th>Title</th>
+                                <th>Status</th>
+                                <th>Price</th>
+                                <th>Viewers</th>
+                                <th>Created</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for stream in streams %}
+                            <tr style="border-color: #3a3a5a;">
+                                <td style="color: #fff; font-weight: 500;">{{ stream.title }}</td>
+                                <td>
+                                    {% if stream.status == 'live' %}
+                                        <span style="background: #e53e3e; color: white; padding: 3px 10px; border-radius: 12px; font-size: 12px; font-weight: bold;">🔴 LIVE</span>
+                                    {% elseif stream.status == 'ended' %}
+                                        <span style="background: #555; color: white; padding: 3px 10px; border-radius: 12px; font-size: 12px;">Ended</span>
+                                    {% else %}
+                                        <span style="background: #667eea; color: white; padding: 3px 10px; border-radius: 12px; font-size: 12px;">Scheduled</span>
+                                    {% endif %}
+                                </td>
+                                <td style="color: #f6d860;">
+                                    <i class="fas fa-coins"></i>
+                                    {{ stream.coinPrice == 0 ? 'Free' : stream.coinPrice }}
+                                </td>
+                                <td>{{ stream.accesses|length }}</td>
+                                <td style="color: #888; font-size: 13px;">{{ stream.createdAt|date('M d, Y') }}</td>
+                                <td>
+                                    {% if stream.status != 'ended' %}
+                                        <a href="{{ path('live_manage', {id: stream.id}) }}" class="btn_profile btn_edit" style="text-decoration:none; padding: 6px 12px; font-size: 12px; display: inline-block;">
+                                            <i class="fas fa-cog"></i> Manage
+                                        </a>
+                                    {% else %}
+                                        <span style="color: #555; font-size: 13px;">—</span>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        {% endif %}
+
+    </div>
+</section>
+{% endblock %}

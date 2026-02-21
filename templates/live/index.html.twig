@@ -1,0 +1,100 @@
+{# templates/live/index.html.twig #}
+{% extends 'base.html.twig' %}
+
+{% block title %}Live Streams - EyeTwin{% endblock %}
+
+{% block body %}
+<section class="profile_section section_padding">
+    <div class="container">
+
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h2 class="statistics_title mb-0">🔴 LIVE STREAMS</h2>
+            {% if isCoach %}
+                <div class="d-flex gap-2">
+                    <a href="{{ path('live_my_streams') }}" class="btn_profile btn_edit" style="text-decoration:none;">
+                        <i class="fas fa-list"></i> My Streams
+                    </a>
+                    <a href="{{ path('live_create') }}" class="btn_profile btn_apply" style="text-decoration:none;">
+                        <i class="fas fa-video"></i> Create Live
+                    </a>
+                </div>
+            {% endif %}
+        </div>
+
+        {% for flash in app.flashes('success') %}
+            <div class="alert alert-success">{{ flash }}</div>
+        {% endfor %}
+        {% for flash in app.flashes('error') %}
+            <div class="alert alert-danger">{{ flash }}</div>
+        {% endfor %}
+        {% for flash in app.flashes('info') %}
+            <div class="alert alert-info">{{ flash }}</div>
+        {% endfor %}
+
+        {% if lives is empty %}
+            <div class="profile_card text-center py-5">
+                <i class="fas fa-video" style="font-size: 64px; color: #667eea; margin-bottom: 20px; display:block;"></i>
+                <h4 style="color: #fff;">No live streams available right now</h4>
+                <p style="color: #a0a0b0;">Check back later or follow coaches to get notified when they go live.</p>
+            </div>
+        {% else %}
+            <div class="row g-4">
+                {% for live in lives %}
+                <div class="col-lg-4 col-md-6">
+                    <div class="profile_card h-100" style="position: relative; overflow: hidden;">
+                        
+                        {% if live.status == 'live' %}
+                            <div style="position: absolute; top: 15px; right: 15px; background: #e53e3e; color: white; padding: 4px 12px; border-radius: 20px; font-size: 12px; font-weight: bold; display: flex; align-items: center; gap: 6px;">
+                                <span style="width: 8px; height: 8px; background: white; border-radius: 50%; animation: pulse 1.5s infinite;"></span>
+                                LIVE
+                            </div>
+                        {% else %}
+                            <div style="position: absolute; top: 15px; right: 15px; background: #667eea; color: white; padding: 4px 12px; border-radius: 20px; font-size: 12px; font-weight: bold;">
+                                SOON
+                            </div>
+                        {% endif %}
+
+                        <div style="background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%); border-radius: 8px; padding: 40px 20px; text-align: center; margin-bottom: 15px;">
+                            <i class="fas fa-video" style="font-size: 48px; color: {% if live.status == 'live' %}#e53e3e{% else %}#667eea{% endif %};"></i>
+                        </div>
+
+                        <h5 style="color: #fff; font-weight: bold; margin-bottom: 8px;">{{ live.title }}</h5>
+                        <p style="color: #a0a0b0; font-size: 13px; margin-bottom: 10px;">
+                            <i class="fas fa-user-graduate"></i> {{ live.coach.username }}
+                        </p>
+                        {% if live.description %}
+                            <p style="color: #c0c0d0; font-size: 13px; margin-bottom: 15px;">{{ live.description|slice(0, 100) }}{% if live.description|length > 100 %}...{% endif %}</p>
+                        {% endif %}
+
+                        <div class="d-flex justify-content-between align-items-center mt-auto">
+                            <span style="color: #f6d860; font-weight: bold;">
+                                <i class="fas fa-coins"></i>
+                                {% if live.coinPrice == 0 %}
+                                    FREE
+                                {% else %}
+                                    {{ live.coinPrice }} coins
+                                {% endif %}
+                            </span>
+                            <a href="{{ path('live_watch', {id: live.id}) }}" class="btn_profile btn_apply" style="text-decoration:none; padding: 8px 16px; font-size: 13px;">
+                                {% if live.status == 'live' %}
+                                    <i class="fas fa-play"></i> Watch Now
+                                {% else %}
+                                    <i class="fas fa-eye"></i> Preview
+                                {% endif %}
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        {% endif %}
+    </div>
+</section>
+
+<style>
+@keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.3; }
+}
+</style>
+{% endblock %}

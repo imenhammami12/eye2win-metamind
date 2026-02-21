@@ -80,22 +80,42 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, TwoFact
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $profilePicture = null;
 
-    // ===== CHAMPS 2FA - COMPATIBLES MYSQL 5.6 =====
-    
+    // ===== 💰 EYETWIN COINS =====
+
+    #[ORM\Column(type: 'integer', options: ['default' => 0])]
+    private int $coinBalance = 0;
+
+    // ===== 2FA FIELDS =====
+
     #[ORM\Column(type: 'string', length: 255, nullable: true)]
     private ?string $totpSecret = null;
 
     #[ORM\Column(type: 'boolean', options: ['default' => false])]
     private bool $isTotpEnabled = false;
 
-    // IMPORTANT: Utiliser 'text' au lieu de 'json' pour MySQL 5.6
     #[ORM\Column(type: 'text', nullable: true)]
     private ?string $backupCodesJson = null;
 
     #[ORM\Column(type: Types::DATETIME_IMMUTABLE, nullable: true)]
     private ?\DateTimeImmutable $totpEnabledAt = null;
 
-    // ===== FIN CHAMPS 2FA =====
+    // ===== PHONE / TELEGRAM =====
+
+    #[ORM\Column(type: 'string', length: 20, nullable: true)]
+    private ?string $phone = null;
+
+    #[ORM\Column(type: 'string', length: 100, nullable: true)]
+    private ?string $telegramChatId = null;
+
+    // ===== FACE RECOGNITION =====
+
+    #[ORM\Column(type: 'text', nullable: true)]
+    private ?string $faceDescriptor = null;
+
+    #[ORM\Column(type: 'string', length: 255, nullable: true)]
+    private ?string $faceImage = null;
+
+    // ===== RELATIONS =====
 
     #[ORM\OneToMany(mappedBy: 'owner', targetEntity: Team::class, orphanRemoval: true)]
     private Collection $ownedTeams;
@@ -115,27 +135,28 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, TwoFact
     #[ORM\OneToMany(mappedBy: 'user', targetEntity: TrainingSession::class)]
     private Collection $trainingSessions;
 
-    /**
-     * @var Collection<int, Video>
-     */
     #[ORM\OneToMany(targetEntity: Video::class, mappedBy: 'uploadedBy', orphanRemoval: true)]
     private Collection $videos;
 
     public function __construct()
     {
-        $this->ownedTeams = new ArrayCollection();
-        $this->teamMemberships = new ArrayCollection();
+        $this->ownedTeams       = new ArrayCollection();
+        $this->teamMemberships  = new ArrayCollection();
         $this->coachApplications = new ArrayCollection();
-        $this->notifications = new ArrayCollection();
-        $this->auditLogs = new ArrayCollection();
+        $this->notifications    = new ArrayCollection();
+        $this->auditLogs        = new ArrayCollection();
         $this->trainingSessions = new ArrayCollection();
-        $this->createdAt = new \DateTime();
-        $this->lastLogin = new \DateTime();
-        $this->accountStatus = AccountStatus::ACTIVE;
-        $this->rolesJson = json_encode(['ROLE_USER']);
-        $this->isTotpEnabled = false;
-        $this->videos = new ArrayCollection();
+        $this->videos           = new ArrayCollection();
+        $this->createdAt        = new \DateTime();
+        $this->lastLogin        = new \DateTime();
+        $this->accountStatus    = AccountStatus::ACTIVE;
+        $this->rolesJson        = json_encode(['ROLE_USER']);
+        $this->isTotpEnabled    = false;
+        $this->coinBalance      = 0;
     }
+
+    // ===== BASIC GETTERS / SETTERS =====
+
     public function getId(): ?int
     {
         return $this->id;
@@ -170,7 +191,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, TwoFact
 
     public function getRoles(): array
     {
-        $roles = json_decode($this->rolesJson, true) ?: [];
+        $roles   = json_decode($this->rolesJson, true) ?: [];
         $roles[] = 'ROLE_USER';
         return array_unique($roles);
     }
@@ -192,9 +213,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, TwoFact
         return $this;
     }
 
-    public function eraseCredentials(): void
-    {
-    }
+    public function eraseCredentials(): void {}
 
     public function getAccountStatus(): ?AccountStatus
     {
@@ -262,41 +281,89 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, TwoFact
         return $this;
     }
 
-    /**
-     * @return Collection<int, Team>
-     */
+    // ===== 💰 COINS =====
+
+    public function getCoinBalance(): int
+    {
+        return $this->coinBalance;
+    }
+
+    public function setCoinBalance(int $coinBalance): static
+    {
+        $this->coinBalance = max(0, $coinBalance); // never go below 0
+        return $this;
+    }
+
+    // ===== PHONE / TELEGRAM =====
+
+    public function getPhone(): ?string
+    {
+        return $this->phone;
+    }
+
+    public function setPhone(?string $phone): static
+    {
+        $this->phone = $phone;
+        return $this;
+    }
+
+    public function getTelegramChatId(): ?string
+    {
+        return $this->telegramChatId;
+    }
+
+    public function setTelegramChatId(?string $telegramChatId): static
+    {
+        $this->telegramChatId = $telegramChatId;
+        return $this;
+    }
+
+    // ===== FACE RECOGNITION =====
+
+    public function getFaceDescriptor(): ?string
+    {
+        return $this->faceDescriptor;
+    }
+
+    public function setFaceDescriptor(?string $faceDescriptor): static
+    {
+        $this->faceDescriptor = $faceDescriptor;
+        return $this;
+    }
+
+    public function getFaceImage(): ?string
+    {
+        return $this->faceImage;
+    }
+
+    public function setFaceImage(?string $faceImage): static
+    {
+        $this->faceImage = $faceImage;
+        return $this;
+    }
+
+    // ===== RELATIONS =====
+
     public function getOwnedTeams(): Collection
     {
         return $this->ownedTeams;
     }
 
-    /**
-     * @return Collection<int, TeamMembership>
-     */
     public function getTeamMemberships(): Collection
     {
         return $this->teamMemberships;
     }
 
-    /**
-     * @return Collection<int, CoachApplication>
-     */
     public function getCoachApplications(): Collection
     {
         return $this->coachApplications;
     }
 
-    /**
-     * @return Collection<int, Notification>
-     */
     public function getNotifications(): Collection
     {
         return $this->notifications;
     }
 
-    /**
-     * @return Collection<int, AuditLog>
-     */
     public function getAuditLogs(): Collection
     {
         return $this->auditLogs;
@@ -307,46 +374,56 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, TwoFact
         return $this->accountStatus === AccountStatus::ACTIVE;
     }
 
-    /**
-     * @return Collection<int, TrainingSession>
-     */
     public function getTrainingSessions(): Collection
     {
         return $this->trainingSessions;
     }
 
-    // ===== MÉTHODES 2FA - CORRIGÉES POUR MYSQL 5.6 =====
+    public function getVideos(): Collection
+    {
+        return $this->videos;
+    }
 
-    /**
-     * Vérifie si l'authentification 2FA est activée pour cet utilisateur
-     */
+    public function addVideo(Video $video): static
+    {
+        if (!$this->videos->contains($video)) {
+            $this->videos->add($video);
+            $video->setUploadedBy($this);
+        }
+        return $this;
+    }
+
+    public function removeVideo(Video $video): static
+    {
+        if ($this->videos->removeElement($video)) {
+            if ($video->getUploadedBy() === $this) {
+                $video->setUploadedBy(null);
+            }
+        }
+        return $this;
+    }
+
+    // ===== 2FA =====
+
     public function isTotpAuthenticationEnabled(): bool
     {
         return $this->isTotpEnabled && $this->totpSecret !== null;
     }
 
-    /**
-     * Retourne l'identifiant utilisateur pour l'authentification TOTP
-     */
     public function getTotpAuthenticationUsername(): string
     {
         return $this->email;
     }
 
-    /**
-     * Retourne la configuration TOTP pour cet utilisateur
-     */
     public function getTotpAuthenticationConfiguration(): ?TotpConfigurationInterface
     {
         if (!$this->totpSecret) {
             return null;
         }
-
-        // Configuration: secret, algorithme SHA1, période de 30 secondes, 6 chiffres
         return new TotpConfiguration(
-            $this->totpSecret, 
-            TotpConfiguration::ALGORITHM_SHA1, 
-            30, 
+            $this->totpSecret,
+            TotpConfiguration::ALGORITHM_SHA1,
+            30,
             6
         );
     }
@@ -370,33 +447,23 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, TwoFact
     public function setIsTotpEnabled(bool $isTotpEnabled): static
     {
         $this->isTotpEnabled = $isTotpEnabled;
-        
-        // Mettre à jour la date d'activation automatiquement
         if ($isTotpEnabled && $this->totpEnabledAt === null) {
             $this->totpEnabledAt = new \DateTimeImmutable();
         } elseif (!$isTotpEnabled) {
             $this->totpEnabledAt = null;
         }
-        
         return $this;
     }
 
-    /**
-     * CORRIGÉ: Getter pour backup codes (décode depuis JSON stocké en TEXT)
-     */
     public function getBackupCodes(): ?array
     {
         if ($this->backupCodesJson === null || $this->backupCodesJson === '') {
             return null;
         }
-        
         $decoded = json_decode($this->backupCodesJson, true);
         return is_array($decoded) ? $decoded : null;
     }
 
-    /**
-     * CORRIGÉ: Setter pour backup codes (encode en JSON pour stockage en TEXT)
-     */
     public function setBackupCodes(?array $backupCodes): static
     {
         $this->backupCodesJson = $backupCodes !== null ? json_encode($backupCodes) : null;
@@ -414,129 +481,24 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, TwoFact
         return $this;
     }
 
-    /**
-     * CORRIGÉ: Invalide un code de secours après utilisation
-     * 
-     * @param string $code Le code de secours à invalider
-     * @return bool True si le code a été trouvé et invalidé, false sinon
-     */
     public function invalidateBackupCode(string $code): bool
     {
         $codes = $this->getBackupCodes();
-        
         if ($codes === null) {
             return false;
         }
-
         $key = array_search($code, $codes, true);
         if ($key !== false) {
             unset($codes[$key]);
-            $this->setBackupCodes(array_values($codes)); // Réindexer et sauvegarder
+            $this->setBackupCodes(array_values($codes));
             return true;
         }
-
         return false;
     }
 
-    /**
-     * CORRIGÉ: Compte le nombre de codes de secours restants
-     */
     public function getRemainingBackupCodesCount(): int
     {
         $codes = $this->getBackupCodes();
         return $codes ? count($codes) : 0;
     }
-
-    // ===== FIN MÉTHODES 2FA =====
-    /**
-     * @return Collection<int, Video>
-     */
-    public function getVideos(): Collection
-    {
-        return $this->videos;
-    }
-
-    public function addVideo(Video $video): static
-    {
-        if (!$this->videos->contains($video)) {
-            $this->videos->add($video);
-            $video->setUploadedBy($this);
-        }
-
-        return $this;
-    }
-
-    public function removeVideo(Video $video): static
-    {
-        if ($this->videos->removeElement($video)) {
-            // set the owning side to null (unless already changed)
-            if ($video->getUploadedBy() === $this) {
-                $video->setUploadedBy(null);
-            }
-        }
-
-        return $this;
-    }
-
-
-#[ORM\Column(type: 'string', length: 20, nullable: true)]
-private ?string $phone = null;
-
-#[ORM\Column(type: 'string', length: 100, nullable: true)]
-private ?string $telegramChatId = null;
-
-// Add these getter and setter methods:
-
-public function getPhone(): ?string
-{
-    return $this->phone;
-}
-
-public function setPhone(?string $phone): static
-{
-    $this->phone = $phone;
-    return $this;
-}
-
-public function getTelegramChatId(): ?string
-{
-    return $this->telegramChatId;
-}
-
-public function setTelegramChatId(?string $telegramChatId): static
-{
-    $this->telegramChatId = $telegramChatId;
-    return $this;
-}
-
-// src/Entity/User.php
-
-#[ORM\Column(type: 'text', nullable: true)]
-private ?string $faceDescriptor = null;
-
-#[ORM\Column(type: 'string', length: 255, nullable: true)]
-private ?string $faceImage = null;
-
-public function getFaceDescriptor(): ?string
-{
-    return $this->faceDescriptor;
-}
-
-public function setFaceDescriptor(?string $faceDescriptor): static
-{
-    $this->faceDescriptor = $faceDescriptor;
-    return $this;
-}
-
-public function getFaceImage(): ?string
-{
-    return $this->faceImage;
-}
-
-public function setFaceImage(?string $faceImage): static
-{
-    $this->faceImage = $faceImage;
-    return $this;
-}
-
 }

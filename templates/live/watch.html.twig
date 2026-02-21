@@ -1,0 +1,210 @@
+{# templates/live/watch.html.twig #}
+{% extends 'base.html.twig' %}
+
+{% block title %}{{ live.title }} - EyeTwin Live{% endblock %}
+
+{% block body %}
+<section class="profile_section section_padding">
+    <div class="container">
+
+        {% for flash in app.flashes('success') %}
+            <div class="alert alert-success">{{ flash }}</div>
+        {% endfor %}
+        {% for flash in app.flashes('error') %}
+            <div class="alert alert-danger">{{ flash }}</div>
+        {% endfor %}
+
+        <div class="row">
+            <div class="col-lg-8">
+
+                {% if hasAccess %}
+                    {# === LIVE PLAYER === #}
+                    <div class="profile_card mb-4 p-0" style="overflow: hidden;">
+                        <div style="background: #000; aspect-ratio: 16/9; display: flex; align-items: center; justify-content: center; position: relative;">
+                            {% if live.isLive %}
+                                {# 
+                                    Plug your actual HLS/WebRTC player here.
+                                    Example with HLS.js:
+                                    <video id="video" controls style="width:100%; height:100%;"></video>
+                                    Script below loads the HLS stream.
+                                #}
+                                <video id="liveVideo" controls autoplay style="width:100%; height:100%; display: block;" poster="">
+                                    <source src="https://stream.eyetwin.com/live/{{ live.streamKey }}/index.m3u8" type="application/x-mpegURL">
+                                    Your browser does not support HLS streaming.
+                                </video>
+                                <div style="position:absolute; top:12px; left:12px; background:#e53e3e; color:white; padding:4px 12px; border-radius:20px; font-size:12px; font-weight:bold; display:flex; align-items:center; gap:6px;">
+                                    <span style="width:8px;height:8px;background:white;border-radius:50%;animation:pulse 1.5s infinite;display:inline-block;"></span>
+                                    LIVE
+                                </div>
+                            {% else %}
+                                <div class="text-center" style="color: #666; padding: 60px;">
+                                    <i class="fas fa-clock" style="font-size: 64px; margin-bottom: 20px; display:block; color: #667eea;"></i>
+                                    <h4 style="color: #fff;">Stream has not started yet</h4>
+                                    <p>The coach will go live soon. This page will update automatically.</p>
+                                </div>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <div class="profile_card">
+                        <div class="d-flex justify-content-between align-items-start">
+                            <div>
+                                <h3 style="color: #fff; font-weight: bold;">{{ live.title }}</h3>
+                                <p style="color: #a0a0b0; margin-bottom: 0;">
+                                    <i class="fas fa-user-graduate"></i> {{ live.coach.username }}
+                                    {% if live.startedAt %}
+                                        · Started {{ live.startedAt|date('H:i') }}
+                                    {% endif %}
+                                </p>
+                            </div>
+                            {% if live.coinPrice > 0 and not isOwner %}
+                                <span style="color: #f6d860; font-size: 13px;">
+                                    <i class="fas fa-check-circle" style="color: #48bb78;"></i> Access granted
+                                </span>
+                            {% endif %}
+                        </div>
+                        {% if live.description %}
+                            <hr style="border-color: #3a3a5a;">
+                            <p style="color: #c0c0d0;">{{ live.description }}</p>
+                        {% endif %}
+                    </div>
+
+                {% else %}
+                    {# === PAYWALL === #}
+                    <div class="profile_card text-center py-5">
+                        <div style="background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%); border-radius: 12px; padding: 40px 20px; margin-bottom: 30px;">
+                            <i class="fas fa-lock" style="font-size: 64px; color: #667eea; display: block; margin-bottom: 15px;"></i>
+                            {% if live.isLive %}
+                                <div style="display:inline-flex; align-items:center; gap:8px; background:#e53e3e; color:white; padding:6px 16px; border-radius:20px; font-size:13px; font-weight:bold; margin-bottom:15px;">
+                                    <span style="width:8px;height:8px;background:white;border-radius:50%;animation:pulse 1.5s infinite;display:inline-block;"></span>
+                                    LIVE NOW
+                                </div>
+                            {% endif %}
+                            <h3 style="color: #fff; font-weight: bold;">{{ live.title }}</h3>
+                            <p style="color: #a0a0b0;"><i class="fas fa-user-graduate"></i> {{ live.coach.username }}</p>
+                        </div>
+
+                        {% if live.description %}
+                            <p style="color: #c0c0d0; margin-bottom: 25px;">{{ live.description }}</p>
+                        {% endif %}
+
+                        <div style="background: #1e1e3a; border: 1px solid #4a4a6a; border-radius: 12px; padding: 30px; margin-bottom: 25px; display: inline-block; min-width: 280px;">
+                            <p style="color: #888; margin-bottom: 8px; font-size: 13px; text-transform: uppercase; letter-spacing: 1px;">Access Price</p>
+                            <div style="font-size: 42px; font-weight: bold; color: #f6d860;">
+                                <i class="fas fa-coins" style="font-size: 32px;"></i>
+                                {{ live.coinPrice }}
+                            </div>
+                            <p style="color: #888; margin-top: 4px; font-size: 13px;">EyeTwin Coins</p>
+                        </div>
+
+                        {% set userCoins = app.user.coinBalance %}
+                        <div class="mb-4">
+                            <span style="color: #a0a0b0; font-size: 14px;">
+                                Your balance: <strong style="color: #f6d860;"><i class="fas fa-coins"></i> {{ userCoins }} coins</strong>
+                            </span>
+                        </div>
+
+                        {% if userCoins >= live.coinPrice %}
+                            <form method="POST">
+                                <input type="hidden" name="_token" value="{{ csrf_token('live_join_' ~ live.id) }}">
+                                <button type="submit" class="btn_profile btn_apply" style="font-size: 16px; padding: 14px 32px;">
+                                    <i class="fas fa-play-circle"></i> Join for {{ live.coinPrice }} Coins
+                                </button>
+                            </form>
+                        {% else %}
+                            <div class="alert alert-warning d-inline-block mb-3" style="background: rgba(246, 173, 85, 0.15); border: 1px solid #f6ad55; color: #f6d860;">
+                                <i class="fas fa-exclamation-triangle"></i>
+                                Not enough coins — you need {{ live.coinPrice - userCoins }} more.
+                            </div>
+                            <br>
+                            <a href="{{ path('coins_index') }}" class="btn_profile btn_apply" style="text-decoration:none; font-size: 15px; padding: 12px 28px;">
+                                <i class="fas fa-shopping-cart"></i> Buy EyeTwin Coins
+                            </a>
+                        {% endif %}
+                    </div>
+                {% endif %}
+
+            </div>
+
+            <div class="col-lg-4">
+                <div class="profile_card">
+                    <h4 class="card_title"><i class="fas fa-info-circle"></i> Stream Info</h4>
+                    <div class="account_info">
+                        <div class="info_row">
+                            <span class="info_label">Coach</span>
+                            <span class="info_value">{{ live.coach.username }}</span>
+                        </div>
+                        <div class="info_row">
+                            <span class="info_label">Status</span>
+                            <span class="info_value">
+                                {% if live.isLive %}
+                                    <span style="color: #e53e3e; font-weight: bold;">🔴 Live</span>
+                                {% elseif live.isEnded %}
+                                    <span style="color: #888;">Ended</span>
+                                {% else %}
+                                    <span style="color: #667eea;">Upcoming</span>
+                                {% endif %}
+                            </span>
+                        </div>
+                        <div class="info_row">
+                            <span class="info_label">Price</span>
+                            <span class="info_value" style="color: #f6d860;">
+                                {{ live.coinPrice == 0 ? 'Free' : live.coinPrice ~ ' coins' }}
+                            </span>
+                        </div>
+                        {% if live.startedAt %}
+                        <div class="info_row">
+                            <span class="info_label">Started</span>
+                            <span class="info_value">{{ live.startedAt|date('H:i') }}</span>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+
+                {% if not hasAccess %}
+                <div class="profile_card mt-4" style="background: linear-gradient(135deg, rgba(102,126,234,0.15) 0%, rgba(118,75,162,0.15) 100%); border: 1px solid #667eea;">
+                    <h4 class="card_title" style="color: #a78bfa;"><i class="fas fa-coins"></i> Need Coins?</h4>
+                    <p style="color: #a0a0b0; font-size: 13px;">Purchase EyeTwin Coins to access exclusive coaching live streams.</p>
+                    <a href="{{ path('coins_index') }}" class="btn_profile btn_apply" style="text-decoration:none; display:block; text-align:center;">
+                        <i class="fas fa-shopping-cart"></i> Buy Coins
+                    </a>
+                </div>
+                {% endif %}
+
+                <div class="mt-4">
+                    <a href="{{ path('live_index') }}" style="color: #667eea; text-decoration: none; font-size: 14px;">
+                        <i class="fas fa-arrow-left"></i> Back to Live Streams
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<style>
+@keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.3; }
+}
+</style>
+
+{% if hasAccess and live.isLive %}
+<script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
+<script>
+const video = document.getElementById('liveVideo');
+const src = video.querySelector('source').src;
+if (Hls.isSupported()) {
+    const hls = new Hls();
+    hls.loadSource(src);
+    hls.attachMedia(video);
+} else if (video.canPlayType('application/vnd.apple.mpegurl')) {
+    video.src = src;
+}
+
+// Auto-refresh if stream not started yet
+{% if not live.isLive %}
+setTimeout(() => location.reload(), 30000);
+{% endif %}
+</script>
+{% endif %}
+{% endblock %}

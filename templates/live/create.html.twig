@@ -1,0 +1,64 @@
+{# templates/live/create.html.twig #}
+{% extends 'base.html.twig' %}
+
+{% block title %}Create Live Stream - EyeTwin{% endblock %}
+
+{% block body %}
+<section class="profile_section section_padding">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-7">
+
+                <div class="profile_card">
+                    <h3 class="card_title mb-4">
+                        <i class="fas fa-video" style="color: #667eea;"></i> Create a Live Stream
+                    </h3>
+
+                    {% for flash in app.flashes('error') %}
+                        <div class="alert alert-danger">{{ flash }}</div>
+                    {% endfor %}
+
+                    {{ form_start(form, {'attr': {'novalidate': 'novalidate'}}) }}
+
+                    <div class="mb-4">
+                        {{ form_label(form.title, null, {'label_attr': {'class': 'form-label', 'style': 'color:#c0c0d0; font-weight:600;'}}) }}
+                        {{ form_widget(form.title) }}
+                        {{ form_errors(form.title) }}
+                    </div>
+
+                    <div class="mb-4">
+                        {{ form_label(form.description, null, {'label_attr': {'class': 'form-label', 'style': 'color:#c0c0d0; font-weight:600;'}}) }}
+                        {{ form_widget(form.description) }}
+                        {{ form_errors(form.description) }}
+                        <small style="color: #888;">Optional — tell viewers what they'll learn.</small>
+                    </div>
+
+                    <div class="mb-4">
+                        {{ form_label(form.coinPrice, null, {'label_attr': {'class': 'form-label', 'style': 'color:#c0c0d0; font-weight:600;'}}) }}
+                        <div class="input-group">
+                            <span class="input-group-text" style="background: #2d2d4e; border: 1px solid #4a4a6a; color: #f6d860;">
+                                <i class="fas fa-coins"></i>
+                            </span>
+                            {{ form_widget(form.coinPrice) }}
+                        </div>
+                        {{ form_errors(form.coinPrice) }}
+                        <small style="color: #888;">Set to 0 for a free live stream.</small>
+                    </div>
+
+                    <div class="profile_actions mt-4">
+                        <button type="submit" class="btn_profile btn_apply">
+                            <i class="fas fa-check"></i> Create Stream
+                        </button>
+                        <a href="{{ path('live_index') }}" class="btn_profile btn_edit" style="text-decoration:none;">
+                            <i class="fas fa-times"></i> Cancel
+                        </a>
+                    </div>
+
+                    {{ form_end(form) }}
+                </div>
+
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}
