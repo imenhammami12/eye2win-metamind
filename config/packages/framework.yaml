@@ -5,7 +5,7 @@ framework:
     handle_all_throwables: true
 
     router:
-        default_uri: '%env(APP_URL)%'   # ← AJOUT
+        default_uri: '%env(APP_URL)%'
 
     session:
         handler_id: null

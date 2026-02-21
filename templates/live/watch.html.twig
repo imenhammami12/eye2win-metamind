@@ -22,15 +22,7 @@
                     <div class="profile_card mb-4 p-0" style="overflow: hidden;">
                         <div style="background: #000; aspect-ratio: 16/9; display: flex; align-items: center; justify-content: center; position: relative;">
                             {% if live.isLive %}
-                                {# 
-                                    Plug your actual HLS/WebRTC player here.
-                                    Example with HLS.js:
-                                    <video id="video" controls style="width:100%; height:100%;"></video>
-                                    Script below loads the HLS stream.
-                                #}
-                                <video id="liveVideo" controls autoplay style="width:100%; height:100%; display: block;" poster="">
-                                    <source src="https://stream.eyetwin.com/live/{{ live.streamKey }}/index.m3u8" type="application/x-mpegURL">
-                                    Your browser does not support HLS streaming.
+                                <video id="liveVideo" controls autoplay muted style="width:100%; height:100%; display: block;">
                                 </video>
                                 <div style="position:absolute; top:12px; left:12px; background:#e53e3e; color:white; padding:4px 12px; border-radius:20px; font-size:12px; font-weight:bold; display:flex; align-items:center; gap:6px;">
                                     <span style="width:8px;height:8px;background:white;border-radius:50%;animation:pulse 1.5s infinite;display:inline-block;"></span>
@@ -192,19 +184,41 @@
 <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
 <script>
 const video = document.getElementById('liveVideo');
-const src = video.querySelector('source').src;
-if (Hls.isSupported()) {
-    const hls = new Hls();
-    hls.loadSource(src);
-    hls.attachMedia(video);
-} else if (video.canPlayType('application/vnd.apple.mpegurl')) {
-    video.src = src;
-}
+const hlsSrc = 'http://127.0.0.1:8888/{{ live.streamKey }}/index.m3u8';
 
-// Auto-refresh if stream not started yet
-{% if not live.isLive %}
-setTimeout(() => location.reload(), 30000);
-{% endif %}
+if (Hls.isSupported()) {
+    const hls = new Hls({
+        lowLatencyMode: true,
+        liveSyncDurationCount: 2,
+        liveMaxLatencyDurationCount: 4,
+        maxLiveSyncPlaybackRate: 1.5,
+    });
+    hls.loadSource(hlsSrc);
+    hls.attachMedia(video);
+    hls.on(Hls.Events.MANIFEST_PARSED, function() {
+        video.play();
+    });
+    hls.on(Hls.Events.ERROR, function(event, data) {
+        if (data.fatal) {
+            console.warn('HLS fatal error:', data.type);
+            setTimeout(() => {
+                hls.loadSource(hlsSrc);
+                hls.attachMedia(video);
+            }, 3000);
+        }
+    });
+} else if (video.canPlayType('application/vnd.apple.mpegurl')) {
+    video.src = hlsSrc;
+    video.play();
+}
 </script>
 {% endif %}
+
+{% if hasAccess and not live.isLive %}
+<script>
+// Auto-refresh toutes les 30s si le stream n'a pas encore commencé
+setTimeout(() => location.reload(), 30000);
+</script>
+{% endif %}
+
 {% endblock %}

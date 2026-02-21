@@ -68,7 +68,26 @@
                                         <a class="nav-link" href="{{ path('community_channels_index') }}">Community</a>
                                     </li>
 
-                                    {# 🔔 Notifications bell #}
+                                    {#  LIVE STREAMS LINK #}
+                                    <li class="nav-item">
+                                        <a class="nav-link" href="{{ path('live_index') }}" style="display:flex; align-items:center; gap:5px;">
+                                            <span style="width:7px; height:7px; background:#e53e3e; border-radius:50%; display:inline-block; animation:navPulse 1.5s infinite;"></span>
+                                            Live
+                                        </a>
+                                    </li>
+
+                                    {#  Coins balance pill in navbar #}
+                                    <li class="nav-item">
+                                        <a href="{{ path('coins_index') }}" class="nav-link" style="display:flex; align-items:center; gap:5px;">
+                                            <span style="background:linear-gradient(90deg,#f6d860,#f6ad55); color:#1a1a2e; padding:3px 10px; border-radius:20px; font-size:12px; font-weight:bold; display:flex; align-items:center; gap:5px;">
+                                                <i class="fas fa-coins"></i>
+                                                {{ app.user.coinBalance }}
+                                            </span>
+                                        </a>
+                                    </li>
+
+
+                                    {#  Notifications bell #}
                                     <li class="nav-item dropdown position-relative">
                                         <a class="nav-link dropdown-toggle" href="#" id="notifDropdown"
                                            role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"
@@ -118,6 +137,8 @@
                                         </div>
                                     </li>
 
+
+
                                     {# 👤 User dropdown #}
                                     <li class="nav-item dropdown">
                                         <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown"
@@ -126,25 +147,26 @@
                                             <i class="fas fa-user-circle"></i> {{ app.user.username }}
                                         </a>
                                         <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+                                           
                                             <a class="dropdown-item" href="{{ path('user_profile') }}">
                                                 <i class="fas fa-user"></i> My Profile
                                             </a>
+
+                                            <div class="dropdown-divider"></div>
+
+
                                             <a class="dropdown-item" href="{{ path('app_2fa_settings') }}">
                                                 <i class="fas fa-shield-alt"></i> Two-Factor Authentication
                                             </a>
+
                                             <div class="dropdown-divider"></div>
+                                            
                                             <a class="dropdown-item" href="{{ path('app_complaints_index') }}">
                                                 <i class="fas fa-headset"></i> Support
                                             </a>
 
                                             {% if is_granted('ROLE_ADMIN') %}
                                                 <div class="dropdown-divider"></div>
-                                                {#
-                                                    ⚠️  TOUJOURS utiliser admin_gate ici — JAMAIS admin_dashboard.
-                                                    admin_gate gère la logique :
-                                                      - face activée  → page reconnaissance faciale → login
-                                                      - face désactivée → login directement
-                                                #}
                                                 <a class="dropdown-item admin-link" href="{{ path('admin_login') }}">
                                                     <i class="fas fa-user-shield"></i> Administration
                                                 </a>
@@ -218,6 +240,13 @@
         </div>
     </footer>
 </div>
+
+<style>
+@keyframes navPulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.3; }
+}
+</style>
 
 {% block javascripts %}
 <script src="{{ asset('assets/js/jquery-1.12.1.min.js') }}"></script>

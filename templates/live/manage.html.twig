@@ -1,7 +1,7 @@
 {# templates/live/manage.html.twig #}
 {% extends 'base.html.twig' %}
 
-{% block title %}Manage Stream — {{ live.title }} - EyeTwin{% endblock %}
+{% block title %}{{ live.title }} — Studio - EyeTwin{% endblock %}
 
 {% block body %}
 <section class="profile_section section_padding">
@@ -14,140 +14,236 @@
             <div class="alert alert-info">{{ flash }}</div>
         {% endfor %}
 
-        <div class="row">
-            <div class="col-lg-8">
-                <div class="profile_card mb-4">
-                    <div class="d-flex justify-content-between align-items-center mb-3">
-                        <h3 class="card_title mb-0">
-                            <i class="fas fa-broadcast-tower" style="color: {% if live.isLive %}#e53e3e{% else %}#667eea{% endif %};"></i>
-                            {{ live.title }}
-                        </h3>
+        {# ===== HEADER ===== #}
+        <div class="profile_card mb-4" style="background: linear-gradient(135deg, #0f0f23 0%, #1a1a3e 100%); border: 1px solid #2a2a4a;">
+            <div class="d-flex justify-content-between align-items-center flex-wrap gap-3">
+                <div>
+                    <div class="d-flex align-items-center gap-3 mb-1">
                         {% if live.isLive %}
-                            <span style="background: #e53e3e; color: white; padding: 6px 16px; border-radius: 20px; font-size: 13px; font-weight: bold; display: flex; align-items: center; gap: 6px;">
-                                <span style="width: 8px; height: 8px; background: white; border-radius: 50%; animation: pulse 1.5s infinite; display:inline-block;"></span>
-                                LIVE
-                            </span>
+
                         {% elseif live.isEnded %}
-                            <span style="background: #555; color: white; padding: 6px 16px; border-radius: 20px; font-size: 13px;">ENDED</span>
+                            <span style="background:#555; color:white; padding:5px 14px; border-radius:20px; font-size:12px;">ENDED</span>
                         {% else %}
-                            <span style="background: #667eea; color: white; padding: 6px 16px; border-radius: 20px; font-size: 13px;">SCHEDULED</span>
+                            <span style="background:#667eea; color:white; padding:5px 14px; border-radius:20px; font-size:12px;">SCHEDULED</span>
                         {% endif %}
+                        <h2 class="statistics_title mb-0" style="font-size:20px;">{{ live.title }}</h2>
                     </div>
-
                     {% if live.description %}
-                        <p style="color: #a0a0b0;">{{ live.description }}</p>
+                        <p style="color:#a0a0b0; margin:0; font-size:14px;">{{ live.description }}</p>
                     {% endif %}
-
-                    <div class="account_info mt-3">
-                        <div class="info_row">
-                            <span class="info_label">Price</span>
-                            <span class="info_value" style="color: #f6d860;">
-                                <i class="fas fa-coins"></i>
-                                {{ live.coinPrice == 0 ? 'Free' : live.coinPrice ~ ' coins' }}
-                            </span>
-                        </div>
-                        <div class="info_row">
-                            <span class="info_label">Viewers (paid)</span>
-                            <span class="info_value">{{ live.accesses|length }}</span>
-                        </div>
-                        {% if live.startedAt %}
-                        <div class="info_row">
-                            <span class="info_label">Started at</span>
-                            <span class="info_value">{{ live.startedAt|date('H:i, M d Y') }}</span>
-                        </div>
-                        {% endif %}
-                    </div>
                 </div>
-
-                {# Stream embed area - simulated with iframe/HLS placeholder #}
-                {% if live.isLive %}
-                <div class="profile_card mb-4">
-                    <h4 class="card_title"><i class="fas fa-desktop"></i> Live Preview</h4>
-                    <div style="background: #000; border-radius: 8px; aspect-ratio: 16/9; display: flex; align-items: center; justify-content: center;">
-                        {# Replace this with your actual streaming embed (e.g. HLS.js, OBS RTMP ingestion URL) #}
-                        <div class="text-center" style="color: #666;">
-                            <i class="fas fa-video" style="font-size: 48px; margin-bottom: 10px; display: block; color: #e53e3e;"></i>
-                            <p>Stream is live — connect via OBS or your streaming software</p>
-                        </div>
-                    </div>
-                </div>
-                {% endif %}
-
-                {# Stream controls #}
-                {% if not live.isEnded %}
-                <div class="profile_card">
-                    <h4 class="card_title"><i class="fas fa-sliders-h"></i> Stream Controls</h4>
-                    <div class="d-flex gap-3 flex-wrap">
+                <div class="d-flex gap-2 flex-wrap">
+                    {% if not live.isEnded %}
                         {% if not live.isLive %}
                             <form method="POST" action="{{ path('live_start', {id: live.id}) }}">
                                 <input type="hidden" name="_token" value="{{ csrf_token('live_start_' ~ live.id) }}">
-                                <button type="submit" class="btn_profile btn_apply" onclick="return confirm('Start your live stream now?')">
+                                <button type="submit" class="btn_profile btn_apply" style="padding:10px 24px;" onclick="return confirm('Start your live stream now?')">
                                     <i class="fas fa-play-circle"></i> GO LIVE
                                 </button>
                             </form>
-                        {% endif %}
-                        {% if live.isLive %}
+                        {% else %}
                             <form method="POST" action="{{ path('live_end', {id: live.id}) }}">
                                 <input type="hidden" name="_token" value="{{ csrf_token('live_end_' ~ live.id) }}">
-                                <button type="submit" class="btn_profile" style="background: #e53e3e; color: white; border: none; border-radius: 6px; padding: 10px 20px; cursor: pointer; font-weight: bold;" onclick="return confirm('End the live stream?')">
+                                <button type="submit" style="background:#e53e3e; color:white; border:none; border-radius:6px; padding:10px 24px; cursor:pointer; font-weight:bold; font-size:14px;" onclick="return confirm('End the live stream?')">
                                     <i class="fas fa-stop-circle"></i> END STREAM
                                 </button>
                             </form>
                         {% endif %}
-                        <a href="{{ path('live_watch', {id: live.id}) }}" class="btn_profile btn_edit" style="text-decoration:none;">
-                            <i class="fas fa-eye"></i> Preview as Viewer
-                        </a>
+                    {% endif %}
+                    <a href="{{ path('live_watch', {id: live.id}) }}" class="btn_profile btn_edit" style="text-decoration:none; padding:10px 24px;">
+                        <i class="fas fa-eye"></i> Viewer View
+                    </a>
+                    <a href="{{ path('live_index') }}" style="color:#667eea; text-decoration:none; display:flex; align-items:center; gap:6px; font-size:14px; padding:10px;">
+                        <i class="fas fa-arrow-left"></i> All Streams
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            {# ===== LEFT COLUMN ===== #}
+            <div class="col-lg-8">
+
+                {# Live Preview Player #}
+                {% if live.isLive %}
+                <div class="profile_card mb-4 p-0" style="overflow:hidden;">
+                    <div style="background:#000; aspect-ratio:16/9; position:relative;">
+                        <video id="previewVideo" controls autoplay muted style="width:100%; height:100%; display:block;"></video>
+                        <div style="position:absolute; top:12px; left:12px; background:#e53e3e; color:white; padding:4px 14px; border-radius:20px; font-size:12px; font-weight:bold; display:flex; align-items:center; gap:6px;">
+                            <span style="width:7px;height:7px;background:white;border-radius:50%;animation:pulse 1.5s infinite;display:inline-block;"></span>
+                            LIVE PREVIEW
+                        </div>
+                        <div style="position:absolute; top:12px; right:12px; background:rgba(0,0,0,0.7); color:#48bb78; padding:4px 12px; border-radius:6px; font-size:11px; font-family:monospace;" id="latencyBadge">
+                            <i class="fas fa-signal"></i> Connecting...
+                        </div>
                     </div>
                 </div>
                 {% endif %}
+
+                {# Stats Row #}
+                <div class="row mb-4">
+                    <div class="col-4">
+                        <div class="profile_card text-center" style="padding: 20px 10px;">
+                            <div style="font-size:28px; font-weight:900; color:#48bb78;">{{ live.accesses|length }}</div>
+                            <div style="color:#888; font-size:12px; text-transform:uppercase; letter-spacing:1px; margin-top:4px;">Viewers</div>
+                        </div>
+                    </div>
+                    <div class="col-4">
+                        <div class="profile_card text-center" style="padding: 20px 10px;">
+                            <div style="font-size:28px; font-weight:900; color:#f6d860;">
+                                {{ live.coinPrice == 0 ? 'Free' : live.coinPrice }}
+                            </div>
+                            <div style="color:#888; font-size:12px; text-transform:uppercase; letter-spacing:1px; margin-top:4px;">Coins / Access</div>
+                        </div>
+                    </div>
+                    <div class="col-4">
+                        <div class="profile_card text-center" style="padding: 20px 10px;">
+                            <div style="font-size:28px; font-weight:900; color:#667eea;" id="durationDisplay">
+                                {% if live.startedAt %}
+                                    {{ live.startedAt|date('H:i') }}
+                                {% else %}
+                                    —
+                                {% endif %}
+                            </div>
+                            <div style="color:#888; font-size:12px; text-transform:uppercase; letter-spacing:1px; margin-top:4px;">Started At</div>
+                        </div>
+                    </div>
+                </div>
+
+                {# OBS Configuration #}
+                <div class="profile_card" style="border: 1px solid #2a2a4a;">
+                    <h4 class="card_title"><i class="fas fa-tv" style="color:#667eea;"></i> Streaming Configuration</h4>
+
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label style="color:#888; font-size:11px; text-transform:uppercase; letter-spacing:1px; display:block; margin-bottom:6px;">RTMP Server</label>
+                            <div class="input-group">
+                                <input type="text" id="rtmpUrl" value="rtmp://localhost:1935" readonly class="form-control" style="background:#0f0f23; border:1px solid #3a3a5a; color:#48bb78; font-family:monospace; font-size:13px;">
+                                <button class="btn" style="background:#2a2a4a; color:white; border:1px solid #3a3a5a;" onclick="copyText('rtmpUrl', 'RTMP URL copied')">
+                                    <i class="fas fa-copy"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <label style="color:#888; font-size:11px; text-transform:uppercase; letter-spacing:1px; display:block; margin-bottom:6px;">Stream Key</label>
+                            <div class="input-group">
+                                <input type="password" id="streamKey" value="{{ live.streamKey }}" readonly class="form-control" style="background:#0f0f23; border:1px solid #3a3a5a; color:#fff; font-family:monospace;">
+                                <button class="btn" style="background:#667eea; color:white; border:none;" onclick="toggleKey()">
+                                    <i class="fas fa-eye" id="eyeIcon"></i>
+                                </button>
+                                <button class="btn" style="background:#2a2a4a; color:white; border:1px solid #3a3a5a;" onclick="copyKey()">
+                                    <i class="fas fa-copy"></i>
+                                </button>
+                            </div>
+                            <small style="color:#e53e3e; font-size:11px;"><i class="fas fa-lock"></i> Keep this secret</small>
+                        </div>
+                    </div>
+
+                    <div class="row g-3 mt-1">
+                        <div class="col-md-4">
+                            <div style="background:#0f0f23; border:1px solid #2a2a4a; border-radius:6px; padding:12px; text-align:center;">
+                                <div style="color:#667eea; font-size:11px; text-transform:uppercase; letter-spacing:1px; margin-bottom:4px;">Recommended Bitrate</div>
+                                <div style="color:#fff; font-weight:bold;">3000–6000 kbps</div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div style="background:#0f0f23; border:1px solid #2a2a4a; border-radius:6px; padding:12px; text-align:center;">
+                                <div style="color:#667eea; font-size:11px; text-transform:uppercase; letter-spacing:1px; margin-bottom:4px;">Resolution</div>
+                                <div style="color:#fff; font-weight:bold;">1920×1080 / 1280×720</div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div style="background:#0f0f23; border:1px solid #2a2a4a; border-radius:6px; padding:12px; text-align:center;">
+                                <div style="color:#667eea; font-size:11px; text-transform:uppercase; letter-spacing:1px; margin-bottom:4px;">Frame Rate</div>
+                                <div style="color:#fff; font-weight:bold;">30 or 60 FPS</div>
+                            </div>
+                        </div>
+                    </div>
+
+
+                </div>
+
             </div>
 
+            {# ===== RIGHT COLUMN ===== #}
             <div class="col-lg-4">
-                <div class="profile_card">
-                    <h4 class="card_title"><i class="fas fa-key"></i> Streaming Setup</h4>
-                    <p style="color: #a0a0b0; font-size: 13px;">Use these details in OBS Studio or any RTMP-compatible software.</p>
 
-                    <div class="mb-3">
-                        <label style="color: #888; font-size: 12px; text-transform: uppercase; letter-spacing: 1px;">Stream Key</label>
-                        <div class="input-group mt-1">
-                            <input type="password" id="streamKey" value="{{ live.streamKey }}" readonly class="form-control" style="background: #1a1a2e; border: 1px solid #4a4a6a; color: #fff; font-family: monospace;">
-                            <button class="btn" style="background: #667eea; color: white; border: none;" onclick="toggleKey()">
-                                <i class="fas fa-eye" id="eyeIcon"></i>
-                            </button>
-                            <button class="btn" style="background: #4a4a6a; color: white; border: none;" onclick="copyKey()">
-                                <i class="fas fa-copy"></i>
-                            </button>
-                        </div>
-                        <small style="color: #e53e3e; font-size: 11px;"><i class="fas fa-lock"></i> Keep this secret — never share it publicly.</small>
+                {# Share Link #}
+                <div class="profile_card mb-4">
+                    <h4 class="card_title"><i class="fas fa-share-alt"></i> Share with Audience</h4>
+                    <div class="input-group">
+                        <input type="text" id="shareLink" value="{{ url('live_watch', {id: live.id}) }}" readonly class="form-control" style="background:#0f0f23; border:1px solid #3a3a5a; color:#a0a0b0; font-size:11px; font-family:monospace;">
+                        <button class="btn" style="background:#2a2a4a; color:white; border:1px solid #3a3a5a;" onclick="copyText('shareLink', 'Link copied!')">
+                            <i class="fas fa-copy"></i>
+                        </button>
                     </div>
+                    <p style="color:#666; font-size:11px; margin-top:6px;">
+                        <i class="fas fa-coins" style="color:#f6d860;"></i>
+                        {{ live.coinPrice == 0 ? 'Free access for all viewers' : 'Viewers pay ' ~ live.coinPrice ~ ' EyeTwin Coins' }}
+                    </p>
+                </div>
 
-                    <div class="mb-3">
-                        <label style="color: #888; font-size: 12px; text-transform: uppercase; letter-spacing: 1px;">RTMP Server URL</label>
-                        <input type="text" value="rtmp://stream.eyetwin.com/live" readonly class="form-control mt-1" style="background: #1a1a2e; border: 1px solid #4a4a6a; color: #a0a0b0; font-family: monospace; font-size: 12px;">
-                        <small style="color: #888; font-size: 11px;">Configure this in OBS → Settings → Stream</small>
-                    </div>
-
+                {# Stream Details #}
+                <div class="profile_card mb-4">
+                    <h4 class="card_title"><i class="fas fa-info-circle"></i> Stream Details</h4>
                     <div class="account_info">
                         <div class="info_row">
-                            <span class="info_label" style="font-size: 12px;">Recommended bitrate</span>
-                            <span class="info_value" style="font-size: 12px;">3000-6000 kbps</span>
+                            <span class="info_label" style="font-size:13px;">Status</span>
+                            <span class="info_value">
+                                {% if live.isLive %}
+                                    <span style="color:#e53e3e; font-weight:bold;">🔴 Live</span>
+                                {% elseif live.isEnded %}
+                                    <span style="color:#888;">Ended</span>
+                                {% else %}
+                                    <span style="color:#667eea;">Scheduled</span>
+                                {% endif %}
+                            </span>
                         </div>
                         <div class="info_row">
-                            <span class="info_label" style="font-size: 12px;">Resolution</span>
-                            <span class="info_value" style="font-size: 12px;">1920×1080 or 1280×720</span>
+                            <span class="info_label" style="font-size:13px;">Viewers</span>
+                            <span class="info_value">{{ live.accesses|length }}</span>
                         </div>
                         <div class="info_row">
-                            <span class="info_label" style="font-size: 12px;">FPS</span>
-                            <span class="info_value" style="font-size: 12px;">30 or 60</span>
+                            <span class="info_label" style="font-size:13px;">Price</span>
+                            <span class="info_value" style="color:#f6d860;">
+                                {{ live.coinPrice == 0 ? 'Free' : live.coinPrice ~ ' coins' }}
+                            </span>
+                        </div>
+                        {% if live.startedAt %}
+                        <div class="info_row">
+                            <span class="info_label" style="font-size:13px;">Started</span>
+                            <span class="info_value">{{ live.startedAt|date('H:i, d M Y') }}</span>
+                        </div>
+                        {% endif %}
+                        {% if live.endedAt %}
+                        <div class="info_row">
+                            <span class="info_label" style="font-size:13px;">Ended</span>
+                            <span class="info_value">{{ live.endedAt|date('H:i, d M Y') }}</span>
+                        </div>
+                        {% endif %}
+                        <div class="info_row">
+                            <span class="info_label" style="font-size:13px;">Revenue</span>
+                            <span class="info_value" style="color:#f6d860;">
+                                <i class="fas fa-coins"></i>
+                                {{ live.accesses|length * live.coinPrice }} coins
+                            </span>
                         </div>
                     </div>
                 </div>
 
-                <div class="profile_card mt-4">
-                    <h4 class="card_title"><i class="fas fa-link"></i> Share Link</h4>
-                    <p style="color: #a0a0b0; font-size: 13px;">Share this link with your audience:</p>
-                    <input type="text" value="{{ url('live_watch', {id: live.id}) }}" readonly class="form-control" style="background: #1a1a2e; border: 1px solid #4a4a6a; color: #a0a0b0; font-size: 12px; font-family: monospace;">
+                {# My Streams #}
+                <div class="profile_card">
+                    <h4 class="card_title"><i class="fas fa-list"></i> My Streams</h4>
+                    <a href="{{ path('live_my_streams') }}" class="btn_profile btn_edit" style="text-decoration:none; display:block; text-align:center;">
+                        <i class="fas fa-broadcast-tower"></i> View All My Streams
+                    </a>
+                    <div style="margin-top:12px;">
+                        <a href="{{ path('live_create') }}" style="color:#667eea; font-size:13px; text-decoration:none;">
+                            <i class="fas fa-plus-circle"></i> Create New Stream
+                        </a>
+                    </div>
                 </div>
+
             </div>
         </div>
     </div>
@@ -160,27 +256,66 @@
 }
 </style>
 
+<script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
 <script>
 function toggleKey() {
     const input = document.getElementById('streamKey');
     const icon = document.getElementById('eyeIcon');
-    if (input.type === 'password') {
-        input.type = 'text';
-        icon.className = 'fas fa-eye-slash';
-    } else {
-        input.type = 'password';
-        icon.className = 'fas fa-eye';
-    }
+    input.type = input.type === 'password' ? 'text' : 'password';
+    icon.className = input.type === 'password' ? 'fas fa-eye' : 'fas fa-eye-slash';
 }
 
 function copyKey() {
     const input = document.getElementById('streamKey');
-    const type = input.type;
+    const prev = input.type;
     input.type = 'text';
     navigator.clipboard.writeText(input.value).then(() => {
-        input.type = type;
-        alert('Stream key copied to clipboard!');
+        input.type = prev;
+        showToast('Stream key copied!');
     });
 }
+
+function copyText(id, msg) {
+    navigator.clipboard.writeText(document.getElementById(id).value)
+        .then(() => showToast(msg));
+}
+
+function showToast(msg) {
+    const el = document.createElement('div');
+    el.textContent = '✅ ' + msg;
+    el.style.cssText = 'position:fixed;bottom:30px;right:30px;background:#48bb78;color:white;padding:12px 24px;border-radius:8px;font-weight:bold;z-index:9999;font-size:14px;box-shadow:0 4px 16px rgba(0,0,0,0.4);transition:opacity 0.3s;';
+    document.body.appendChild(el);
+    setTimeout(() => { el.style.opacity = '0'; setTimeout(() => el.remove(), 300); }, 2000);
+}
+
+{% if live.isLive %}
+const video = document.getElementById('previewVideo');
+const hlsSrc = 'http://127.0.0.1:8888/{{ live.streamKey }}/index.m3u8';
+const badge = document.getElementById('latencyBadge');
+
+if (video && Hls.isSupported()) {
+    const hls = new Hls({
+        lowLatencyMode: true,
+        liveSyncDurationCount: 2,
+        liveMaxLatencyDurationCount: 4,
+        maxLiveSyncPlaybackRate: 1.5,
+    });
+    hls.loadSource(hlsSrc);
+    hls.attachMedia(video);
+    hls.on(Hls.Events.MANIFEST_PARSED, () => {
+        video.play();
+        if (badge) badge.innerHTML = '<i class="fas fa-signal"></i> Live';
+    });
+    hls.on(Hls.Events.ERROR, (e, data) => {
+        if (data.fatal) {
+            if (badge) badge.innerHTML = '<i class="fas fa-exclamation-triangle"></i> Reconnecting...';
+            setTimeout(() => { hls.loadSource(hlsSrc); hls.attachMedia(video); }, 3000);
+        }
+    });
+} else if (video && video.canPlayType('application/vnd.apple.mpegurl')) {
+    video.src = hlsSrc;
+    video.play();
+}
+{% endif %}
 </script>
 {% endblock %}
