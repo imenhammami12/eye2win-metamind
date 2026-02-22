@@ -4,6 +4,8 @@ namespace App\Controller\Community;
 
 use App\Entity\Message;
 use App\Form\MessageType;
+use App\Service\CloudinaryUploader;
+use App\Service\CloudinaryUploaderCHAT;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -227,11 +229,12 @@ final class MessageController extends AbstractController
         EntityManagerInterface $em,
         ChannelRepository $channelRepo,
         HubInterface $hub,
+        CloudinaryUploaderCHAT $cloudinaryUploader,
         Environment $twig
     ): Response {
 
         // ✅ visibility check
-        $visible = $channelRepo->findVisibleForUser();
+        $visible = $channelRepo->findVisibleForUser($this->getUser());
         $visibleIds = array_map(fn($c) => $c->getId(), $visible);
         if (!in_array($channel->getId(), $visibleIds, true)) {
             throw $this->createAccessDeniedException("Channel non accessible.");
@@ -300,24 +303,52 @@ final class MessageController extends AbstractController
             $mime = $file->getClientMimeType() ?? 'application/octet-stream';
             $size = $file->getSize() ?? 0;
 
-            // Move file to storage
+
+            // Move file to storage FIRST (creates stable path)
             try {
                 $file->move($uploadDir, $stored);
             } catch (\Throwable $e) {
                 if ($request->isXmlHttpRequest()) {
+                    return new JsonResponse(['ok' => false, 'error' => 'Upload failed: '.$e->getMessage()], 500);
+                }
+                throw $e;
+            }
+
+// ✅ upload from the moved file path (NOT temp file)
+            $localPath = rtrim($uploadDir, '/\\') . DIRECTORY_SEPARATOR . $stored;
+
+            $upload = ['secure_url' => null, 'public_id' => null];
+            try {
+                if ($mime === 'application/pdf') {
+                    // ✅ PDFs as public RAW
+                    $upload = $cloudinaryUploader->uploadRawFromPath($localPath);
+                } else {
+                    // ✅ everything else (images will remain image)
+                    $upload = $cloudinaryUploader->uploadFromPath($localPath);
+                }            } catch (\Throwable $e) {
+                if ($request->isXmlHttpRequest()) {
                     return new JsonResponse([
                         'ok' => false,
-                        'error' => 'Upload failed: '.$e->getMessage(),
+                        'error' => 'Cloudinary upload failed: ' . $e->getMessage(),
                     ], 500);
                 }
                 throw $e;
             }
 
             $att = new MessageAttachment();
+
+            // ✅ Store Cloudinary references
+            $att->setUrl($upload['secure_url'] ?? null);
+            $att->setPublicId($upload['public_id'] ?? null);
+            $att->setCloudResourceType($upload['resource_type'] ?? null);
+
             $att->setOriginalName($originalName);
             $att->setStoredName($stored);
             $att->setMimeType($mime);
             $att->setSize($size);
+
+
+
 
             // ✅ THIS is the important part (updates both sides)
             $message->addAttachment($att);
@@ -343,7 +374,8 @@ final class MessageController extends AbstractController
             'attachments' => array_map(fn($a) => [
                 'id' => $a->getId(),
                 'name' => $a->getOriginalName(),
-                'url' => $this->generateUrl('community_attachment_download', ['id' => $a->getId()]),
+                //'url' => $this->generateUrl('community_attachment_download', ['id' => $a->getId()]),
+                'url' => $a->getUrl() ?: $this->generateUrl('community_attachment_download', ['id' => $a->getId()]),
                 'mime' => $a->getMimeType(),
                 'size' => $a->getSize(),
             ], $message->getAttachments()->toArray()),

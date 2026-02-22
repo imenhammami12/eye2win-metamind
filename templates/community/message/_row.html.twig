@@ -111,13 +111,14 @@
 {#                            </a>#}
 {#                        {% endfor %}#}
                         {% for a in m.attachments %}
+                            {% set fileUrl = a.url ? a.url : path('community_attachment_download', {id: a.id}) %}
                             {% set mime = a.mimeType|default('') %}
 
                             {% if mime starts with 'image/' %}
                                 <div class="msg-attach-preview">
-                                    <a href="{{ path('community_attachment_download', {id: a.id}) }}" target="_blank" rel="noopener">
+                                    <a href="{{ fileUrl }}" target="_blank" rel="noopener">
                                         <img
-                                                src="{{ path('community_attachment_download', {id: a.id}) }}"
+                                                src="{{ fileUrl }}"
                                                 alt="{{ a.originalName }}"
                                                 class="chat-image"
                                         >
@@ -127,7 +128,7 @@
 
                             {% else %}
                                 <a class="file-pill"
-                                   href="{{ path('community_attachment_download', {id: a.id}) }}"
+                                   href="{{ fileUrl }}"
                                    target="_blank" rel="noopener">
                                     <i class="fas fa-paperclip"></i>
                                     {{ a.originalName }}

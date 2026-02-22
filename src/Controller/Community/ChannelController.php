@@ -21,7 +21,7 @@ class ChannelController extends AbstractController
     #[Route('/channels', name: 'community_channels_index')]
     public function index(ChannelRepository $repo, NotificationRepository $notificationRepo): Response
     {
-        $channels = $repo->findVisibleForUser();
+        $channels = $repo->findVisibleForUser($this->getUser());
         $channelNotifications = [];
         if ($this->getUser()) {
             $channelNotifications = $notificationRepo->findChannelNotificationsForUser($this->getUser());
@@ -66,7 +66,7 @@ class ChannelController extends AbstractController
     ): Response
     {
         // Access control: only APPROVED+active+allowed (same logic as index)
-        $visible = $channelRepo->findVisibleForUser();
+        $visible = $channelRepo->findVisibleForUser($this->getUser());
         $visibleIds = array_map(fn($c) => $c->getId(), $visible);
 
         if (!in_array($channel->getId(), $visibleIds, true)) {

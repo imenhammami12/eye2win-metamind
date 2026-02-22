@@ -28,6 +28,18 @@ class MessageAttachment
     #[ORM\Column]
     private ?int $size = null;
 
+    #[ORM\Column(length: 255, nullable: true)]
+    private ?string $url = null;
+
+    #[ORM\Column(length: 255, nullable: true)]
+    private ?string $publicId = null;
+
+    #[ORM\Column(length: 20, nullable: true)]
+    private ?string $cloudResourceType = null;
+
+    public function getCloudResourceType(): ?string { return $this->cloudResourceType; }
+    public function setCloudResourceType(?string $t): static { $this->cloudResourceType = $t; return $this; }
+
     public function getId(): ?int
     {
         return $this->id;
@@ -83,4 +95,16 @@ class MessageAttachment
 
     public function getMessage(): ?Message { return $this->message; }
     public function setMessage(?Message $message): self { $this->message = $message; return $this; }
+
+    public function getPublicId(): ?string{ return $this->publicId; }
+    public function setPublicId(?string $publicId): static{
+        $this->publicId = $publicId;
+        return $this;
+    }
+
+    public function getUrl(): ?string{ return $this->url; }
+    public function setUrl(?string $url): static{
+        $this->url = $url;
+        return $this;
+    }
 }

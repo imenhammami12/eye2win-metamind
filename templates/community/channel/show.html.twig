@@ -627,23 +627,6 @@
                     : (m.content && m.content.trim() !== '')
                         ? `<div class="msg-text">${escapeHtml(m.content)}</div>`
                         : '';
-
-                // ✅ attachments (build BEFORE return)
-  //               let filesHtml = '';
-  //               if (!m.isDeleted && Array.isArray(m.attachments) && m.attachments.length > 0) {
-  //                   filesHtml = `
-  //   <div class="msg-files mt-2">
-  //     ${m.attachments.map(a => `
-  //       <a class="file-pill"
-  //          href="${escapeHtml(a.url)}" target="_blank" rel="noopener">
-  //          <i class="fas fa-paperclip"></i>
-  //          ${escapeHtml(a.name)}
-  //          <span style="opacity:.7;">(${Math.round((a.size||0)/1024)} KB)</span>
-  //       </a>
-  //     `).join('')}
-  //   </div>
-  // `;
-  //               }  JUSTE 9BAL INLINE MESSAGE IMAGE
                 let filesHtml = '';
                 if (!m.isDeleted && Array.isArray(m.attachments) && m.attachments.length > 0) {
                     filesHtml = `<div class="msg-files mt-2">` + m.attachments.map(a => {

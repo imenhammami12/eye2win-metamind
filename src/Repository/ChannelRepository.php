@@ -5,6 +5,7 @@ namespace App\Repository;
 use App\Entity\Channel;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
+use Symfony\Component\Security\Core\User\UserInterface;
 
 /**
  * @extends ServiceEntityRepository<Channel>
@@ -41,7 +42,7 @@ class ChannelRepository extends ServiceEntityRepository
     //        ;
     //    }
 
-    public function findVisibleForUser(): array
+    public function findVisibleForUser(?UserInterface $user = null): array
     {
         $qb = $this->createQueryBuilder('c')
             ->andWhere('c.status = :approved')
@@ -50,6 +51,22 @@ class ChannelRepository extends ServiceEntityRepository
             ->setParameter('active', true)
             ->orderBy('c.createdAt', 'DESC')
             ;
+        // visitor => only public
+        if ($user === null) {
+            $qb->andWhere('c.type = :public')
+                ->setParameter('public', Channel::TYPE_PUBLIC);
+            return $qb->getQuery()->getResult();
+        }
+
+        // user => public OR createdBy = me
+    $roles = method_exists($user, 'getRoles') ? $user->getRoles() : [];
+    $isAdmin = in_array('ROLE_ADMIN', $roles, true);
+
+    if (!$isAdmin) {
+        $qb->andWhere('c.type = :public OR c.createdBy = :me')
+            ->setParameter('public', Channel::TYPE_PUBLIC)
+            ->setParameter('me', $user->getUserIdentifier());
+    }
 
         return $qb->getQuery()->getResult();
     } /// returns only channels that are approved + active /// used in channelController index+show

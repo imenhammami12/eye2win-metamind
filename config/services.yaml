@@ -35,6 +35,12 @@ services:
             $apiSecret: '%env(CLOUDINARY_API_SECRET)%'
             $defaultFolder: '%env(default::CLOUDINARY_DEFAULT_FOLDER)%'
 
+    App\Service\CloudinaryUploaderCHAT:
+        arguments:
+            $cloudName: '%env(AYA_CLOUDINARY_CLOUD_NAME)%'
+            $apiKey: '%env(AYA_CLOUDINARY_API_KEY)%'
+            $apiSecret: '%env(AYA_CLOUDINARY_API_SECRET)%'
+            $defaultFolder: '%env(default::AYA_CLOUDINARY_DEFAULT_FOLDER)%'
     # add more service definitions when explicit configuration is needed
     # please note that last definitions always *replace* previous ones
     
