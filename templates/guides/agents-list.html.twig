@@ -1,0 +1,313 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Guides Valorant • Eye2Win Metamind{% endblock %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    <link rel="stylesheet" href="{{ asset('assets/css/guides-enhanced.css') }}">
+    <style>
+        * {
+            transition: color 0.2s ease, background-color 0.2s ease, border-color 0.2s ease, transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        body { 
+            background: linear-gradient(135deg, #0a0e27 0%, #10141e 50%, #0a0e27 100%);
+            color: #fff;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            min-height: 100vh;
+        }
+
+        /* Page Header */
+        .guides-header {
+            background: linear-gradient(135deg, rgba(255, 0, 0, 0.05) 0%, rgba(76, 211, 227, 0.05) 100%);
+            border: 2px solid rgba(255, 0, 0, 0.3);
+            border-left: 6px solid #ff0000;
+            padding: 50px 40px;
+            border-radius: 16px;
+            margin-bottom: 50px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            animation: slideUp 0.6s ease;
+        }
+
+        .guides-header h1 {
+            color: #fff;
+            font-size: 52px;
+            font-weight: 900;
+            margin-bottom: 15px;
+            letter-spacing: -1px;
+            background: linear-gradient(135deg, #fff 0%, #4cd3e3 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .guides-header h1 i {
+            color: #ff0000;
+            font-size: 48px;
+        }
+
+        .guides-header p {
+            color: #aeb8c9;
+            font-size: 16px;
+            line-height: 1.6;
+            margin: 0;
+        }
+
+        /* Agents List */
+        .agents-list {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            animation: slideUp 0.6s ease;
+        }
+
+        .agent-row {
+            background: linear-gradient(135deg, rgba(26, 31, 46, 0.6) 0%, rgba(11, 17, 31, 0.6) 100%);
+            border: 2px solid rgba(255, 0, 0, 0.1);
+            border-radius: 14px;
+            padding: 25px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 25px;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            backdrop-filter: blur(5px);
+            transition: all 0.3s ease;
+        }
+
+        .agent-row::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -50%;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle, rgba(255, 0, 0, 0.1) 0%, transparent 70%);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            pointer-events: none;
+        }
+
+        .agent-row:hover {
+            border-color: #ff0000;
+            transform: translateX(10px);
+            box-shadow: 0 15px 40px rgba(255, 0, 0, 0.15);
+        }
+
+        .agent-row:hover::before {
+            opacity: 1;
+        }
+
+        /* Agent Profile */
+        .agent-profile {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            min-width: 200px;
+        }
+
+        .agent-image {
+            width: 80px;
+            height: 80px;
+            border-radius: 12px;
+            overflow: hidden;
+            border: 2px solid rgba(76, 211, 227, 0.3);
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.3);
+            flex-shrink: 0;
+        }
+
+        .agent-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .agent-name {
+            color: #fff;
+            font-size: 24px;
+            font-weight: 900;
+            letter-spacing: -0.5px;
+        }
+
+        /* Guide Button */
+        .agent-guides-btn {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            background: linear-gradient(135deg, rgba(76, 211, 227, 0.1) 0%, rgba(76, 211, 227, 0.05) 100%);
+            border: 2px solid rgba(76, 211, 227, 0.3);
+            color: #4cd3e3;
+            padding: 12px 25px;
+            border-radius: 10px;
+            font-weight: 700;
+            text-transform: uppercase;
+            font-size: 11px;
+            letter-spacing: 1px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            white-space: nowrap;
+            min-width: 140px;
+            justify-content: center;
+        }
+
+        .agent-guides-btn:hover {
+            background: linear-gradient(135deg, rgba(76, 211, 227, 0.2) 0%, rgba(76, 211, 227, 0.1) 100%);
+            border-color: #ff0000;
+            color: #ff0000;
+            box-shadow: 0 8px 20px rgba(76, 211, 227, 0.2);
+        }
+
+        .agent-guides-btn i {
+            font-size: 12px;
+        }
+
+        /* Animations */
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Responsive */
+        @media (max-width: 1024px) {
+            .agent-row {
+                padding: 20px;
+                gap: 15px;
+            }
+
+            .agent-guides-btn {
+                padding: 10px 20px;
+                font-size: 10px;
+                min-width: 120px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .guides-header {
+                padding: 30px 20px;
+            }
+
+            .guides-header h1 {
+                font-size: 32px;
+            }
+
+            .agent-row {
+                flex-direction: column;
+                text-align: center;
+                padding: 20px;
+                gap: 15px;
+            }
+
+            .agent-profile {
+                flex-direction: column;
+                min-width: auto;
+            }
+
+            .agent-guides-btn {
+                width: 100%;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .agent-row {
+                padding: 15px;
+            }
+
+            .agent-image {
+                width: 70px;
+                height: 70px;
+            }
+
+            .agent-name {
+                font-size: 18px;
+            }
+        }
+    </style>
+{% endblock %}
+
+{% block body %}
+<div class="container py-5">
+    <!-- Header -->
+    <div class="guides-header">
+        <h1>
+            <i class="fas fa-play-circle"></i>
+            {{ game.name }}
+        </h1>
+        <p>Sélectionne un agent pour découvrir les meilleures techniques et stratégies au combat.</p>
+    </div>
+
+    <div class="guide-stat-grid">
+        <div class="guide-stat-card">
+            <div class="guide-stat-label">Agents</div>
+            <div class="guide-stat-value" id="agentsTotalCount">{{ agents|length }}</div>
+        </div>
+        <div class="guide-stat-card">
+            <div class="guide-stat-label">Visible</div>
+            <div class="guide-stat-value" id="agentsVisibleCount">{{ agents|length }}</div>
+        </div>
+    </div>
+
+    <div class="guide-toolbar">
+        <input id="agentSearchInput" class="guide-input" type="text" placeholder="Rechercher un agent...">
+    </div>
+    <div class="guide-results-note" id="agentsResultsNote">{{ agents|length }} agent(s) affiché(s)</div>
+
+    <!-- Agents List -->
+    <div class="agents-list">
+        {% for agent in agents %}
+            <div class="agent-row" data-agent-name="{{ agent.name|lower }}">
+                <div class="agent-profile">
+                    <div class="agent-image">
+                        <img src="{{ agent.image }}" alt="{{ agent.name }}">
+                    </div>
+                    <h2 class="agent-name">{{ agent.name }}</h2>
+                </div>
+
+
+
+                <a href="{{ path('app_guides_agent', {gameSlug: game.slug, agentSlug: agent.slug}) }}" class="agent-guides-btn">
+                    Guides
+                    <i class="fas fa-arrow-right"></i>
+                </a>
+            </div>
+        {% endfor %}
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const searchInput = document.getElementById('agentSearchInput');
+    const rows = document.querySelectorAll('.agent-row');
+    const visibleCount = document.getElementById('agentsVisibleCount');
+    const totalCount = document.getElementById('agentsTotalCount');
+    const resultsNote = document.getElementById('agentsResultsNote');
+
+    function applyFilter() {
+        const query = (searchInput?.value || '').trim().toLowerCase();
+        let shown = 0;
+
+        rows.forEach(row => {
+            const name = row.dataset.agentName || '';
+            const match = query === '' || name.includes(query);
+            row.classList.toggle('guide-hidden', !match);
+            if (match) {
+                shown++;
+            }
+        });
+
+        if (visibleCount) visibleCount.textContent = String(shown);
+        if (totalCount) totalCount.textContent = String(rows.length);
+        if (resultsNote) resultsNote.textContent = `${shown} agent(s) affiché(s)`;
+    }
+
+    searchInput?.addEventListener('input', applyFilter);
+    applyFilter();
+});
+</script>
+{% endblock %}

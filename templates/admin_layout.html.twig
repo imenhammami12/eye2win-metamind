@@ -71,6 +71,12 @@
                     <span>Videos</span>
                 </a>
 
+                <a href="{{ path('app_guide_dashboard') }}"
+                   class="{{ app.request.attributes.get('_route') starts with 'app_guide' or app.request.attributes.get('_route') starts with 'app_game_' or app.request.attributes.get('_route') starts with 'app_agent_' ? 'active' : '' }}">
+                    <i class="bi bi-collection-play"></i>
+                    <span>Guides</span>
+                </a>
+
                 <a href="{{ path('admin_coach_applications_index') }}" 
                    class="{{ app.request.attributes.get('_route') starts with 'admin_coach_applications' ? 'active' : '' }}">
                     <i class="bi bi-clipboard-check"></i>

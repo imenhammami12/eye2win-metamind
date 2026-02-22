@@ -1,0 +1,79 @@
+{% extends "admin_layout.html.twig" %}
+
+{% block title %}Guides Dashboard - Admin{% endblock %}
+
+{% block body %}
+<div class="container-fluid py-4">
+    <h1 class="mb-4">Guides Dashboard</h1>
+
+    <div class="row mb-4">
+        <div class="col-md-3">
+            <div class="card bg-warning text-dark">
+                <div class="card-body">
+                    <h5>Pending Reviews</h5>
+                    <h2>{{ pendingCount }}</h2>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card bg-info text-dark">
+                <div class="card-body">
+                    <h5>Games</h5>
+                    <h2>{{ games|length }}</h2>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="d-flex gap-2">
+                <a href="{{ path('app_guide_pending') }}" class="btn btn-warning">Review Pending</a>
+                <a href="{{ path('app_guide_manage_videos') }}" class="btn btn-secondary">Manage Videos</a>
+                <a href="{{ path('app_game_list') }}" class="btn btn-primary">Manage Games</a>
+                <a href="{{ path('app_agent_list') }}" class="btn btn-success">Manage Agents</a>
+                <a href="{{ path('app_guide_admin_new') }}" class="btn btn-danger">+ Add Guide Video</a>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header">Pending Guides</div>
+                <div class="card-body">
+                    {% if recentGuides is empty %}
+                        <p>No pending guides.</p>
+                    {% else %}
+                        <ul class="list-group">
+                            {% for guide in recentGuides|slice(0, 10) %}
+                                <li class="list-group-item d-flex justify-content-between">
+                                    <span>{{ guide.title }}</span>
+                                    <small>{{ guide.uploadedBy.username }}</small>
+                                </li>
+                            {% endfor %}
+                        </ul>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header">Popular Guides</div>
+                <div class="card-body">
+                    {% if popularGuides is empty %}
+                        <p>No approved guides yet.</p>
+                    {% else %}
+                        <ul class="list-group">
+                            {% for guide in popularGuides %}
+                                <li class="list-group-item d-flex justify-content-between align-items-center">
+                                    <span>{{ guide.title }}</span>
+                                    <span class="badge bg-danger">❤ {{ guide.likes }}</span>
+                                </li>
+                            {% endfor %}
+                        </ul>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

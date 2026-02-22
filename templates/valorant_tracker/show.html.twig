@@ -1,75 +1,513 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Match Valorant {{ match.trackerMatchId }}{% endblock %}
+{% block title %}Match {{ match.trackerMatchId }} • Valorant Tracker{% endblock %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    <style>
+        * {
+            transition: color 0.2s ease, background-color 0.2s ease, border-color 0.2s ease, transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        body { 
+            background: linear-gradient(135deg, #0a0e27 0%, #10141e 50%, #0a0e27 100%);
+            color: #fff;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            min-height: 100vh;
+        }
+        
+        /* Glow Effects */
+        @keyframes glow {
+            0%, 100% { box-shadow: 0 0 20px rgba(255, 0, 0, 0.1), 0 5px 20px rgba(0, 0, 0, 0.3); }
+            50% { box-shadow: 0 0 30px rgba(255, 0, 0, 0.2), 0 5px 20px rgba(0, 0, 0, 0.3); }
+        }
+
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes slideDown {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Match Hero Section */
+        .match-hero {
+            background: linear-gradient(135deg, rgba(255, 0, 0, 0.05) 0%, rgba(76, 211, 227, 0.05) 100%);
+            border: 2px solid rgba(255, 0, 0, 0.3);
+            border-left: 6px solid #ff0000;
+            padding: 40px;
+            border-radius: 16px;
+            margin-bottom: 40px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            animation: slideUp 0.6s ease;
+        }
+        
+        .match-hero h1 {
+            color: #fff;
+            font-size: 48px;
+            font-weight: 900;
+            margin-bottom: 15px;
+            letter-spacing: -1px;
+            background: linear-gradient(135deg, #fff 0%, #4cd3e3 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .match-hero h1 i {
+            color: #ff0000;
+            margin-right: 12px;
+            font-size: 44px;
+        }
+        
+        .match-hero-meta {
+            color: #aeb8c9;
+            font-size: 15px;
+            line-height: 1.8;
+            font-weight: 500;
+            letter-spacing: 0.3px;
+        }
+
+        .match-hero-meta i {
+            color: #ff0000;
+            margin-right: 8px;
+            font-weight: 600;
+        }
+
+        /* Stat Cards */
+        .stat-card {
+            background: linear-gradient(135deg, rgba(26, 31, 46, 0.8) 0%, rgba(11, 17, 31, 0.8) 100%);
+            border: 2px solid rgba(255, 0, 0, 0.1);
+            border-radius: 16px;
+            padding: 30px 25px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(5px);
+            animation: slideUp 0.6s ease;
+        }
+
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -50%;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle, rgba(255, 0, 0, 0.1) 0%, transparent 70%);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+        
+        .stat-card:hover {
+            border-color: #ff0000;
+            box-shadow: 0 15px 40px rgba(255, 0, 0, 0.15), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+            transform: translateY(-8px);
+        }
+
+        .stat-card:hover::before {
+            opacity: 1;
+        }
+        
+        .stat-label {
+            color: #7a8fa3;
+            font-size: 11px;
+            text-transform: uppercase;
+            font-weight: 700;
+            margin-bottom: 15px;
+            letter-spacing: 1.5px;
+        }
+
+        .stat-label i {
+            color: #ff0000;
+            margin-right: 6px;
+        }
+        
+        .stat-value {
+            background: linear-gradient(135deg, #4cd3e3 0%, #00bcd4 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            font-size: 42px;
+            font-weight: 900;
+            letter-spacing: -2px;
+        }
+        
+        /* Chart Cards */
+        .chart-card {
+            background: linear-gradient(135deg, rgba(26, 31, 46, 0.9) 0%, rgba(11, 17, 31, 0.9) 100%);
+            border: 2px solid rgba(255, 0, 0, 0.1);
+            border-radius: 16px;
+            padding: 30px;
+            margin-bottom: 30px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(5px);
+            animation: slideUp 0.6s ease;
+        }
+
+        .chart-card:hover {
+            border-color: rgba(255, 0, 0, 0.2);
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.05);
+        }
+        
+        .chart-title {
+            color: #fff;
+            font-size: 16px;
+            font-weight: 700;
+            margin-bottom: 25px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            letter-spacing: 0.3px;
+        }
+        
+        .chart-title i {
+            color: #ff0000;
+            font-size: 18px;
+            width: 24px;
+            height: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* Table Styling */
+        .table-container {
+            background: linear-gradient(135deg, rgba(26, 31, 46, 0.9) 0%, rgba(11, 17, 31, 0.9) 100%);
+            border: 2px solid rgba(255, 0, 0, 0.1);
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(5px);
+            animation: slideUp 0.7s ease;
+        }
+
+        .table-header {
+            padding: 25px;
+            background: linear-gradient(90deg, #ff0000 0%, #c6019a 100%);
+            border-bottom: 3px solid rgba(255, 0, 0, 0.3);
+            box-shadow: 0 5px 15px rgba(255, 0, 0, 0.1);
+        }
+
+        .table-header h3 {
+            color: #fff;
+            margin: 0;
+            font-weight: 800;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 18px;
+            letter-spacing: 0.5px;
+        }
+
+        .table-header i {
+            font-size: 20px;
+        }
+        
+        .table {
+            color: #aeb8c9;
+            margin-bottom: 0;
+        }
+        
+        .table thead tr {
+            background: linear-gradient(90deg, rgba(255, 0, 0, 0.1) 0%, rgba(198, 1, 154, 0.1) 100%);
+            border-bottom: 2px solid rgba(255, 0, 0, 0.2);
+        }
+
+        .table thead th {
+            padding: 18px 15px !important;
+            font-weight: 700;
+            text-transform: uppercase;
+            font-size: 11px;
+            letter-spacing: 1px;
+            color: #4cd3e3;
+            background: transparent;
+        }
+        
+        .table tbody tr {
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            position: relative;
+            transition: all 0.2s ease;
+        }
+
+        .table tbody tr:nth-child(even) {
+            background: rgba(0, 0, 0, 0.2);
+        }
+        
+        .table tbody tr:hover {
+            background: rgba(255, 0, 0, 0.1);
+        }
+
+        .table tbody td {
+            padding: 18px 15px !important;
+            vertical-align: middle;
+            color: #aeb8c9;
+        }
+
+        /* Player Name & Tag */
+        .player-name {
+            color: #fff;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 14px;
+            letter-spacing: 0.2px;
+        }
+        
+        .player-tag {
+            color: #4cd3e3;
+            font-size: 11px;
+            font-weight: 600;
+            opacity: 0.8;
+        }
+
+        /* Agent Badge */
+        .agent-badge {
+            display: inline-block;
+            background: linear-gradient(135deg, rgba(76, 211, 227, 0.15) 0%, rgba(76, 211, 227, 0.05) 100%);
+            border: 1.5px solid rgba(76, 211, 227, 0.5);
+            color: #4cd3e3;
+            padding: 6px 12px;
+            border-radius: 8px;
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            transition: all 0.3s ease;
+        }
+
+        .agent-badge:hover {
+            background: linear-gradient(135deg, rgba(76, 211, 227, 0.3) 0%, rgba(76, 211, 227, 0.15) 100%);
+            border-color: rgba(76, 211, 227, 0.8);
+            box-shadow: 0 5px 15px rgba(76, 211, 227, 0.2);
+        }
+
+        /* Stat Highlight */
+        .stat-highlight {
+            color: #4cd3e3;
+            font-weight: 800;
+            font-size: 15px;
+            letter-spacing: 0.5px;
+        }
+
+        /* Back Button */
+        .btn-back {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            background: linear-gradient(135deg, #4cd3e3 0%, #00bcd4 100%);
+            border: none;
+            color: #0b111f;
+            padding: 12px 28px;
+            border-radius: 10px;
+            font-weight: 700;
+            text-transform: uppercase;
+            font-size: 11px;
+            letter-spacing: 1px;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            box-shadow: 0 8px 25px rgba(76, 211, 227, 0.2);
+            white-space: nowrap;
+        }
+        
+        .btn-back:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 12px 35px rgba(76, 211, 227, 0.4);
+            color: #0b111f;
+        }
+
+        .btn-back i {
+            font-size: 14px;
+        }
+
+        /* Chart Wrapper */
+        .chart-wrapper {
+            position: relative;
+            height: 350px;
+            width: 100%;
+            padding: 10px;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .match-hero {
+                padding: 25px;
+            }
+
+            .match-hero h1 {
+                font-size: 32px;
+            }
+
+            .stat-card {
+                padding: 20px 15px;
+            }
+
+            .stat-value {
+                font-size: 28px;
+            }
+
+            .chart-wrapper {
+                height: 250px;
+            }
+
+            .table {
+                font-size: 13px;
+            }
+
+            .table thead th {
+                padding: 12px 8px !important;
+            }
+
+            .table tbody td {
+                padding: 12px 8px !important;
+            }
+        }
+    </style>
+{% endblock %}
 
 {% block body %}
-<div class="container py-4" data-controller="valorant-tracker"
-     data-valorant-tracker-chart-labels-value='{{ match.joueurs|map(p => p.riotName ~ (p.riotTag ? "#" ~ p.riotTag : ""))|json_encode|e('html_attr') }}'
-     data-valorant-tracker-kills-value='{{ match.joueurs|map(p => p.statistique ? p.statistique.kills : 0)|json_encode|e('html_attr') }}'
-     data-valorant-tracker-deaths-value='{{ match.joueurs|map(p => p.statistique ? p.statistique.deaths : 0)|json_encode|e('html_attr') }}'
-     data-valorant-tracker-assists-value='{{ match.joueurs|map(p => p.statistique ? p.statistique.assists : 0)|json_encode|e('html_attr') }}'>
-
-    <div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-4">
-        <div>
-            <h1 class="h3 mb-1">Match {{ match.trackerMatchId }}</h1>
-            <p class="text-muted mb-0">
-                {{ match.mapName ?: 'Map inconnue' }} • {{ match.mode ?: 'Mode inconnu' }} •
-                {{ match.playedAt ? match.playedAt|date('d/m/Y H:i') : 'Date indisponible' }}
-            </p>
+<div class="container py-5">
+    <!-- Header -->
+    <div class="d-flex justify-content-between align-items-start mb-4">
+        <div class="match-hero flex-grow-1">
+            <h1>
+                <i class="fas fa-gamepad"></i> 
+                Match {{ match.trackerMatchId }}
+            </h1>
+            <div class="match-hero-meta">
+                <i class="fas fa-map"></i> {{ match.mapName ?: 'Map inconnue' }} 
+                <span class="ms-3"><i class="fas fa-crosshairs"></i> {{ match.mode ?: 'Mode inconnu' }}</span>
+                <span class="ms-3"><i class="fas fa-clock"></i> {{ match.playedAt ? match.playedAt|date('d/m/Y H:i') : 'Date indisponible' }}</span>
+            </div>
         </div>
-        <a href="{{ path('valorant_tracker_dashboard') }}" class="btn btn-outline-primary">Retour dashboard</a>
+        <a href="{{ path('valorant_tracker_dashboard') }}" class="btn-back ms-3" style="white-space: nowrap;">
+            <i class="fas fa-arrow-left"></i> Dashboard
+        </a>
     </div>
 
-    <div class="row g-3 mb-3">
-        <div class="col-md-3"><div class="card shadow-sm"><div class="card-body"><small class="text-muted">Score</small><div class="h4 mb-0">{{ match.scoreTeamA ?? 0 }} - {{ match.scoreTeamB ?? 0 }}</div></div></div></div>
-        <div class="col-md-3"><div class="card shadow-sm"><div class="card-body"><small class="text-muted">Joueurs</small><div class="h4 mb-0">{{ match.joueurs|length }}</div></div></div></div>
-        <div class="col-md-3"><div class="card shadow-sm"><div class="card-body"><small class="text-muted">Durée</small><div class="h4 mb-0">{{ match.durationSeconds ? (match.durationSeconds / 60)|round(0, 'floor') ~ ' min' : '-' }}</div></div></div></div>
-        <div class="col-md-3"><div class="card shadow-sm"><div class="card-body"><small class="text-muted">Équipes</small><div class="h4 mb-0">{{ match.equipes|length }}</div></div></div></div>
+    <!-- Stats Cards -->
+    <div class="row g-4 mb-4">
+        <div class="col-md-3">
+            <div class="stat-card">
+                <div class="stat-label"><i class="fas fa-trophy"></i> Score</div>
+                <div class="stat-value">{{ match.scoreTeamA ?? 0 }}-{{ match.scoreTeamB ?? 0 }}</div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="stat-card">
+                <div class="stat-label"><i class="fas fa-users"></i> Joueurs</div>
+                <div class="stat-value">{{ match.joueurs|length }}</div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="stat-card">
+                <div class="stat-label"><i class="fas fa-hourglass-half"></i> Durée</div>
+                <div class="stat-value">{{ match.durationSeconds ? (match.durationSeconds / 60)|round(0, 'floor') ~ 'm' : '-' }}</div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="stat-card">
+                <div class="stat-label"><i class="fas fa-shield-alt"></i> Équipes</div>
+                <div class="stat-value">{{ match.equipes|length }}</div>
+            </div>
+        </div>
     </div>
 
-    <div class="row g-3 mb-3">
+    <!-- Charts -->
+    <div class="row g-4 mb-4">
         <div class="col-lg-6">
-            <div class="card shadow-sm">
-                <div class="card-header">Performance individuelle (K/D/A)</div>
-                <div class="card-body"><canvas data-valorant-tracker-target="kdaChart" height="220"></canvas></div>
+            <div class="chart-card">
+                <div class="chart-title">
+                    <i class="fas fa-chart-bar"></i> Performance K/D/A
+                </div>
+                <div class="chart-wrapper">
+                    <canvas id="kdaChart"></canvas>
+                </div>
             </div>
         </div>
         <div class="col-lg-6">
-            <div class="card shadow-sm">
-                <div class="card-header">Heatmap Kills (approximation)</div>
-                <div class="card-body"><canvas data-valorant-tracker-target="heatmapChart" height="220"></canvas></div>
+            <div class="chart-card">
+                <div class="chart-title">
+                    <i class="fas fa-bullseye"></i> Damage Distribution
+                </div>
+                <div class="chart-wrapper">
+                    <canvas id="damageChart"></canvas>
+                </div>
             </div>
         </div>
     </div>
 
-    <div class="card shadow-sm">
+    <!-- Players Table -->
+    <div class="table-container">
+        <div class="table-header">
+            <h3><i class="fas fa-list"></i> Statistiques Joueurs</h3>
+        </div>
         <div class="table-responsive">
-            <table class="table table-striped mb-0">
+            <table class="table">
                 <thead>
-                <tr>
-                    <th>Joueur</th>
-                    <th>Équipe</th>
-                    <th>Agent</th>
-                    <th>Kills</th>
-                    <th>Deaths</th>
-                    <th>Assists</th>
-                    <th>Headshots</th>
-                    <th>Damage</th>
-                </tr>
+                    <tr>
+                        <th>Joueur</th>
+                        <th>Équipe</th>
+                        <th>Agent</th>
+                        <th style="text-align: center;">Kills</th>
+                        <th style="text-align: center;">Deaths</th>
+                        <th style="text-align: center;">Assists</th>
+                        <th style="text-align: center;">HS</th>
+                        <th style="text-align: center;">Dmg</th>
+                    </tr>
                 </thead>
                 <tbody>
-                {% for p in match.joueurs %}
-                    <tr>
-                        <td>{{ p.riotName }}{% if p.riotTag %}<small class="text-muted">#{{ p.riotTag }}</small>{% endif %}</td>
-                        <td>{{ p.equipe ? p.equipe.name : '-' }}</td>
-                        <td>{{ p.agent ?: '-' }}</td>
-                        <td>{{ p.statistique ? p.statistique.kills : 0 }}</td>
-                        <td>{{ p.statistique ? p.statistique.deaths : 0 }}</td>
-                        <td>{{ p.statistique ? p.statistique.assists : 0 }}</td>
-                        <td>{{ p.statistique and p.statistique.headshots is not null ? p.statistique.headshots : '-' }}</td>
-                        <td>{{ p.statistique and p.statistique.damage is not null ? p.statistique.damage : '-' }}</td>
-                    </tr>
-                {% endfor %}
+                    {% for p in match.joueurs %}
+                        <tr>
+                            <td>
+                                <div class="player-name">
+                                    <span>{{ p.riotName }}</span>
+                                    {% if p.riotTag %}<span class="player-tag">#{{ p.riotTag }}</span>{% endif %}
+                                </div>
+                            </td>
+                            <td>
+                                {% if p.equipe %}
+                                    <span style="color: #4cd3e3; font-weight: 600;">{{ p.equipe.name }}</span>
+                                {% else %}
+                                    <span style="color: #666;">-</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                {% if p.agent %}
+                                    <span class="agent-badge">{{ p.agent }}</span>
+                                {% else %}
+                                    <span style="color: #666;">-</span>
+                                {% endif %}
+                            </td>
+                            <td style="text-align: center;">
+                                <span class="stat-highlight">{{ p.statistique ? p.statistique.kills : 0 }}</span>
+                            </td>
+                            <td style="text-align: center;">
+                                <span>{{ p.statistique ? p.statistique.deaths : 0 }}</span>
+                            </td>
+                            <td style="text-align: center;">
+                                <span>{{ p.statistique ? p.statistique.assists : 0 }}</span>
+                            </td>
+                            <td style="text-align: center;">
+                                <span>{{ p.statistique and p.statistique.headshots is not null ? p.statistique.headshots : '-' }}</span>
+                            </td>
+                            <td style="text-align: center;">
+                                <span>{{ p.statistique and p.statistique.damage is not null ? p.statistique.damage : '-' }}</span>
+                            </td>
+                        </tr>
+                    {% else %}
+                        <tr>
+                            <td colspan="8" style="text-align: center; padding: 40px !important; color: #666;">
+                                <i class="fas fa-inbox" style="font-size: 24px; margin-bottom: 10px; display: block;"></i>
+                                Aucun joueur enregistré
+                            </td>
+                        </tr>
+                    {% endfor %}
                 </tbody>
             </table>
         </div>
@@ -77,4 +515,60 @@
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.3/dist/chart.umd.min.js"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const labels = {{ match.joueurs|map(p => p.riotName ~ (p.riotTag ? "#" ~ p.riotTag : ""))|json_encode|raw }};
+        const kills = {{ match.joueurs|map(p => p.statistique ? p.statistique.kills : 0)|json_encode|raw }};
+        const deaths = {{ match.joueurs|map(p => p.statistique ? p.statistique.deaths : 0)|json_encode|raw }};
+        const assists = {{ match.joueurs|map(p => p.statistique ? p.statistique.assists : 0)|json_encode|raw }};
+        const damage = {{ match.joueurs|map(p => p.statistique ? p.statistique.damage : 0)|json_encode|raw }};
+
+        // K/D/A Chart
+        const kdaCtx = document.getElementById('kdaChart')?.getContext('2d');
+        if (kdaCtx) {
+            new Chart(kdaCtx, {
+                type: 'bar',
+                data: {
+                    labels: labels,
+                    datasets: [
+                        { label: 'Kills', data: kills, backgroundColor: '#4cd3e3', borderRadius: 6 },
+                        { label: 'Deaths', data: deaths, backgroundColor: '#ff0000', borderRadius: 6 },
+                        { label: 'Assists', data: assists, backgroundColor: '#ffc107', borderRadius: 6 }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { labels: { color: '#aeb8c9' } } },
+                    scales: {
+                        y: { ticks: { color: '#aeb8c9' }, grid: { color: 'rgba(255, 255, 255, 0.05)' } },
+                        x: { ticks: { color: '#aeb8c9' }, grid: { color: 'rgba(255, 255, 255, 0.05)' } }
+                    }
+                }
+            });
+        }
+
+        // Damage Chart
+        const dmgCtx = document.getElementById('damageChart')?.getContext('2d');
+        if (dmgCtx) {
+            new Chart(dmgCtx, {
+                type: 'doughnut',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        data: damage,
+                        backgroundColor: ['#4cd3e3', '#ff0000', '#ffc107', '#00bcd4', '#c6019a', '#38a4ff'],
+                        borderColor: '#0b111f',
+                        borderWidth: 2
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { labels: { color: '#aeb8c9' }, position: 'bottom' } }
+                }
+            });
+        }
+    });
+</script>
 {% endblock %}
