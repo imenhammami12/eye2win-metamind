@@ -2,12 +2,45 @@
 {% set isMe = isMe|default(false) %}
 {% set showActions = showActions|default(false) %}
 
+<style>
+    .file-pill{
+        display:inline-block;
+        padding:6px 10px;
+        border-radius:12px;
+        background:rgba(255,255,255,0.08);
+        color:#fff;
+        text-decoration:none;
+        margin-right:6px;
+        margin-top:6px;
+        font-size:12px;
+    }
+    .chat-image{
+        max-width: 260px;
+        max-height: 180px;
+        border-radius: 12px;
+        display: block;
+        margin-top: 6px;
+        border: 1px solid rgba(255,255,255,0.12);
+    }
+
+    .msg-attach-preview{
+        margin-top: 6px;
+    }
+
+    .file-caption{
+        font-size: 12px;
+        margin-top: 4px;
+        opacity: .9;
+    }
+</style>
+
 <div class="msg-row {{ isMe ? 'me' : 'other' }}" data-msg-id="{{ m.id }}">
     {% if not isMe %}
         <div class="avatar" title="{{ m.senderName }}">
             {{ m.senderName|slice(0,1)|upper }}
         </div>
     {% endif %}
+
 
     <div class="bubble">
         <div class="msg-top">
@@ -62,7 +95,48 @@
             {% if m.isDeleted %}
                 <div class="msg-deleted">this message is deleted.</div>
             {% else %}
-                <div class="msg-text">{{ m.content }}</div>
+                {% if m.content is not empty %}
+                    <div class="msg-text">{{ m.content }}</div>
+                {% endif %}
+
+                {% if m.attachments is defined and m.attachments|length > 0 %}
+                    <div class="msg-files mt-2">
+{#                        {% for a in m.attachments %}#}
+{#                            <a class="file-pill"#}
+{#                               href="{{ path('community_attachment_download', {id: a.id}) }}"#}
+{#                               target="_blank" rel="noopener">#}
+{#                                <i class="fas fa-paperclip"></i>#}
+{#                                {{ a.originalName }}#}
+{#                                <span style="opacity:.7;">({{ (a.size / 1024)|round }} KB)</span>#}
+{#                            </a>#}
+{#                        {% endfor %}#}
+                        {% for a in m.attachments %}
+                            {% set mime = a.mimeType|default('') %}
+
+                            {% if mime starts with 'image/' %}
+                                <div class="msg-attach-preview">
+                                    <a href="{{ path('community_attachment_download', {id: a.id}) }}" target="_blank" rel="noopener">
+                                        <img
+                                                src="{{ path('community_attachment_download', {id: a.id}) }}"
+                                                alt="{{ a.originalName }}"
+                                                class="chat-image"
+                                        >
+                                    </a>
+                                    <div class="file-caption">{{ a.originalName }} <span style="opacity:.7;">({{ (a.size / 1024)|round }} KB)</span></div>
+                                </div>
+
+                            {% else %}
+                                <a class="file-pill"
+                                   href="{{ path('community_attachment_download', {id: a.id}) }}"
+                                   target="_blank" rel="noopener">
+                                    <i class="fas fa-paperclip"></i>
+                                    {{ a.originalName }}
+                                    <span style="opacity:.7;">({{ (a.size / 1024)|round }} KB)</span>
+                                </a>
+                            {% endif %}
+                        {% endfor %}
+                    </div>
+                {% endif %}
             {% endif %}
         {% endif %}
     </div>

@@ -5,6 +5,8 @@ namespace App\Entity;
 use App\Repository\MessageRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 
 
 #[ORM\Entity(repositoryClass: MessageRepository::class)]
@@ -14,6 +16,9 @@ class Message
     #[ORM\GeneratedValue]
     #[ORM\Column]
     private ?int $id = null;
+
+    #[ORM\OneToMany(mappedBy: 'message', targetEntity: MessageAttachment::class, cascade: ['persist','remove'], orphanRemoval: true)]
+    private Collection $attachments;
 
     #[ORM\Column(type: Types::TEXT)]
     private ?string $content = null;
@@ -123,6 +128,32 @@ class Message
     {
         $this->channel = $channel;
 
+        return $this;
+    }
+
+    public function __construct() {
+        $this->attachments = new ArrayCollection();
+    }
+
+    public function getAttachments(): Collection {
+        return $this->attachments; }
+
+    public function addAttachment(MessageAttachment $attachment): self
+    {
+        if (!$this->attachments->contains($attachment)) {
+            $this->attachments[] = $attachment;
+            $attachment->setMessage($this);
+        }
+
+        return $this;
+    }
+    public function removeAttachment(MessageAttachment $att): self
+    {
+        if ($this->attachments->removeElement($att)) {
+            if ($att->getMessage() === $this) {
+                $att->setMessage(null);
+            }
+        }
         return $this;
     }
 }

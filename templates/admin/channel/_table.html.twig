@@ -181,6 +181,12 @@
 
                     <td>
                         <div class="btn-group" role="group">
+                            <a href="{{ path('admin_channels_show', {id: c.id}) }}"
+                               class="btn btn-sm btn-outline-info"
+                               title="View details">
+                                <i class="bi bi-eye"></i>
+                            </a>
+
                             <a class="btn btn-sm btn-warning"
                                href="{{ path('admin_channels_edit', {id: c.id}) }}"
                                data-bs-toggle="tooltip"

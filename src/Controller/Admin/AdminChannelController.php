@@ -15,6 +15,9 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 
+use App\Repository\MessageRepository;
+
+
 #[Route('/admin/channels')]
 #[IsGranted('ROLE_ADMIN')]
 class AdminChannelController extends AbstractController
@@ -195,5 +198,23 @@ class AdminChannelController extends AbstractController
         $this->addFlash('success', 'Channel deleted ✅');
         return $this->redirectToRoute('admin_channels_index');
     }
+
+    #[Route('/{id}', name: 'admin_channels_show', requirements: ['id' => '\d+'], methods: ['GET'])]
+    public function show(Channel $channel, MessageRepository $messageRepo): Response
+    {
+        $messagesCount = $messageRepo->count(['channel' => $channel]);
+        $lastMessages = $messageRepo->findBy(
+            ['channel' => $channel],
+            ['sentAt' => 'DESC'],
+            8
+        );
+
+        return $this->render('admin/channel/show.html.twig', [
+            'channel' => $channel,
+            'messagesCount' => $messagesCount,
+            'lastMessages' => $lastMessages,
+        ]);
+    }
+
 
 }

@@ -1,77 +1,3 @@
-{#{% extends 'base.html.twig' %}#}
-{#{% block body %}#}
-{#    <div class="container mt-4">#}
-{#        <h2>{{ channel.name }}</h2>#}
-{#        <p class="text-muted">{{ channel.description }}</p>#}
-
-{#        <hr>#}
-
-{#        <h5>Messages</h5>#}
-{#        <div class="mb-4">#}
-{#            {% for m in messages %}#}
-{#                <div class="card mb-2">#}
-{#                    <div class="card-body">#}
-
-{#                        <div class="d-flex justify-content-between">#}
-{#                            <strong>{{ m.senderName }}</strong>#}
-{#                            <small>{{ m.sentAt|date('d/m/Y H:i') }}</small>#}
-{#                        </div>#}
-
-{#                        #}{# ✅ INLINE EDIT MODE #}
-{#                        {% if editId is defined and editId == m.id and editForm is not null %}#}
-{#                            {{ form_start(editForm) }}#}
-{#                            {{ form_row(editForm.content) }}#}
-{#                            <button class="btn btn-danger btn-sm mt-2">Sauver</button>#}
-{#                            <a class="btn btn-secondary btn-sm mt-2"#}
-{#                               href="{{ path('community_channels_show', {id: channel.id}) }}">#}
-{#                                Annuler#}
-{#                            </a>#}
-{#                            {{ form_end(editForm) }}#}
-
-{#                        {% else %}#}
-
-{#                            <div class="mt-2">#}
-{#                                {% if m.isDeleted %}#}
-{#                                    <em class="text-muted">Ce message a été supprimé.</em>#}
-{#                                {% else %}#}
-{#                                    {{ m.content }}#}
-{#                                {% endif %}#}
-{#                            </div>#}
-
-{#                            {% if app.user and m.senderEmail == app.user.userIdentifier and not m.isDeleted %}#}
-{#                                <div class="mt-2">#}
-{#                                    <a class="btn btn-sm btn-outline-warning"#}
-{#                                       href="{{ path('community_channels_show', {id: channel.id, edit: m.id}) }}">#}
-{#                                        Edit#}
-{#                                    </a>#}
-
-{#                                    <form method="post" action="{{ path('community_message_delete', {id: m.id}) }}" style="display:inline;">#}
-{#                                        <input type="hidden" name="_token" value="{{ csrf_token('delete_message_' ~ m.id) }}">#}
-{#                                        <button class="btn btn-sm btn-outline-danger">Delete</button>#}
-{#                                    </form>#}
-{#                                </div>#}
-{#                            {% endif %}#}
-
-{#                        {% endif %}#}
-
-{#                    </div>#}
-{#                </div>#}
-{#            {% endfor %}#}
-
-{#        </div>#}
-
-{#        {% if is_granted('ROLE_USER') %}#}
-{#            <h5>Envoyer un message</h5>#}
-{#            {{ form_start(messageForm) }}#}
-{#            {{ form_row(messageForm.content) }}#}
-{#            <button class="btn btn-danger">Envoyer</button>#}
-{#            {{ form_end(messageForm) }}#}
-{#        {% else %}#}
-{#            <p class="text-muted">Connecte-toi pour envoyer un message.</p>#}
-{#        {% endif %}#}
-{#    </div>#}
-{#{% endblock %}#}
-{# templates/community/channel/show.html.twig #}
 {% extends 'base.html.twig' %}
 
 {% block body %}
@@ -325,6 +251,41 @@
             gap: 10px;
             margin-top: 10px;
         }
+        #files-preview{
+            display:flex;
+            flex-wrap:wrap;
+            gap:8px;
+            margin-top:8px;
+        }
+
+        .file-chip{
+            display:inline-flex;
+            align-items:center;
+            gap:8px;
+            padding:6px 10px;
+            border-radius:14px;
+            background: rgba(255,255,255,0.08);
+            border: 1px solid rgba(255,255,255,0.10);
+            color: rgba(255,255,255,0.90);
+            font-size: 12px;
+        }
+
+        .file-chip .file-size{
+            opacity:.7;
+        }
+
+        .file-chip .file-remove{
+            border:0;
+            background: transparent;
+            color: rgba(255,255,255,0.75);
+            cursor:pointer;
+            font-size: 14px;
+            line-height: 1;
+        }
+
+        .file-chip .file-remove:hover{
+            color:#ff5a7a;
+        }
     </style>
 
     <div class="container chat-wrap">
@@ -364,104 +325,36 @@
                     </div>
                 {% endfor %}
 
-                {#                {% for m in messages %}#}
-{#                    {% set isMe = app.user and (m.senderEmail == app.user.userIdentifier) %}#}
-
-{#                    <div class="msg-row {{ isMe ? 'me' : 'other' }}">#}
-
-{#                        #}{# avatar left for others, right hidden for me #}
-{#                        {% if not isMe %}#}
-{#                            <div class="avatar" title="{{ m.senderName }}">#}
-{#                                {{ m.senderName|slice(0,1)|upper }}#}
-{#                            </div>#}
-{#                        {% endif %}#}
-
-{#                        <div class="bubble">#}
-
-{#                            <div class="msg-top">#}
-{#                                <div class="d-flex align-items-center gap-2" style="gap:10px;">#}
-{#                                    <div class="msg-name">{{ m.senderName }}</div>#}
-{#                                    <div class="msg-time">{{ m.sentAt|date('d/m/Y H:i') }}</div>#}
-{#                                </div>#}
-
-{#                                #}{# 3 dots actions only for owner and not deleted and not in edit mode #}
-{#                                {% if isMe and not m.isDeleted and not (editId is defined and editId == m.id and editForm is not null) %}#}
-{#                                    <div class="msg-actions dropdown">#}
-{#                                        <button class="dots-btn" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">#}
-{#                                            <i class="fas fa-ellipsis-v"></i>#}
-{#                                        </button>#}
-
-{#                                        <div class="dropdown-menu dropdown-menu-right dots-menu">#}
-{#                                            <a class="dots-item"#}
-{#                                               href="{{ path('community_channels_show', {id: channel.id, edit: m.id}) }}">#}
-{#                                                <i class="fas fa-pen"></i> Edit#}
-{#                                            </a>#}
-
-{#                                            <form method="post"#}
-{#                                                  action="{{ path('community_message_delete', {id: m.id}) }}"#}
-{#                                                  style="margin:0;">#}
-{#                                                <input type="hidden" name="_token" value="{{ csrf_token('delete_message_' ~ m.id) }}">#}
-{#                                                <button class="dots-item dots-danger" type="submit">#}
-{#                                                    <i class="fas fa-trash"></i> Delete#}
-{#                                                </button>#}
-{#                                            </form>#}
-{#                                        </div>#}
-{#                                    </div>#}
-{#                                {% endif %}#}
-{#                            </div>#}
-
-{#                            #}{# ✅ INLINE EDIT MODE #}
-{#                            {% if editId is defined and editId == m.id and editForm is not null %}#}
-{#                                <div class="edit-panel">#}
-{#                                    {{ form_start(editForm) }}#}
-{#                                    {{ form_widget(editForm.content) }}#}
-
-{#                                    <div class="edit-actions">#}
-{#                                        <button class="btn btn-danger btn-sm">#}
-{#                                            <i class="fas fa-save"></i> Save#}
-{#                                        </button>#}
-{#                                        <a class="btn btn-secondary btn-sm"#}
-{#                                           href="{{ path('community_channels_show', {id: channel.id}) }}">#}
-{#                                            Cancel#}
-{#                                        </a>#}
-{#                                    </div>#}
-
-{#                                    {{ form_end(editForm) }}#}
-{#                                </div>#}
-
-{#                            {% else %}#}
-{#                                {% if m.isDeleted %}#}
-{#                                    <div class="msg-deleted">this message is deleted.</div>#}
-{#                                {% else %}#}
-{#                                    <div class="msg-text">{{ m.content }}</div>#}
-{#                                {% endif %}#}
-{#                            {% endif %}#}
-
-{#                        </div>#}
-
-{#                        {% if isMe %}#}
-{#                            <div class="avatar" title="You" style="background: rgba(255,45,85,0.18); border-color: rgba(255,45,85,0.20);">#}
-{#                                <i class="fas fa-user"></i>#}
-{#                            </div>#}
-{#                        {% endif %}#}
-{#                    </div>#}
-{#                {% else %}#}
-{#                    <div class="text-center" style="color: rgba(255,255,255,0.75); padding: 30px 10px;">#}
-{#                        No message at the moment. Start a conversation 🔥#}
-{#                    </div>#}
-{#                {% endfor %}#}
             </div>
 
             <div class="chat-compose">
                 {% if is_granted('ROLE_USER') %}
-                    {{ form_start(messageForm) }}
+
+                    {{ form_start(messageForm, { attr: { id: 'message-form' } }) }}
                     <div class="compose-row">
+
                         {{ form_widget(messageForm.content, {'attr': {'placeholder': 'Type here...', 'rows': 2}}) }}
+
+                        {# ✅ hidden file input #}
+                        {# ✅ keep Symfony id, just hide input nicely #}
+                        {{ form_widget(messageForm.files, { attr: { class: 'file-input-hidden' } }) }}
+
+                        <label for="{{ messageForm.files.vars.id }}" class="btn-send" style="cursor:pointer;" title="Attach file">
+                            <i class="fas fa-paperclip"></i>
+                        </label>
+
                         <button class="btn-send" type="submit">
                             <i class="fas fa-paper-plane"></i> Send
                         </button>
                     </div>
+
+{#                    <div id="files-preview" style="margin-top:6px; font-size:12px; color: rgba(255,255,255,0.7);"></div>#}
+                    <div id="compose-error" style="margin-top:6px; font-size:12px; color: #ff6b81;"></div>
+                    <div id="files-preview" style="margin-top:6px; font-size:12px; color: rgba(255,255,255,0.7);"></div>
                     {{ form_end(messageForm) }}
+
+
+
                 {% else %}
                     <div class="text-muted">Login to send a message.</div>
                 {% endif %}
@@ -476,6 +369,39 @@
             const form = document.querySelector('.chat-compose form');
             const textarea = form ? form.querySelector('textarea') : null;
 
+            if (chatStream) {
+                chatStream.addEventListener('submit', async (e) => {
+                    const form = e.target;
+                    if (!(form instanceof HTMLFormElement)) return;
+
+                    if (!form.action.includes('/messages/') || !form.action.endsWith('/delete')) return;
+
+                    e.preventDefault();
+
+                    const res = await fetch(form.action, {
+                        method: 'POST',
+                        body: new FormData(form),
+                        headers: {'X-Requested-With': 'XMLHttpRequest'}
+                    });
+
+                    const errorBox = document.getElementById('compose-error');
+
+                    if (!res.ok) {
+                        let payload = null;
+                        try { payload = await res.json(); } catch (e) {}
+
+                        const msg = payload?.error
+                            || (Array.isArray(payload?.errors) && payload.errors.length ? payload.errors[0] : null)
+                            || 'Unable to send message.';
+
+                        if (errorBox) errorBox.textContent = msg;
+                        return;
+                    }
+                    if (errorBox) errorBox.textContent = '';
+                });
+            }
+
+
             function scrollToBottom() {
                 if (chatStream) chatStream.scrollTop = chatStream.scrollHeight;
             }
@@ -485,12 +411,16 @@
 
             // ✅ Mercure topic per channel
             const topic = "urn:channel:{{ channel.id }}";
+
             // ✅ This generates the URL AND sets the auth cookie for subscribing
             // Docs: use withCredentials:true so cookie is sent to the hub. :contentReference[oaicite:5]{index=5}
-            const hub = "http://127.0.0.1:3000/.well-known/mercure";
-            const url = hub + "?topic=" + encodeURIComponent(topic);
+            /*const hub = "http://127.0.0.1:3000/.well-known/mercure";
+            const url = hub + "?topic=" + encodeURIComponent(topic);*/
+            const mercureUrl = "{{ mercure('urn:channel:' ~ channel.id, { subscribe: 'urn:channel:' ~ channel.id })|escape('js') }}";
 
-            const es = new EventSource(url); // ✅ no cookies needed
+            //const es = new EventSource(url); // ✅ no cookies needed
+            const es = new EventSource(mercureUrl, { withCredentials: true });
+
             es.onopen = () => console.log("✅ Mercure connected");
             es.onerror = (e) => console.log("❌ Mercure error", e);
 
@@ -501,20 +431,48 @@
                 const row = document.querySelector(`[data-msg-id="${data.id}"]`);
 
                 // ✅ DELETE: update existing row (do not append)
+                // if (data.type === 'delete') {
+                //     if (!row) return;
+                //     // remove actions
+                //     const actions = row.querySelector('.msg-actions');
+                //     if (actions) actions.remove();                    // replace content with deleted label
+                //     const txt = row.querySelector('.msg-text');
+                //     if (txt) {
+                //         txt.className = 'msg-deleted';
+                //         txt.textContent = 'this message is deleted.';
+                //     } else {
+                //         const del = row.querySelector('.msg-deleted');
+                //         if (del) del.textContent = 'this message is deleted.';
+                //         //row.querySelector('.msg-deleted')?.textContent = 'this message is deleted.';
+                //     }
+                //     row.querySelectorAll('.msg-files').forEach(el => el.remove());
+                //     return;
+                // }
+
                 if (data.type === 'delete') {
                     if (!row) return;
-                    // remove actions
+
+                    // remove actions (edit/delete)
                     const actions = row.querySelector('.msg-actions');
-                    if (actions) actions.remove();                    // replace content with deleted label
-                    const txt = row.querySelector('.msg-text');
-                    if (txt) {
-                        txt.className = 'msg-deleted';
-                        txt.textContent = 'this message is deleted.';
-                    } else {
-                        const del = row.querySelector('.msg-deleted');
-                        if (del) del.textContent = 'this message is deleted.';
-                        //row.querySelector('.msg-deleted')?.textContent = 'this message is deleted.';
+                    if (actions) actions.remove();
+
+                    // remove any attachments
+                    row.querySelectorAll('.msg-files').forEach(el => el.remove());
+
+                    // ✅ ensure a deleted label exists inside bubble
+                    const bubble = row.querySelector('.bubble');
+                    if (bubble) {
+                        // remove old text if any
+                        bubble.querySelectorAll('.msg-text').forEach(el => el.remove());
+                        // remove existing deleted label (avoid duplicates)
+                        bubble.querySelectorAll('.msg-deleted').forEach(el => el.remove());
+
+                        const del = document.createElement('div');
+                        del.className = 'msg-deleted';
+                        del.textContent = 'this message is deleted.';
+                        bubble.appendChild(del);
                     }
+
                     return;
                 }
 
@@ -537,6 +495,57 @@
                 scrollToBottom();
             };
 
+            const fileInput = document.getElementById('msg-files');
+            const preview = document.getElementById('files-preview');
+
+            // if (fileInput && preview) {
+            //     fileInput.addEventListener('change', () => {
+            //         const files = Array.from(fileInput.files || []);
+            //         preview.textContent = files.length
+            //             ? files.map(f => `${f.name} (${Math.round(f.size/1024)} KB)`).join(' • ')
+            //             : '';
+            //     });
+            // }
+            if (fileInput && preview) {
+                const renderFiles = () => {
+                    preview.innerHTML = '';
+                    const files = Array.from(fileInput.files || []);
+                    if (!files.length) return;
+
+                    files.forEach((f, idx) => {
+                        const chip = document.createElement('span');
+                        chip.className = 'file-chip';
+
+                        const name = document.createElement('span');
+                        name.textContent = f.name;
+
+                        const size = document.createElement('span');
+                        size.className = 'file-size';
+                        size.textContent = `(${Math.round(f.size/1024)} KB)`;
+
+                        const remove = document.createElement('button');
+                        remove.type = 'button';
+                        remove.className = 'file-remove';
+                        remove.textContent = '×';
+                        remove.title = 'Remove';
+
+                        remove.addEventListener('click', () => {
+                            const dt = new DataTransfer();
+                            files.forEach((file, i) => { if (i !== idx) dt.items.add(file); });
+                            fileInput.files = dt.files;
+                            renderFiles();
+                        });
+
+                        chip.appendChild(name);
+                        chip.appendChild(size);
+                        chip.appendChild(remove);
+                        preview.appendChild(chip);
+                    });
+                };
+
+                fileInput.addEventListener('change', renderFiles);
+            }
+
 
             function escapeHtml(str) {
                 return String(str ?? '')
@@ -547,48 +556,143 @@
                     .replaceAll("'", "&#039;");
             }
 
+  //           function buildMessageHtml(m, isMe) {
+  //               const senderName = escapeHtml(m.senderName);
+  //               const sentAt = escapeHtml(m.sentAt);
+  //
+  //               const avatarLeft = `
+  //       <div class="avatar" title="${senderName}">
+  //           ${senderName.slice(0,1).toUpperCase()}
+  //       </div>
+  //   `;
+  //
+  //               const avatarRight = `
+  //       <div class="avatar" title="You" style="background: rgba(255,45,85,0.18); border-color: rgba(255,45,85,0.20);">
+  //           <i class="fas fa-user"></i>
+  //       </div>
+  //   `;
+  //
+  //               const body = m.isDeleted
+  //                   ? `<div class="msg-deleted">this message is deleted.</div>`
+  //                   : `<div class="msg-text">${escapeHtml(m.content)}</div>`;
+  //
+  //               // ⚠️ No actions dropdown in realtime inserted messages
+  //               return `
+  //       <div class="msg-row ${isMe ? 'me' : 'other'}" data-msg-id="${m.id}">
+  //           ${isMe ? '' : avatarLeft}
+  //           <div class="bubble">
+  //               <div class="msg-top">
+  //                   <div class="d-flex align-items-center gap-2" style="gap:10px;">
+  //                       <div class="msg-name">${senderName}</div>
+  //                       <div class="msg-time">${sentAt}</div>
+  //                   </div>
+  //               </div>
+  //               ${body}
+  //           </div>
+  //           ${isMe ? avatarRight : ''}
+  //       </div>
+  //   `;
+  //
+  //               let filesHtml = '';
+  //               if (Array.isArray(m.attachments) && m.attachments.length > 0 && !m.isDeleted) {
+  //                   filesHtml = `<div class="msg-files mt-2">` + m.attachments.map(a => `
+  //     <a class="badge bg-dark text-white text-decoration-none me-1"
+  //        href="${escapeHtml(a.url)}">
+  //        <i class="fas fa-paperclip"></i> ${escapeHtml(a.name)}
+  //     </a>
+  // `).join('') + `</div>`;
+  //               }
+  //
+  //           }
+
             function buildMessageHtml(m, isMe) {
                 const senderName = escapeHtml(m.senderName);
                 const sentAt = escapeHtml(m.sentAt);
 
                 const avatarLeft = `
-        <div class="avatar" title="${senderName}">
-            ${senderName.slice(0,1).toUpperCase()}
-        </div>
-    `;
+    <div class="avatar" title="${senderName}">
+      ${senderName.slice(0, 1).toUpperCase()}
+    </div>
+  `;
 
                 const avatarRight = `
-        <div class="avatar" title="You" style="background: rgba(255,45,85,0.18); border-color: rgba(255,45,85,0.20);">
-            <i class="fas fa-user"></i>
-        </div>
-    `;
+    <div class="avatar" title="You" style="background: rgba(255,45,85,0.18); border-color: rgba(255,45,85,0.20);">
+      <i class="fas fa-user"></i>
+    </div>
+  `;
 
-                const body = m.isDeleted
+                // ✅ body (allow empty content if only files exist)
+                const bodyHtml = m.isDeleted
                     ? `<div class="msg-deleted">this message is deleted.</div>`
-                    : `<div class="msg-text">${escapeHtml(m.content)}</div>`;
+                    : (m.content && m.content.trim() !== '')
+                        ? `<div class="msg-text">${escapeHtml(m.content)}</div>`
+                        : '';
 
-                // ⚠️ No actions dropdown in realtime inserted messages
-                return `
-        <div class="msg-row ${isMe ? 'me' : 'other'}" data-msg-id="${m.id}">
-            ${isMe ? '' : avatarLeft}
-            <div class="bubble">
-                <div class="msg-top">
-                    <div class="d-flex align-items-center gap-2" style="gap:10px;">
-                        <div class="msg-name">${senderName}</div>
-                        <div class="msg-time">${sentAt}</div>
-                    </div>
-                </div>
-                ${body}
-            </div>
-            ${isMe ? avatarRight : ''}
+                // ✅ attachments (build BEFORE return)
+  //               let filesHtml = '';
+  //               if (!m.isDeleted && Array.isArray(m.attachments) && m.attachments.length > 0) {
+  //                   filesHtml = `
+  //   <div class="msg-files mt-2">
+  //     ${m.attachments.map(a => `
+  //       <a class="file-pill"
+  //          href="${escapeHtml(a.url)}" target="_blank" rel="noopener">
+  //          <i class="fas fa-paperclip"></i>
+  //          ${escapeHtml(a.name)}
+  //          <span style="opacity:.7;">(${Math.round((a.size||0)/1024)} KB)</span>
+  //       </a>
+  //     `).join('')}
+  //   </div>
+  // `;
+  //               }  JUSTE 9BAL INLINE MESSAGE IMAGE
+                let filesHtml = '';
+                if (!m.isDeleted && Array.isArray(m.attachments) && m.attachments.length > 0) {
+                    filesHtml = `<div class="msg-files mt-2">` + m.attachments.map(a => {
+                        const mime = (a.mime || '').toLowerCase();
+
+                        if (mime.startsWith('image/')) {
+                            return `
+        <div class="msg-attach-preview">
+          <a href="${escapeHtml(a.url)}" target="_blank" rel="noopener">
+            <img src="${escapeHtml(a.url)}" alt="${escapeHtml(a.name)}" class="chat-image">
+          </a>
+          <div class="file-caption">${escapeHtml(a.name)}
+            <span style="opacity:.7;">(${Math.round((a.size||0)/1024)} KB)</span>
+          </div>
         </div>
-    `;
-            }
+      `;
+                        }
 
+                        return `
+      <a class="file-pill" href="${escapeHtml(a.url)}" target="_blank" rel="noopener">
+        <i class="fas fa-paperclip"></i>
+        ${escapeHtml(a.name)}
+        <span style="opacity:.7;">(${Math.round((a.size||0)/1024)} KB)</span>
+      </a>
+    `;
+                    }).join('') + `</div>`;
+                }
+
+                return `
+    <div class="msg-row ${isMe ? 'me' : 'other'}" data-msg-id="${m.id}">
+      ${isMe ? '' : avatarLeft}
+      <div class="bubble">
+        <div class="msg-top">
+          <div class="d-flex align-items-center gap-2" style="gap:10px;">
+            <div class="msg-name">${senderName}</div>
+            <div class="msg-time">${sentAt}</div>
+          </div>
+        </div>
+        ${bodyHtml}
+        ${filesHtml}
+      </div>
+      ${isMe ? avatarRight : ''}
+    </div>
+  `;
+            }
 
             // ✅ Send message without refresh
             if (form && textarea) {
-                form.addEventListener('submit', async (e) => {
+                /*form.addEventListener('submit', async (e) => {
                     e.preventDefault();
 
                     const fd = new FormData(form);
@@ -611,8 +715,67 @@
                         }
                         scrollToBottom();
                         textarea.value = '';
+                        const fileInput = document.getElementById('msg-files');
+                        const preview = document.getElementById('files-preview');
+                        if (fileInput) fileInput.value = '';
+                        if (preview) preview.textContent = '';
+
                     }
-                });
+                });*/
+
+                if (form && textarea) {
+                    form.addEventListener('submit', async (e) => {
+                        e.preventDefault();
+
+                        const errorBox = document.getElementById('compose-error');
+                        if (errorBox) errorBox.textContent = '';
+
+                        const fd = new FormData(form);
+
+                        let res;
+                        try {
+                            res = await fetch(form.action, {
+                                method: 'POST',
+                                body: fd,
+                                headers: { 'X-Requested-With': 'XMLHttpRequest' }
+                            });
+                        } catch (err) {
+                            if (errorBox) errorBox.textContent = 'Network error. Try again.';
+                            return;
+                        }
+
+                        // Try to read JSON (works for both ok and 422)
+                        let json = null;
+                        try { json = await res.json(); } catch (e) {}
+
+                        if (!res.ok || json?.ok === false) {
+                            const msg =
+                                json?.error ||
+                                (Array.isArray(json?.errors) && json.errors.length ? json.errors[0] : null) ||
+                                'Unable to send message.';
+                            if (errorBox) errorBox.textContent = msg;
+                            return;
+                        }
+
+                        if (json.ok && json.html) {
+                            const existing = document.querySelector(`[data-msg-id="${json.id}"]`);
+                            if (existing) {
+                                existing.outerHTML = json.html;
+                            } else {
+                                chatStream.insertAdjacentHTML('beforeend', json.html);
+                            }
+
+                            // reset UI
+                            textarea.value = '';
+                            const fileInput = document.getElementById('msg-files');
+                            const preview = document.getElementById('files-preview');
+                            if (fileInput) fileInput.value = '';
+                            if (preview) preview.textContent = '';
+
+                            scrollToBottom();
+                        }
+                    });
+                }
                 textarea.addEventListener('keydown', (e) => {
                     if (e.key === 'Enter' && !e.shiftKey) {
                         e.preventDefault();
@@ -620,25 +783,26 @@
                     }
                 });
             }
+
         })();
 
-        chatStream.addEventListener('submit', async (e) => {
-            const form = e.target;
-            if (!(form instanceof HTMLFormElement)) return;
-
-            // match delete forms
-            if (!form.action.includes('/messages/') || !form.action.endsWith('/delete')) return;
-
-            e.preventDefault();
-
-            const res = await fetch(form.action, {
-                method: 'POST',
-                body: new FormData(form),
-                headers: {'X-Requested-With': 'XMLHttpRequest'}
-            });
-
-            if (!res.ok) return;
-        });
+        // chatStream.addEventListener('submit', async (e) => {
+        //     const form = e.target;
+        //     if (!(form instanceof HTMLFormElement)) return;
+        //
+        //     // match delete forms
+        //     if (!form.action.includes('/messages/') || !form.action.endsWith('/delete')) return;
+        //
+        //     e.preventDefault();
+        //
+        //     const res = await fetch(form.action, {
+        //         method: 'POST',
+        //         body: new FormData(form),
+        //         headers: {'X-Requested-With': 'XMLHttpRequest'}
+        //     });
+        //
+        //     if (!res.ok) return;
+        // });
 
     </script>
 

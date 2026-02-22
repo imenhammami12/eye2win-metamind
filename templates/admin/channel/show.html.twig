@@ -1,0 +1,268 @@
+{% extends 'admin_layout.html.twig' %}
+
+{% block title %}Channel Details{% endblock %}
+{% block page_title %}Channel Details{% endblock %}
+
+{% block body %}
+
+    <style>
+        .channel-avatar-big{
+            width: 140px; height: 140px;
+            border-radius: 50%;
+            display:flex; align-items:center; justify-content:center;
+            font-weight: 900; font-size: 56px;
+            color: white;
+            background: linear-gradient(135deg, rgba(255,0,80,0.35), rgba(0,220,255,0.25));
+            border: 1px solid rgba(255,255,255,0.12);
+            box-shadow: 0 10px 35px rgba(0,0,0,0.35);
+            margin: 0 auto;
+            position: relative;
+        }
+        .status-dot{
+            position:absolute; right: 14px; bottom: 14px;
+            width: 14px; height: 14px; border-radius: 50%;
+            border: 2px solid rgba(0,0,0,0.35);
+        }
+    </style>
+
+    {% set STATUS_PENDING  = constant('App\\\\Entity\\\\Channel::STATUS_PENDING') %}
+    {% set STATUS_APPROVED = constant('App\\\\Entity\\\\Channel::STATUS_APPROVED') %}
+    {% set STATUS_REJECTED = constant('App\\\\Entity\\\\Channel::STATUS_REJECTED') %}
+
+    {% set isPending  = channel.status == STATUS_PENDING %}
+    {% set isApproved = channel.status == STATUS_APPROVED %}
+    {% set isRejected = channel.status == STATUS_REJECTED %}
+
+    <div class="user-profile-header">
+        <div class="row align-items-center">
+            <div class="col">
+                <h1 class="page-title">Channel Details</h1>
+                <nav aria-label="breadcrumb">
+                    <ol class="breadcrumb-list">
+                        <li><a href="{{ path('admin_dashboard') }}"><i class="bi bi-house"></i> Dashboard</a></li>
+                        <li><a href="{{ path('admin_channels_index') }}">Channels</a></li>
+                        <li class="active">{{ channel.name }}</li>
+                    </ol>
+                </nav>
+            </div>
+
+            <div class="col-auto">
+                <a href="{{ path('admin_channels_index') }}" class="btn btn-outline-light btn-sm">
+                    <i class="bi bi-arrow-left"></i> Back to List
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <div class="user-details-grid">
+
+        {# LEFT CARD (like avatar + actions) #}
+        <div class="table-card p-4">
+            <div class="text-center">
+                <div class="channel-avatar-big">
+                    {{ channel.name|slice(0,2)|upper }}
+                    <span class="status-dot"
+                          style="background:
+                                  {% if isApproved and channel.isActive %}#28a745
+                                  {% elseif isApproved and not channel.isActive %}#ffc107
+                                  {% elseif isPending %}#17a2b8
+                                  {% else %}#dc3545{% endif %};">
+                </span>
+                </div>
+
+                <h3 class="mt-3 mb-1">{{ channel.name }}</h3>
+                <div class="text-muted mb-3">{{ channel.description ?: 'No description.' }}</div>
+
+                <div class="d-flex justify-content-center gap-2 flex-wrap mb-4">
+                <span class="badge
+                    {% if isApproved %}bg-success
+                    {% elseif isPending %}bg-info
+                    {% else %}bg-danger{% endif %}">
+                    {{ channel.status|capitalize }}
+                </span>
+
+                    <span class="badge {{ channel.isActive ? 'bg-success' : 'bg-secondary' }}">
+                    {{ channel.isActive ? 'Active' : 'Inactive' }}
+                </span>
+
+                    <span class="badge bg-dark">
+                    {{ channel.type }}
+                </span>
+                </div>
+            </div>
+
+            <h6 class="text-uppercase text-muted mb-2">Quick Actions</h6>
+
+            <div class="d-grid gap-2">
+                <a href="{{ path('admin_channels_edit', {id: channel.id}) }}"
+                   class="btn btn-primary">
+                    <i class="bi bi-pencil"></i> Edit Channel
+                </a>
+
+                {% if isPending %}
+                    <form method="post" action="{{ path('admin_channels_approve', {id: channel.id}) }}">
+                        <input type="hidden" name="_token" value="{{ csrf_token('approve_' ~ channel.id) }}">
+                        <button class="btn btn-success w-100" type="submit">
+                            <i class="bi bi-check2-circle"></i> Approve Channel
+                        </button>
+                    </form>
+
+                    <button class="btn btn-danger" type="button"
+                            data-bs-toggle="modal" data-bs-target="#rejectModal">
+                        <i class="bi bi-x-circle"></i> Reject Channel
+                    </button>
+                {% endif %}
+
+                <form method="post" action="{{ path('admin_channels_toggle', {id: channel.id}) }}">
+                    <input type="hidden" name="_token" value="{{ csrf_token('toggle_' ~ channel.id) }}">
+                    <button class="btn btn-warning w-100" type="submit">
+                        <i class="bi bi-toggle2-on"></i>
+                        {{ channel.isActive ? 'Deactivate' : 'Activate' }}
+                    </button>
+                </form>
+
+                <button class="btn btn-outline-danger" type="button"
+                        data-bs-toggle="modal" data-bs-target="#deleteModal">
+                    <i class="bi bi-trash"></i> Delete Channel
+                </button>
+            </div>
+        </div>
+
+        {# RIGHT CARD (information) #}
+        <div class="table-card p-4">
+            <div class="personal-info-dark">
+                <div class="personal-info-header">
+                    <div class="info-title"><i class="bi bi-info-circle"></i> Channel Information</div>
+                </div>
+
+                <div class="info-group">
+                    <div class="info-item">
+                        <div class="info-icon"><i class="bi bi-hash"></i></div>
+                        <div class="info-content">
+                            <div class="info-label">Channel ID</div>
+                            <div class="info-value">#{{ channel.id }}</div>
+                        </div>
+                    </div>
+
+                    <div class="info-item">
+                        <div class="info-icon"><i class="bi bi-person"></i></div>
+                        <div class="info-content">
+                            <div class="info-label">Created By</div>
+                            <div class="info-value">{{ channel.createdBy ?: '—' }}</div>
+                        </div>
+                    </div>
+
+                    <div class="info-item">
+                        <div class="info-icon"><i class="bi bi-calendar-event"></i></div>
+                        <div class="info-content">
+                            <div class="info-label">Created At</div>
+                            <div class="info-value">
+                                {{ channel.createdAt ? channel.createdAt|date('M d, Y - H:i') : '—' }}
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="info-item">
+                        <div class="info-icon"><i class="bi bi-chat-dots"></i></div>
+                        <div class="info-content">
+                            <div class="info-label">Messages</div>
+                            <div class="info-value">{{ messagesCount }}</div>
+                        </div>
+                    </div>
+
+                    {% if channel.rejectionReason %}
+                        <div class="info-item">
+                            <div class="info-icon"><i class="bi bi-exclamation-triangle"></i></div>
+                            <div class="info-content">
+                                <div class="info-label">Rejection Reason</div>
+                                <div class="info-value">{{ channel.rejectionReason }}</div>
+                            </div>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+
+            <hr style="border-color: rgba(255,255,255,0.08);">
+
+            <h5 class="mb-3">Recent Messages</h5>
+            <div class="table-responsive">
+                <table class="table table-dark table-borderless align-middle">
+                    <thead>
+                    <tr>
+                        <th>Sender</th>
+                        <th>Message</th>
+                        <th class="text-end">Time</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {% for m in lastMessages %}
+                        <tr>
+                            <td>{{ m.senderName }}</td>
+                            <td style="max-width: 380px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+                                {{ m.isDeleted ? 'this message is deleted.' : m.content }}
+                            </td>
+                            <td class="text-end">{{ m.sentAt ? m.sentAt|date('d/m/Y H:i') : '' }}</td>
+                        </tr>
+                    {% else %}
+                        <tr>
+                            <td colspan="3" class="text-center text-muted py-4">No messages yet.</td>
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+
+        </div>
+    </div>
+
+    {# REJECT MODAL #}
+    <div class="modal fade" id="rejectModal" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content bg-dark text-white">
+                <div class="modal-header">
+                    <h5 class="modal-title">Reject Channel</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+
+                <form method="post" action="{{ path('admin_channels_reject', {id: channel.id}) }}">
+                    <div class="modal-body">
+                        <input type="hidden" name="_token" value="{{ csrf_token('reject_' ~ channel.id) }}">
+                        <label class="form-label">Reason</label>
+                        <textarea class="form-control" name="reason" rows="3" required></textarea>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-outline-light" data-bs-dismiss="modal">Cancel</button>
+                        <button type="submit" class="btn btn-danger">Reject</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    {# DELETE MODAL #}
+    <div class="modal fade" id="deleteModal" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content bg-dark text-white">
+                <div class="modal-header">
+                    <h5 class="modal-title">Delete Channel</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+
+                <form method="post" action="{{ path('admin_channels_delete', {id: channel.id}) }}">
+                    <div class="modal-body">
+                        <input type="hidden" name="_token" value="{{ csrf_token('admin_delete_channel_' ~ channel.id) }}">
+                        <p class="mb-0">
+                            Delete <strong>{{ channel.name }}</strong>?<br>
+                            Messages: <strong>{{ messagesCount }}</strong>
+                        </p>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-outline-light" data-bs-dismiss="modal">Cancel</button>
+                        <button type="submit" class="btn btn-danger">Delete</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+{% endblock %}
