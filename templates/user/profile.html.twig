@@ -148,98 +148,118 @@
                 </div>
                 {% endif %}
             </div>
-
         </div>
     </div>
 </section>
 
-{# ═══════════════════════════════════ MODAL ═══════════════════════════════════ #}
+<script src="https://cdn.jsdelivr.net/npm/@vladmandic/face-api/dist/face-api.js"></script>
+
+{# ═══════════════════════ MODAL ═══════════════════════ #}
 <div id="avatarModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.9);z-index:9999;align-items:center;justify-content:center;">
 <div style="background:#0d0d1a;border:1px solid #2a2a4a;border-radius:20px;padding:36px;max-width:540px;width:94%;position:relative;max-height:94vh;overflow-y:auto;">
 
-    <button onclick="closeModal()" style="position:absolute;top:16px;right:16px;background:none;border:none;color:#555;font-size:22px;cursor:pointer;transition:color .2s;" onmouseover="this.style.color='#fff'" onmouseout="this.style.color='#555'">
+    <button onclick="closeModal()" style="position:absolute;top:16px;right:16px;background:none;border:none;color:#555;font-size:22px;cursor:pointer;" onmouseover="this.style.color='#fff'" onmouseout="this.style.color='#555'">
         <i class="fas fa-times"></i>
     </button>
 
-    {# ── STEP 1 : Formulaire ── #}
     <div id="s1">
         <div style="display:flex;align-items:center;gap:12px;margin-bottom:6px;">
             <div style="background:linear-gradient(135deg,#667eea,#764ba2);border-radius:10px;padding:8px 12px;">
                 <i class="fas fa-wand-magic-sparkles" style="color:white;font-size:18px;"></i>
             </div>
             <div>
-                <h4 style="color:#fff;font-weight:800;margin:0;font-size:18px;">Avatar G</h4>
-                <p style="color:#48bb78;font-size:11px;margin:0;font-weight:600;">✅ Powered by FLUX.1 · HuggingFace</p>
+                <h4 style="color:#fff;font-weight:800;margin:0;font-size:18px;">Avatar Generator</h4>
             </div>
         </div>
-        <p style="color:#a0a0b0;font-size:13px;margin-bottom:20px;">Describe your appearance and choose a style — AI generates a unique avatar in ~15 seconds.</p>
+        <p style="color:#a0a0b0;font-size:13px;margin-bottom:16px;">Describe your appearance or upload a photo — AI generates a unique avatar in ~15 seconds.</p>
 
-        {# Description de l'apparence #}
-        <div style="margin-bottom:16px;">
+        {# TABS #}
+        <div style="display:flex;gap:0;margin-bottom:18px;background:#13132a;border-radius:10px;padding:4px;">
+            <button id="tabTextBtn" onclick="switchTab('text')" style="flex:1;padding:10px;border:none;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer;background:linear-gradient(90deg,#667eea,#764ba2);color:white;">
+                <i class="fas fa-pen"></i> Describe
+            </button>
+            <button id="tabPhotoBtn" onclick="switchTab('photo')" style="flex:1;padding:10px;border:none;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer;background:transparent;color:#555;">
+                <i class="fas fa-camera"></i> Upload Photo
+            </button>
+        </div>
+
+        {# TAB TEXT #}
+        <div id="tabText">
+            <div style="margin-bottom:16px;">
+                <label style="color:#667eea;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:1px;display:block;margin-bottom:8px;">
+                    <i class="fas fa-user-circle"></i> Describe your appearance
+                </label>
+                <input id="descInput" type="text" maxlength="200"
+                    placeholder="e.g. young woman with long black hair, glasses, smiling"
+                    style="width:100%;background:#13132a;border:1.5px solid #2a2a4a;border-radius:10px;padding:12px 14px;color:#fff;font-size:13px;outline:none;font-family:inherit;transition:border-color .2s;box-sizing:border-box;"
+                    oninput="updateBtn()"
+                    onfocus="this.style.borderColor='#667eea'"
+                    onblur="this.style.borderColor='#2a2a4a'">
+                <div style="display:flex;justify-content:space-between;margin-top:5px;">
+                    <p style="color:#555;font-size:11px;margin:0;">💡 The more precise, the better the result.</p>
+                    <p id="charCount" style="color:#555;font-size:11px;margin:0;">0/200</p>
+                </div>
+            </div>
+        </div>
+
+        {# TAB PHOTO #}
+        <div id="tabPhoto" style="display:none;margin-bottom:16px;">
             <label style="color:#667eea;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:1px;display:block;margin-bottom:8px;">
-                <i class="fas fa-user-circle"></i> Describe your appearance
+                <i class="fas fa-image"></i> Upload your photo
             </label>
-            <input id="descInput" type="text" maxlength="200"
-                placeholder="e.g. young man with short dark hair, glasses, blue hoodie, smiling"
-                style="width:100%;background:#13132a;border:1.5px solid #2a2a4a;border-radius:10px;padding:12px 14px;color:#fff;font-size:13px;outline:none;font-family:inherit;transition:border-color .2s;box-sizing:border-box;"
-                oninput="updateBtn()"
-                onfocus="this.style.borderColor='#667eea'"
-                onblur="this.style.borderColor='#2a2a4a'">
-            <div style="display:flex;justify-content:space-between;margin-top:5px;">
-                <p style="color:#555;font-size:11px;margin:0;">💡 The more precise you are, the better the result.</p>
-                <p id="charCount" style="color:#555;font-size:11px;margin:0;">0/200</p>
+            <div id="dropZone"
+                onclick="document.getElementById('photoFileInput').click()"
+                ondragover="event.preventDefault();this.style.borderColor='#667eea'"
+                ondragleave="this.style.borderColor='#2a2a4a'"
+                ondrop="handleDrop(event)"
+                style="border:2px dashed #2a2a4a;border-radius:12px;padding:24px 16px;text-align:center;cursor:pointer;transition:border-color .2s;background:#13132a;">
+                <div id="dropZoneContent">
+                    <i class="fas fa-cloud-upload-alt" style="font-size:36px;color:#3a3a6a;margin-bottom:10px;display:block;"></i>
+                    <p style="color:#667eea;font-weight:700;margin:0 0 4px;">Click or drag your photo here</p>
+                    <p style="color:#444;font-size:12px;margin:0;">JPG, PNG · Max 5MB</p>
+                </div>
+                <img id="photoPreview" src="" alt="" style="display:none;max-width:140px;max-height:140px;border-radius:10px;margin:0 auto;object-fit:cover;border:2px solid #667eea;">
+            </div>
+            <input type="file" id="photoFileInput" accept="image/jpeg,image/png,image/webp" style="display:none;" onchange="handleFileSelect(this)">
+
+            <div id="analyzeStatus" style="display:none;margin-top:10px;padding:12px 14px;background:#13132a;border-radius:8px;border:1px solid #2a2a4a;">
+                <p id="analyzeStatusText" style="color:#a0a0b0;font-size:13px;margin:0 0 8px;"></p>
+                <div id="descEditWrapper" style="display:none;">
+                    <label style="color:#555;font-size:11px;display:block;margin-bottom:4px;">✏️ You can refine this description:</label>
+                    <input id="photoDescInput" type="text" maxlength="200"
+                        style="width:100%;background:#0d0d1a;border:1.5px solid #2a2a4a;border-radius:8px;padding:9px 12px;color:#fff;font-size:12px;outline:none;font-family:inherit;box-sizing:border-box;transition:border-color .2s;"
+                        oninput="photoDesc=this.value;updateBtn();"
+                        onfocus="this.style.borderColor='#667eea'"
+                        onblur="this.style.borderColor='#2a2a4a'">
+                </div>
             </div>
         </div>
 
-        {# Styles #}
+        {# STYLES #}
         <div style="margin-bottom:22px;">
             <label style="color:#667eea;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:1px;display:block;margin-bottom:10px;">
                 <i class="fas fa-palette"></i> Style
             </label>
             <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;">
-                <div class="sbtn sel" data-style="anime">
-                    <div style="font-size:26px;">🌸</div>
-                    <div class="sbtn-name">Anime</div>
-                    <div class="sbtn-sub">Ghibli / Japan</div>
-                </div>
-                <div class="sbtn" data-style="cartoon">
-                    <div style="font-size:26px;">🎨</div>
-                    <div class="sbtn-name">Cartoon</div>
-                    <div class="sbtn-sub">Pixar / 3D</div>
-                </div>
-                <div class="sbtn" data-style="manga">
-                    <div style="font-size:26px;">📖</div>
-                    <div class="sbtn-name">Manga</div>
-                    <div class="sbtn-sub">Ink / B&W</div>
-                </div>
-                <div class="sbtn" data-style="pixel">
-                    <div style="font-size:26px;">👾</div>
-                    <div class="sbtn-name">Pixel Art</div>
-                    <div class="sbtn-sub">Retro / RPG</div>
-                </div>
-                <div class="sbtn" data-style="fantasy">
-                    <div style="font-size:26px;">⚔️</div>
-                    <div class="sbtn-name">Fantasy</div>
-                    <div class="sbtn-sub">Epic / Magic</div>
-                </div>
-                <div class="sbtn" data-style="realistic">
-                    <div style="font-size:26px;">📷</div>
-                    <div class="sbtn-name">Realistic</div>
-                    <div class="sbtn-sub">Photo style</div>
-                </div>
+                <div class="sbtn sel" data-style="anime"><div style="font-size:26px;">🌸</div><div class="sbtn-name">Anime</div><div class="sbtn-sub">Ghibli / Japan</div></div>
+                <div class="sbtn" data-style="cartoon"><div style="font-size:26px;">🎨</div><div class="sbtn-name">Cartoon</div><div class="sbtn-sub">Pixar / 3D</div></div>
+                <div class="sbtn" data-style="manga"><div style="font-size:26px;">📖</div><div class="sbtn-name">Manga</div><div class="sbtn-sub">Ink / B&W</div></div>
+                <div class="sbtn" data-style="pixel"><div style="font-size:26px;">👾</div><div class="sbtn-name">Pixel Art</div><div class="sbtn-sub">Retro / RPG</div></div>
+                <div class="sbtn" data-style="fantasy"><div style="font-size:26px;">⚔️</div><div class="sbtn-name">Fantasy</div><div class="sbtn-sub">Epic / Magic</div></div>
+                <div class="sbtn" data-style="realistic"><div style="font-size:26px;">📷</div><div class="sbtn-name">Realistic</div><div class="sbtn-sub">Photo style</div></div>
             </div>
         </div>
 
         <button id="genBtn" onclick="generate()" disabled
-            style="width:100%;background:linear-gradient(90deg,#667eea,#764ba2);color:white;border:none;border-radius:10px;padding:15px;font-size:15px;font-weight:800;cursor:pointer;opacity:.35;transition:all .2s;letter-spacing:.5px;">
+            style="width:100%;background:linear-gradient(90deg,#667eea,#764ba2);color:white;border:none;border-radius:10px;padding:15px;font-size:15px;font-weight:800;cursor:pointer;opacity:.35;transition:all .2s;">
             <i class="fas fa-wand-magic-sparkles"></i> &nbsp;Generate my avatar
         </button>
         <p style="color:#333;font-size:11px;text-align:center;margin-top:8px;">
-            Powered by <strong style="color:#555;">HuggingFace</strong> · FLUX.1-schnell · Free tier
+            Powered by <strong style="color:#555;">HuggingFace</strong> · FLUX.1 · Free tier
         </p>
     </div>
 
-    {# ── STEP 2 : Loading ── #}
+    {# STEP 2 #}
     <div id="s2" style="display:none;text-align:center;padding:20px 0;">
         <div style="width:80px;height:80px;border-radius:50%;background:linear-gradient(135deg,#667eea,#764ba2);display:flex;align-items:center;justify-content:center;margin:0 auto 20px;animation:pulse 1.5s infinite;">
             <i class="fas fa-spinner fa-spin" style="font-size:32px;color:white;"></i>
@@ -252,25 +272,19 @@
         <p id="progTxt" style="color:#444;font-size:11px;margin-top:4px;">Connecting to HuggingFace…</p>
     </div>
 
-    {# ── STEP 3 : Résultat ── #}
+    {# STEP 3 #}
     <div id="s3" style="display:none;">
         <h4 style="color:#fff;font-weight:800;text-align:center;margin-bottom:4px;">✨ Your avatar is ready!</h4>
         <p style="color:#a0a0b0;font-size:13px;text-align:center;margin-bottom:24px;">Apply it or generate a new one.</p>
-
         <div style="text-align:center;margin-bottom:28px;">
-            <img id="resultImg" src="" alt="avatar"
-                 style="width:200px;height:200px;border-radius:16px;object-fit:cover;border:3px solid #667eea;box-shadow:0 0 40px rgba(102,126,234,.5);">
+            <img id="resultImg" src="" alt="avatar" style="width:200px;height:200px;border-radius:16px;object-fit:cover;border:3px solid #667eea;box-shadow:0 0 40px rgba(102,126,234,.5);">
             <p id="resultStyle" style="color:#667eea;font-size:12px;font-weight:700;margin-top:10px;text-transform:uppercase;letter-spacing:1px;"></p>
         </div>
-
         <div style="display:flex;gap:10px;">
-            <button onclick="backToForm()"
-                style="flex:1;background:#13132a;color:#a0a0b0;border:1.5px solid #2a2a4a;border-radius:10px;padding:13px;cursor:pointer;font-size:13px;font-weight:600;transition:all .2s;"
-                onmouseover="this.style.borderColor='#667eea'" onmouseout="this.style.borderColor='#2a2a4a'">
+            <button onclick="backToForm()" style="flex:1;background:#13132a;color:#a0a0b0;border:1.5px solid #2a2a4a;border-radius:10px;padding:13px;cursor:pointer;font-size:13px;font-weight:600;" onmouseover="this.style.borderColor='#667eea'" onmouseout="this.style.borderColor='#2a2a4a'">
                 <i class="fas fa-redo"></i> New
             </button>
-            <button id="applyBtn" onclick="applyAvatar()"
-                style="flex:2;background:linear-gradient(90deg,#667eea,#764ba2);color:white;border:none;border-radius:10px;padding:13px;cursor:pointer;font-size:14px;font-weight:800;transition:all .2s;">
+            <button id="applyBtn" onclick="applyAvatar()" style="flex:2;background:linear-gradient(90deg,#667eea,#764ba2);color:white;border:none;border-radius:10px;padding:13px;cursor:pointer;font-size:14px;font-weight:800;">
                 <i class="fas fa-check"></i> Apply as profile picture
             </button>
         </div>
@@ -281,23 +295,13 @@
 
 <style>
 @keyframes pulse { 0%,100%{transform:scale(1)} 50%{transform:scale(1.08)} }
-.avatar-gen-btn {
-    position:absolute;bottom:8px;left:50%;transform:translateX(-50%);
-    background:rgba(102,126,234,.92);color:white;border:none;border-radius:20px;
-    padding:7px 18px;font-size:12px;font-weight:700;cursor:pointer;
-    white-space:nowrap;display:flex;align-items:center;gap:6px;
-    backdrop-filter:blur(4px);transition:background .2s;
-}
+.avatar-gen-btn { position:absolute;bottom:8px;left:50%;transform:translateX(-50%);background:rgba(102,126,234,.92);color:white;border:none;border-radius:20px;padding:7px 18px;font-size:12px;font-weight:700;cursor:pointer;white-space:nowrap;display:flex;align-items:center;gap:6px;backdrop-filter:blur(4px); }
 .avatar-gen-btn:hover { background:rgba(102,126,234,1); }
-.sbtn {
-    background:#13132a;border:2px solid #1e1e3a;border-radius:12px;
-    padding:12px 8px;text-align:center;cursor:pointer;
-    transition:all .2s;color:#666;
-}
+.sbtn { background:#13132a;border:2px solid #1e1e3a;border-radius:12px;padding:12px 8px;text-align:center;cursor:pointer;transition:all .2s;color:#666; }
 .sbtn:hover { border-color:#667eea;color:#fff; }
-.sbtn.sel   { border-color:#667eea;background:rgba(102,126,234,.15);color:#fff; }
-.sbtn-name  { font-size:12px;font-weight:700;margin-top:4px;color:inherit; }
-.sbtn-sub   { font-size:10px;color:#555;margin-top:2px; }
+.sbtn.sel { border-color:#667eea;background:rgba(102,126,234,.15);color:#fff; }
+.sbtn-name { font-size:12px;font-weight:700;margin-top:4px;color:inherit; }
+.sbtn-sub { font-size:10px;color:#555;margin-top:2px; }
 .sbtn.sel .sbtn-sub { color:#a0a0b0; }
 </style>
 
@@ -306,184 +310,380 @@ const TOONIFY_URL = '{{ path("avatar_toonify") }}';
 const SAVE_URL    = '{{ path("avatar_save") }}';
 const CSRF_TOON   = '{{ csrf_token("avatar_toonify") }}';
 const CSRF_SAVE   = '{{ csrf_token("avatar_save") }}';
+const FACEAPI_MODELS = 'https://cdn.jsdelivr.net/npm/@vladmandic/face-api/model';
 
 let selectedStyle  = 'anime';
 let outputUrl      = null;
 let progressTimer  = null;
 let retryTimer     = null;
+let currentTab     = 'text';
+let photoDesc      = null;
+let faceApiLoaded  = false;
+let faceApiLoading = false;
 
-// ── Modal ──────────────────────────────────────────────────────────────────
-function openModal()  { document.getElementById('avatarModal').style.display = 'flex'; }
-function closeModal() {
-    document.getElementById('avatarModal').style.display = 'none';
-    resetAll();
+// ═══════════════════════════════════════════════
+//  DÉTECTION DE COULEUR PAR LUMINANCE
+//  Basé sur la vraie luminosité perçue (pas HSL)
+//  Précis pour cheveux noirs, bruns, blonds, etc.
+// ═══════════════════════════════════════════════
+
+// Luminance perçue d'un pixel (0-255)
+function luminance(r, g, b) {
+    return 0.299 * r + 0.587 * g + 0.114 * b;
 }
-document.getElementById('avatarModal').addEventListener('click', e => {
-    if (e.target === e.currentTarget) closeModal();
-});
+
+// Catégorie de couleur cheveux basée sur luminance + teinte
+function classifyHairColor(r, g, b) {
+    const lum = luminance(r, g, b);
+    if (lum < 40)  return 'black';
+    if (lum < 80)  return 'very dark brown';
+    if (lum < 110) return 'dark brown';
+    if (lum < 145) return 'medium brown';
+    // Checker si c'est du roux : rouge dominant
+    const isRedish = r > g * 1.3 && r > b * 1.3;
+    if (lum < 175) return isRedish ? 'auburn' : 'light brown';
+    if (lum < 210) return isRedish ? 'red' : 'dark blonde';
+    return 'blonde';
+}
+
+// Catégorie teint de peau basée sur luminance
+function classifySkinTone(r, g, b) {
+    const lum = luminance(r, g, b);
+    if (lum > 210) return 'fair';
+    if (lum > 175) return 'light';
+    if (lum > 140) return 'medium';
+    if (lum > 105) return 'tan';
+    if (lum > 70)  return 'brown';
+    return 'dark';
+}
+
+// Vérifier si un pixel ressemble à une peau humaine
+function isSkinPixel(r, g, b) {
+    // Condition : rouge dominant, saturation modérée
+    return r > 80 && g > 40 && b > 20
+        && r > g && r > b
+        && (r - g) > 10
+        && Math.abs(g - b) < 80;
+}
+
+// Vérifier si un pixel est probablement un cheveu (pas de fond, pas peau)
+function isHairPixel(r, g, b) {
+    const lum = luminance(r, g, b);
+    // Éviter les pixels très lumineux (fond blanc/beige) et les pixels peau
+    return lum < 180 && !isSkinPixel(r, g, b) && !(r > 200 && g > 200 && b > 200);
+}
+
+// Analyse canvas : échantillonne proprement les zones
+async function analyzePhoto(imgEl) {
+    const canvas = document.createElement('canvas');
+    const W = Math.min(imgEl.naturalWidth  || 400, 400);
+    const H = Math.min(imgEl.naturalHeight || 400, 400);
+    canvas.width = W; canvas.height = H;
+    const ctx = canvas.getContext('2d');
+    ctx.drawImage(imgEl, 0, 0, W, H);
+
+    const imageData = ctx.getImageData(0, 0, W, H).data;
+
+    // Collecter les pixels de la zone supérieure (cheveux) : top 30% de l'image
+    const hairPixels = [];
+    for (let y = 0; y < H * 0.30; y += 4) {
+        for (let x = W * 0.15; x < W * 0.85; x += 4) {
+            const i = (Math.floor(y) * W + Math.floor(x)) * 4;
+            const r = imageData[i], g = imageData[i+1], b = imageData[i+2];
+            if (isHairPixel(r, g, b)) hairPixels.push([r, g, b]);
+        }
+    }
+
+    // Collecter les pixels de la zone centrale (peau) : 35%-65% hauteur
+    const skinPixels = [];
+    for (let y = H * 0.35; y < H * 0.65; y += 4) {
+        for (let x = W * 0.25; x < W * 0.75; x += 4) {
+            const i = (Math.floor(y) * W + Math.floor(x)) * 4;
+            const r = imageData[i], g = imageData[i+1], b = imageData[i+2];
+            if (isSkinPixel(r, g, b)) skinPixels.push([r, g, b]);
+        }
+    }
+
+    // Calculer la couleur médiane des cheveux
+    let hairColor = 'dark';
+    if (hairPixels.length > 5) {
+        // Trier par luminance et prendre la médiane
+        hairPixels.sort((a, b) => luminance(...a) - luminance(...b));
+        const mid = hairPixels[Math.floor(hairPixels.length / 2)];
+        hairColor = classifyHairColor(...mid);
+    }
+
+    // Calculer la couleur médiane de la peau
+    let skinTone = 'medium';
+    if (skinPixels.length > 5) {
+        skinPixels.sort((a, b) => luminance(...a) - luminance(...b));
+        const mid = skinPixels[Math.floor(skinPixels.length / 2)];
+        skinTone = classifySkinTone(...mid);
+    }
+
+    return { hairColor, skinTone };
+}
+
+// ═══════════════════════════════════════════════
+//  FACE-API.JS — âge / genre / expression
+// ═══════════════════════════════════════════════
+async function loadFaceApiModels() {
+    if (faceApiLoaded || faceApiLoading) return;
+    faceApiLoading = true;
+    try {
+        await Promise.all([
+            faceapi.nets.tinyFaceDetector.loadFromUri(FACEAPI_MODELS),
+            faceapi.nets.ageGenderNet.loadFromUri(FACEAPI_MODELS),
+            faceapi.nets.faceExpressionNet.loadFromUri(FACEAPI_MODELS),
+        ]);
+        faceApiLoaded = true;
+    } catch(e) {}
+    faceApiLoading = false;
+}
+
+// ═══════════════════════════════════════════════
+//  MODAL
+// ═══════════════════════════════════════════════
+function openModal()  { document.getElementById('avatarModal').style.display='flex'; loadFaceApiModels(); }
+function closeModal() { document.getElementById('avatarModal').style.display='none'; resetAll(); }
+document.getElementById('avatarModal').addEventListener('click', e => { if(e.target===e.currentTarget) closeModal(); });
 
 function resetAll() {
-    outputUrl = null;
-    if (progressTimer) { clearInterval(progressTimer); progressTimer = null; }
-    if (retryTimer)    { clearTimeout(retryTimer);     retryTimer    = null; }
+    outputUrl = photoDesc = null;
+    if(progressTimer) { clearInterval(progressTimer); progressTimer=null; }
+    if(retryTimer)    { clearTimeout(retryTimer);     retryTimer=null; }
     show('s1'); hide('s2'); hide('s3');
-    document.getElementById('progBar').style.width = '5%';
-    document.getElementById('loadingTitle').textContent    = 'Generating…';
-    document.getElementById('loadingSubtitle').textContent = 'FLUX.1 is generating your image · 15–30 seconds';
+    document.getElementById('progBar').style.width           = '5%';
+    document.getElementById('loadingTitle').textContent      = 'Generating…';
+    document.getElementById('loadingSubtitle').textContent   = 'FLUX.1 is generating your image · 15–30 seconds';
+    document.getElementById('photoPreview').style.display    = 'none';
+    document.getElementById('dropZoneContent').style.display = 'block';
+    document.getElementById('descEditWrapper').style.display = 'none';
+    hide('analyzeStatus');
+    updateBtn();
 }
 function backToForm() { show('s1'); hide('s3'); }
-function show(id) { document.getElementById(id).style.display = 'block'; }
-function hide(id) { document.getElementById(id).style.display = 'none'; }
+function show(id) { document.getElementById(id).style.display='block'; }
+function hide(id) { document.getElementById(id).style.display='none'; }
 
-// ── Description & bouton ───────────────────────────────────────────────────
-const descEl = document.getElementById('descInput');
-descEl.addEventListener('input', function() {
-    document.getElementById('charCount').textContent = this.value.length + '/200';
+// ── Tabs ──────────────────────────────────────
+function switchTab(tab) {
+    currentTab = tab;
+    const isText = tab==='text';
+    document.getElementById('tabText').style.display  = isText ? 'block':'none';
+    document.getElementById('tabPhoto').style.display = isText ? 'none':'block';
+    const on  = 'flex:1;padding:10px;border:none;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer;background:linear-gradient(90deg,#667eea,#764ba2);color:white;';
+    const off = 'flex:1;padding:10px;border:none;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer;background:transparent;color:#555;';
+    document.getElementById('tabTextBtn').setAttribute('style',  isText ? on:off);
+    document.getElementById('tabPhotoBtn').setAttribute('style', !isText? on:off);
+    if(!isText) loadFaceApiModels();
     updateBtn();
-});
-function updateBtn() {
-    const ok  = descEl.value.trim().length >= 3;
-    const btn = document.getElementById('genBtn');
-    btn.disabled      = !ok;
-    btn.style.opacity = ok ? '1' : '.35';
-    btn.style.cursor  = ok ? 'pointer' : 'default';
 }
 
-// ── Style ──────────────────────────────────────────────────────────────────
+const descEl = document.getElementById('descInput');
+descEl.addEventListener('input', function() {
+    document.getElementById('charCount').textContent = this.value.length+'/200';
+    updateBtn();
+});
+
+// ── Photo upload ──────────────────────────────
+function handleFileSelect(i) { if(i.files&&i.files[0]) processPhoto(i.files[0]); }
+function handleDrop(e) {
+    e.preventDefault();
+    document.getElementById('dropZone').style.borderColor='#2a2a4a';
+    const f=e.dataTransfer.files[0];
+    if(f&&f.type.startsWith('image/')) processPhoto(f);
+}
+
+async function processPhoto(file) {
+    if(file.size > 5*1024*1024) { showToast('File too large. Max 5MB.',true); return; }
+    photoDesc = null; updateBtn();
+
+    const statusDiv  = document.getElementById('analyzeStatus');
+    const statusText = document.getElementById('analyzeStatusText');
+    statusDiv.style.display = 'block';
+    statusText.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Analyzing your photo…';
+
+    // Charger l'image
+    const imgUrl = await new Promise(res => {
+        const r = new FileReader();
+        r.onload = e => res(e.target.result);
+        r.readAsDataURL(file);
+    });
+    const preview = document.getElementById('photoPreview');
+    preview.src = imgUrl; preview.style.display = 'block';
+    document.getElementById('dropZoneContent').style.display = 'none';
+
+    const imgEl = new Image();
+    await new Promise(res => { imgEl.onload = res; imgEl.src = imgUrl; });
+
+    // ── 1. Analyse couleurs (canvas — toujours disponible) ──
+    const { hairColor, skinTone } = await analyzePhoto(imgEl);
+
+    // ── 2. face-api : âge / genre / expression ──
+    let ageDesc = 'young', genderDesc = 'person', exprText = '';
+    let faceDetected = false;
+
+    // Attendre les modèles (max 12s)
+    let waited = 0;
+    while (!faceApiLoaded && waited < 12000) {
+        await new Promise(r => setTimeout(r,400)); waited += 400;
+    }
+
+    if (faceApiLoaded) {
+        try {
+            const det = await faceapi
+                .detectSingleFace(imgEl, new faceapi.TinyFaceDetectorOptions())
+                .withAgeAndGender()
+                .withFaceExpressions();
+
+            if (det) {
+                faceDetected = true;
+                const age = Math.round(det.age);
+                if      (age < 13) ageDesc = 'child';
+                else if (age < 20) ageDesc = 'teenage';
+                else if (age < 30) ageDesc = 'young';
+                else if (age < 45) ageDesc = 'adult';
+                else if (age < 60) ageDesc = 'middle-aged';
+                else               ageDesc = 'elderly';
+
+                genderDesc = det.gender === 'male' ? 'man' : 'woman';
+
+                const topExpr = Object.entries(det.expressions).sort((a,b)=>b[1]-a[1])[0][0];
+                const exprMap = { happy:'smiling', sad:'sad', angry:'serious', surprised:'surprised', neutral:'' };
+                exprText = exprMap[topExpr] ?? '';
+            }
+        } catch(e) {}
+    }
+
+    // ── 3. Construire la description propre ──
+    const parts = [];
+    if (faceDetected) {
+        parts.push(ageDesc + ' ' + genderDesc);
+    } else {
+        parts.push('person');
+    }
+    parts.push(hairColor + ' hair');
+    parts.push(skinTone + ' skin');
+    if (exprText) parts.push(exprText);
+
+    photoDesc = parts.join(', ');
+
+    // Afficher uniquement la description — pas d'infos techniques
+    statusText.innerHTML = `✅ <strong style="color:#fff;">${photoDesc}</strong>`;
+
+    // Champ éditable pour affiner
+    const wrapper = document.getElementById('descEditWrapper');
+    wrapper.style.display = 'block';
+    document.getElementById('photoDescInput').value = photoDesc;
+    updateBtn();
+}
+
+function updateBtn() {
+    const ok = currentTab==='text' ? descEl.value.trim().length>=3 : photoDesc!==null;
+    const btn = document.getElementById('genBtn');
+    btn.disabled=!ok; btn.style.opacity=ok?'1':'.35'; btn.style.cursor=ok?'pointer':'default';
+}
+
 document.querySelectorAll('.sbtn').forEach(el => {
     el.addEventListener('click', function() {
-        document.querySelectorAll('.sbtn').forEach(b => b.classList.remove('sel'));
-        this.classList.add('sel');
-        selectedStyle = this.dataset.style;
+        document.querySelectorAll('.sbtn').forEach(b=>b.classList.remove('sel'));
+        this.classList.add('sel'); selectedStyle=this.dataset.style;
     });
 });
 
-// ── Générer ────────────────────────────────────────────────────────────────
+// ── Générer ───────────────────────────────────
 async function generate() {
-    const desc = descEl.value.trim();
-    if (desc.length < 3) return;
-
+    const desc = currentTab==='text' ? descEl.value.trim() : photoDesc;
+    if(!desc||desc.length<3) return;
     hide('s1'); show('s2');
-
-    const steps = [
-        { pct: 15, txt: 'Connecting to HuggingFace…' },
-        { pct: 30, txt: 'Building prompt for FLUX.1…' },
-        { pct: 50, txt: 'FLUX.1 is generating the image…' },
-        { pct: 70, txt: 'Rendering details…' },
-        { pct: 88, txt: 'Finalizing…' },
+    const steps=[
+        {pct:15,txt:'Connecting to HuggingFace…'},
+        {pct:30,txt:'Building prompt for FLUX.1…'},
+        {pct:50,txt:'FLUX.1 is generating the image…'},
+        {pct:70,txt:'Rendering details…'},
+        {pct:88,txt:'Finalizing…'},
     ];
-    let si = 0;
-    progressTimer = setInterval(() => {
-        if (si < steps.length) {
-            document.getElementById('progBar').style.width = steps[si].pct + '%';
-            document.getElementById('progTxt').textContent = steps[si].txt;
-            si++;
+    let si=0;
+    progressTimer=setInterval(()=>{
+        if(si<steps.length){
+            document.getElementById('progBar').style.width=steps[si].pct+'%';
+            document.getElementById('progTxt').textContent=steps[si].txt; si++;
         }
-    }, 5000);
-
+    },5000);
     await doGenerate(desc);
 }
 
 async function doGenerate(desc) {
     try {
-        const fd = new FormData();
-        fd.append('_token',      CSRF_TOON);
-        fd.append('description', desc);
-        fd.append('style',       selectedStyle);
-
-        const res  = await fetch(TOONIFY_URL, { method: 'POST', body: fd });
-        const data = await res.json();
-
-        // Cas spécial : modèle HuggingFace en cours de chargement (cold start)
-        if (data.model_loading) {
-            const wait = (data.retry_after || 20) * 1000;
-            clearInterval(progressTimer); progressTimer = null;
-            document.getElementById('loadingTitle').textContent    = '⏳ Model warming up…';
-            document.getElementById('loadingSubtitle').textContent = 'HuggingFace is loading FLUX.1 — auto-retry in ' + (data.retry_after || 20) + 's';
-            document.getElementById('progBar').style.width         = '20%';
-            document.getElementById('progTxt').textContent         = 'This happens once every few hours. Please wait…';
-
-            // Auto-retry après le délai indiqué
-            retryTimer = setTimeout(async () => {
-                document.getElementById('loadingTitle').textContent    = 'Generating…';
-                document.getElementById('loadingSubtitle').textContent = 'FLUX.1 is generating your image…';
+        const fd=new FormData();
+        fd.append('_token',CSRF_TOON); fd.append('description',desc); fd.append('style',selectedStyle);
+        const res=await fetch(TOONIFY_URL,{method:'POST',body:fd});
+        const data=await res.json();
+        if(data.model_loading){
+            const wait=(data.retry_after||20)*1000;
+            clearInterval(progressTimer); progressTimer=null;
+            document.getElementById('loadingTitle').textContent='⏳ Model warming up…';
+            document.getElementById('loadingSubtitle').textContent='Auto-retry in '+(data.retry_after||20)+'s…';
+            document.getElementById('progBar').style.width='20%';
+            retryTimer=setTimeout(async()=>{
+                document.getElementById('loadingTitle').textContent='Generating…';
+                document.getElementById('loadingSubtitle').textContent='FLUX.1 is generating your image…';
                 await doGenerate(desc);
-            }, wait);
+            },wait);
             return;
         }
-
-        clearInterval(progressTimer); progressTimer = null;
-        document.getElementById('progBar').style.width = '100%';
-
-        if (data.success && data.output_url) {
-            outputUrl = data.output_url;
-            await new Promise(r => setTimeout(r, 300));
+        clearInterval(progressTimer); progressTimer=null;
+        document.getElementById('progBar').style.width='100%';
+        if(data.success&&data.output_url){
+            outputUrl=data.output_url;
+            await new Promise(r=>setTimeout(r,300));
             hide('s2'); show('s3');
-            document.getElementById('resultImg').src = outputUrl + '?t=' + Date.now();
-            const styleName = document.querySelector('.sbtn.sel .sbtn-name')?.textContent || selectedStyle;
-            document.getElementById('resultStyle').textContent = styleName + ' style · FLUX.1-schnell';
+            document.getElementById('resultImg').src=outputUrl+'?t='+Date.now();
+            const sn=document.querySelector('.sbtn.sel .sbtn-name')?.textContent||selectedStyle;
+            document.getElementById('resultStyle').textContent=sn+' style · FLUX.1';
         } else {
             hide('s2'); show('s1');
-            showToast(data.error || 'Generation failed. Please retry.', true);
+            showToast(data.error||'Generation failed. Please retry.',true);
         }
-    } catch (err) {
-        clearInterval(progressTimer); progressTimer = null;
+    } catch(e){
+        clearInterval(progressTimer); progressTimer=null;
         hide('s2'); show('s1');
-        showToast('Connection error. Please retry.', true);
+        showToast('Connection error. Please retry.',true);
     }
 }
 
-// ── Appliquer ──────────────────────────────────────────────────────────────
 async function applyAvatar() {
-    if (!outputUrl) return;
-    const btn = document.getElementById('applyBtn');
-    btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Saving…';
-    btn.disabled  = true;
-
+    if(!outputUrl) return;
+    const btn=document.getElementById('applyBtn');
+    btn.innerHTML='<i class="fas fa-spinner fa-spin"></i> Saving…'; btn.disabled=true;
     try {
-        const fd = new FormData();
-        fd.append('_token',    CSRF_SAVE);
-        fd.append('image_url', outputUrl);
-
-        const res  = await fetch(SAVE_URL, { method: 'POST', body: fd });
-        const data = await res.json();
-
-        if (data.success) {
-            const cur = document.getElementById('currentAvatar');
-            const src = data.url + '?t=' + Date.now();
-            if (cur?.tagName === 'IMG') {
-                cur.src = src;
-            } else if (cur) {
-                const img = document.createElement('img');
-                img.src = src; img.className = 'profile_image'; img.id = 'currentAvatar';
-                cur.replaceWith(img);
-            }
-            closeModal();
-            showToast('🎨 Avatar applied successfully!');
+        const fd=new FormData();
+        fd.append('_token',CSRF_SAVE); fd.append('image_url',outputUrl);
+        const res=await fetch(SAVE_URL,{method:'POST',body:fd});
+        const data=await res.json();
+        if(data.success){
+            const cur=document.getElementById('currentAvatar');
+            const src=data.url+'?t='+Date.now();
+            if(cur?.tagName==='IMG'){ cur.src=src; }
+            else if(cur){ const img=document.createElement('img'); img.src=src; img.className='profile_image'; img.id='currentAvatar'; cur.replaceWith(img); }
+            closeModal(); showToast('🎨 Avatar applied successfully!');
         } else {
-            showToast(data.error || 'Could not save avatar.', true);
-            btn.innerHTML = '<i class="fas fa-check"></i> Apply as profile picture';
-            btn.disabled  = false;
+            showToast(data.error||'Could not save.',true);
+            btn.innerHTML='<i class="fas fa-check"></i> Apply as profile picture'; btn.disabled=false;
         }
-    } catch(e) {
-        showToast('Connection error.', true);
-        btn.innerHTML = '<i class="fas fa-check"></i> Apply as profile picture';
-        btn.disabled  = false;
+    } catch(e){
+        showToast('Connection error.',true);
+        btn.innerHTML='<i class="fas fa-check"></i> Apply as profile picture'; btn.disabled=false;
     }
 }
 
-function showToast(msg, isErr = false) {
-    const el = document.createElement('div');
-    el.textContent = (isErr ? '❌ ' : '✅ ') + msg;
-    Object.assign(el.style, {
-        position:'fixed', bottom:'28px', right:'28px',
-        background: isErr ? '#c53030' : '#276749',
-        color:'white', padding:'13px 22px', borderRadius:'10px',
-        fontWeight:'700', zIndex:'99999', fontSize:'14px',
-        boxShadow:'0 6px 24px rgba(0,0,0,.5)', maxWidth:'360px',
-    });
+function showToast(msg,isErr=false){
+    const el=document.createElement('div');
+    el.textContent=(isErr?'❌ ':'✅ ')+msg;
+    Object.assign(el.style,{position:'fixed',bottom:'28px',right:'28px',background:isErr?'#c53030':'#276749',color:'white',padding:'13px 22px',borderRadius:'10px',fontWeight:'700',zIndex:'99999',fontSize:'14px',boxShadow:'0 6px 24px rgba(0,0,0,.5)',maxWidth:'360px'});
     document.body.appendChild(el);
-    setTimeout(() => el.remove(), 5000);
+    setTimeout(()=>el.remove(),5000);
 }
 </script>
 {% endblock %}
