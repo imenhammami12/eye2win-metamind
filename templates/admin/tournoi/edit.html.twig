@@ -1,0 +1,172 @@
+{% extends 'admin_layout.html.twig' %}
+
+{% block title %}Edit Tournoi{% endblock %}
+{% block page_title %}Edit Tournoi{% endblock %}
+
+{% block body %}
+<div class="mb-3 fade-in">
+    <a href="{{ path('admin_tournoi_index') }}" class="btn btn-outline-secondary">
+        <i class="bi bi-arrow-left me-2"></i>Back to List
+    </a>
+</div>
+
+<div class="row justify-content-center fade-in" style="animation-delay: 0.1s;">
+    <div class="col-lg-8">
+        <div class="table-card">
+            <div class="card-header-gradient" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 1.5rem; border-radius: 16px 16px 0 0;">
+                <h5 class="mb-0 text-white"><i class="bi bi-pencil-square me-2"></i>Edit Tournoi Information</h5>
+            </div>
+            
+            {{ form_start(form, {'attr': {'class': 'p-4', 'id': 'editTournoiForm', 'novalidate': 'novalidate'}}) }}
+                
+                <div class="row g-4">
+                    {# Nom #}
+                    <div class="col-md-12 form-group-enhanced">
+                        <label class="form-label fw-bold">
+                            <i class="bi bi-tag me-1"></i>
+                            Nom du Tournoi
+                            <span class="required-indicator" style="color: #fa709a;">*</span>
+                        </label>
+                        {{ form_widget(form.nom) }}
+                        <div class="custom-error-message">{{ form_errors(form.nom) }}</div>
+                    </div>
+
+                    {# Dates #}
+                    <div class="col-md-6 form-group-enhanced">
+                        <label class="form-label fw-bold">
+                            <i class="bi bi-calendar-event me-1"></i>
+                            Date de Début
+                            <span class="required-indicator" style="color: #fa709a;">*</span>
+                        </label>
+                        {{ form_widget(form.dateDebut) }}
+                        <div class="custom-error-message">{{ form_errors(form.dateDebut) }}</div>
+                    </div>
+
+                    <div class="col-md-6 form-group-enhanced">
+                        <label class="form-label fw-bold">
+                            <i class="bi bi-calendar-check me-1"></i>
+                            Date de Fin
+                            <span class="required-indicator" style="color: #fa709a;">*</span>
+                        </label>
+                        {{ form_widget(form.dateFin) }}
+                        <div class="custom-error-message">{{ form_errors(form.dateFin) }}</div>
+                    </div>
+                    
+                    {# Type #}
+                    <div class="col-md-6 form-group-enhanced">
+                        <label class="form-label fw-bold">
+                            <i class="bi bi-list-task me-1"></i>
+                            Type
+                        </label>
+                        {{ form_widget(form.typeTournoi) }}
+                        <div class="custom-error-message">{{ form_errors(form.typeTournoi) }}</div>
+                    </div>
+
+                    {# Description #}
+                    <div class="col-md-12 form-group-enhanced">
+                        <label class="form-label fw-bold">
+                            <i class="bi bi-file-text me-1"></i>
+                            Description
+                        </label>
+                        {{ form_widget(form.description) }}
+                        <div class="custom-error-message">{{ form_errors(form.description) }}</div>
+                    </div>
+
+                    {# Image #}
+                    <div class="col-md-12 form-group-enhanced">
+                        <label class="form-label fw-bold">
+                            <i class="bi bi-image me-1"></i>
+                            Logo (Image)
+                        </label>
+                        {% if tournoi.image %}
+                            <div class="mb-2">
+                                <img src="{{ asset('uploads/tournois/' ~ tournoi.image) }}" alt="Current Image" style="max-height: 100px; border-radius: 8px;">
+                                <small class="d-block text-muted">Current image</small>
+                            </div>
+                        {% endif %}
+                        {{ form_widget(form.image, {'required': false}) }}
+                        <div class="custom-error-message">{{ form_errors(form.image) }}</div>
+                        <small class="form-help-text text-muted">
+                            <i class="bi bi-info-circle me-1"></i>Upload a new logo to replace the current one (JPEG, PNG, WEBP)
+                        </small>
+                    </div>
+                </div>
+                
+                {# Action Buttons #}
+                <div class="mt-4 d-flex gap-2">
+                    <button type="submit" class="btn btn-warning" id="submitBtn">
+                        <i class="bi bi-save me-2"></i>Update Tournoi
+                    </button>
+                    <a href="{{ path('admin_tournoi_index') }}" class="btn btn-outline-secondary">
+                        <i class="bi bi-x-circle me-2"></i>Cancel
+                    </a>
+                </div>
+
+            {{ form_end(form) }}
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block javascripts %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const form = document.getElementById('editTournoiForm');
+    const submitBtn = document.getElementById('submitBtn');
+    
+    if (form) {
+        form.addEventListener('submit', function(e) {
+            submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Updating...';
+            submitBtn.style.opacity = '0.8';
+        });
+
+        // Real-time validation feedback
+        form.querySelectorAll('input, select').forEach(input => {
+            input.addEventListener('blur', function() {
+                if (this.checkValidity()) {
+                    this.classList.add('is-valid');
+                    this.classList.remove('is-invalid');
+                } else {
+                    this.classList.add('is-invalid');
+                    this.classList.remove('is-valid');
+                }
+            });
+            
+            input.addEventListener('input', function() {
+                if (this.classList.contains('is-invalid') && this.checkValidity()) {
+                    this.classList.remove('is-invalid');
+                    this.classList.add('is-valid');
+                }
+            });
+        });
+    }
+});
+
+// Reuse the enhanced error styles
+const style = document.createElement('style');
+style.textContent = `
+    .form-control.is-valid {
+        border-color: #43e97b;
+        box-shadow: 0 0 0 0.15rem rgba(67, 233, 123, 0.25);
+    }
+    
+    .form-control.is-invalid {
+        border-color: #dc3545;
+        box-shadow: 0 0 0 0.15rem rgba(220, 53, 69, 0.25);
+    }
+
+    .custom-error-message, 
+    .custom-error-message ul, 
+    .custom-error-message li, 
+    .custom-error-message span {
+        color: #ff0000 !important; /* Bright Red */
+        font-weight: bold;
+        list-style-type: none;
+        padding-left: 0;
+        margin-top: 5px;
+        display: block;
+    }
+`;
+document.head.appendChild(style);
+</script>
+{% endblock %}

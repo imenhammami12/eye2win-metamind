@@ -1,6 +1,6 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Accueil - EyeTwin eSport Platform{% endblock %}
+{% block title %}Home - EyeTwin eSport Platform{% endblock %}
 
 {% block body %}
 <!-- Banner Section -->
@@ -10,19 +10,19 @@
             <div class="col-lg-12 text-center">
                 <div class="banner_text">
                     <div class="banner_text_iner">
-                        <h1>Bienvenue sur EyeTwin eSport</h1>
-                        <p>La plateforme eSport de référence pour l'analyse intelligente,
-                           le coaching personnalisé et les tournois compétitifs.</p>
+                        <h1>Welcome to EyeTwin eSport</h1>
+                        <p>The leading eSport platform for intelligent analysis,
+                           personalized coaching, and competitive tournaments.</p>
                         {% if not app.user %}
                             <a href="{{ path('app_register') }}" class="btn_1">
-                                Commencer maintenant <i class="fas fa-arrow-right"></i>
+                                Get started now <i class="fas fa-arrow-right"></i>
                             </a>
                             <a href="{{ path('app_login') }}" class="btn_2">
-                                Se connecter
+                                Sign in
                             </a>
                         {% else %}
                             <a href="{{ path('app_video_upload') }}" class="btn_1">
-                                Uploader une vidéo <i class="fas fa-upload"></i>
+                                Upload a video <i class="fas fa-upload"></i>
                             </a>
                         {% endif %}
                     </div>
@@ -37,15 +37,15 @@
     <div class="container">
         <div class="row align-items-center mb-4">
             <div class="col-lg-8">
-                <h2>Vos dernières vidéos</h2>
+                <h2>Your recent videos</h2>
             </div>
             <div class="col-lg-4 text-lg-right">
-                <a href="{{ path('app_video_upload') }}" class="btn btn-primary">Ajouter une vidéo</a>
+                <a href="{{ path('app_video_upload') }}" class="btn btn-primary">Add a video</a>
             </div>
         </div>
 
         {% if videos is empty %}
-            <div class="alert alert-info">Aucune vidéo pour le moment.</div>
+            <div class="alert alert-info">No videos yet.</div>
         {% else %}
             <div class="row">
                 {% for video in videos %}
@@ -53,13 +53,28 @@
                         <div class="card h-100">
                             <div class="card-body">
                                 <h5 class="card-title">{{ video.title }}</h5>
-                                <p class="text-muted">{{ video.gameType }}</p>
+                                <p class="text-muted mb-2">{{ video.gameType }}</p>
+                                <div class="d-flex align-items-center justify-content-between mb-2">
+                                    <span class="text-muted">
+                                        <i class="bi bi-person me-1"></i>{{ video.uploadedBy.username }}
+                                    </span>
+                                    {% if video.visibility == 'PUBLIC' %}
+                                        <span class="badge bg-success">PUBLIC</span>
+                                    {% else %}
+                                        <span class="badge bg-secondary">PRIVATE</span>
+                                    {% endif %}
+                                </div>
+                                {% if video.uploadedBy == app.user %}
+                                    <small class="text-primary fw-semibold">My video</small>
+                                {% elseif video.visibility == 'PUBLIC' %}
+                                    <small class="text-success fw-semibold">Public video</small>
+                                {% endif %}
                                 <video class="w-100" controls preload="metadata">
                                     <source src="{{ video.videoUrl }}" type="video/mp4">
                                 </video>
                             </div>
                             <div class="card-footer bg-white">
-                                <a href="{{ path('app_video_show', { id: video.id }) }}" class="btn btn-sm btn-outline-primary">Voir détails</a>
+                                <a href="{{ path('app_video_show', { id: video.id }) }}" class="btn btn-sm btn-outline-primary">View details</a>
                             </div>
                         </div>
                     </div>

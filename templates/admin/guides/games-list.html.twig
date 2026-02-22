@@ -1,0 +1,43 @@
+{% extends "admin_layout.html.twig" %}
+
+{% block title %}Manage Games{% endblock %}
+
+{% block body %}
+<div class="container-fluid py-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1>Manage Games</h1>
+        <a href="{{ path('app_game_new') }}" class="btn btn-primary">+ Add Game</a>
+    </div>
+
+    <div class="table-responsive">
+        <table class="table table-dark table-striped">
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Slug</th>
+                    <th>Color</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for game in games %}
+                    <tr>
+                        <td>{{ game.name }}</td>
+                        <td>{{ game.slug }}</td>
+                        <td><span style="display:inline-block;width:20px;height:20px;background:{{ game.color }};border-radius:4px;"></span> {{ game.color }}</td>
+                        <td>
+                            <a href="{{ path('app_game_edit', {id: game.id}) }}" class="btn btn-sm btn-info">Edit</a>
+                            <form method="post" action="{{ path('app_game_delete', {id: game.id}) }}" style="display:inline;">
+                                <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ game.id) }}">
+                                <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Delete game?')">Delete</button>
+                            </form>
+                        </td>
+                    </tr>
+                {% else %}
+                    <tr><td colspan="4">No games found.</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

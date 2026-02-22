@@ -15,9 +15,12 @@ class UserRepository extends ServiceEntityRepository
     
     /**
      * Find users by role
+<<<<<<< HEAD
      *
      * @param string $role The role to search for (e.g., 'ROLE_COACH')
      * @return User[]
+=======
+>>>>>>> computer-vision
      */
     public function findUsersByRole(string $role): array
     {
@@ -28,4 +31,22 @@ class UserRepository extends ServiceEntityRepository
             ->getQuery()
             ->getResult();
     }
+<<<<<<< HEAD
+=======
+
+    /**
+     * Search users by username or email (for team invitations)
+     */
+    public function searchForInvitation(string $query): array
+    {
+        return $this->createQueryBuilder('u')
+            ->where('u.username LIKE :query OR u.email LIKE :query')
+            ->andWhere('u.accountStatus = :status')
+            ->setParameter('query', '%' . $query . '%')
+            ->setParameter('status', \App\Entity\AccountStatus::ACTIVE)
+            ->setMaxResults(10)
+            ->getQuery()
+            ->getResult();
+    }
+>>>>>>> computer-vision
 }

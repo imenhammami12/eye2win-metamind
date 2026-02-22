@@ -54,12 +54,42 @@
                     {% endfor %}
                 </select>
             </div>
+<<<<<<< HEAD
+=======
+
+            <div class="col-md-2">
+                <label class="form-label">
+                    <i class="bi bi-sort-down me-1"></i>Sort By
+                </label>
+                <select name="sort" class="form-select">
+                    <option value="date" {{ sortBy == 'date' ? 'selected' : '' }}>Date</option>
+                    <option value="time" {{ sortBy == 'time' ? 'selected' : '' }}>Time</option>
+                    <option value="localisation" {{ sortBy == 'localisation' ? 'selected' : '' }}>Location</option>
+                    <option value="type" {{ sortBy == 'type' ? 'selected' : '' }}>Type</option>
+                    <option value="level" {{ sortBy == 'level' ? 'selected' : '' }}>Level</option>
+                </select>
+            </div>
+
+            <div class="col-md-2">
+                <label class="form-label">
+                    <i class="bi bi-arrow-up-down me-1"></i>Order
+                </label>
+                <select name="order" class="form-select">
+                    <option value="DESC" {{ sortOrder == 'DESC' ? 'selected' : '' }}>Descending</option>
+                    <option value="ASC" {{ sortOrder == 'ASC' ? 'selected' : '' }}>Ascending</option>
+                </select>
+            </div>
+>>>>>>> computer-vision
             
             <div class="col-md-2 d-flex align-items-end gap-2">
                 <button type="submit" class="btn btn-primary flex-grow-1">
                     <i class="bi bi-search me-1"></i>Filter
                 </button>
+<<<<<<< HEAD
                 {% if search or typeFilter or levelFilter %}
+=======
+                {% if search or typeFilter or levelFilter or sortBy != 'date' or sortOrder != 'DESC' %}
+>>>>>>> computer-vision
                     <a href="{{ path('admin_planning_index') }}" class="btn btn-outline-secondary" title="Clear filters">
                         <i class="bi bi-x-lg"></i>
                     </a>
@@ -95,8 +125,39 @@
                     <th style="width: 80px; text-align: center;">Image</th>
                     <th>Activity</th>
                     <th>Description</th>
+<<<<<<< HEAD
                     <th>Date & Time</th>
                     <th>Location</th>
+=======
+                    <th style="cursor: pointer;">
+                        <a href="{{ path('admin_planning_index', {
+                            search: search,
+                            type: typeFilter,
+                            level: levelFilter,
+                            sort: 'date',
+                            order: sortBy == 'date' and sortOrder == 'DESC' ? 'ASC' : 'DESC'
+                        }) }}" class="text-decoration-none text-white" title="Click to sort by date">
+                            Date & Time
+                            {% if sortBy == 'date' %}
+                                <i class="bi bi-{{ sortOrder == 'DESC' ? 'arrow-down' : 'arrow-up' }} ms-2" style="font-size: 0.85rem;"></i>
+                            {% endif %}
+                        </a>
+                    </th>
+                    <th style="cursor: pointer;">
+                        <a href="{{ path('admin_planning_index', {
+                            search: search,
+                            type: typeFilter,
+                            level: levelFilter,
+                            sort: 'localisation',
+                            order: sortBy == 'localisation' and sortOrder == 'DESC' ? 'ASC' : 'DESC'
+                        }) }}" class="text-decoration-none text-white" title="Click to sort by location">
+                            Location
+                            {% if sortBy == 'localisation' %}
+                                <i class="bi bi-{{ sortOrder == 'DESC' ? 'arrow-down' : 'arrow-up' }} ms-2" style="font-size: 0.85rem;"></i>
+                            {% endif %}
+                        </a>
+                    </th>
+>>>>>>> computer-vision
                     <th>Need Partner</th>
                     <th style="width: 150px;">Actions</th>
                 </tr>

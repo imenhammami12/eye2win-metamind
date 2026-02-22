@@ -16,12 +16,20 @@ security:
             security: false
         
         # Firewall for administration - MUST BE BEFORE 'main'
+<<<<<<< HEAD
+=======
+        # NO 2FA for admin
+>>>>>>> computer-vision
         admin:
             pattern: ^/admin
             lazy: true
             provider: app_user_provider
             user_checker: App\Security\AccountStatusChecker
+<<<<<<< HEAD
             
+=======
+
+>>>>>>> computer-vision
             # Admin login form
             form_login:
                 login_path: admin_login
@@ -41,11 +49,25 @@ security:
                 path: /admin
         
         # Main firewall for regular users
+<<<<<<< HEAD
+=======
+        # WITH 2FA for users
+>>>>>>> computer-vision
         main:
             lazy: true
             provider: app_user_provider
             user_checker: App\Security\AccountStatusChecker
             
+<<<<<<< HEAD
+=======
+            two_factor:
+                auth_form_path: 2fa_login
+                check_path: 2fa_login_check
+                enable_csrf: true
+                prepare_on_login: true
+                prepare_on_access_denied: true
+
+>>>>>>> computer-vision
             # User login form
             form_login:
                 login_path: app_login
@@ -71,20 +93,36 @@ security:
     
     # Access control
     access_control:
+<<<<<<< HEAD
+=======
+        # 2FA routes - ONLY for regular users
+        - { path: ^/2fa, roles: IS_AUTHENTICATED_2FA_IN_PROGRESS }
+        
+>>>>>>> computer-vision
         # Public routes
         - { path: ^/login, roles: PUBLIC_ACCESS }
         - { path: ^/register, roles: PUBLIC_ACCESS }
+        - { path: ^/admin/login, roles: PUBLIC_ACCESS }
         
+<<<<<<< HEAD
         # Admin routes
         - { path: ^/admin/login, roles: PUBLIC_ACCESS }      # Admin login accessible to all
         - { path: ^/admin/audit, roles: ROLE_SUPER_ADMIN }   # Audit logs = Super Admin only
         - { path: ^/admin, roles: ROLE_ADMIN }                # Backoffice = Admin minimum
         
         # User routes
+=======
+        # Admin routes - NO 2FA required
+        - { path: ^/admin/audit, roles: ROLE_SUPER_ADMIN }
+        - { path: ^/admin, roles: ROLE_ADMIN }
+        
+        # User routes - 2FA required if enabled
+>>>>>>> computer-vision
         - { path: ^/profile, roles: ROLE_USER }
         - { path: ^/upload, roles: ROLE_USER }
         - { path: ^/video, roles: ROLE_USER }
-        - { path: ^/dashboard, roles: ROLE_ADMIN }
+        - { path: ^/dashboard, roles: ROLE_USER }
+        - { path: ^/valorant-tracker, roles: ROLE_USER }
 
 
 when@test:

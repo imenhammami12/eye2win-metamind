@@ -7,6 +7,9 @@ parameters:
     profile_pictures_directory: '%kernel.project_dir%/public/uploads/profiles'
     team_logos_directory: '%kernel.project_dir%/public/uploads/teams'
     cv_directory: '%kernel.project_dir%/public/uploads/cv'
+    teams_directory: '%kernel.project_dir%/public/uploads/teams'
+    tournois_directory: '%kernel.project_dir%/public/uploads/tournois'
+
 
 services:
     # default configuration for services in *this* file
@@ -33,8 +36,21 @@ services:
     # add more service definitions when explicit configuration is needed
     # please note that last definitions always *replace* previous ones
     
+<<<<<<< HEAD
     # Configuration du service d'email pour les applications coach
     App\Service\CoachApplicationEmailService:
         arguments:
             $fromEmail: '%env(MAILER_FROM_EMAIL)%'
             $fromName: '%env(MAILER_FROM_NAME)%'
+=======
+    # Configuration du service d'email
+    App\Service\CoachApplicationEmailService:
+        arguments:
+            $fromEmail: '%env(MAILER_FROM_EMAIL)%'
+            $fromName: '%env(MAILER_FROM_NAME)%'
+
+    App\Service\ValorantTracker\TrackerGgClient:
+        arguments:
+            $apiKey: '%env(TRACKER_GG_API_KEY)%'
+            $baseUrl: '%env(TRACKER_GG_BASE_URL)%'
+>>>>>>> computer-vision

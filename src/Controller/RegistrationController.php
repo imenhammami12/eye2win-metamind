@@ -24,7 +24,7 @@ class RegistrationController extends AbstractController
     ): Response {
         // If user is already logged in, redirect to dashboard
         if ($this->getUser()) {
-            return $this->redirectToRoute('app_dashboard');
+            return $this->redirectToRoute('app_home');
         }
 
         $user = new User();

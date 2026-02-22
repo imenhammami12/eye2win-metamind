@@ -7,6 +7,9 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Scheb\TwoFactorBundle\Model\Totp\TotpConfiguration;
+use Scheb\TwoFactorBundle\Model\Totp\TotpConfigurationInterface;
+use Scheb\TwoFactorBundle\Model\Totp\TwoFactorInterface;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
@@ -16,7 +19,7 @@ use Symfony\Component\Validator\Constraints as Assert;
 #[ORM\Table(name: '`user`')]
 #[UniqueEntity(fields: ['email'], message: 'This email address is already registered')]
 #[UniqueEntity(fields: ['username'], message: 'This username is already taken')]
-class User implements UserInterface, PasswordAuthenticatedUserInterface
+class User implements UserInterface, PasswordAuthenticatedUserInterface, TwoFactorInterface
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
@@ -77,6 +80,23 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $profilePicture = null;
 
+    // ===== CHAMPS 2FA - COMPATIBLES MYSQL 5.6 =====
+    
+    #[ORM\Column(type: 'string', length: 255, nullable: true)]
+    private ?string $totpSecret = null;
+
+    #[ORM\Column(type: 'boolean', options: ['default' => false])]
+    private bool $isTotpEnabled = false;
+
+    // IMPORTANT: Utiliser 'text' au lieu de 'json' pour MySQL 5.6
+    #[ORM\Column(type: 'text', nullable: true)]
+    private ?string $backupCodesJson = null;
+
+    #[ORM\Column(type: Types::DATETIME_IMMUTABLE, nullable: true)]
+    private ?\DateTimeImmutable $totpEnabledAt = null;
+
+    // ===== FIN CHAMPS 2FA =====
+
     #[ORM\OneToMany(mappedBy: 'owner', targetEntity: Team::class, orphanRemoval: true)]
     private Collection $ownedTeams;
 
@@ -94,11 +114,21 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     #[ORM\OneToMany(mappedBy: 'user', targetEntity: TrainingSession::class)]
     private Collection $trainingSessions;
+<<<<<<< HEAD
+=======
+
+>>>>>>> computer-vision
     /**
      * @var Collection<int, Video>
      */
     #[ORM\OneToMany(targetEntity: Video::class, mappedBy: 'uploadedBy', orphanRemoval: true)]
     private Collection $videos;
+
+    /**
+     * @var Collection<int, MatchValorant>
+     */
+    #[ORM\OneToMany(targetEntity: MatchValorant::class, mappedBy: 'owner', orphanRemoval: true)]
+    private Collection $valorantMatches;
 
     public function __construct()
     {
@@ -112,7 +142,9 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         $this->lastLogin = new \DateTime();
         $this->accountStatus = AccountStatus::ACTIVE;
         $this->rolesJson = json_encode(['ROLE_USER']);
+        $this->isTotpEnabled = false;
         $this->videos = new ArrayCollection();
+        $this->valorantMatches = new ArrayCollection();
     }
     public function getId(): ?int
     {
@@ -292,6 +324,143 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     {
         return $this->trainingSessions;
     }
+<<<<<<< HEAD
+=======
+
+    // ===== MÉTHODES 2FA - CORRIGÉES POUR MYSQL 5.6 =====
+
+    /**
+     * Vérifie si l'authentification 2FA est activée pour cet utilisateur
+     */
+    public function isTotpAuthenticationEnabled(): bool
+    {
+        return $this->isTotpEnabled && $this->totpSecret !== null;
+    }
+
+    /**
+     * Retourne l'identifiant utilisateur pour l'authentification TOTP
+     */
+    public function getTotpAuthenticationUsername(): string
+    {
+        return $this->email;
+    }
+
+    /**
+     * Retourne la configuration TOTP pour cet utilisateur
+     */
+    public function getTotpAuthenticationConfiguration(): ?TotpConfigurationInterface
+    {
+        if (!$this->totpSecret) {
+            return null;
+        }
+
+        // Configuration: secret, algorithme SHA1, période de 30 secondes, 6 chiffres
+        return new TotpConfiguration(
+            $this->totpSecret, 
+            TotpConfiguration::ALGORITHM_SHA1, 
+            30, 
+            6
+        );
+    }
+
+    public function getTotpSecret(): ?string
+    {
+        return $this->totpSecret;
+    }
+
+    public function setTotpSecret(?string $totpSecret): static
+    {
+        $this->totpSecret = $totpSecret;
+        return $this;
+    }
+
+    public function getIsTotpEnabled(): bool
+    {
+        return $this->isTotpEnabled;
+    }
+
+    public function setIsTotpEnabled(bool $isTotpEnabled): static
+    {
+        $this->isTotpEnabled = $isTotpEnabled;
+        
+        // Mettre à jour la date d'activation automatiquement
+        if ($isTotpEnabled && $this->totpEnabledAt === null) {
+            $this->totpEnabledAt = new \DateTimeImmutable();
+        } elseif (!$isTotpEnabled) {
+            $this->totpEnabledAt = null;
+        }
+        
+        return $this;
+    }
+
+    /**
+     * CORRIGÉ: Getter pour backup codes (décode depuis JSON stocké en TEXT)
+     */
+    public function getBackupCodes(): ?array
+    {
+        if ($this->backupCodesJson === null || $this->backupCodesJson === '') {
+            return null;
+        }
+        
+        $decoded = json_decode($this->backupCodesJson, true);
+        return is_array($decoded) ? $decoded : null;
+    }
+
+    /**
+     * CORRIGÉ: Setter pour backup codes (encode en JSON pour stockage en TEXT)
+     */
+    public function setBackupCodes(?array $backupCodes): static
+    {
+        $this->backupCodesJson = $backupCodes !== null ? json_encode($backupCodes) : null;
+        return $this;
+    }
+
+    public function getTotpEnabledAt(): ?\DateTimeImmutable
+    {
+        return $this->totpEnabledAt;
+    }
+
+    public function setTotpEnabledAt(?\DateTimeImmutable $totpEnabledAt): static
+    {
+        $this->totpEnabledAt = $totpEnabledAt;
+        return $this;
+    }
+
+    /**
+     * CORRIGÉ: Invalide un code de secours après utilisation
+     * 
+     * @param string $code Le code de secours à invalider
+     * @return bool True si le code a été trouvé et invalidé, false sinon
+     */
+    public function invalidateBackupCode(string $code): bool
+    {
+        $codes = $this->getBackupCodes();
+        
+        if ($codes === null) {
+            return false;
+        }
+
+        $key = array_search($code, $codes, true);
+        if ($key !== false) {
+            unset($codes[$key]);
+            $this->setBackupCodes(array_values($codes)); // Réindexer et sauvegarder
+            return true;
+        }
+
+        return false;
+    }
+
+    /**
+     * CORRIGÉ: Compte le nombre de codes de secours restants
+     */
+    public function getRemainingBackupCodesCount(): int
+    {
+        $codes = $this->getBackupCodes();
+        return $codes ? count($codes) : 0;
+    }
+
+    // ===== FIN MÉTHODES 2FA =====
+>>>>>>> computer-vision
     /**
      * @return Collection<int, Video>
      */
@@ -321,4 +490,37 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
         return $this;
     }
+<<<<<<< HEAD
+=======
+
+    /**
+     * @return Collection<int, MatchValorant>
+     */
+    public function getValorantMatches(): Collection
+    {
+        return $this->valorantMatches;
+    }
+
+    public function addValorantMatch(MatchValorant $match): static
+    {
+        if (!$this->valorantMatches->contains($match)) {
+            $this->valorantMatches->add($match);
+            $match->setOwner($this);
+        }
+
+        return $this;
+    }
+
+    public function removeValorantMatch(MatchValorant $match): static
+    {
+        if ($this->valorantMatches->removeElement($match)) {
+            if ($match->getOwner() === $this) {
+                $match->setOwner(null);
+            }
+        }
+
+        return $this;
+    }
+
+>>>>>>> computer-vision
 }

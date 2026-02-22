@@ -46,40 +46,115 @@
     </div>
 </div>
 
-{# Filter #}
+{# Advanced Filters Card #}
 <div class="table-card mb-4 fade-in" style="animation-delay: 0.1s;">
-    <div class="table-header">
-        <h5><i class="bi bi-funnel me-2"></i>Filters</h5>
+    <div class="table-header d-flex justify-content-between align-items-center">
+        <h5 class="mb-0"><i class="bi bi-funnel me-2"></i>Filters</h5>
+        <button class="btn btn-sm btn-outline-secondary" type="button" data-bs-toggle="collapse" data-bs-target="#filterCollapse" aria-expanded="true">
+            <i class="bi bi-chevron-down"></i>
+        </button>
     </div>
     
-    <form method="get" class="p-3">
-        <div class="row g-3 align-items-end">
-            <div class="col-md-4">
-                <label class="form-label">
-                    <i class="bi bi-filter me-1"></i>Filter by Status
-                </label>
-                <select name="status" class="form-select" onchange="this.form.submit()">
-                    <option value="">All Statuses</option>
-                    {% for status in applicationStatuses %}
-                        <option value="{{ status.value }}" {{ statusFilter == status.value ? 'selected' : '' }}>
-                            {{ status.label }}
-                        </option>
-                    {% endfor %}
-                </select>
-            </div>
-            
-            <div class="col-md-8 d-flex justify-content-end gap-2">
-                {% if statusFilter %}
-                    <a href="{{ path('admin_coach_applications_index') }}" class="btn btn-outline-secondary" title="Clear filters">
-                        <i class="bi bi-x-lg me-1"></i>Clear
+    <div class="collapse show" id="filterCollapse">
+        <form method="get" class="p-3" id="filterForm">
+            <div class="row g-3">
+                {# Search Bar #}
+                <div class="col-md-6">
+                    <label class="form-label">
+                        <i class="bi bi-search me-1"></i>Search
+                    </label>
+                    <div class="input-group">
+                        <span class="input-group-text"><i class="bi bi-search"></i></span>
+                        <input type="text" 
+                               name="search" 
+                               class="form-control" 
+                               placeholder="Name, username, email, certifications..."
+                               value="{{ search }}"
+                               id="searchInput">
+                        {% if search %}
+                            <button type="button" class="btn btn-outline-secondary" onclick="document.getElementById('searchInput').value=''; document.getElementById('filterForm').submit();">
+                                <i class="bi bi-x"></i>
+                            </button>
+                        {% endif %}
+                    </div>
+                    <small class="text-muted">
+                        <i class="bi bi-info-circle me-1"></i>Search in name, username, email, certifications, and experience
+                    </small>
+                </div>
+                
+                {# Status Filter #}
+                <div class="col-md-3">
+                    <label class="form-label">
+                        <i class="bi bi-filter me-1"></i>Status
+                    </label>
+                    <select name="status" class="form-select" onchange="this.form.submit()">
+                        <option value="">All Statuses</option>
+                        {% for status in applicationStatuses %}
+                            <option value="{{ status.value }}" {{ statusFilter == status.value ? 'selected' : '' }}>
+                                {{ status.label }}
+                            </option>
+                        {% endfor %}
+                    </select>
+                </div>
+                
+                {# Sort By #}
+                <div class="col-md-3">
+                    <label class="form-label">
+                        <i class="bi bi-sort-down me-1"></i>Sort By
+                    </label>
+                    <div class="input-group">
+                        <select name="sort_by" class="form-select" onchange="this.form.submit()">
+                            <option value="submittedAt" {{ sortBy == 'submittedAt' ? 'selected' : '' }}>Submitted Date</option>
+                            <option value="reviewedAt" {{ sortBy == 'reviewedAt' ? 'selected' : '' }}>Reviewed Date</option>
+                            <option value="status" {{ sortBy == 'status' ? 'selected' : '' }}>Status</option>
+                        </select>
+                        <select name="sort_order" class="form-select" style="max-width: 100px;" onchange="this.form.submit()">
+                            <option value="DESC" {{ sortOrder == 'DESC' ? 'selected' : '' }}>↓ DESC</option>
+                            <option value="ASC" {{ sortOrder == 'ASC' ? 'selected' : '' }}>↑ ASC</option>
+                        </select>
+                    </div>
+                </div>
+                
+                {# Date Range #}
+                <div class="col-md-6">
+                    <label class="form-label">
+                        <i class="bi bi-calendar-range me-1"></i>Submission Date Range
+                    </label>
+                    <div class="input-group">
+                        <span class="input-group-text">From</span>
+                        <input type="date" 
+                               name="date_from" 
+                               class="form-control" 
+                               value="{{ dateFrom }}"
+                               onchange="this.form.submit()">
+                        <span class="input-group-text">To</span>
+                        <input type="date" 
+                               name="date_to" 
+                               class="form-control" 
+                               value="{{ dateTo }}"
+                               onchange="this.form.submit()">
+                    </div>
+                </div>
+                
+                {# Action Buttons #}
+                <div class="col-md-6 d-flex align-items-end gap-2">
+                    {% if statusFilter or search or dateFrom or dateTo %}
+                        <a href="{{ path('admin_coach_applications_index') }}" class="btn btn-outline-secondary flex-fill">
+                            <i class="bi bi-x-lg me-1"></i>Clear All Filters
+                        </a>
+                    {% endif %}
+                    
+                    <button type="submit" class="btn btn-primary flex-fill">
+                        <i class="bi bi-funnel me-2"></i>Apply Filters
+                    </button>
+                    
+                    <a href="{{ path('admin_coaches_list') }}" class="btn btn-success flex-fill">
+                        <i class="bi bi-award me-2"></i>View Coaches
                     </a>
-                {% endif %}
-                <a href="{{ path('admin_coaches_list') }}" class="btn btn-success">
-                    <i class="bi bi-award me-2"></i>View All Coaches
-                </a>
+                </div>
             </div>
-        </div>
-    </form>
+        </form>
+    </div>
 </div>
 
 {# Results Summary #}
@@ -87,6 +162,9 @@
     <h6 class="text-muted mb-0">
         <i class="bi bi-info-circle me-2"></i>
         Found <strong>{{ applications|length }}</strong> application{{ applications|length != 1 ? 's' : '' }}
+        {% if statusFilter or search or dateFrom or dateTo %}
+            <span class="badge bg-primary">Filtered</span>
+        {% endif %}
     </h6>
 </div>
 
@@ -206,7 +284,14 @@
                             <div class="empty-state">
                                 <i class="bi bi-inbox" style="font-size: 64px; opacity: 0.2;"></i>
                                 <h4 class="mt-3 mb-2">No Applications Found</h4>
-                                <p class="text-muted">Coach applications will appear here</p>
+                                {% if statusFilter or search or dateFrom or dateTo %}
+                                    <p class="text-muted">Try adjusting your filters</p>
+                                    <a href="{{ path('admin_coach_applications_index') }}" class="btn btn-sm btn-outline-primary mt-2">
+                                        <i class="bi bi-x-lg me-1"></i>Clear Filters
+                                    </a>
+                                {% else %}
+                                    <p class="text-muted">Coach applications will appear here</p>
+                                {% endif %}
                             </div>
                         </td>
                     </tr>
@@ -219,8 +304,12 @@
 
 {% block javascripts %}
 <script>
+<<<<<<< HEAD
 // Initialize Bootstrap tooltips
+=======
+>>>>>>> computer-vision
 document.addEventListener('DOMContentLoaded', function() {
+    // Initialize Bootstrap tooltips
     const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
     tooltipTriggerList.map(function (tooltipTriggerEl) {
         return new bootstrap.Tooltip(tooltipTriggerEl, {
@@ -238,6 +327,20 @@ document.addEventListener('DOMContentLoaded', function() {
             this.style.transform = 'translateX(0)';
         });
     });
+    
+    // Real-time search (optional - debounced)
+    const searchInput = document.getElementById('searchInput');
+    if (searchInput) {
+        let timeout;
+        searchInput.addEventListener('input', function() {
+            clearTimeout(timeout);
+            timeout = setTimeout(() => {
+                // Auto-submit after 500ms of no typing
+                // Uncomment the line below if you want auto-submit
+                // document.getElementById('filterForm').submit();
+            }, 500);
+        });
+    }
 });
 </script>
 {% endblock %}

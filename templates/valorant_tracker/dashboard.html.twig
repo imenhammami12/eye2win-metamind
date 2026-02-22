@@ -1,0 +1,110 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Valorant Tracker Dashboard{% endblock %}
+
+{% block body %}
+<div class="container py-4" data-controller="valorant-tracker" data-valorant-tracker-auto-refresh-value="true" data-valorant-tracker-refresh-interval-value="90000">
+    <div class="d-flex flex-wrap justify-content-between align-items-center mb-3 gap-2">
+        <div>
+            <h1 class="h3 mb-1">Dashboard Valorant</h1>
+            <p class="text-muted mb-0">Vue globale des matchs importés depuis Tracker.gg.</p>
+        </div>
+        <div class="d-flex gap-2">
+            <a href="{{ path('valorant_tracker_import') }}" class="btn btn-primary">Importer un match</a>
+            <form method="post" action="{{ path('valorant_tracker_refresh') }}">
+                <input type="hidden" name="_token" value="{{ csrf_token('valorant_tracker_refresh') }}">
+                <button class="btn btn-outline-secondary">Rafraîchir</button>
+            </form>
+        </div>
+    </div>
+
+    <div class="card shadow-sm mb-3">
+        <div class="card-body">
+            <form method="get" class="row g-3 align-items-end">
+                <div class="col-md-3">
+                    <label class="form-label">Joueur</label>
+                    <input name="player" class="form-control" value="{{ filters.player }}" placeholder="Pseudo ou tag">
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label">Équipe</label>
+                    <input name="team" class="form-control" value="{{ filters.team }}" placeholder="Nom d'équipe">
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label">Match / Carte</label>
+                    <input name="match" class="form-control" value="{{ filters.match }}" placeholder="ID ou map">
+                </div>
+                <div class="col-md-2">
+                    <label class="form-label">Archives</label>
+                    <select name="archived" class="form-select">
+                        <option value="" {{ filters.archived == '' ? 'selected' : '' }}>Actifs</option>
+                        <option value="with" {{ filters.archived == 'with' ? 'selected' : '' }}>Avec archivés</option>
+                        <option value="only" {{ filters.archived == 'only' ? 'selected' : '' }}>Archivés seuls</option>
+                    </select>
+                </div>
+                <div class="col-md-1 d-grid">
+                    <button class="btn btn-outline-primary">Filtrer</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div class="card shadow-sm">
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+                <thead class="table-light">
+                <tr>
+                    <th>Match</th>
+                    <th>Carte</th>
+                    <th>Mode</th>
+                    <th>Score</th>
+                    <th>Joueurs</th>
+                    <th>Date</th>
+                    <th>Actions</th>
+                </tr>
+                </thead>
+                <tbody>
+                {% for match in matches %}
+                    <tr class="{{ match.archivedAt ? 'table-secondary' : '' }}">
+                        <td><code>{{ match.trackerMatchId }}</code></td>
+                        <td>{{ match.mapName ?: '-' }}</td>
+                        <td>{{ match.mode ?: '-' }}</td>
+                        <td>
+                            {% if match.scoreTeamA is not null or match.scoreTeamB is not null %}
+                                <strong>{{ match.scoreTeamA ?? 0 }} - {{ match.scoreTeamB ?? 0 }}</strong>
+                            {% else %}
+                                -
+                            {% endif %}
+                        </td>
+                        <td>{{ match.joueurs|length }}</td>
+                        <td>{{ match.playedAt ? match.playedAt|date('d/m/Y H:i') : '-' }}</td>
+                        <td>
+                            <div class="d-flex flex-wrap gap-1">
+                                <a class="btn btn-sm btn-outline-primary" href="{{ path('valorant_tracker_show', {id: match.id}) }}">Voir</a>
+
+                                {% if not match.archivedAt %}
+                                <form method="post" action="{{ path('valorant_tracker_archive', {id: match.id}) }}">
+                                    <input type="hidden" name="_token" value="{{ csrf_token('valorant_tracker_archive_' ~ match.id) }}">
+                                    <button class="btn btn-sm btn-outline-warning">Archiver</button>
+                                </form>
+                                {% endif %}
+
+                                <form method="post" action="{{ path('valorant_tracker_delete', {id: match.id}) }}" onsubmit="return confirm('Supprimer ce match ?');">
+                                    <input type="hidden" name="_token" value="{{ csrf_token('valorant_tracker_delete_' ~ match.id) }}">
+                                    <button class="btn btn-sm btn-outline-danger">Supprimer</button>
+                                </form>
+                            </div>
+                        </td>
+                    </tr>
+                {% else %}
+                    <tr>
+                        <td colspan="7" class="text-center py-4 text-muted">
+                            Aucun match trouvé. Importez un match depuis Tracker.gg.
+                        </td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

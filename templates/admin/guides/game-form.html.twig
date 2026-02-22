@@ -1,0 +1,44 @@
+{% extends "admin_layout.html.twig" %}
+
+{% block title %}{{ game ? 'Edit Game' : 'New Game' }}{% endblock %}
+
+{% block body %}
+<div class="container-fluid py-4" style="max-width: 700px;">
+    <h1 class="mb-4">{{ game ? 'Edit Game' : 'Create New Game' }}</h1>
+
+    {{ form_start(form) }}
+        <div class="mb-3">
+            {{ form_label(form.name) }}
+            {{ form_widget(form.name) }}
+            {{ form_errors(form.name) }}
+        </div>
+
+        <div class="mb-3">
+            {{ form_label(form.slug) }}
+            {{ form_widget(form.slug) }}
+            {{ form_errors(form.slug) }}
+        </div>
+
+        <div class="mb-3">
+            {{ form_label(form.icon) }}
+            {{ form_widget(form.icon) }}
+            {{ form_errors(form.icon) }}
+        </div>
+
+        <div class="mb-3">
+            {{ form_label(form.color) }}
+            {{ form_widget(form.color) }}
+            {{ form_errors(form.color) }}
+        </div>
+
+        <div class="mb-3">
+            {{ form_label(form.description) }}
+            {{ form_widget(form.description) }}
+            {{ form_errors(form.description) }}
+        </div>
+
+        <button type="submit" class="btn btn-primary">{{ game ? 'Update' : 'Create' }}</button>
+        <a href="{{ path('app_game_list') }}" class="btn btn-secondary">Cancel</a>
+    {{ form_end(form) }}
+</div>
+{% endblock %}

@@ -1,0 +1,142 @@
+{% extends "admin_layout.html.twig" %}
+
+{% block title %}Pending Guides{% endblock %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    <link rel="stylesheet" href="{{ asset('assets/css/guides-enhanced.css') }}">
+{% endblock %}
+
+{% block body %}
+<div class="container-fluid py-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1 class="mb-0">Pending Guides Review</h1>
+        <a href="{{ path('app_guide_admin_new') }}" class="btn btn-danger">+ Add Guide Video</a>
+    </div>
+
+    {% if guides is empty %}
+        <div class="alert alert-info">No guides waiting for review.</div>
+    {% else %}
+        <div class="admin-guide-statline">
+            <span class="admin-guide-chip">Pending: <strong id="pendingTotalCount">{{ guides|length }}</strong></span>
+            <span class="admin-guide-chip">Visible: <strong id="pendingVisibleCount">{{ guides|length }}</strong></span>
+        </div>
+
+        <div class="admin-guide-toolbar">
+            <input id="pendingSearch" class="guide-input" type="text" placeholder="Search title or uploader...">
+            <select id="pendingGameFilter" class="guide-select">
+                <option value="all">All games</option>
+                {% for guide in guides %}
+                    <option value="{{ guide.game.name|lower }}">{{ guide.game.name }}</option>
+                {% endfor %}
+            </select>
+            <select id="pendingMapFilter" class="guide-select">
+                <option value="all">All maps</option>
+                {% for guide in guides %}
+                    <option value="{{ guide.map|lower }}">{{ guide.map }}</option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <div class="table-responsive">
+            <table class="table table-dark table-striped">
+                <thead>
+                    <tr>
+                        <th>Title</th>
+                        <th>Game</th>
+                        <th>Agent</th>
+                        <th>Map</th>
+                        <th>Uploader</th>
+                        <th>Date</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for guide in guides %}
+                        <tr data-title="{{ guide.title|lower }}" data-uploader="{{ guide.uploadedBy.username|lower }}" data-game="{{ guide.game.name|lower }}" data-map="{{ guide.map|lower }}">
+                            <td>{{ guide.title }}</td>
+                            <td>{{ guide.game.name }}</td>
+                            <td>{{ guide.agent ? guide.agent.name : '-' }}</td>
+                            <td>{{ guide.map }}</td>
+                            <td>{{ guide.uploadedBy.username }}</td>
+                            <td>{{ guide.createdAt|date('d/m/Y H:i') }}</td>
+                            <td>
+                                <div class="d-flex gap-1">
+                                    <form method="post" action="{{ path('app_guide_approve', {id: guide.id}) }}">
+                                        <input type="hidden" name="_token" value="{{ csrf_token('approve' ~ guide.id) }}">
+                                        <button type="submit" class="btn btn-sm btn-success">Approve</button>
+                                    </form>
+
+                                    <form method="post" action="{{ path('app_guide_reject', {id: guide.id}) }}">
+                                        <input type="hidden" name="_token" value="{{ csrf_token('reject' ~ guide.id) }}">
+                                        <button type="submit" class="btn btn-sm btn-warning">Reject</button>
+                                    </form>
+
+                                    <form method="post" action="{{ path('app_guide_admin_delete', {id: guide.id}) }}">
+                                        <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ guide.id) }}">
+                                        <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Delete guide permanently?')">Delete</button>
+                                    </form>
+                                </div>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    {% endif %}
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const rows = document.querySelectorAll('tbody tr[data-title]');
+    const searchInput = document.getElementById('pendingSearch');
+    const gameFilter = document.getElementById('pendingGameFilter');
+    const mapFilter = document.getElementById('pendingMapFilter');
+    const totalEl = document.getElementById('pendingTotalCount');
+    const visibleEl = document.getElementById('pendingVisibleCount');
+
+    [gameFilter, mapFilter].forEach(select => {
+        if (!select) return;
+        const seen = new Set(['all']);
+        [...select.options].forEach(option => {
+            const v = option.value;
+            if (seen.has(v)) {
+                option.remove();
+            } else {
+                seen.add(v);
+            }
+        });
+    });
+
+    function applyPendingFilters() {
+        const query = (searchInput?.value || '').trim().toLowerCase();
+        const game = (gameFilter?.value || 'all').toLowerCase();
+        const map = (mapFilter?.value || 'all').toLowerCase();
+        let visible = 0;
+
+        rows.forEach(row => {
+            const title = row.dataset.title || '';
+            const uploader = row.dataset.uploader || '';
+            const rowGame = row.dataset.game || '';
+            const rowMap = row.dataset.map || '';
+
+            const searchMatch = query === '' || title.includes(query) || uploader.includes(query);
+            const gameMatch = game === 'all' || rowGame === game;
+            const mapMatch = map === 'all' || rowMap === map;
+            const show = searchMatch && gameMatch && mapMatch;
+
+            row.classList.toggle('guide-hidden', !show);
+            if (show) visible++;
+        });
+
+        if (totalEl) totalEl.textContent = String(rows.length);
+        if (visibleEl) visibleEl.textContent = String(visible);
+    }
+
+    searchInput?.addEventListener('input', applyPendingFilters);
+    gameFilter?.addEventListener('change', applyPendingFilters);
+    mapFilter?.addEventListener('change', applyPendingFilters);
+    applyPendingFilters();
+});
+</script>
+{% endblock %}

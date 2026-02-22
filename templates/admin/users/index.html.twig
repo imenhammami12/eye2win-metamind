@@ -4,8 +4,59 @@
 {% block page_title %}User Management{% endblock %}
 
 {% block body %}
+{# Quick Stats - MOVED TO TOP #}
+{% if users|length > 0 %}
+<div class="row g-3 mb-4 fade-in">
+    <div class="col-xl-3 col-lg-6 col-md-6">
+        <div class="stat-card">
+            <div class="stat-card-icon" style="background: linear-gradient(135deg, #667eea, #764ba2);">
+                <i class="bi bi-people text-white"></i>
+            </div>
+            <div class="stat-card-title">Total Users</div>
+            <div class="stat-card-value">{{ users|length }}</div>
+        </div>
+    </div>
+    
+    <div class="col-xl-3 col-lg-6 col-md-6">
+        <div class="stat-card">
+            <div class="stat-card-icon" style="background: linear-gradient(135deg, #43e97b, #38f9d7);">
+                <i class="bi bi-check-circle text-white"></i>
+            </div>
+            <div class="stat-card-title">Active</div>
+            <div class="stat-card-value">
+                {{ users|filter(u => u.accountStatus.value == 'ACTIVE')|length }}
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-xl-3 col-lg-6 col-md-6">
+        <div class="stat-card">
+            <div class="stat-card-icon" style="background: linear-gradient(135deg, #f093fb, #f5576c);">
+                <i class="bi bi-award text-white"></i>
+            </div>
+            <div class="stat-card-title">Coaches</div>
+            <div class="stat-card-value">
+                {{ users|filter(u => 'ROLE_COACH' in u.roles)|length }}
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-xl-3 col-lg-6 col-md-6">
+        <div class="stat-card">
+            <div class="stat-card-icon" style="background: linear-gradient(135deg, #fa709a, #fee140);">
+                <i class="bi bi-shield text-white"></i>
+            </div>
+            <div class="stat-card-title">Admins</div>
+            <div class="stat-card-value">
+                {{ users|filter(u => 'ROLE_ADMIN' in u.roles)|length }}
+            </div>
+        </div>
+    </div>
+</div>
+{% endif %}
+
 {# Filters and Search #}
-<div class="table-card mb-4 fade-in">
+<div class="table-card mb-4 fade-in" style="animation-delay: 0.1s;">
     <div class="table-header">
         <h5><i class="bi bi-funnel me-2"></i>Filters & Search</h5>
     </div>
@@ -68,7 +119,7 @@
 </div>
 
 {# Results Summary #}
-<div class="mb-3 fade-in" style="animation-delay: 0.1s;">
+<div class="mb-3 fade-in" style="animation-delay: 0.15s;">
     <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
         <h6 class="text-muted mb-0">
             <i class="bi bi-info-circle me-2"></i>
@@ -224,54 +275,11 @@
     </div>
 </div>
 
-{# Quick Stats #}
-{% if users|length > 0 %}
-<div class="row g-3 mt-4 fade-in" style="animation-delay: 0.3s;">
-    <div class="col-xl-3 col-lg-6 col-md-6">
-        <div class="stat-card">
-            <div class="stat-card-icon" style="background: linear-gradient(135deg, #667eea, #764ba2);">
-                <i class="bi bi-people text-white"></i>
-            </div>
-            <div class="stat-card-title">Total Users</div>
-            <div class="stat-card-value">{{ users|length }}</div>
-        </div>
-    </div>
-    
-    <div class="col-xl-3 col-lg-6 col-md-6">
-        <div class="stat-card">
-            <div class="stat-card-icon" style="background: linear-gradient(135deg, #43e97b, #38f9d7);">
-                <i class="bi bi-check-circle text-white"></i>
-            </div>
-            <div class="stat-card-title">Active</div>
-            <div class="stat-card-value">
-                {{ users|filter(u => u.accountStatus.value == 'ACTIVE')|length }}
-            </div>
-        </div>
-    </div>
-    
-    <div class="col-xl-3 col-lg-6 col-md-6">
-        <div class="stat-card">
-            <div class="stat-card-icon" style="background: linear-gradient(135deg, #f093fb, #f5576c);">
-                <i class="bi bi-award text-white"></i>
-            </div>
-            <div class="stat-card-title">Coaches</div>
-            <div class="stat-card-value">
-                {{ users|filter(u => 'ROLE_COACH' in u.roles)|length }}
-            </div>
-        </div>
-    </div>
-    
-    <div class="col-xl-3 col-lg-6 col-md-6">
-        <div class="stat-card">
-            <div class="stat-card-icon" style="background: linear-gradient(135deg, #fa709a, #fee140);">
-                <i class="bi bi-shield text-white"></i>
-            </div>
-            <div class="stat-card-title">Admins</div>
-            <div class="stat-card-value">
-                {{ users|filter(u => 'ROLE_ADMIN' in u.roles)|length }}
-            </div>
-        </div>
-    </div>
+{# Permission Info Alert #}
+{% if not is_granted('ROLE_SUPER_ADMIN') %}
+<div class="alert alert-info mt-4 fade-in" style="animation-delay: 0.3s;">
+    <i class="bi bi-info-circle me-2"></i>
+    <strong>Permission Notice:</strong> You have ROLE_ADMIN access. Only Super Administrators can suspend, ban, or delete other Administrators.
 </div>
 {% endif %}
 

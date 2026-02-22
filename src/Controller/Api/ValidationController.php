@@ -16,6 +16,7 @@ class ValidationController extends AbstractController
     {
         $data = json_decode($request->getContent(), true);
         $username = $data['username'] ?? '';
+        $currentUserId = $data['currentUserId'] ?? null;
         
         // Basic validation
         if (empty($username) || strlen($username) < 3) {
@@ -25,19 +26,36 @@ class ValidationController extends AbstractController
             ]);
         }
         
-        if (!preg_match('/^[a-zA-Z0-9_]+$/', $username)) {
+        if (strlen($username) > 50) {
             return $this->json([
                 'available' => false,
-                'message' => 'Username can only contain letters, numbers, and underscores'
+                'message' => 'Username cannot exceed 50 characters'
+            ]);
+        }
+        
+        if (!preg_match('/^[a-zA-Z0-9_-]+$/', $username)) {
+            return $this->json([
+                'available' => false,
+                'message' => 'Username can only contain letters, numbers, hyphens and underscores'
             ]);
         }
         
         // Check if username exists in database
         $existingUser = $userRepository->findOneBy(['username' => $username]);
         
+        // If editing and it's the current user's username, it's OK
+        if ($existingUser && $currentUserId && $existingUser->getId() == $currentUserId) {
+            return $this->json([
+                'available' => true,
+                'message' => 'This is your current username',
+                'is_current' => true
+            ]);
+        }
+        
         return $this->json([
             'available' => $existingUser === null,
-            'message' => $existingUser ? 'This username is already taken' : 'Username is available'
+            'message' => $existingUser ? 'This username is already taken' : 'Username is available',
+            'is_current' => false
         ]);
     }
     
@@ -46,6 +64,7 @@ class ValidationController extends AbstractController
     {
         $data = json_decode($request->getContent(), true);
         $email = $data['email'] ?? '';
+        $currentUserId = $data['currentUserId'] ?? null;
         
         // Basic validation
         if (empty($email) || !filter_var($email, FILTER_VALIDATE_EMAIL)) {
@@ -58,9 +77,19 @@ class ValidationController extends AbstractController
         // Check if email exists in database
         $existingUser = $userRepository->findOneBy(['email' => strtolower(trim($email))]);
         
+        // If editing and it's the current user's email, it's OK
+        if ($existingUser && $currentUserId && $existingUser->getId() == $currentUserId) {
+            return $this->json([
+                'available' => true,
+                'message' => 'This is your current email',
+                'is_current' => true
+            ]);
+        }
+        
         return $this->json([
             'available' => $existingUser === null,
-            'message' => $existingUser ? 'This email is already registered' : 'Email is available'
+            'message' => $existingUser ? 'This email is already registered' : 'Email is available',
+            'is_current' => false
         ]);
     }
 }

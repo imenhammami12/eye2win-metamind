@@ -1,0 +1,125 @@
+{#{% extends 'base.html.twig' %}#}
+
+{#{% block title %}Edit Channel{% endblock %}#}
+
+{#{% block body %}#}
+{#    <div class="container mt-4 mb-5">#}
+
+{#        <div class="esport-hero">#}
+{#            <h2 class="page-title">Edit Channel</h2>#}
+{#            <p class="mb-0">Modifie les infos • garde un look clean eSport ✅</p>#}
+{#        </div>#}
+
+{#        <div class="form-panel">#}
+{#            {{ form_start(form) }}#}
+
+{#            <div class="row g-3">#}
+{#                <div class="col-12 col-md-6">#}
+{#                    {{ form_label(form.name) }}#}
+{#                    {{ form_widget(form.name, {'attr': {'class': 'form-control'}}) }}#}
+{#                    {{ form_errors(form.name) }}#}
+{#                </div>#}
+
+{#                <div class="col-12 col-md-6">#}
+{#                    {{ form_label(form.game) }}#}
+{#                    {{ form_widget(form.game, {'attr': {'class': 'form-control'}}) }}#}
+{#                    {{ form_errors(form.game) }}#}
+{#                </div>#}
+
+{#                <div class="col-12">#}
+{#                    {{ form_label(form.description) }}#}
+{#                    {{ form_widget(form.description, {'attr': {'class': 'form-control', 'rows': 4}}) }}#}
+{#                    {{ form_errors(form.description) }}#}
+{#                </div>#}
+
+{#                <div class="col-12 col-md-6">#}
+{#                    {{ form_label(form.type) }}#}
+{#                    {{ form_widget(form.type, {'attr': {'class': 'form-select'}}) }}#}
+{#                    {{ form_errors(form.type) }}#}
+{#                </div>#}
+
+{#                <div class="col-12 col-md-6">#}
+{#                    {{ form_label(form.imageUrl) }}#}
+{#                    {{ form_widget(form.imageUrl, {'attr': {'class': 'form-control'}}) }}#}
+{#                    {{ form_errors(form.imageUrl) }}#}
+{#                </div>#}
+{#            </div>#}
+
+{#            <div class="form-actions">#}
+{#                <button class="btn btn-accent">#}
+{#                    <i class="fas fa-save"></i> Save#}
+{#                </button>#}
+
+{#                <a href="{{ path('community_channels_index') }}" class="btn btn-soft">#}
+{#                    Cancel#}
+{#                </a>#}
+{#            </div>#}
+
+{#            {{ form_end(form) }}#}
+{#        </div>#}
+
+{#    </div>#}
+{#{% endblock %}#}
+{# templates/community/channel/edit.html.twig #}
+{% extends 'base.html.twig' %}
+
+{% block title %}Edit Channel{% endblock %}
+
+{% block body %}
+    <div class="container mt-4 mb-5">
+
+        {# Header / hero #}
+        <div class="esport-hero">
+            <div class="d-flex justify-content-between align-items-center flex-wrap" style="gap:12px;">
+                <div>
+                    <h2 class="mb-1">Edit Channel</h2>
+                    <p class="mb-0">Modifie les infos • garde un look clean eSport ✅</p>
+                </div>
+                <a href="{{ path('community_channels_index') }}" class="btn btn-soft">
+                    <i class="fas fa-arrow-left"></i> Back
+                </a>
+            </div>
+        </div>
+
+        {# Form panel #}
+        <div class="form-panel">
+            {{ form_start(form) }}
+
+            <div class="row g-3">
+                <div class="col-12 col-md-6">
+                    {{ form_row(form.name) }}
+                </div>
+
+                <div class="col-12 col-md-6">
+                    {{ form_row(form.game) }}
+                </div>
+
+                <div class="col-12">
+                    {{ form_row(form.description) }}
+                </div>
+
+                <div class="col-12 col-md-6">
+                    {# IMPORTANT: do NOT force form-select here, because it's radios (expanded=true) #}
+                    {{ form_row(form.type) }}
+                </div>
+
+                <div class="col-12 col-md-6">
+                    {{ form_row(form.imageUrl) }}
+                </div>
+            </div>
+
+            <div class="mt-4 d-flex gap-2" style="gap:10px; flex-wrap:wrap;">
+                <button class="btn btn-accent">
+                    <i class="fas fa-save"></i> Save
+                </button>
+
+                <a href="{{ path('community_channels_index') }}" class="btn btn-soft">
+                    Cancel
+                </a>
+            </div>
+
+            {{ form_end(form) }}
+        </div>
+
+    </div>
+{% endblock %}

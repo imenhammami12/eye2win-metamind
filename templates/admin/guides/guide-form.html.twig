@@ -1,0 +1,148 @@
+{% extends "admin_layout.html.twig" %}
+
+{% block title %}{{ edit|default(false) ? 'Edit Guide Video' : 'Add Guide Video' }}{% endblock %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    <link rel="stylesheet" href="{{ asset('assets/css/guides-enhanced.css') }}">
+{% endblock %}
+
+{% block body %}
+<div class="container-fluid py-4" style="max-width: 900px;">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1 class="mb-0">{{ edit|default(false) ? 'Edit Guide Video' : 'Add Guide Video' }}</h1>
+        <a href="{{ path('app_guide_dashboard') }}" class="btn btn-secondary">Back</a>
+    </div>
+
+    <div class="card">
+        <div class="card-body p-4">
+            {{ form_start(form, {'attr': {'enctype': 'multipart/form-data'}}) }}
+
+            <div class="row g-3">
+                <div class="col-md-6">
+                    {{ form_label(form.title) }}
+                    {{ form_widget(form.title) }}
+                    {{ form_errors(form.title) }}
+                </div>
+
+                <div class="col-md-6">
+                    {{ form_label(form.game) }}
+                    {{ form_widget(form.game) }}
+                    {{ form_errors(form.game) }}
+                </div>
+
+                <div class="col-md-6">
+                    {{ form_label(form.agent) }}
+                    {{ form_widget(form.agent) }}
+                    {{ form_errors(form.agent) }}
+                </div>
+
+                <div class="col-md-6">
+                    {{ form_label(form.map) }}
+                    {{ form_widget(form.map) }}
+                    {{ form_errors(form.map) }}
+                </div>
+
+                <div class="col-12">
+                    {{ form_label(form.videoUrl) }}
+                    {{ form_widget(form.videoUrl) }}
+                    {{ form_errors(form.videoUrl) }}
+                    <small class="text-muted">Option 1: lien vidéo.</small>
+                </div>
+
+                <div class="col-12">
+                    {{ form_label(form.videoFile) }}
+                    {{ form_widget(form.videoFile) }}
+                    {{ form_errors(form.videoFile) }}
+                    <small class="text-muted">Option 2: fichier vidéo (MP4/WEBM/OGG/MOV, max 250MB).</small>
+                </div>
+
+                <div class="col-12">
+                    {{ form_label(form.description) }}
+                    {{ form_widget(form.description) }}
+                    {{ form_errors(form.description) }}
+                </div>
+
+                <div class="col-12">
+                    {{ form_label(form.thumbnail) }}
+                    {{ form_widget(form.thumbnail) }}
+                    {{ form_errors(form.thumbnail) }}
+                    <small class="text-muted">Option 1: lien image miniature.</small>
+                </div>
+
+                <div class="col-12">
+                    {{ form_label(form.thumbnailFile) }}
+                    {{ form_widget(form.thumbnailFile) }}
+                    {{ form_errors(form.thumbnailFile) }}
+                    <small class="text-muted">Option 2: fichier image (JPEG/PNG/WEBP, max 5MB).</small>
+                </div>
+            </div>
+
+            <div class="mt-4 d-flex gap-2">
+                <button type="submit" class="btn btn-danger">{{ edit|default(false) ? 'Update Guide Video' : 'Save Guide Video' }}</button>
+                <a href="{{ path('app_guide_dashboard') }}" class="btn btn-outline-secondary">Cancel</a>
+            </div>
+
+            {{ form_end(form) }}
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const gameSelect = document.getElementById('{{ form.game.vars.id }}');
+    const mapSelect = document.getElementById('{{ form.map.vars.id }}');
+
+    if (!gameSelect || !mapSelect) {
+        return;
+    }
+
+    const mapsByGame = {
+        valorant: ['All', 'Ascent', 'Bind', 'Breeze', 'Fracture', 'Haven', 'Icebox', 'Lotus', 'Pearl', 'Split', 'Sunset', 'Abyss'],
+        lol: ['All', 'Summoner\'s Rift', 'Howling Abyss', 'SR Jungle'],
+        fifa: ['All', 'Kick Off', 'Ultimate Team', 'Career Mode', 'Clubs'],
+        fortnite: ['All', 'Battle Royale Island', 'Zero Build Island', 'Reload', 'Creative']
+    };
+
+    function detectGameSlug() {
+        const selectedOption = gameSelect.options[gameSelect.selectedIndex];
+        if (!selectedOption) {
+            return null;
+        }
+
+        const gameName = selectedOption.textContent.trim().toLowerCase();
+
+        if (gameName.includes('valorant')) return 'valorant';
+        if (gameName.includes('league') || gameName.includes('lol')) return 'lol';
+        if (gameName.includes('fifa')) return 'fifa';
+        if (gameName.includes('fortnite')) return 'fortnite';
+
+        return null;
+    }
+
+    function refreshMapOptions() {
+        const currentValue = mapSelect.value;
+        const gameSlug = detectGameSlug();
+        const allowedMaps = mapsByGame[gameSlug] || ['All'];
+
+        mapSelect.innerHTML = '';
+
+        allowedMaps.forEach(function (mapName) {
+            const option = document.createElement('option');
+            option.value = mapName;
+            option.textContent = mapName;
+            mapSelect.appendChild(option);
+        });
+
+        if (allowedMaps.includes(currentValue)) {
+            mapSelect.value = currentValue;
+        } else {
+            mapSelect.value = 'All';
+        }
+    }
+
+    gameSelect.addEventListener('change', refreshMapOptions);
+    refreshMapOptions();
+});
+</script>
+{% endblock %}

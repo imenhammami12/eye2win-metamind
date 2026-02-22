@@ -4,11 +4,11 @@ namespace App\Controller;
 
 use App\Entity\User;
 use App\Entity\Video;
-use App\Form\VideoAdminType;
 use App\Form\VideoUploadType;
 use App\Repository\VideoRepository;
 use App\Service\VideoMatchService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
@@ -22,7 +22,11 @@ class VideoMatchController extends AbstractController
         $videos = [];
 
         if ($user instanceof User) {
-            $videos = $videoRepository->findByUser($user);
+            if ($this->isGranted('ROLE_ADMIN')) {
+                $videos = $videoRepository->findBy([], ['uploadedAt' => 'DESC']);
+            } else {
+                $videos = $videoRepository->findVisibleForUser($user);
+            }
             $videos = array_slice($videos, 0, 6);
         }
 
@@ -39,6 +43,20 @@ class VideoMatchController extends AbstractController
         $form = $this->createForm(VideoUploadType::class);
         $form->handleRequest($request);
 
+        if ($form->isSubmitted() && !$form->isValid()) {
+            if ($request->isXmlHttpRequest()) {
+                $errors = [];
+                foreach ($form->getErrors(true) as $error) {
+                    $errors[] = $error->getMessage();
+                }
+
+                return new JsonResponse([
+                    'error' => 'Formulaire invalide.',
+                    'details' => $errors,
+                ], Response::HTTP_BAD_REQUEST);
+            }
+        }
+
         if ($form->isSubmitted() && $form->isValid()) {
             $user = $this->getUser();
 
@@ -50,19 +68,44 @@ class VideoMatchController extends AbstractController
 
             if (!$videoFile) {
                 $this->addFlash('error', 'Veuillez sélectionner un fichier vidéo.');
+                if ($request->isXmlHttpRequest()) {
+                    return new JsonResponse([
+                        'error' => 'Veuillez sélectionner un fichier vidéo.',
+                    ], Response::HTTP_BAD_REQUEST);
+                }
+
                 return $this->render('video/upload.html.twig', [
                     'form' => $form->createView(),
                 ]);
             }
 
-            $video = $videoMatchService->createFromUpload(
-                $user,
-                $form->get('title')->getData(),
-                $form->get('gameType')->getData(),
-                $videoFile
-            );
+            try {
+                $video = $videoMatchService->createFromUpload(
+                    $user,
+                    $form->get('title')->getData(),
+                    $form->get('gameType')->getData(),
+                    $videoFile,
+                    (string) $form->get('visibility')->getData()
+                );
+            } catch (\Throwable $exception) {
+                $message = 'Échec de l\'upload. Vérifiez la configuration Cloudinary.';
+                $this->addFlash('error', $message);
+
+                if ($request->isXmlHttpRequest()) {
+                    return new JsonResponse(['error' => $message], Response::HTTP_BAD_REQUEST);
+                }
+
+                return $this->render('video/upload.html.twig', [
+                    'form' => $form->createView(),
+                ]);
+            }
 
             $this->addFlash('success', 'Vidéo uploadée avec succès.');
+            $redirectUrl = $this->generateUrl('app_video_show', ['id' => $video->getId()]);
+
+            if ($request->isXmlHttpRequest()) {
+                return new JsonResponse(['redirect' => $redirectUrl], Response::HTTP_CREATED);
+            }
 
             return $this->redirectToRoute('app_video_show', ['id' => $video->getId()]);
         }
@@ -93,52 +136,4 @@ class VideoMatchController extends AbstractController
         ]);
     }
 
-    #[Route('/dashboard', name: 'app_dashboard', methods: ['GET'])]
-    public function dashboard(VideoRepository $videoRepository): Response
-    {
-        $this->denyAccessUnlessGranted('ROLE_ADMIN');
-
-        $videos = $videoRepository->findBy([], ['uploadedAt' => 'DESC']);
-
-        return $this->render('home/dashboard.html.twig', [
-            'videos' => $videos,
-        ]);
-    }
-
-    #[Route('/dashboard/video/{id}/edit', name: 'app_admin_video_edit', requirements: ['id' => '\\d+'], methods: ['GET', 'POST'])]
-    public function adminEdit(Video $video, Request $request, VideoMatchService $videoMatchService): Response
-    {
-        $this->denyAccessUnlessGranted('ROLE_ADMIN');
-
-        $form = $this->createForm(VideoAdminType::class, $video);
-        $form->handleRequest($request);
-
-        if ($form->isSubmitted() && $form->isValid()) {
-            $videoMatchService->updateVideo($video);
-            $this->addFlash('success', 'Vidéo mise à jour.');
-
-            return $this->redirectToRoute('app_dashboard');
-        }
-
-        return $this->render('video/admin_edit.html.twig', [
-            'form' => $form->createView(),
-            'video' => $video,
-        ]);
-    }
-
-    #[Route('/dashboard/video/{id}/delete', name: 'app_admin_video_delete', requirements: ['id' => '\\d+'], methods: ['POST'])]
-    public function adminDelete(Video $video, Request $request, VideoMatchService $videoMatchService): Response
-    {
-        $this->denyAccessUnlessGranted('ROLE_ADMIN');
-
-        if (!$this->isCsrfTokenValid('delete_video_' . $video->getId(), (string) $request->request->get('_token'))) {
-            $this->addFlash('error', 'Jeton CSRF invalide.');
-            return $this->redirectToRoute('app_dashboard');
-        }
-
-        $videoMatchService->deleteVideo($video);
-        $this->addFlash('success', 'Vidéo supprimée.');
-
-        return $this->redirectToRoute('app_dashboard');
-    }
 }

@@ -1,0 +1,341 @@
+{% extends "base.html.twig" %}
+
+{% block title %}My Guides - Eye2Win Metamind{% endblock %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    <link rel="stylesheet" href="{{ asset('assets/css/guides-enhanced.css') }}">
+{% endblock %}
+
+{% block body %}
+<style>
+    .my-guides-container {
+        max-width: 1200px;
+        margin: 40px auto;
+        padding: 0 20px;
+    }
+
+    .header-section {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 30px;
+        flex-wrap: wrap;
+        gap: 20px;
+    }
+
+    .header-title {
+        color: #fff;
+        font-size: 32px;
+        font-weight: 700;
+        margin: 0;
+    }
+
+    .upload-btn {
+        background: linear-gradient(135deg, #ff0000 0%, #e60000 100%);
+        color: #fff;
+        padding: 12px 24px;
+        border-radius: 8px;
+        text-decoration: none;
+        font-weight: 600;
+        transition: all 0.3s ease;
+    }
+
+    .upload-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 20px rgba(255, 0, 0, 0.3);
+    }
+
+    .guides-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+        gap: 24px;
+    }
+
+    .guide-card {
+        background: linear-gradient(135deg, rgba(26, 31, 46, 0.8) 0%, rgba(11, 17, 31, 0.8) 100%);
+        border: 2px solid rgba(76, 211, 227, 0.1);
+        border-radius: 12px;
+        overflow: hidden;
+        transition: all 0.3s ease;
+    }
+
+    .guide-card:hover {
+        border-color: rgba(76, 211, 227, 0.3);
+        transform: translateY(-4px);
+    }
+
+    .guide-thumbnail {
+        width: 100%;
+        height: 180px;
+        object-fit: cover;
+        background: #000;
+    }
+
+    .guide-content {
+        padding: 20px;
+    }
+
+    .guide-title {
+        color: #fff;
+        font-size: 18px;
+        font-weight: 700;
+        margin-bottom: 10px;
+    }
+
+    .guide-meta {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 12px;
+        font-size: 13px;
+    }
+
+    .guide-game {
+        color: #4cd3e3;
+        font-weight: 600;
+    }
+
+    .guide-status {
+        padding: 4px 10px;
+        border-radius: 12px;
+        font-size: 11px;
+        text-transform: uppercase;
+        font-weight: 700;
+    }
+
+    .status-pending {
+        background: rgba(255, 193, 7, 0.2);
+        color: #ffc107;
+    }
+
+    .status-approved {
+        background: rgba(76, 211, 227, 0.2);
+        color: #4cd3e3;
+    }
+
+    .status-rejected {
+        background: rgba(255, 0, 0, 0.2);
+        color: #ff6b6b;
+    }
+
+    .guide-description {
+        color: #aeb8c9;
+        font-size: 14px;
+        margin-bottom: 15px;
+        line-height: 1.5;
+    }
+
+    .guide-stats {
+        display: flex;
+        gap: 16px;
+        margin-bottom: 15px;
+        color: #aeb8c9;
+        font-size: 13px;
+    }
+
+    .guide-actions {
+        display: flex;
+        gap: 10px;
+    }
+
+    .btn-action {
+        flex: 1;
+        padding: 8px 14px;
+        border-radius: 6px;
+        text-decoration: none;
+        font-size: 13px;
+        text-align: center;
+        font-weight: 600;
+        border: none;
+        cursor: pointer;
+    }
+
+    .btn-edit {
+        background: rgba(76, 211, 227, 0.2);
+        color: #4cd3e3;
+    }
+
+    .btn-delete {
+        background: rgba(255, 0, 0, 0.2);
+        color: #ff6b6b;
+    }
+
+    .empty-state {
+        text-align: center;
+        padding: 80px 20px;
+        color: #aeb8c9;
+    }
+
+    .empty-state i {
+        font-size: 64px;
+        margin-bottom: 20px;
+        color: rgba(76, 211, 227, 0.3);
+    }
+</style>
+
+<div class="my-guides-container">
+    <div class="header-section">
+        <h1 class="header-title">My Guides</h1>
+        <a href="{{ path('app_guide_upload') }}" class="upload-btn">+ Upload New Guide</a>
+    </div>
+
+    {% if guides is empty %}
+        <div class="empty-state">
+            <i class="fas fa-video"></i>
+            <h3>No guides yet</h3>
+            <p>Start sharing your gaming knowledge with the community!</p>
+        </div>
+    {% else %}
+        <div class="guide-stat-grid">
+            <div class="guide-stat-card">
+                <div class="guide-stat-label">Total</div>
+                <div class="guide-stat-value" id="myGuidesTotal">{{ guides|length }}</div>
+            </div>
+            <div class="guide-stat-card">
+                <div class="guide-stat-label">Visible</div>
+                <div class="guide-stat-value" id="myGuidesVisible">{{ guides|length }}</div>
+            </div>
+            <div class="guide-stat-card">
+                <div class="guide-stat-label">Approved Visible</div>
+                <div class="guide-stat-value" id="myGuidesApproved">0</div>
+            </div>
+        </div>
+
+        <div class="guide-toolbar">
+            <input id="myGuidesSearch" class="guide-input" type="text" placeholder="Search by title, map...">
+            <select id="myGuidesStatus" class="guide-select">
+                <option value="all">All status</option>
+                <option value="approved">Approved</option>
+                <option value="pending">Pending</option>
+                <option value="rejected">Rejected</option>
+            </select>
+            <select id="myGuidesGame" class="guide-select">
+                <option value="all">All games</option>
+                {% for guide in guides %}
+                    <option value="{{ guide.game.name|lower }}">{{ guide.game.name }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="guide-results-note" id="myGuidesResultsNote">{{ guides|length }} guide(s) affiché(s)</div>
+
+        <div class="guides-grid">
+            {% for guide in guides %}
+                <div class="guide-card"
+                     data-title="{{ guide.title|lower }}"
+                     data-status="{{ guide.status|lower }}"
+                     data-game="{{ guide.game.name|lower }}"
+                     data-map="{{ guide.map|lower }}"
+                >
+                    {% if guide.thumbnail %}
+                        <img src="{{ guide.thumbnail }}" alt="{{ guide.title }}" class="guide-thumbnail">
+                    {% else %}
+                        <div class="guide-thumbnail" style="display:flex;align-items:center;justify-content:center;color:#4cd3e3;">
+                            <i class="fas fa-play-circle" style="font-size:48px;"></i>
+                        </div>
+                    {% endif %}
+
+                    <div class="guide-content">
+                        <h3 class="guide-title">{{ guide.title }}</h3>
+
+                        <div class="guide-meta">
+                            <span class="guide-game">{{ guide.game.name }}</span>
+                            <span class="guide-status status-{{ guide.status }}">{{ guide.status }}</span>
+                        </div>
+
+                        {% if guide.description %}
+                            <p class="guide-description">{{ guide.description|slice(0, 100) }}{% if guide.description|length > 100 %}...{% endif %}</p>
+                        {% endif %}
+
+                        <div class="guide-stats">
+                            <span><i class="fas fa-heart"></i> {{ guide.likes }}</span>
+                            <span><i class="fas fa-eye"></i> {{ guide.views }}</span>
+                            <span><i class="fas fa-map"></i> {{ guide.map }}</span>
+                        </div>
+
+                        <div class="guide-actions">
+                            {% if guide.status != 'approved' %}
+                                <a href="{{ path('app_guide_edit', {id: guide.id}) }}" class="btn-action btn-edit">Edit</a>
+                            {% endif %}
+
+                            <form method="post" action="{{ path('app_guide_delete', {id: guide.id}) }}" style="flex:1;">
+                                <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ guide.id) }}">
+                                <button type="submit" class="btn-action btn-delete" onclick="return confirm('Delete this guide?')">Delete</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    {% endif %}
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const cards = document.querySelectorAll('.guide-card');
+    const searchInput = document.getElementById('myGuidesSearch');
+    const statusSelect = document.getElementById('myGuidesStatus');
+    const gameSelect = document.getElementById('myGuidesGame');
+    const visibleEl = document.getElementById('myGuidesVisible');
+    const totalEl = document.getElementById('myGuidesTotal');
+    const approvedEl = document.getElementById('myGuidesApproved');
+    const noteEl = document.getElementById('myGuidesResultsNote');
+
+    if (gameSelect) {
+        const unique = new Set();
+        [...gameSelect.options].forEach(opt => {
+            const val = opt.value;
+            if (val === 'all') {
+                return;
+            }
+            if (unique.has(val)) {
+                opt.remove();
+            } else {
+                unique.add(val);
+            }
+        });
+    }
+
+    function applyMyGuidesFilters() {
+        const query = (searchInput?.value || '').trim().toLowerCase();
+        const status = (statusSelect?.value || 'all').toLowerCase();
+        const game = (gameSelect?.value || 'all').toLowerCase();
+
+        let visible = 0;
+        let approved = 0;
+
+        cards.forEach(card => {
+            const title = card.dataset.title || '';
+            const cardStatus = card.dataset.status || '';
+            const cardGame = card.dataset.game || '';
+            const cardMap = card.dataset.map || '';
+
+            const searchMatch = query === '' || title.includes(query) || cardMap.includes(query);
+            const statusMatch = status === 'all' || cardStatus === status;
+            const gameMatch = game === 'all' || cardGame === game;
+            const show = searchMatch && statusMatch && gameMatch;
+
+            card.classList.toggle('guide-hidden', !show);
+
+            if (show) {
+                visible++;
+                if (cardStatus === 'approved') {
+                    approved++;
+                }
+            }
+        });
+
+        if (totalEl) totalEl.textContent = String(cards.length);
+        if (visibleEl) visibleEl.textContent = String(visible);
+        if (approvedEl) approvedEl.textContent = String(approved);
+        if (noteEl) noteEl.textContent = `${visible} guide(s) affiché(s)`;
+    }
+
+    searchInput?.addEventListener('input', applyMyGuidesFilters);
+    statusSelect?.addEventListener('change', applyMyGuidesFilters);
+    gameSelect?.addEventListener('change', applyMyGuidesFilters);
+    applyMyGuidesFilters();
+});
+</script>
+
+{% endblock %}

@@ -14,10 +14,39 @@ use Symfony\Component\Routing\Annotation\Route;
 class PlanningController extends AbstractController
 {
     #[Route('/planing', name: 'app_planning_index')]
+<<<<<<< HEAD
     public function index(PlanningRepository $planningRepository): Response
     {
         $user = $this->getUser();
         $plannings = $planningRepository->findAll();
+=======
+    public function index(PlanningRepository $planningRepository, Request $request): Response
+    {
+        $user = $this->getUser();
+        $sortBy = $request->query->get('sort', 'date');
+        $sortOrder = $request->query->get('order', 'DESC');
+        
+        // Validate sort parameters
+        $validSortFields = ['date', 'time'];
+        if (!in_array($sortBy, $validSortFields)) {
+            $sortBy = 'date';
+        }
+        
+        if (!in_array($sortOrder, ['ASC', 'DESC'])) {
+            $sortOrder = 'DESC';
+        }
+        
+        // Get all plannings with sorting
+        $queryBuilder = $planningRepository->createQueryBuilder('p')
+            ->orderBy('p.' . $sortBy, $sortOrder);
+        
+        // Add secondary sort by time if sorting by date
+        if ($sortBy === 'date') {
+            $queryBuilder->addOrderBy('p.time', 'ASC');
+        }
+        
+        $plannings = $queryBuilder->getQuery()->getResult();
+>>>>>>> computer-vision
         
         // Get user's existing sessions to check which plannings they've already joined
         $userSessionPlanningIds = [];
@@ -30,6 +59,11 @@ class PlanningController extends AbstractController
         return $this->render('planning/index.html.twig', [
             'plannings' => $plannings,
             'userSessionPlanningIds' => $userSessionPlanningIds,
+<<<<<<< HEAD
+=======
+            'sortBy' => $sortBy,
+            'sortOrder' => $sortOrder,
+>>>>>>> computer-vision
         ]);
     }
 

@@ -1,0 +1,97 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Tournaments - EyeTwin{% endblock %}
+
+{% block body %}
+    <!-- Breadcrumb -->
+    <section class="breadcrumb breadcrumb_bg">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-12">
+                    <div class="breadcrumb_iner text-center">
+                        <div class="breadcrumb_iner_item">
+                            <h2>Tournaments</h2>
+                            <p><a href="{{ path('app_home') }}">Home</a> <span>-</span> Tournaments</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Tournament List -->
+    <section class="tournaments_list section_padding">
+        <div class="container">
+            <div class="row justify-content-center">
+                <div class="col-lg-8">
+                    <div class="section_tittle text-center">
+                        <h2>Ongoing & Upcoming Tournaments</h2>
+                        <p>Join the excitement! Browse our tournaments and check out the match schedules.</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="row">
+                {% for tournament in tournaments %}
+                    <div class="col-lg-4 col-md-6 mb-4">
+                        <div class="single_gaming_tournament card border-0 shadow h-100" style="background-color: #1a1a2e; color: #fff; border: 1px solid #2d2d44;">
+                            <div class="tournament_img">
+                                {% if tournament.image %}
+                                    <img src="{{ asset('uploads/tournois/' ~ tournament.image) }}" 
+                                         class="card-img-top" 
+                                         alt="{{ tournament.nom }}" 
+                                         style="height: 200px; object-fit: cover; opacity: 0.9;">
+                                {% else %}
+                                    <div class="d-flex align-items-center justify-content-center" style="height: 200px; background: linear-gradient(45deg, #16213e, #0f3460);">
+                                        <i class="fas fa-trophy fa-4x text-white-50"></i>
+                                    </div>
+                                {% endif %}
+                            </div>
+                            
+                            <div class="card-body d-flex flex-column p-4">
+                                <div class="mb-2">
+                                    <span class="badge rounded-pill px-3 py-2 shadow-sm" style="background-color: #e94560; font-weight: 600; letter-spacing: 0.5px;">
+                                        {{ tournament.typeTournoi ? tournament.typeTournoi.name : 'TOURNAMENT' }}
+                                    </span>
+                                </div>
+                                
+                                <h4 class="card-title mb-3 text-white fw-bold" style="font-size: 1.5rem; letter-spacing: -0.5px; line-height: 1.2;">{{ tournament.nom }}</h4>
+                                
+                                <div class="tournament_meta mb-4 small text-muted">
+                                    <div class="d-flex align-items-center mb-2">
+                                        <div style="width: 24px;"><i class="far fa-calendar-alt text-danger"></i></div>
+                                        <span>
+                                            <span class="text-white-50">Start:</span> {{ tournament.dateDebut ? tournament.dateDebut|date('M d, Y') : 'TBA' }}
+                                            <br>
+                                            <span class="text-white-50">End:</span> &nbsp; {{ tournament.dateFin ? tournament.dateFin|date('M d, Y') : 'TBA' }}
+                                        </span>
+                                    </div>
+                                    <div class="d-flex align-items-center">
+                                        <div style="width: 24px;"><i class="fas fa-gamepad text-danger"></i></div>
+                                        <span>{{ tournament.matchs|length }} Matches</span>
+                                    </div>
+                                </div>
+                                
+                                <p class="card-text mb-4 flex-grow-1" style="color: #aeb8c9; font-size: 0.95rem; line-height: 1.5;">
+                                    {{ tournament.description|u.truncate(100, '...') }}
+                                </p>
+                                
+                                <a href="{{ path('app_tournoi_show', {'id': tournament.id}) }}" class="btn w-100 fw-bold py-2" style="background-color: #0f3460; color: white; border: 1px solid #284b7e; border-radius: 6px; transition: all 0.2s;">
+                                    View Details <i class="fas fa-arrow-right ms-1"></i>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                {% else %}
+                    <div class="col-12 text-center">
+                        <div class="alert alert-dark border-0 py-5" style="background-color: #1a1a2e; color: #fff;">
+                            <i class="fas fa-gamepad fa-3x mb-3 text-white-50"></i>
+                            <h4>No Tournaments Found</h4>
+                            <p class="text-muted">There are no active tournaments at the moment.</p>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+    </section>
+{% endblock %}

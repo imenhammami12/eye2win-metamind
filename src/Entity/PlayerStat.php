@@ -2,6 +2,7 @@
 
 namespace App\Entity;
 
+use App\Entity\Video;
 use App\Repository\PlayerStatRepository;
 use Doctrine\ORM\Mapping as ORM;
 
@@ -24,7 +25,7 @@ class PlayerStat
 
     #[ORM\ManyToOne(inversedBy: 'playerStats')]
     #[ORM\JoinColumn(nullable: false)]
-    private ?video $videomatch = null;
+    private ?Video $videomatch = null;
 
     public function getId(): ?int
     {
@@ -67,12 +68,12 @@ class PlayerStat
         return $this;
     }
 
-    public function getVideomatch(): ?video
+    public function getVideomatch(): ?Video
     {
         return $this->videomatch;
     }
 
-    public function setVideomatch(?video $videomatch): static
+    public function setVideomatch(?Video $videomatch): static
     {
         $this->videomatch = $videomatch;
 

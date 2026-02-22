@@ -3,6 +3,7 @@
 namespace App\Form;
 
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\FileType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
@@ -36,21 +37,38 @@ class VideoUploadType extends AbstractType
                     ]),
                 ],
             ])
+            ->add('visibility', ChoiceType::class, [
+                'label' => 'Visibilité',
+                'mapped' => false,
+                'choices' => [
+                    'Privé' => 'PRIVATE',
+                    'Public' => 'PUBLIC',
+                ],
+                'data' => 'PRIVATE',
+                'expanded' => true,
+                'multiple' => false,
+            ])
             ->add('videoFile', FileType::class, [
                 'label' => 'Fichier vidéo (MP4)',
                 'mapped' => false,
                 'required' => true,
                 'constraints' => [
+                    new NotBlank(['message' => 'Veuillez sélectionner un fichier vidéo.']),
                     new File([
                         'maxSize' => '200M',
                         'mimeTypes' => [
                             'video/mp4',
+                            'video/x-m4v',
+                            'application/mp4',
                         ],
                         'mimeTypesMessage' => 'Veuillez uploader un fichier MP4 valide.',
                         'maxSizeMessage' => 'La vidéo est trop volumineuse ({{ size }} {{ suffix }}). Maximum autorisé : {{ limit }} {{ suffix }}.',
                     ]),
                 ],
                 'help' => 'Format accepté : MP4 (max 200MB)',
+                'attr' => [
+                    'accept' => '.mp4,.MP4,video/mp4',
+                ],
             ]);
     }
 

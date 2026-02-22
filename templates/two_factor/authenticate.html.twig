@@ -1,0 +1,149 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Two-Factor Authentication - EyeTwin{% endblock %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    <link rel="stylesheet" href="{{ asset('assets/css/gaming-auth.css') }}">
+{% endblock %}
+
+{% block body %}
+<section class="contact-section section_padding">
+    <div class="container-fluid p-0">
+        <div class="row g-0">
+            <div class="col-12">
+                <div class="auth-container">
+
+                    <!-- Left column - Gaming image -->
+                    <div class="auth-image-section">
+                        <!-- Background image handled via CSS -->
+                    </div>
+
+                    <!-- Right column - 2FA form -->
+                    <div class="auth-form-section">
+                        <div class="gaming-card card shadow-lg">
+                            <div class="card-body p-5">
+
+                                <div class="auth-header text-center mb-4">
+                                    <i class="fas fa-shield-alt fa-3x text-primary mb-3"></i>
+                                    <h2>Two-Factor Authentication</h2>
+                                    <p>Enter the 6-digit code from your authenticator app</p>
+                                </div>
+
+                                {% if error is defined and error %}
+                                    <div class="alert alert-danger">
+                                        <i class="fas fa-exclamation-circle"></i>
+                                        {{ error.messageKey|trans(error.messageData, 'SchebTwoFactorBundle') }}
+                                    </div>
+                                {% endif %}
+
+                                <form action="{{ path('2fa_login_check') }}" method="post">
+                                    <div class="form-group mb-4">
+                                        <label for="_auth_code">Authentication Code</label>
+                                        <input 
+                                            type="text" 
+                                            id="_auth_code" 
+                                            name="_auth_code" 
+                                            class="form-control form-control-lg text-center" 
+                                            placeholder="000000"
+                                            autocomplete="off"
+                                            maxlength="6"
+                                            pattern="[0-9]{6}"
+                                            required
+                                            autofocus
+                                            style="letter-spacing: 0.5em; font-size: 1.5rem; font-weight: 600;"
+                                        >
+                                        <small class="form-text text-muted mt-2">
+                                            <i class="fas fa-mobile-alt"></i> Open your authenticator app to get your code
+                                        </small>
+                                    </div>
+
+                                    <div class="form-check mb-4">
+                                        <input 
+                                            type="checkbox" 
+                                            id="_trusted" 
+                                            name="_trusted" 
+                                            class="form-check-input"
+                                            value="1"
+                                        >
+                                        <label class="form-check-label" for="_trusted">
+                                            Trust this device for 30 days
+                                        </label>
+                                    </div>
+
+                                    <input type="hidden" name="_csrf_token" value="{{ csrf_token('two_factor') }}">
+
+                                    <button class="btn btn_1 btn-lg btn-block mb-3" type="submit">
+                                        <i class="fas fa-sign-in-alt"></i> Verify Code
+                                    </button>
+                                </form>
+
+                                <hr class="my-4">
+
+                                <div class="text-center">
+                                    <p class="mb-2 text-muted small">Lost your device?</p>
+                                    <button 
+                                        type="button" 
+                                        class="btn btn-sm btn-outline-secondary"
+                                        data-toggle="collapse"
+                                        data-target="#backupCodeForm"
+                                    >
+                                        <i class="fas fa-key"></i> Use Backup Code
+                                    </button>
+                                </div>
+
+                                <div class="collapse mt-3" id="backupCodeForm">
+                                    <div class="card bg-light">
+                                        <div class="card-body">
+                                            <form action="{{ path('2fa_login_check') }}" method="post">
+                                                <div class="form-group">
+                                                    <label for="_backup_code">Backup Code</label>
+                                                    <input 
+                                                        type="text" 
+                                                        id="_backup_code" 
+                                                        name="_auth_code" 
+                                                        class="form-control text-center" 
+                                                        placeholder="XXXXX-XXXXX"
+                                                        autocomplete="off"
+                                                    >
+                                                    <small class="form-text text-muted">
+                                                        Each backup code can only be used once
+                                                    </small>
+                                                </div>
+                                                <input type="hidden" name="_csrf_token" value="{{ csrf_token('two_factor') }}">
+                                                <button type="submit" class="btn btn_2 btn-block">
+                                                    Verify Backup Code
+                                                </button>
+                                            </form>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="text-center mt-4">
+                                    <a href="{{ path('app_logout') }}" class="text-muted small">
+                                        <i class="fas fa-arrow-left"></i> Cancel and Logout
+                                    </a>
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<script>
+    // Auto-submit when 6 digits are entered
+    document.getElementById('_auth_code').addEventListener('input', function(e) {
+        // Remove non-numeric characters
+        e.target.value = e.target.value.replace(/\D/g, '');
+        
+        if (e.target.value.length === 6 && /^\d{6}$/.test(e.target.value)) {
+            setTimeout(() => e.target.form.submit(), 300);
+        }
+    });
+</script>
+{% endblock %}

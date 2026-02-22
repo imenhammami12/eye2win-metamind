@@ -1,0 +1,199 @@
+{% extends 'admin_layout.html.twig' %}
+
+{% block title %}Upload Video{% endblock %}
+{% block page_title %}Upload Video{% endblock %}
+
+{% block body %}
+<div class="mb-3 fade-in">
+    <a href="{{ path('admin_videos_index') }}" class="btn btn-outline-secondary">
+        <i class="bi bi-arrow-left me-2"></i>Back to List
+    </a>
+</div>
+
+<div class="row justify-content-center fade-in" style="animation-delay: 0.1s;">
+    <div class="col-lg-8">
+        <div class="table-card">
+            <div class="card-header-gradient" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 1.5rem; border-radius: 16px 16px 0 0;">
+                <h5 class="mb-0 text-white"><i class="bi bi-cloud-arrow-up me-2"></i>Video Information</h5>
+            </div>
+
+            <div class="p-4">
+                {{ form_start(form, { method: 'POST', attr: { id: 'videoUploadForm', enctype: 'multipart/form-data', novalidate: 'novalidate' } }) }}
+                    <div class="row g-4">
+                        <div class="col-md-12 form-group-enhanced">
+                            <label class="form-label fw-bold">
+                                <i class="bi bi-person me-1"></i>
+                                Owner
+                                <span class="required-indicator" style="color: #fa709a;">*</span>
+                            </label>
+                            {{ form_widget(form.user, { attr: { class: 'form-select' } }) }}
+                            <small class="form-help-text text-muted">
+                                <i class="bi bi-info-circle me-1"></i>Select the user who owns this video
+                            </small>
+                        </div>
+
+                        <div class="col-md-6 form-group-enhanced">
+                            <label class="form-label fw-bold">
+                                <i class="bi bi-type me-1"></i>
+                                Title
+                                <span class="required-indicator" style="color: #fa709a;">*</span>
+                            </label>
+                            {{ form_widget(form.title, { attr: { class: 'form-control' } }) }}
+                            <small class="form-help-text text-muted">
+                                <i class="bi bi-info-circle me-1"></i>Short and descriptive title
+                            </small>
+                        </div>
+
+                        <div class="col-md-6 form-group-enhanced">
+                            <label class="form-label fw-bold">
+                                <i class="bi bi-controller me-1"></i>
+                                Game Type
+                                <span class="required-indicator" style="color: #fa709a;">*</span>
+                            </label>
+                            {{ form_widget(form.gameType, { attr: { class: 'form-control' } }) }}
+                            <small class="form-help-text text-muted">
+                                <i class="bi bi-info-circle me-1"></i>Example: Valorant, CS2, FIFA
+                            </small>
+                        </div>
+
+                        <div class="col-md-6 form-group-enhanced">
+                            {{ form_row(form.visibility, { attr: { class: 'form-select' } }) }}
+                        </div>
+
+                        <div class="col-md-12 form-group-enhanced">
+                            <label class="form-label fw-bold">
+                                <i class="bi bi-file-earmark-play me-1"></i>
+                                Video File (MP4)
+                                <span class="required-indicator" style="color: #fa709a;">*</span>
+                            </label>
+                            {{ form_widget(form.videoFile, { attr: { class: 'form-control' } }) }}
+                            <small class="form-help-text text-muted">
+                                <i class="bi bi-info-circle me-1"></i>MP4 only, max 200MB
+                            </small>
+                        </div>
+                    </div>
+
+                    <div class="alert mt-4" style="background: linear-gradient(135deg, rgba(102, 126, 234, 0.1), rgba(118, 75, 162, 0.1)); border: 1px solid rgba(102, 126, 234, 0.3); border-radius: 12px;">
+                        <div class="d-flex align-items-start">
+                            <i class="bi bi-info-circle me-3" style="font-size: 24px; color: #667eea;"></i>
+                            <div>
+                                <strong style="color: #667eea;">Upload Requirements</strong>
+                                <p class="mb-0 mt-1 text-muted">MP4 only, max 200MB. The video will be stored in Cloudinary.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div id="uploadProgress" class="mt-4 d-none">
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <strong>Upload progress</strong>
+                            <span id="uploadProgressText" class="text-muted">Uploading... 0%</span>
+                        </div>
+                        <div class="progress" style="height: 10px;">
+                            <div id="uploadProgressBar" class="progress-bar progress-bar-striped progress-bar-animated" role="progressbar" style="width: 0%" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"></div>
+                        </div>
+                    </div>
+
+                    <div class="mt-4 d-flex gap-2">
+                        <button type="submit" class="btn btn-success" id="submitBtn">
+                            <i class="bi bi-upload me-2"></i>Upload Video
+                        </button>
+                        <a href="{{ path('admin_videos_index') }}" class="btn btn-outline-secondary">
+                            <i class="bi bi-x-circle me-2"></i>Cancel
+                        </a>
+                    </div>
+                {{ form_end(form) }}
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const form = document.getElementById('videoUploadForm');
+    const progressWrap = document.getElementById('uploadProgress');
+    const progressBar = document.getElementById('uploadProgressBar');
+    const progressText = document.getElementById('uploadProgressText');
+
+    if (!form) {
+        return;
+    }
+
+    form.addEventListener('submit', function (event) {
+        event.preventDefault();
+
+    if (!form.checkValidity()) {
+        form.reportValidity();
+        return;
+    }
+
+    const actionUrl = form.action || window.location.href;
+        const xhr = new XMLHttpRequest();
+        xhr.open(form.method.toUpperCase(), actionUrl);
+        xhr.setRequestHeader('X-Requested-With', 'XMLHttpRequest');
+
+        progressWrap.classList.remove('d-none');
+        progressBar.style.width = '0%';
+        progressBar.setAttribute('aria-valuenow', '0');
+        progressText.textContent = 'Uploading... 0%';
+
+        xhr.upload.addEventListener('progress', function (e) {
+            if (e.lengthComputable) {
+                const percent = Math.round((e.loaded / e.total) * 100);
+                progressBar.style.width = percent + '%';
+                progressBar.setAttribute('aria-valuenow', String(percent));
+                progressText.textContent = 'Uploading... ' + percent + '%';
+            }
+        });
+
+        xhr.onload = function () {
+            if (xhr.status >= 200 && xhr.status < 300) {
+                const contentType = xhr.getResponseHeader('Content-Type') || '';
+                if (contentType.includes('application/json')) {
+                    try {
+                        const data = JSON.parse(xhr.responseText);
+                        if (data.redirect) {
+                            window.location = data.redirect;
+                            return;
+                        }
+                    } catch (e) {
+                        // ignore JSON parse errors
+                    }
+                } else {
+                    document.open();
+                    document.write(xhr.responseText);
+                    document.close();
+                    return;
+                }
+                window.location = xhr.responseURL || form.action;
+            } else {
+                try {
+                    const data = JSON.parse(xhr.responseText);
+                    if (data.error) {
+                        if (Array.isArray(data.details) && data.details.length) {
+                            progressText.textContent = data.error + ' ' + data.details.join(' | ');
+                        } else {
+                            progressText.textContent = data.error;
+                        }
+                        return;
+                    }
+                } catch (e) {
+                    // ignore JSON parse errors
+                }
+                progressText.textContent = 'Upload failed (HTTP ' + xhr.status + '). Please retry.';
+            }
+        };
+
+        xhr.onerror = function () {
+            progressText.textContent = 'Network error. Please retry.';
+        };
+
+        xhr.onabort = function () {
+            progressText.textContent = 'Upload cancelled.';
+        };
+
+        xhr.send(new FormData(form));
+    });
+});
+</script>
+
+{% endblock %}

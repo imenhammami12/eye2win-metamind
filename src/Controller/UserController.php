@@ -3,11 +3,14 @@
 
 namespace App\Controller;
 
+use App\Entity\Notification;
 use App\Entity\User;
 use App\Entity\CoachApplication;
 use App\Entity\ApplicationStatus;
 use App\Form\UserProfileType;
 use App\Form\CoachApplicationType;
+use App\Repository\UserRepository;
+use App\Repository\NotificationRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -27,6 +30,7 @@ class UserController extends AbstractController
         /** @var User $user */
         $user = $this->getUser();
         
+<<<<<<< HEAD
         // Récupérer toutes les demandes de coach de l'utilisateur
         $coachApplications = $em->getRepository(CoachApplication::class)
             ->findBy(['user' => $user], ['submittedAt' => 'DESC']);
@@ -35,12 +39,22 @@ class UserController extends AbstractController
         $latestCoachApplication = !empty($coachApplications) ? $coachApplications[0] : null;
         
         // Vérifier s'il y a une demande en attente
+=======
+        $coachApplications = $em->getRepository(CoachApplication::class)
+            ->findBy(['user' => $user], ['submittedAt' => 'DESC']);
+        
+        $latestCoachApplication = !empty($coachApplications) ? $coachApplications[0] : null;
+        
+>>>>>>> computer-vision
         $hasPendingApplication = false;
         if ($latestCoachApplication && $latestCoachApplication->getStatus() === ApplicationStatus::PENDING) {
             $hasPendingApplication = true;
         }
         
+<<<<<<< HEAD
         // Statistiques basiques
+=======
+>>>>>>> computer-vision
         $stats = [
             'teams_count' => $user->getTeamMemberships()->count(),
             'owned_teams_count' => $user->getOwnedTeams()->count(),
@@ -58,7 +72,8 @@ class UserController extends AbstractController
     public function editProfile(
         Request $request, 
         EntityManagerInterface $em,
-        SluggerInterface $slugger
+        SluggerInterface $slugger,
+        UserRepository $userRepository
     ): Response {
         $this->denyAccessUnlessGranted('ROLE_USER');
         
@@ -68,6 +83,19 @@ class UserController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
+            // NIVEAU 2 : Validation côté serveur
+            $newEmail = $form->get('email')->getData();
+            if ($newEmail !== $user->getEmail()) {
+                $existingUser = $userRepository->findOneBy(['email' => strtolower(trim($newEmail))]);
+                if ($existingUser && $existingUser->getId() !== $user->getId()) {
+                    $this->addFlash('error', 'This email address is already registered by another user.');
+                    return $this->render('user/edit_profile.html.twig', [
+                        'form' => $form->createView(),
+                        'user' => $user,
+                    ]);
+                }
+            }
+            
             // Gérer l'upload de la photo de profil
             $profilePictureFile = $form->get('profilePictureFile')->getData();
             
@@ -107,7 +135,6 @@ class UserController extends AbstractController
         /** @var User $user */
         $user = $this->getUser();
         
-        // Statistiques basiques
         $stats = [
             'teams_count' => $user->getTeamMemberships()->count(),
             'owned_teams_count' => $user->getOwnedTeams()->count(),
@@ -132,13 +159,19 @@ class UserController extends AbstractController
         /** @var User $user */
         $user = $this->getUser();
         
+<<<<<<< HEAD
         // Vérifier si l'utilisateur est déjà coach
+=======
+>>>>>>> computer-vision
         if (in_array('ROLE_COACH', $user->getRoles())) {
             $this->addFlash('info', 'You are already a coach!');
             return $this->redirectToRoute('user_profile');
         }
         
+<<<<<<< HEAD
         // Vérifier si l'utilisateur a déjà une demande en cours
+=======
+>>>>>>> computer-vision
         $existingApplication = $em->getRepository(CoachApplication::class)
             ->findOneBy([
                 'user' => $user,
@@ -155,6 +188,7 @@ class UserController extends AbstractController
         
         $form = $this->createForm(CoachApplicationType::class, $application);
         $form->handleRequest($request);
+<<<<<<< HEAD
 
         if ($form->isSubmitted() && $form->isValid()) {
             // Gérer l'upload du CV
@@ -186,5 +220,54 @@ class UserController extends AbstractController
         return $this->render('coach/application.html.twig', [
             'form' => $form->createView(),
         ]);
+=======
+
+        if ($form->isSubmitted() && $form->isValid()) {
+            $cvFile = $form->get('cvFileUpload')->getData();
+            
+            if ($cvFile) {
+                $originalFilename = pathinfo($cvFile->getClientOriginalName(), PATHINFO_FILENAME);
+                $safeFilename = $slugger->slug($originalFilename);
+                $newFilename = $safeFilename.'-'.uniqid().'.'.$cvFile->guessExtension();
+
+                try {
+                    $cvFile->move(
+                        $this->getParameter('cv_directory'),
+                        $newFilename
+                    );
+                    $application->setCvFile($newFilename);
+                } catch (FileException $e) {
+                    $this->addFlash('error', 'Error uploading CV.');
+                }
+            }
+            
+            $em->persist($application);
+            $em->flush();
+            
+            $this->addFlash('success', 'Your coach application has been submitted successfully!');
+            return $this->redirectToRoute('user_profile');
+        }
+
+        return $this->render('coach/application.html.twig', [
+            'form' => $form->createView(),
+        ]);
+    }
+
+    #[Route('/notification/{id}/read', name: 'user_notification_read', methods: ['POST'], requirements: ['id' => '\d+'])]
+    public function markNotificationRead(int $id, Request $request, NotificationRepository $notificationRepo, EntityManagerInterface $em): Response
+    {
+        $this->denyAccessUnlessGranted('ROLE_USER');
+        if (!$this->isCsrfTokenValid('notification_read_'.$id, $request->request->get('_token'))) {
+            throw $this->createAccessDeniedException('Invalid token.');
+        }
+        $notification = $notificationRepo->find($id);
+        if (!$notification || $notification->getUser() !== $this->getUser()) {
+            throw $this->createAccessDeniedException('Notification not found.');
+        }
+        $notification->markAsRead();
+        $em->flush();
+        $target = $request->headers->get('Referer') ?: $this->generateUrl('community_channels_index');
+        return $this->redirect($target);
+>>>>>>> computer-vision
     }
 }

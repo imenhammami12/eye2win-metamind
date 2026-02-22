@@ -1,0 +1,139 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}{{ tournament.nom }} - EyeTwin{% endblock %}
+
+{% block body %}
+    <!-- Breadcrumb -->
+    <section class="breadcrumb breadcrumb_bg">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-12">
+                    <div class="breadcrumb_iner text-center">
+                        <div class="breadcrumb_iner_item">
+                            <h2>{{ tournament.nom }}</h2>
+                            <p><a href="{{ path('app_tournoi_index') }}">Tournaments</a> <span>-</span> Details</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Tournament Details -->
+    <section class="tournament_details section_padding">
+        <div class="container">
+            <div class="row">
+                <!-- Sidebar / Image -->
+                <div class="col-lg-4">
+                    <div class="card border-0 shadow-sm mb-4" style="background-color: #1a1a2e; color: #fff; border: 1px solid #2d2d44;">
+                        {% if tournament.image %}
+                            <img src="{{ asset('uploads/tournois/' ~ tournament.image) }}" 
+                                 class="card-img-top rounded-top" 
+                                 alt="{{ tournament.nom }}">
+                        {% else %}
+                            <div class="d-flex align-items-center justify-content-center rounded-top" style="height: 300px; background: linear-gradient(45deg, #16213e, #0f3460);">
+                                <i class="fas fa-trophy fa-5x text-white-50"></i>
+                            </div>
+                        {% endif %}
+                        <div class="card-body p-4">
+                            <h4 class="mb-4 text-white" style="border-bottom: 2px solid #e94560; padding-bottom: 10px; display: inline-block;">Tournament Info</h4>
+                            <ul class="list-group list-group-flush">
+                                <li class="list-group-item d-flex justify-content-between align-items-center" style="background-color: transparent; color: #aeb8c9; border-bottom: 1px solid #2d2d44;">
+                                    Type
+                                    <span class="badge rounded-pill" style="background-color: #e94560;">{{ tournament.typeTournoi ? tournament.typeTournoi.name : 'N/A' }}</span>
+                                </li>
+                                <li class="list-group-item d-flex justify-content-between align-items-center" style="background-color: transparent; color: #aeb8c9; border-bottom: 1px solid #2d2d44;">
+                                    Start Date
+                                    <span class="text-white">{{ tournament.dateDebut ? tournament.dateDebut|date('M d, Y') : 'TBA' }}</span>
+                                </li>
+                                <li class="list-group-item d-flex justify-content-between align-items-center" style="background-color: transparent; color: #aeb8c9; border-bottom: 1px solid #2d2d44;">
+                                    End Date
+                                    <span class="text-white">{{ tournament.dateFin ? tournament.dateFin|date('M d, Y') : 'TBA' }}</span>
+                                </li>
+                                <li class="list-group-item d-flex justify-content-between align-items-center" style="background-color: transparent; color: #aeb8c9; border-bottom: none;">
+                                    Total Matches
+                                    <span class="badge rounded-pill" style="background-color: #0f3460; border: 1px solid #2d2d44;">{{ matches|length }}</span>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Main Content -->
+                <div class="col-lg-8">
+                    <div class="content_wrapper">
+                        <h3 class="mb-3">Description</h3>
+                        <p class="text-muted mb-5">
+                            {{ tournament.description|default('No description available for this tournament.')|nl2br }}
+                        </p>
+                        
+                        <h3 class="mb-4">Match Schedule</h3>
+                        
+                        {% if matches|length > 0 %}
+                            <div class="matches-list">
+                                {% for match in matches %}
+                                    <div class="match-card mb-3 p-4 rounded shadow-sm d-flex flex-wrap align-items-center justify-content-between" 
+                                         style="background-color: #1a1a2e; border: 1px solid #16213e; transition: transform 0.2s;">
+                                        
+                                        {# Date Column #}
+                                        <div class="match-date mb-2 mb-md-0 me-md-4 text-center" style="min-width: 100px;">
+                                            <div style="color: #e94560; font-weight: bold; font-size: 1.1rem;">
+                                                {{ match.dateMatch ? match.dateMatch|date('M d') : 'TBA' }}
+                                            </div>
+                                            <div class="small text-muted">
+                                                {{ match.dateMatch ? match.dateMatch|date('H:i') : '--:--' }}
+                                            </div>
+                                        </div>
+
+                                        {# Teams Column #}
+                                        <div class="match-teams flex-grow-1 text-center mb-3 mb-md-0">
+                                            <div class="d-flex align-items-center justify-content-center gap-3">
+                                                <div class="team-name text-end fw-bold text-white fs-5" style="width: 45%;">
+                                                    {{ match.equipe1 }}
+                                                </div>
+                                                
+                                                <div class="vs-badge px-2 py-1 rounded small fw-bold" style="background-color: #0f3460; color: #aeb8c9;">VS</div>
+                                                
+                                                <div class="team-name text-start fw-bold text-white fs-5" style="width: 45%;">
+                                                    {{ match.equipe2 }}
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        {# Status/Score Column #}
+                                        <div class="match-status text-center ms-md-4" style="min-width: 120px;">
+                                            {% if match.score is not null %}
+                                                <div class="score-display px-3 py-2 rounded fw-bold text-white mb-1" style="background-color: #e94560;">
+                                                    {{ match.score }}
+                                                </div>
+                                                <small class="text-muted">Final Score</small>
+                                            {% else %}
+                                                {% if match.dateMatch and match.dateMatch < date() %}
+                                                     <span class="badge bg-secondary">Finished</span>
+                                                {% else %}
+                                                     <span class="badge bg-warning text-dark">Upcoming</span>
+                                                {% endif %}
+                                            {% endif %}
+                                        </div>
+
+                                    </div>
+                                {% endfor %}
+                            </div>
+                        {% else %}
+                            <div class="alert alert-dark border-0" style="background-color: #1a1a2e; color: #fff;">
+                                <i class="fas fa-exclamation-triangle me-2"></i>
+                                No matches have been scheduled for this tournament yet.
+                            </div>
+                        {% endif %}
+                        
+                        <div class="mt-5">
+                            <a href="{{ path('app_tournoi_index') }}" class="btn btn-outline-primary">
+                                <i class="fas fa-arrow-left me-2"></i> Back to Tournaments
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+{% endblock %}

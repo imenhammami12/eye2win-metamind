@@ -299,6 +299,7 @@ class AdminUserController extends AbstractController
     }
     
     #[Route('/create', name: 'admin_users_create')]
+<<<<<<< HEAD
     public function create(
         Request $request,
         EntityManagerInterface $em,
@@ -344,10 +345,76 @@ class AdminUserController extends AbstractController
             
             $this->addFlash('success', 'User created successfully');
             return $this->redirectToRoute('admin_users_show', ['id' => $user->getId()]);
+=======
+public function create(
+    Request $request,
+    EntityManagerInterface $em,
+    UserPasswordHasherInterface $passwordHasher,
+    UserRepository $userRepository // 👈 AJOUTER ceci
+): Response {
+    if ($request->isMethod('POST')) {
+        if (!$this->isCsrfTokenValid('create-user', $request->request->get('_token'))) {
+            throw $this->createAccessDeniedException('Invalid CSRF token');
+>>>>>>> computer-vision
         }
         
-        return $this->render('admin/users/create.html.twig');
+        // 🛡️ NIVEAU 2 : Validation côté serveur
+        $username = $request->request->get('username');
+        $email = $request->request->get('email');
+        
+        // Vérifier unicité du username
+        $existingUsername = $userRepository->findOneBy(['username' => $username]);
+        if ($existingUsername) {
+            $this->addFlash('error', 'This username is already taken');
+            return $this->render('admin/users/create.html.twig');
+        }
+        
+        // Vérifier unicité de l'email
+        $existingEmail = $userRepository->findOneBy(['email' => strtolower(trim($email))]);
+        if ($existingEmail) {
+            $this->addFlash('error', 'This email is already registered');
+            return $this->render('admin/users/create.html.twig');
+        }
+        
+        $user = new User();
+        $user->setEmail($email);
+        $user->setUsername($username);
+        $user->setFullName($request->request->get('fullName'));
+        
+        $password = $passwordHasher->hashPassword($user, $request->request->get('password'));
+        $user->setPassword($password);
+        
+        $role = $request->request->get('role', 'ROLE_USER');
+        
+        // Only SUPER_ADMIN can create admins
+        if ($role === 'ROLE_ADMIN' && !$this->isGranted('ROLE_SUPER_ADMIN')) {
+            $this->addFlash('error', 'Only Super Administrators can create Administrator accounts');
+            return $this->render('admin/users/create.html.twig');
+        }
+        
+        $roles = ['ROLE_USER'];
+        if ($role !== 'ROLE_USER') {
+            $roles[] = $role;
+        }
+        $user->setRoles($roles);
+        
+        $this->createAuditLog(
+            $em,
+            'USER_CREATED',
+            'User',
+            null,
+            "New user created: " . $user->getUsername() . " with role: $role"
+        );
+        
+        $em->persist($user);
+        $em->flush();
+        
+        $this->addFlash('success', 'User created successfully');
+        return $this->redirectToRoute('admin_users_show', ['id' => $user->getId()]);
     }
+    
+    return $this->render('admin/users/create.html.twig');
+}
     
     private function createAuditLog(
         EntityManagerInterface $em,
