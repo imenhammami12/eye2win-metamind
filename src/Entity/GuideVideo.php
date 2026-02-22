@@ -3,6 +3,8 @@
 namespace App\Entity;
 
 use App\Repository\GuideVideoRepository;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Validator\Constraints as Assert;
 
@@ -63,6 +65,10 @@ class GuideVideo
     #[ORM\JoinColumn(nullable: true)]
     private ?Agent $agent = null;
 
+    #[ORM\ManyToMany(targetEntity: User::class)]
+    #[ORM\JoinTable(name: 'guide_video_likes')]
+    private Collection $likedBy;
+
     public function __construct()
     {
         $this->createdAt = new \DateTime();
@@ -70,6 +76,7 @@ class GuideVideo
         $this->views = 0;
         $this->status = 'pending';
         $this->map = 'All';
+        $this->likedBy = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -245,5 +252,37 @@ class GuideVideo
     {
         $this->agent = $agent;
         return $this;
+    }
+
+    /**
+     * @return Collection<int, User>
+     */
+    public function getLikedBy(): Collection
+    {
+        return $this->likedBy;
+    }
+
+    public function addLikedBy(User $user): static
+    {
+        if (!$this->likedBy->contains($user)) {
+            $this->likedBy->add($user);
+            $this->likes++;
+        }
+
+        return $this;
+    }
+
+    public function removeLikedBy(User $user): static
+    {
+        if ($this->likedBy->removeElement($user)) {
+            $this->likes = max(0, $this->likes - 1);
+        }
+
+        return $this;
+    }
+
+    public function isLikedByUser(User $user): bool
+    {
+        return $this->likedBy->contains($user);
     }
 }

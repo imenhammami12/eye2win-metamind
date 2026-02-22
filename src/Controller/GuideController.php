@@ -8,7 +8,9 @@ use App\Entity\GuideVideo;
 use App\Repository\AgentRepository;
 use App\Repository\GameRepository;
 use App\Repository\GuideVideoRepository;
+use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 
@@ -19,6 +21,7 @@ class GuideController extends AbstractController
         private GameRepository $gameRepository,
         private AgentRepository $agentRepository,
         private GuideVideoRepository $guideVideoRepository,
+        private EntityManagerInterface $entityManager,
     ) {
     }
 
@@ -32,24 +35,7 @@ class GuideController extends AbstractController
         ]);
     }
 
-    #[Route('/{gameSlug}', name: 'app_guides_game', requirements: ['gameSlug' => '^(?!upload$|my-guides$).*'])]
-    public function showGame(string $gameSlug): Response
-    {
-        $game = $this->gameRepository->findBySlug($gameSlug);
-
-        if (!$game) {
-            throw $this->createNotFoundException('Game not found');
-        }
-
-        $agents = $this->agentRepository->findByGame($game);
-
-        return $this->render('guides/agents-list.html.twig', [
-            'game' => $game,
-            'agents' => $agents,
-        ]);
-    }
-
-    #[Route('/{gameSlug}/{agentSlug}', name: 'app_guides_agent')]
+    #[Route('/{gameSlug}/{agentSlug}', name: 'app_guides_agent', priority: 10)]
     public function showAgent(string $gameSlug, string $agentSlug): Response
     {
         $game = $this->gameRepository->findBySlug($gameSlug);
@@ -80,6 +66,64 @@ class GuideController extends AbstractController
             'agent' => $agent,
             'guides' => $guides,
             'maps' => $maps,
+        ]);
+    }
+
+    #[Route('/video/{id}/like', name: 'app_guide_like', methods: ['POST'], priority: 20)]
+    public function toggleLike(int $id): JsonResponse
+    {
+        $user = $this->getUser();
+        
+        if (!$user) {
+            return new JsonResponse([
+                'success' => false,
+                'message' => 'You must be logged in to like videos'
+            ], 401);
+        }
+
+        $guide = $this->guideVideoRepository->find($id);
+
+        if (!$guide) {
+            return new JsonResponse([
+                'success' => false,
+                'message' => 'Video not found'
+            ], 404);
+        }
+
+        $isLiked = $guide->isLikedByUser($user);
+
+        if ($isLiked) {
+            $guide->removeLikedBy($user);
+            $action = 'unliked';
+        } else {
+            $guide->addLikedBy($user);
+            $action = 'liked';
+        }
+
+        $this->entityManager->flush();
+
+        return new JsonResponse([
+            'success' => true,
+            'action' => $action,
+            'likes' => $guide->getLikes(),
+            'isLiked' => !$isLiked
+        ]);
+    }
+
+    #[Route('/{gameSlug}', name: 'app_guides_game', requirements: ['gameSlug' => '^(?!upload$|my-guides$|video).*'])]
+    public function showGame(string $gameSlug): Response
+    {
+        $game = $this->gameRepository->findBySlug($gameSlug);
+
+        if (!$game) {
+            throw $this->createNotFoundException('Game not found');
+        }
+
+        $agents = $this->agentRepository->findByGame($game);
+
+        return $this->render('guides/agents-list.html.twig', [
+            'game' => $game,
+            'agents' => $agents,
         ]);
     }
 }
