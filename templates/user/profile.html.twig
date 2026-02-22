@@ -1,73 +1,58 @@
 {# templates/user/profile.html.twig #}
 {% extends 'base.html.twig' %}
-
 {% block title %}My Profile - EyeTwin{% endblock %}
-
 {% block body %}
+
 <section class="profile_section section_padding">
     <div class="container">
         <div class="row">
-            <!-- Profile Card -->
+
+            {# ── Colonne gauche ── #}
             <div class="col-lg-4">
                 <div class="profile_card">
-                    <div class="profile_header">
+                    <div class="profile_header" style="position:relative;">
                         {% if user.profilePicture %}
-                            <img src="{{ asset('uploads/profiles/' ~ user.profilePicture) }}" 
-                                 alt="{{ user.username }}" 
-                                 class="profile_image">
+                            <img src="{{ asset('uploads/profiles/' ~ user.profilePicture) }}"
+                                 alt="{{ user.username }}" class="profile_image" id="currentAvatar">
                         {% else %}
-                            <div class="profile_image_placeholder">
-                                {{ user.username|slice(0, 1)|upper }}
+                            <div class="profile_image_placeholder" id="currentAvatar">
+                                {{ user.username|slice(0,1)|upper }}
                             </div>
                         {% endif %}
+                        <button onclick="openModal()" class="avatar-gen-btn">
+                            <i class="fas fa-magic"></i> Generate Avatar
+                        </button>
                     </div>
-                    
                     <div class="profile_info">
                         <h2 class="profile_username">{{ user.username }}</h2>
                         <p class="profile_email">{{ user.email }}</p>
-                        
                         <div class="profile_status">
                             {% if user.accountStatus.value == 'ACTIVE' %}
-                                <span class="status_badge status_active">
-                                    <i class="fas fa-check-circle"></i> Active
-                                </span>
+                                <span class="status_badge status_active"><i class="fas fa-check-circle"></i> Active</span>
                             {% elseif user.accountStatus.value == 'SUSPENDED' %}
-                                <span class="status_badge status_suspended">
-                                    <i class="fas fa-pause-circle"></i> Suspended
-                                </span>
+                                <span class="status_badge status_suspended"><i class="fas fa-pause-circle"></i> Suspended</span>
                             {% elseif user.accountStatus.value == 'BANNED' %}
-                                <span class="status_badge status_banned">
-                                    <i class="fas fa-ban"></i> Banned
-                                </span>
+                                <span class="status_badge status_banned"><i class="fas fa-ban"></i> Banned</span>
                             {% endif %}
-                            
                             {% if is_granted('ROLE_COACH') %}
-                                <span class="status_badge status_coach">
-                                    <i class="fas fa-graduation-cap"></i> Coach
-                                </span>
+                                <span class="status_badge status_coach"><i class="fas fa-graduation-cap"></i> Coach</span>
                             {% endif %}
-                            
                             {% if is_granted('ROLE_ADMIN') %}
-                                <span class="status_badge status_admin">
-                                    <i class="fas fa-shield-alt"></i> Admin
-                                </span>
+                                <span class="status_badge status_admin"><i class="fas fa-shield-alt"></i> Admin</span>
                             {% endif %}
                         </div>
                     </div>
-
                     <div class="profile_actions">
                         {% if not is_granted('ROLE_ADMIN') and not is_granted('ROLE_COACH') and not hasPendingApplication %}
                             <a href="{{ path('user_apply_coach') }}" class="btn_profile btn_apply">
                                 <i class="fas fa-graduation-cap"></i> APPLY TO BE A COACH
                             </a>
                         {% endif %}
-
                         <a href="{{ path('user_edit_profile') }}" class="btn_profile btn_edit">
                             <i class="fas fa-edit"></i> EDIT PROFILE
                         </a>
                     </div>
                 </div>
-                
                 {% if user.bio %}
                 <div class="profile_card mt-4">
                     <h4 class="card_title"><i class="fas fa-user"></i> ABOUT ME</h4>
@@ -75,95 +60,58 @@
                 </div>
                 {% endif %}
             </div>
-            
-            <!-- Right Column -->
-            <div class="col-lg-8">
 
+            {# ── Colonne droite ── #}
+            <div class="col-lg-8">
                 {% if is_granted('ROLE_COACH') and latestCoachApplication and latestCoachApplication.status.value == 'APPROVED' %}
-                <div class="profile_card mb-4" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white;">
+                <div class="profile_card mb-4" style="background:linear-gradient(135deg,#667eea,#764ba2);color:white;">
                     <div class="text-center py-4">
-                        <i class="fas fa-graduation-cap" style="font-size: 48px; margin-bottom: 15px;"></i>
+                        <i class="fas fa-graduation-cap" style="font-size:48px;margin-bottom:15px;"></i>
                         <h3 class="mb-2">🎉 Congratulations!</h3>
                         <h4 class="mb-3">You are now a certified Coach</h4>
                         <p class="mb-0">You can now create live streams and help other players improve their skills.</p>
-                        {% if latestCoachApplication.reviewedAt %}
-                            <small class="d-block mt-3" style="opacity: 0.9;">
-                                Approved on {{ latestCoachApplication.reviewedAt|date('F d, Y') }}
-                            </small>
-                        {% endif %}
                     </div>
                 </div>
                 {% endif %}
 
-                {# ===== COINS CARD ===== #}
-                <div class="profile_card mb-4" style="background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%); border: 1px solid #4a4a6a;">
+                <div class="profile_card mb-4" style="background:linear-gradient(135deg,#1a1a2e,#16213e);border:1px solid #4a4a6a;">
                     <div class="d-flex justify-content-between align-items-center flex-wrap gap-3">
                         <div>
-                            <h4 class="card_title mb-1">
-                                <i class="fas fa-coins" style="color: #f6d860;"></i> EyeTwin Coins
-                            </h4>
-                            <p style="color: #a0a0b0; font-size: 13px; margin-bottom: 0;">
-                                Use coins to access exclusive coaching live streams
-                            </p>
+                            <h4 class="card_title mb-1"><i class="fas fa-coins" style="color:#f6d860;"></i> EyeTwin Coins</h4>
+                            <p style="color:#a0a0b0;font-size:13px;margin:0;">Use coins to access exclusive coaching live streams</p>
                         </div>
                         <div class="text-end">
-                            <div style="font-size: 42px; font-weight: 900; color: #f6d860; line-height: 1;">
-                                {{ app.user.coinBalance }}
-                            </div>
-                            <small style="color: #888; font-size: 12px;">coins available</small>
-                            <br>
-                            <a href="{{ path('coins_index') }}" style="
-                                display: inline-block;
-                                margin-top: 8px;
-                                background: linear-gradient(90deg, #f6d860, #f6ad55);
-                                color: #1a1a2e;
-                                padding: 8px 20px;
-                                border-radius: 20px;
-                                font-size: 13px;
-                                font-weight: bold;
-                                text-decoration: none;">
+                            <div style="font-size:42px;font-weight:900;color:#f6d860;line-height:1;">{{ app.user.coinBalance }}</div>
+                            <small style="color:#888;font-size:12px;">coins available</small><br>
+                            <a href="{{ path('coins_index') }}" style="display:inline-block;margin-top:8px;background:linear-gradient(90deg,#f6d860,#f6ad55);color:#1a1a2e;padding:8px 20px;border-radius:20px;font-size:13px;font-weight:bold;text-decoration:none;">
                                 <i class="fas fa-plus"></i> Buy More Coins
                             </a>
                         </div>
                     </div>
                 </div>
 
-                {# ===== GAME STATISTICS ===== #}
                 <div class="game_statistics">
                     <h3 class="statistics_title">GAME STATISTICS</h3>
                     <div class="statistics_grid">
                         <div class="stat_item">
                             <div class="stat_icon"><i class="fas fa-users"></i></div>
-                            <div class="stat_info">
-                                <p class="stat_label">Teams Joined</p>
-                                <h4 class="stat_value">{{ stats.teams_count }}</h4>
-                            </div>
+                            <div class="stat_info"><p class="stat_label">Teams Joined</p><h4 class="stat_value">{{ stats.teams_count }}</h4></div>
                         </div>
                         <div class="stat_item">
                             <div class="stat_icon"><i class="fas fa-crown"></i></div>
-                            <div class="stat_info">
-                                <p class="stat_label">Teams Owned</p>
-                                <h4 class="stat_value">{{ stats.owned_teams_count }}</h4>
-                            </div>
+                            <div class="stat_info"><p class="stat_label">Teams Owned</p><h4 class="stat_value">{{ stats.owned_teams_count }}</h4></div>
                         </div>
                         <div class="stat_item">
                             <div class="stat_icon"><i class="fas fa-trophy"></i></div>
-                            <div class="stat_info">
-                                <p class="stat_label">Achievements</p>
-                                <h4 class="stat_value">0</h4>
-                            </div>
+                            <div class="stat_info"><p class="stat_label">Achievements</p><h4 class="stat_value">0</h4></div>
                         </div>
                         <div class="stat_item">
                             <div class="stat_icon"><i class="fas fa-star"></i></div>
-                            <div class="stat_info">
-                                <p class="stat_label">Rating</p>
-                                <h4 class="stat_value">N/A</h4>
-                            </div>
+                            <div class="stat_info"><p class="stat_label">Rating</p><h4 class="stat_value">N/A</h4></div>
                         </div>
                     </div>
                 </div>
 
-                {# ===== ACCOUNT INFO ===== #}
                 <div class="profile_card mt-4">
                     <h4 class="card_title"><i class="fas fa-info-circle"></i> Account Information</h4>
                     <div class="account_info">
@@ -178,60 +126,364 @@
                         </div>
                         {% endif %}
                         <div class="info_row">
-                            <span class="info_label">Teams</span>
-                            <span class="info_value">{{ user.teamMemberships|length }} team(s) joined</span>
-                        </div>
-                        <div class="info_row">
-                            <span class="info_label">Teams created</span>
-                            <span class="info_value">{{ user.ownedTeams|length }} team(s)</span>
-                        </div>
-                        <div class="info_row">
                             <span class="info_label">EyeTwin Coins</span>
-                            <span class="info_value" style="color: #f6d860; font-weight: bold;">
+                            <span class="info_value" style="color:#f6d860;font-weight:bold;">
                                 <i class="fas fa-coins"></i> {{ app.user.coinBalance }}
                             </span>
                         </div>
                     </div>
                 </div>
 
-                {# ===== COACH APPLICATION ===== #}
                 {% if latestCoachApplication and not is_granted('ROLE_COACH') %}
                 <div class="profile_card mt-4">
                     <h4 class="card_title"><i class="fas fa-graduation-cap"></i> Coach Application Status</h4>
-                    <div class="coach_application">
-                        {% if latestCoachApplication.status.value == 'PENDING' %}
-                            <div class="alert alert-warning">
-                                <strong><i class="fas fa-clock"></i> Status:</strong> Pending Review
-                                <p class="mb-0 mt-2">Your application is currently being reviewed by our team.</p>
-                            </div>
-                        {% elseif latestCoachApplication.status.value == 'REJECTED' %}
-                            <div class="alert alert-danger">
-                                <strong><i class="fas fa-times-circle"></i> Status:</strong> Rejected
-                                <p class="mb-0 mt-2">Unfortunately, your application was not approved.</p>
-                            </div>
-                        {% endif %}
-                        <hr>
-                        <p><strong>Submission date:</strong> {{ latestCoachApplication.submittedAt|date('m/d/Y at h:i A') }}</p>
-                        {% if latestCoachApplication.reviewedAt %}
-                            <p><strong>Review date:</strong> {{ latestCoachApplication.reviewedAt|date('m/d/Y at h:i A') }}</p>
-                        {% endif %}
-                        {% if latestCoachApplication.reviewComment %}
-                            <hr>
-                            <p><strong>Administrator's comment:</strong></p>
-                            <div class="alert alert-info">{{ latestCoachApplication.reviewComment }}</div>
-                        {% endif %}
-                        {% if latestCoachApplication.status.value == 'REJECTED' %}
-                            <hr>
-                            <a href="{{ path('user_apply_coach') }}" class="btn btn-primary">
-                                <i class="fas fa-redo"></i> Submit New Application
-                            </a>
-                        {% endif %}
-                    </div>
+                    {% if latestCoachApplication.status.value == 'PENDING' %}
+                        <div class="alert alert-warning"><strong><i class="fas fa-clock"></i> Pending Review</strong></div>
+                    {% elseif latestCoachApplication.status.value == 'REJECTED' %}
+                        <div class="alert alert-danger"><strong><i class="fas fa-times-circle"></i> Rejected</strong></div>
+                        <a href="{{ path('user_apply_coach') }}" class="btn btn-primary mt-2">
+                            <i class="fas fa-redo"></i> Submit New Application
+                        </a>
+                    {% endif %}
                 </div>
                 {% endif %}
-
             </div>
+
         </div>
     </div>
 </section>
+
+{# ═══════════════════════════════════ MODAL ═══════════════════════════════════ #}
+<div id="avatarModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.9);z-index:9999;align-items:center;justify-content:center;">
+<div style="background:#0d0d1a;border:1px solid #2a2a4a;border-radius:20px;padding:36px;max-width:540px;width:94%;position:relative;max-height:94vh;overflow-y:auto;">
+
+    <button onclick="closeModal()" style="position:absolute;top:16px;right:16px;background:none;border:none;color:#555;font-size:22px;cursor:pointer;transition:color .2s;" onmouseover="this.style.color='#fff'" onmouseout="this.style.color='#555'">
+        <i class="fas fa-times"></i>
+    </button>
+
+    {# ── STEP 1 : Formulaire ── #}
+    <div id="s1">
+        <div style="display:flex;align-items:center;gap:12px;margin-bottom:6px;">
+            <div style="background:linear-gradient(135deg,#667eea,#764ba2);border-radius:10px;padding:8px 12px;">
+                <i class="fas fa-wand-magic-sparkles" style="color:white;font-size:18px;"></i>
+            </div>
+            <div>
+                <h4 style="color:#fff;font-weight:800;margin:0;font-size:18px;">Avatar G</h4>
+                <p style="color:#48bb78;font-size:11px;margin:0;font-weight:600;">✅ Powered by FLUX.1 · HuggingFace</p>
+            </div>
+        </div>
+        <p style="color:#a0a0b0;font-size:13px;margin-bottom:20px;">Describe your appearance and choose a style — AI generates a unique avatar in ~15 seconds.</p>
+
+        {# Description de l'apparence #}
+        <div style="margin-bottom:16px;">
+            <label style="color:#667eea;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:1px;display:block;margin-bottom:8px;">
+                <i class="fas fa-user-circle"></i> Describe your appearance
+            </label>
+            <input id="descInput" type="text" maxlength="200"
+                placeholder="e.g. young man with short dark hair, glasses, blue hoodie, smiling"
+                style="width:100%;background:#13132a;border:1.5px solid #2a2a4a;border-radius:10px;padding:12px 14px;color:#fff;font-size:13px;outline:none;font-family:inherit;transition:border-color .2s;box-sizing:border-box;"
+                oninput="updateBtn()"
+                onfocus="this.style.borderColor='#667eea'"
+                onblur="this.style.borderColor='#2a2a4a'">
+            <div style="display:flex;justify-content:space-between;margin-top:5px;">
+                <p style="color:#555;font-size:11px;margin:0;">💡 The more precise you are, the better the result.</p>
+                <p id="charCount" style="color:#555;font-size:11px;margin:0;">0/200</p>
+            </div>
+        </div>
+
+        {# Styles #}
+        <div style="margin-bottom:22px;">
+            <label style="color:#667eea;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:1px;display:block;margin-bottom:10px;">
+                <i class="fas fa-palette"></i> Style
+            </label>
+            <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;">
+                <div class="sbtn sel" data-style="anime">
+                    <div style="font-size:26px;">🌸</div>
+                    <div class="sbtn-name">Anime</div>
+                    <div class="sbtn-sub">Ghibli / Japan</div>
+                </div>
+                <div class="sbtn" data-style="cartoon">
+                    <div style="font-size:26px;">🎨</div>
+                    <div class="sbtn-name">Cartoon</div>
+                    <div class="sbtn-sub">Pixar / 3D</div>
+                </div>
+                <div class="sbtn" data-style="manga">
+                    <div style="font-size:26px;">📖</div>
+                    <div class="sbtn-name">Manga</div>
+                    <div class="sbtn-sub">Ink / B&W</div>
+                </div>
+                <div class="sbtn" data-style="pixel">
+                    <div style="font-size:26px;">👾</div>
+                    <div class="sbtn-name">Pixel Art</div>
+                    <div class="sbtn-sub">Retro / RPG</div>
+                </div>
+                <div class="sbtn" data-style="fantasy">
+                    <div style="font-size:26px;">⚔️</div>
+                    <div class="sbtn-name">Fantasy</div>
+                    <div class="sbtn-sub">Epic / Magic</div>
+                </div>
+                <div class="sbtn" data-style="realistic">
+                    <div style="font-size:26px;">📷</div>
+                    <div class="sbtn-name">Realistic</div>
+                    <div class="sbtn-sub">Photo style</div>
+                </div>
+            </div>
+        </div>
+
+        <button id="genBtn" onclick="generate()" disabled
+            style="width:100%;background:linear-gradient(90deg,#667eea,#764ba2);color:white;border:none;border-radius:10px;padding:15px;font-size:15px;font-weight:800;cursor:pointer;opacity:.35;transition:all .2s;letter-spacing:.5px;">
+            <i class="fas fa-wand-magic-sparkles"></i> &nbsp;Generate my avatar
+        </button>
+        <p style="color:#333;font-size:11px;text-align:center;margin-top:8px;">
+            Powered by <strong style="color:#555;">HuggingFace</strong> · FLUX.1-schnell · Free tier
+        </p>
+    </div>
+
+    {# ── STEP 2 : Loading ── #}
+    <div id="s2" style="display:none;text-align:center;padding:20px 0;">
+        <div style="width:80px;height:80px;border-radius:50%;background:linear-gradient(135deg,#667eea,#764ba2);display:flex;align-items:center;justify-content:center;margin:0 auto 20px;animation:pulse 1.5s infinite;">
+            <i class="fas fa-spinner fa-spin" style="font-size:32px;color:white;"></i>
+        </div>
+        <h5 id="loadingTitle" style="color:#fff;margin-bottom:8px;font-size:17px;">Generating…</h5>
+        <p id="loadingSubtitle" style="color:#a0a0b0;font-size:13px;margin-bottom:20px;">FLUX.1 is generating your image · 15–30 seconds</p>
+        <div style="background:#13132a;border-radius:20px;height:6px;overflow:hidden;margin-bottom:6px;">
+            <div id="progBar" style="background:linear-gradient(90deg,#667eea,#764ba2);height:100%;width:5%;border-radius:20px;transition:width 2s ease;"></div>
+        </div>
+        <p id="progTxt" style="color:#444;font-size:11px;margin-top:4px;">Connecting to HuggingFace…</p>
+    </div>
+
+    {# ── STEP 3 : Résultat ── #}
+    <div id="s3" style="display:none;">
+        <h4 style="color:#fff;font-weight:800;text-align:center;margin-bottom:4px;">✨ Your avatar is ready!</h4>
+        <p style="color:#a0a0b0;font-size:13px;text-align:center;margin-bottom:24px;">Apply it or generate a new one.</p>
+
+        <div style="text-align:center;margin-bottom:28px;">
+            <img id="resultImg" src="" alt="avatar"
+                 style="width:200px;height:200px;border-radius:16px;object-fit:cover;border:3px solid #667eea;box-shadow:0 0 40px rgba(102,126,234,.5);">
+            <p id="resultStyle" style="color:#667eea;font-size:12px;font-weight:700;margin-top:10px;text-transform:uppercase;letter-spacing:1px;"></p>
+        </div>
+
+        <div style="display:flex;gap:10px;">
+            <button onclick="backToForm()"
+                style="flex:1;background:#13132a;color:#a0a0b0;border:1.5px solid #2a2a4a;border-radius:10px;padding:13px;cursor:pointer;font-size:13px;font-weight:600;transition:all .2s;"
+                onmouseover="this.style.borderColor='#667eea'" onmouseout="this.style.borderColor='#2a2a4a'">
+                <i class="fas fa-redo"></i> New
+            </button>
+            <button id="applyBtn" onclick="applyAvatar()"
+                style="flex:2;background:linear-gradient(90deg,#667eea,#764ba2);color:white;border:none;border-radius:10px;padding:13px;cursor:pointer;font-size:14px;font-weight:800;transition:all .2s;">
+                <i class="fas fa-check"></i> Apply as profile picture
+            </button>
+        </div>
+    </div>
+
+</div>
+</div>
+
+<style>
+@keyframes pulse { 0%,100%{transform:scale(1)} 50%{transform:scale(1.08)} }
+.avatar-gen-btn {
+    position:absolute;bottom:8px;left:50%;transform:translateX(-50%);
+    background:rgba(102,126,234,.92);color:white;border:none;border-radius:20px;
+    padding:7px 18px;font-size:12px;font-weight:700;cursor:pointer;
+    white-space:nowrap;display:flex;align-items:center;gap:6px;
+    backdrop-filter:blur(4px);transition:background .2s;
+}
+.avatar-gen-btn:hover { background:rgba(102,126,234,1); }
+.sbtn {
+    background:#13132a;border:2px solid #1e1e3a;border-radius:12px;
+    padding:12px 8px;text-align:center;cursor:pointer;
+    transition:all .2s;color:#666;
+}
+.sbtn:hover { border-color:#667eea;color:#fff; }
+.sbtn.sel   { border-color:#667eea;background:rgba(102,126,234,.15);color:#fff; }
+.sbtn-name  { font-size:12px;font-weight:700;margin-top:4px;color:inherit; }
+.sbtn-sub   { font-size:10px;color:#555;margin-top:2px; }
+.sbtn.sel .sbtn-sub { color:#a0a0b0; }
+</style>
+
+<script>
+const TOONIFY_URL = '{{ path("avatar_toonify") }}';
+const SAVE_URL    = '{{ path("avatar_save") }}';
+const CSRF_TOON   = '{{ csrf_token("avatar_toonify") }}';
+const CSRF_SAVE   = '{{ csrf_token("avatar_save") }}';
+
+let selectedStyle  = 'anime';
+let outputUrl      = null;
+let progressTimer  = null;
+let retryTimer     = null;
+
+// ── Modal ──────────────────────────────────────────────────────────────────
+function openModal()  { document.getElementById('avatarModal').style.display = 'flex'; }
+function closeModal() {
+    document.getElementById('avatarModal').style.display = 'none';
+    resetAll();
+}
+document.getElementById('avatarModal').addEventListener('click', e => {
+    if (e.target === e.currentTarget) closeModal();
+});
+
+function resetAll() {
+    outputUrl = null;
+    if (progressTimer) { clearInterval(progressTimer); progressTimer = null; }
+    if (retryTimer)    { clearTimeout(retryTimer);     retryTimer    = null; }
+    show('s1'); hide('s2'); hide('s3');
+    document.getElementById('progBar').style.width = '5%';
+    document.getElementById('loadingTitle').textContent    = 'Generating…';
+    document.getElementById('loadingSubtitle').textContent = 'FLUX.1 is generating your image · 15–30 seconds';
+}
+function backToForm() { show('s1'); hide('s3'); }
+function show(id) { document.getElementById(id).style.display = 'block'; }
+function hide(id) { document.getElementById(id).style.display = 'none'; }
+
+// ── Description & bouton ───────────────────────────────────────────────────
+const descEl = document.getElementById('descInput');
+descEl.addEventListener('input', function() {
+    document.getElementById('charCount').textContent = this.value.length + '/200';
+    updateBtn();
+});
+function updateBtn() {
+    const ok  = descEl.value.trim().length >= 3;
+    const btn = document.getElementById('genBtn');
+    btn.disabled      = !ok;
+    btn.style.opacity = ok ? '1' : '.35';
+    btn.style.cursor  = ok ? 'pointer' : 'default';
+}
+
+// ── Style ──────────────────────────────────────────────────────────────────
+document.querySelectorAll('.sbtn').forEach(el => {
+    el.addEventListener('click', function() {
+        document.querySelectorAll('.sbtn').forEach(b => b.classList.remove('sel'));
+        this.classList.add('sel');
+        selectedStyle = this.dataset.style;
+    });
+});
+
+// ── Générer ────────────────────────────────────────────────────────────────
+async function generate() {
+    const desc = descEl.value.trim();
+    if (desc.length < 3) return;
+
+    hide('s1'); show('s2');
+
+    const steps = [
+        { pct: 15, txt: 'Connecting to HuggingFace…' },
+        { pct: 30, txt: 'Building prompt for FLUX.1…' },
+        { pct: 50, txt: 'FLUX.1 is generating the image…' },
+        { pct: 70, txt: 'Rendering details…' },
+        { pct: 88, txt: 'Finalizing…' },
+    ];
+    let si = 0;
+    progressTimer = setInterval(() => {
+        if (si < steps.length) {
+            document.getElementById('progBar').style.width = steps[si].pct + '%';
+            document.getElementById('progTxt').textContent = steps[si].txt;
+            si++;
+        }
+    }, 5000);
+
+    await doGenerate(desc);
+}
+
+async function doGenerate(desc) {
+    try {
+        const fd = new FormData();
+        fd.append('_token',      CSRF_TOON);
+        fd.append('description', desc);
+        fd.append('style',       selectedStyle);
+
+        const res  = await fetch(TOONIFY_URL, { method: 'POST', body: fd });
+        const data = await res.json();
+
+        // Cas spécial : modèle HuggingFace en cours de chargement (cold start)
+        if (data.model_loading) {
+            const wait = (data.retry_after || 20) * 1000;
+            clearInterval(progressTimer); progressTimer = null;
+            document.getElementById('loadingTitle').textContent    = '⏳ Model warming up…';
+            document.getElementById('loadingSubtitle').textContent = 'HuggingFace is loading FLUX.1 — auto-retry in ' + (data.retry_after || 20) + 's';
+            document.getElementById('progBar').style.width         = '20%';
+            document.getElementById('progTxt').textContent         = 'This happens once every few hours. Please wait…';
+
+            // Auto-retry après le délai indiqué
+            retryTimer = setTimeout(async () => {
+                document.getElementById('loadingTitle').textContent    = 'Generating…';
+                document.getElementById('loadingSubtitle').textContent = 'FLUX.1 is generating your image…';
+                await doGenerate(desc);
+            }, wait);
+            return;
+        }
+
+        clearInterval(progressTimer); progressTimer = null;
+        document.getElementById('progBar').style.width = '100%';
+
+        if (data.success && data.output_url) {
+            outputUrl = data.output_url;
+            await new Promise(r => setTimeout(r, 300));
+            hide('s2'); show('s3');
+            document.getElementById('resultImg').src = outputUrl + '?t=' + Date.now();
+            const styleName = document.querySelector('.sbtn.sel .sbtn-name')?.textContent || selectedStyle;
+            document.getElementById('resultStyle').textContent = styleName + ' style · FLUX.1-schnell';
+        } else {
+            hide('s2'); show('s1');
+            showToast(data.error || 'Generation failed. Please retry.', true);
+        }
+    } catch (err) {
+        clearInterval(progressTimer); progressTimer = null;
+        hide('s2'); show('s1');
+        showToast('Connection error. Please retry.', true);
+    }
+}
+
+// ── Appliquer ──────────────────────────────────────────────────────────────
+async function applyAvatar() {
+    if (!outputUrl) return;
+    const btn = document.getElementById('applyBtn');
+    btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Saving…';
+    btn.disabled  = true;
+
+    try {
+        const fd = new FormData();
+        fd.append('_token',    CSRF_SAVE);
+        fd.append('image_url', outputUrl);
+
+        const res  = await fetch(SAVE_URL, { method: 'POST', body: fd });
+        const data = await res.json();
+
+        if (data.success) {
+            const cur = document.getElementById('currentAvatar');
+            const src = data.url + '?t=' + Date.now();
+            if (cur?.tagName === 'IMG') {
+                cur.src = src;
+            } else if (cur) {
+                const img = document.createElement('img');
+                img.src = src; img.className = 'profile_image'; img.id = 'currentAvatar';
+                cur.replaceWith(img);
+            }
+            closeModal();
+            showToast('🎨 Avatar applied successfully!');
+        } else {
+            showToast(data.error || 'Could not save avatar.', true);
+            btn.innerHTML = '<i class="fas fa-check"></i> Apply as profile picture';
+            btn.disabled  = false;
+        }
+    } catch(e) {
+        showToast('Connection error.', true);
+        btn.innerHTML = '<i class="fas fa-check"></i> Apply as profile picture';
+        btn.disabled  = false;
+    }
+}
+
+function showToast(msg, isErr = false) {
+    const el = document.createElement('div');
+    el.textContent = (isErr ? '❌ ' : '✅ ') + msg;
+    Object.assign(el.style, {
+        position:'fixed', bottom:'28px', right:'28px',
+        background: isErr ? '#c53030' : '#276749',
+        color:'white', padding:'13px 22px', borderRadius:'10px',
+        fontWeight:'700', zIndex:'99999', fontSize:'14px',
+        boxShadow:'0 6px 24px rgba(0,0,0,.5)', maxWidth:'360px',
+    });
+    document.body.appendChild(el);
+    setTimeout(() => el.remove(), 5000);
+}
+</script>
 {% endblock %}

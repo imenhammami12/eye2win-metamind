@@ -13,6 +13,7 @@
         "doctrine/orm": "^3.6",
         "easycorp/easyadmin-bundle": "^4.28",
         "endroid/qr-code": "5.0",
+        "guzzlehttp/guzzle": "^7.10",
         "knplabs/knp-paginator-bundle": "^6.10",
         "meteo-concept/hcaptcha-bundle": "^4.5",
         "nyholm/psr7": "*",
