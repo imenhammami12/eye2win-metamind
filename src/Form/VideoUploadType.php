@@ -53,16 +53,22 @@ class VideoUploadType extends AbstractType
                 'mapped' => false,
                 'required' => true,
                 'constraints' => [
+                    new NotBlank(['message' => 'Veuillez sélectionner un fichier vidéo.']),
                     new File([
                         'maxSize' => '200M',
                         'mimeTypes' => [
                             'video/mp4',
+                            'video/x-m4v',
+                            'application/mp4',
                         ],
                         'mimeTypesMessage' => 'Veuillez uploader un fichier MP4 valide.',
                         'maxSizeMessage' => 'La vidéo est trop volumineuse ({{ size }} {{ suffix }}). Maximum autorisé : {{ limit }} {{ suffix }}.',
                     ]),
                 ],
                 'help' => 'Format accepté : MP4 (max 200MB)',
+                'attr' => [
+                    'accept' => '.mp4,.MP4,video/mp4',
+                ],
             ]);
     }
 

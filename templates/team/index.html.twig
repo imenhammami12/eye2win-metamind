@@ -1,0 +1,191 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}My Teams{% endblock %}
+
+{% block body %}
+
+<section class="breadcrumb breadcrumb_bg">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-12">
+                <div class="breadcrumb_iner text-center">
+                    <div class="breadcrumb_iner_item">
+                        <h2>Team Management</h2>
+                        <p><a href="{{ path('app_home') }}">Home</a> <span>-</span> Dashboard</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="blog_part section_padding">
+    <div class="container">
+        {# Pending Invitations #}
+        {% if pendingInvitations|length > 0 %}
+        <div class="row mb-5">
+            <div class="col-12">
+                <div class="alert alert-info shadow-sm">
+                    <h4 class="text-dark">
+                        <i class="fas fa-envelope me-2"></i> 
+                        Pending Invitations ({{ pendingInvitations|length }})
+                    </h4>
+                    <div class="row mt-3">
+                        {% for invitation in pendingInvitations %}
+                        <div class="col-md-6 col-lg-4 mb-3">
+                            <div class="card h-100 border-info">
+                                <div class="card-body">
+                                    <h5 class="card-title text-dark">{{ invitation.team.name }}</h5>
+                                    <p class="card-text text-muted small">
+                                        <i class="fas fa-user me-1"></i> Invited by {{ invitation.team.owner.username }}<br>
+                                        <i class="fas fa-clock me-1"></i> {{ invitation.invitedAt|date('M d, Y at H:i') }}
+                                    </p>
+                                    <div class="d-grid gap-2">
+                                        <form method="post" action="{{ path('app_teams_invitation_accept', {id: invitation.id}) }}">
+                                            <button type="submit" class="btn btn-success btn-sm w-100">
+                                                <i class="fas fa-check"></i> Accept
+                                            </button>
+                                        </form>
+                                        <form method="post" action="{{ path('app_teams_invitation_decline', {id: invitation.id}) }}">
+                                            <button type="submit" class="btn btn-danger btn-sm w-100">
+                                                <i class="fas fa-times"></i> Decline
+                                            </button>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+
+        {# Pending Join Requests #}
+        {% if pendingRequests|length > 0 %}
+        <div class="row mb-5">
+            <div class="col-12">
+                <div class="alert alert-warning shadow-sm">
+                    <h4 class="text-dark">
+                        <i class="fas fa-hourglass-half me-2"></i> 
+                        My Pending Requests ({{ pendingRequests|length }})
+                    </h4>
+                    <div class="row mt-3">
+                        {% for request in pendingRequests %}
+                        <div class="col-md-6 col-lg-4 mb-3">
+                            <div class="card h-100 border-warning">
+                                <div class="card-body">
+                                    <h5 class="card-title text-dark">{{ request.team.name }}</h5>
+                                    <p class="card-text text-muted small">
+                                        <i class="fas fa-user me-1"></i> Owner: {{ request.team.owner.username }}<br>
+                                        <i class="fas fa-clock me-1"></i> Requested on {{ request.invitedAt|date('M d, Y at H:i') }}
+                                    </p>
+                                    <span class="badge bg-warning text-dark">
+                                        <i class="fas fa-clock"></i> Awaiting Response
+                                    </span>
+                                    <form method="post" action="{{ path('app_teams_request_cancel', {id: request.id}) }}" class="mt-2">
+                                        <button type="submit" class="btn btn-sm btn-secondary w-100" onclick="return confirm('Cancel this request?')">
+                                            <i class="fas fa-times"></i> Cancel Request
+                                        </button>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+
+        <div class="row mb-4">
+            <div class="col-lg-6">
+                <h2 class="text-white"><i class="fas fa-users me-2"></i>My Teams</h2>
+            </div>
+            <div class="col-lg-6 text-end">
+                <a href="{{ path('app_teams_create') }}" class="btn btn-primary">
+                    <i class="fas fa-plus"></i> Create Team
+                </a>
+            </div>
+        </div>
+
+        {# Owned Teams #}
+        {% if ownedTeams|length > 0 %}
+        <div class="row mb-5">
+            <div class="col-12">
+                <h4 class="text-white mb-3">
+                    <i class="fas fa-crown text-warning me-2"></i> Teams I Own
+                </h4>
+                <div class="row">
+                    {% for team in ownedTeams %}
+                    <div class="col-md-6 col-lg-4 mb-4">
+                        {% include 'team/_team_card.html.twig' with {'team': team, 'isOwner': true} %}
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+        {% endif %}
+
+        {# Member Teams #}
+        {% if memberTeams|length > 0 %}
+        <div class="row mb-5">
+            <div class="col-12">
+                <h4 class="text-white mb-3">
+                    <i class="fas fa-users me-2"></i> Teams I'm Member Of
+                </h4>
+                <div class="row">
+                    {% for team in memberTeams %}
+                    <div class="col-md-6 col-lg-4 mb-4">
+                        {% include 'team/_team_card.html.twig' with {'team': team, 'isOwner': false} %}
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+        {% endif %}
+
+        {# All Teams #}
+        <div class="row">
+            <div class="col-12">
+                <h4 class="text-white mb-3">
+                    <i class="fas fa-globe me-2"></i> All Teams
+                </h4>
+                <div class="row">
+                    {% for team in allTeams %}
+                        {# Skip teams user is already part of #}
+                        {% set userIsMember = false %}
+                        {% for membership in team.teamMemberships %}
+                            {% if membership.user == app.user and membership.status.value in ['ACTIVE', 'INVITED'] %}
+                                {% set userIsMember = true %}
+                            {% endif %}
+                        {% endfor %}
+                        
+                        {% if not userIsMember %}
+                        <div class="col-md-6 col-lg-4 mb-4">
+                            {% include 'team/_team_card.html.twig' with {'team': team, 'isOwner': false} %}
+                        </div>
+                        {% endif %}
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+
+        {% if ownedTeams|length == 0 and memberTeams|length == 0 %}
+        <div class="row">
+            <div class="col-12">
+                <div class="alert alert-info text-center shadow-sm">
+                    <i class="fas fa-info-circle fa-3x mb-3 text-info"></i>
+                    <h4 class="text-dark">You're Not Part of Any Team</h4>
+                    <p class="text-muted">Create your own team or wait for an invitation!</p>
+                    <a href="{{ path('app_teams_create') }}" class="btn btn-primary mt-3">
+                        <i class="fas fa-plus"></i> Create My First Team
+                    </a>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+</section>
+{% endblock %}

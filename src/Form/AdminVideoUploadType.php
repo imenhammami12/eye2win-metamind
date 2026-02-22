@@ -56,6 +56,8 @@ class AdminVideoUploadType extends AbstractType
                     'Public' => 'PUBLIC',
                 ],
                 'data' => 'PRIVATE',
+                'expanded' => true,
+                'multiple' => false,
                 'help' => 'Privé par défaut',
             ])
             ->add('videoFile', FileType::class, [

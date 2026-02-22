@@ -1,0 +1,80 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Match Valorant {{ match.trackerMatchId }}{% endblock %}
+
+{% block body %}
+<div class="container py-4" data-controller="valorant-tracker"
+     data-valorant-tracker-chart-labels-value='{{ match.joueurs|map(p => p.riotName ~ (p.riotTag ? "#" ~ p.riotTag : ""))|json_encode|e('html_attr') }}'
+     data-valorant-tracker-kills-value='{{ match.joueurs|map(p => p.statistique ? p.statistique.kills : 0)|json_encode|e('html_attr') }}'
+     data-valorant-tracker-deaths-value='{{ match.joueurs|map(p => p.statistique ? p.statistique.deaths : 0)|json_encode|e('html_attr') }}'
+     data-valorant-tracker-assists-value='{{ match.joueurs|map(p => p.statistique ? p.statistique.assists : 0)|json_encode|e('html_attr') }}'>
+
+    <div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-4">
+        <div>
+            <h1 class="h3 mb-1">Match {{ match.trackerMatchId }}</h1>
+            <p class="text-muted mb-0">
+                {{ match.mapName ?: 'Map inconnue' }} • {{ match.mode ?: 'Mode inconnu' }} •
+                {{ match.playedAt ? match.playedAt|date('d/m/Y H:i') : 'Date indisponible' }}
+            </p>
+        </div>
+        <a href="{{ path('valorant_tracker_dashboard') }}" class="btn btn-outline-primary">Retour dashboard</a>
+    </div>
+
+    <div class="row g-3 mb-3">
+        <div class="col-md-3"><div class="card shadow-sm"><div class="card-body"><small class="text-muted">Score</small><div class="h4 mb-0">{{ match.scoreTeamA ?? 0 }} - {{ match.scoreTeamB ?? 0 }}</div></div></div></div>
+        <div class="col-md-3"><div class="card shadow-sm"><div class="card-body"><small class="text-muted">Joueurs</small><div class="h4 mb-0">{{ match.joueurs|length }}</div></div></div></div>
+        <div class="col-md-3"><div class="card shadow-sm"><div class="card-body"><small class="text-muted">Durée</small><div class="h4 mb-0">{{ match.durationSeconds ? (match.durationSeconds / 60)|round(0, 'floor') ~ ' min' : '-' }}</div></div></div></div>
+        <div class="col-md-3"><div class="card shadow-sm"><div class="card-body"><small class="text-muted">Équipes</small><div class="h4 mb-0">{{ match.equipes|length }}</div></div></div></div>
+    </div>
+
+    <div class="row g-3 mb-3">
+        <div class="col-lg-6">
+            <div class="card shadow-sm">
+                <div class="card-header">Performance individuelle (K/D/A)</div>
+                <div class="card-body"><canvas data-valorant-tracker-target="kdaChart" height="220"></canvas></div>
+            </div>
+        </div>
+        <div class="col-lg-6">
+            <div class="card shadow-sm">
+                <div class="card-header">Heatmap Kills (approximation)</div>
+                <div class="card-body"><canvas data-valorant-tracker-target="heatmapChart" height="220"></canvas></div>
+            </div>
+        </div>
+    </div>
+
+    <div class="card shadow-sm">
+        <div class="table-responsive">
+            <table class="table table-striped mb-0">
+                <thead>
+                <tr>
+                    <th>Joueur</th>
+                    <th>Équipe</th>
+                    <th>Agent</th>
+                    <th>Kills</th>
+                    <th>Deaths</th>
+                    <th>Assists</th>
+                    <th>Headshots</th>
+                    <th>Damage</th>
+                </tr>
+                </thead>
+                <tbody>
+                {% for p in match.joueurs %}
+                    <tr>
+                        <td>{{ p.riotName }}{% if p.riotTag %}<small class="text-muted">#{{ p.riotTag }}</small>{% endif %}</td>
+                        <td>{{ p.equipe ? p.equipe.name : '-' }}</td>
+                        <td>{{ p.agent ?: '-' }}</td>
+                        <td>{{ p.statistique ? p.statistique.kills : 0 }}</td>
+                        <td>{{ p.statistique ? p.statistique.deaths : 0 }}</td>
+                        <td>{{ p.statistique ? p.statistique.assists : 0 }}</td>
+                        <td>{{ p.statistique and p.statistique.headshots is not null ? p.statistique.headshots : '-' }}</td>
+                        <td>{{ p.statistique and p.statistique.damage is not null ? p.statistique.damage : '-' }}</td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.3/dist/chart.umd.min.js"></script>
+{% endblock %}

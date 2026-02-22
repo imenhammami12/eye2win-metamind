@@ -1,4 +1,5 @@
 <?php
+// src/Form/CoachApplicationType.php
 
 namespace App\Form;
 
@@ -18,37 +19,37 @@ class CoachApplicationType extends AbstractType
     {
         $builder
             ->add('certifications', TextareaType::class, [
-                'label' => 'Certifications et qualifications',
+                'label' => 'Certifications and Qualifications',
                 'attr' => [
                     'rows' => 4,
-                    'placeholder' => 'Listez vos certifications, rangs, accomplissements...'
+                    'placeholder' => 'List your certifications, ranks, achievements...'
                 ],
                 'constraints' => [
-                    new NotBlank(['message' => 'Veuillez renseigner vos certifications']),
+                    new NotBlank(['message' => 'Please provide your certifications']),
                     new Length([
                         'min' => 50,
-                        'minMessage' => 'Décrivez vos certifications en au moins {{ limit }} caractères',
+                        'minMessage' => 'Describe your certifications in at least {{ limit }} characters',
                     ])
                 ],
-                'help' => 'Minimum 50 caractères'
+                'help' => 'Minimum 50 characters'
             ])
             ->add('experience', TextareaType::class, [
-                'label' => 'Expérience en coaching',
+                'label' => 'Coaching Experience',
                 'attr' => [
                     'rows' => 6,
-                    'placeholder' => 'Décrivez votre expérience de coaching en détail...'
+                    'placeholder' => 'Describe your coaching experience in detail...'
                 ],
                 'constraints' => [
-                    new NotBlank(['message' => 'Veuillez décrire votre expérience']),
+                    new NotBlank(['message' => 'Please describe your experience']),
                     new Length([
                         'min' => 100,
-                        'minMessage' => 'Décrivez votre expérience en au moins {{ limit }} caractères',
+                        'minMessage' => 'Describe your experience in at least {{ limit }} characters',
                     ])
                 ],
-                'help' => 'Minimum 100 caractères'
+                'help' => 'Minimum 100 characters'
             ])
             ->add('cvFileUpload', FileType::class, [
-                'label' => 'CV / Portfolio (optionnel)',
+                'label' => 'CV / Portfolio (optional)',
                 'mapped' => false,
                 'required' => false,
                 'constraints' => [
@@ -59,11 +60,11 @@ class CoachApplicationType extends AbstractType
                             'application/msword',
                             'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
                         ],
-                        'mimeTypesMessage' => 'Veuillez uploader un fichier PDF ou Word valide',
-                        'maxSizeMessage' => 'Le fichier est trop volumineux ({{ size }} {{ suffix }}). Maximum autorisé : {{ limit }} {{ suffix }}.',
+                        'mimeTypesMessage' => 'Please upload a valid PDF or Word file',
+                        'maxSizeMessage' => 'The file is too large ({{ size }} {{ suffix }}). Maximum allowed: {{ limit }} {{ suffix }}.',
                     ])
                 ],
-                'help' => 'Formats acceptés : PDF, DOC, DOCX (max 5MB)'
+                'help' => 'Accepted formats: PDF, DOC, DOCX (max 5MB)'
             ])
         ;
     }

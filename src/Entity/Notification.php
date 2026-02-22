@@ -33,6 +33,20 @@ class Notification
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $link = null;
 
+// src/Entity/Notification.php
+
+#[ORM\Column(name:'`read`' ,type: 'boolean')]
+private bool $read = false;
+
+
+
+public function setRead(bool $read): self
+{
+    $this->read = $read;
+    return $this;
+}
+
+
     public function __construct()
     {
         $this->createdAt = new \DateTime();

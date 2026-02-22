@@ -15,73 +15,89 @@ security:
             pattern: ^/(_(profiler|wdt)|css|images|js)/
             security: false
         
-        # Firewall pour l'administration - DOIT ÊTRE AVANT 'main'
+        # Firewall for administration - MUST BE BEFORE 'main'
+        # NO 2FA for admin
         admin:
             pattern: ^/admin
             lazy: true
             provider: app_user_provider
-            
-            # Formulaire de connexion admin
+            user_checker: App\Security\AccountStatusChecker
+
+            # Admin login form
             form_login:
                 login_path: admin_login
                 check_path: admin_login
                 default_target_path: admin_dashboard
                 enable_csrf: true
             
-            # Déconnexion admin
+            # Admin logout
             logout:
                 path: admin_logout
                 target: admin_login
             
-            # Remember me pour admin
+            # Remember me for admin
             remember_me:
                 secret: '%kernel.secret%'
                 lifetime: 604800
                 path: /admin
         
-        # Firewall principal pour les utilisateurs normaux
+        # Main firewall for regular users
+        # WITH 2FA for users
         main:
             lazy: true
             provider: app_user_provider
+            user_checker: App\Security\AccountStatusChecker
             
-            # Formulaire de connexion utilisateur
+            two_factor:
+                auth_form_path: 2fa_login
+                check_path: 2fa_login_check
+                enable_csrf: true
+                prepare_on_login: true
+                prepare_on_access_denied: true
+
+            # User login form
             form_login:
                 login_path: app_login
                 check_path: app_login
                 default_target_path: app_home
                 enable_csrf: true
             
-            # Déconnexion utilisateur
+            # User logout
             logout:
                 path: app_logout
                 target: app_login
             
-            # Remember me pour utilisateurs
+            # Remember me for users
             remember_me:
                 secret: '%kernel.secret%'
                 lifetime: 604800
                 path: /
     
     role_hierarchy:
-        ROLE_ADMIN: ROLE_USER
-        ROLE_SUPER_ADMIN: [ROLE_ADMIN, ROLE_USER]
+        ROLE_COACH: ROLE_USER
+        ROLE_ADMIN: [ROLE_COACH, ROLE_USER]
+        ROLE_SUPER_ADMIN: [ROLE_ADMIN, ROLE_COACH, ROLE_USER]
     
     # Access control
     access_control:
-        # Routes publiques
+        # 2FA routes - ONLY for regular users
+        - { path: ^/2fa, roles: IS_AUTHENTICATED_2FA_IN_PROGRESS }
+        
+        # Public routes
         - { path: ^/login, roles: PUBLIC_ACCESS }
         - { path: ^/register, roles: PUBLIC_ACCESS }
+        - { path: ^/admin/login, roles: PUBLIC_ACCESS }
         
-        # Routes admin
-        - { path: ^/admin/login, roles: PUBLIC_ACCESS }      # Login admin accessible à tous
-        - { path: ^/admin/audit, roles: ROLE_SUPER_ADMIN }   # Audit logs = Super Admin uniquement
-        - { path: ^/admin, roles: ROLE_ADMIN }                # Backoffice = Admin minimum
+        # Admin routes - NO 2FA required
+        - { path: ^/admin/audit, roles: ROLE_SUPER_ADMIN }
+        - { path: ^/admin, roles: ROLE_ADMIN }
         
-        # Routes utilisateur
+        # User routes - 2FA required if enabled
         - { path: ^/profile, roles: ROLE_USER }
         - { path: ^/upload, roles: ROLE_USER }
         - { path: ^/video, roles: ROLE_USER }
         - { path: ^/dashboard, roles: ROLE_USER }
+        - { path: ^/valorant-tracker, roles: ROLE_USER }
 
 
 when@test:

@@ -25,16 +25,19 @@
                 </div>
 
                 <div class="upload-card__body">
-                    {{ form_start(form, { attr: { id: 'userVideoUploadForm', novalidate: 'novalidate' } }) }}
+                    {{ form_start(form, { attr: { id: 'userVideoUploadForm' } }) }}
+                        {{ form_errors(form) }}
                         <div class="row g-4">
                             <div class="col-md-6">
                                 <label class="form-label">Title <span class="text-danger">*</span></label>
                                 {{ form_widget(form.title, { attr: { class: 'form-control' } }) }}
+                                {{ form_errors(form.title) }}
                                 <small class="form-text">Short and descriptive title</small>
                             </div>
                             <div class="col-md-6">
                                 <label class="form-label">Game type <span class="text-danger">*</span></label>
                                 {{ form_widget(form.gameType, { attr: { class: 'form-control' } }) }}
+                                {{ form_errors(form.gameType) }}
                                 <small class="form-text">Example: Valorant, CS2, FIFA</small>
                             </div>
                             <div class="col-md-6">
@@ -42,11 +45,13 @@
                                 <div class="visibility-options">
                                     {{ form_widget(form.visibility) }}
                                 </div>
+                                {{ form_errors(form.visibility) }}
                                 <small class="form-text">Private by default</small>
                             </div>
                             <div class="col-md-12">
                                 <label class="form-label">Video file (MP4) <span class="text-danger">*</span></label>
                                 {{ form_widget(form.videoFile, { attr: { class: 'form-control', 'accept': '.mp4,.MP4' } }) }}
+                                {{ form_errors(form.videoFile) }}
                                 <small class="form-text">MP4 only, max 200MB</small>
                             </div>
                         </div>
@@ -225,6 +230,15 @@
         line-height: 1.4;
     }
 
+    .invalid-feedback,
+    .form-error-message {
+        display: block;
+        margin-top: 0.35rem;
+        color: #fca5a5;
+        font-size: 0.85rem;
+        line-height: 1.35;
+    }
+
     .form-control,
     .form-select {
         width: 100%;
@@ -260,9 +274,13 @@
         border: 1px solid rgba(255, 255, 255, 0.12);
         border-radius: 999px;
         padding: 0.45rem 0.9rem;
+        padding-left: 0.9rem;
+        min-height: auto;
+        margin: 0;
     }
 
     .visibility-options .form-check-input {
+        float: none;
         margin: 0;
         width: 1rem;
         height: 1rem;
@@ -272,6 +290,7 @@
     .visibility-options .form-check-label {
         color: #e5e7eb;
         font-weight: 600;
+        margin: 0;
     }
 
     .upload-info {
@@ -345,6 +364,7 @@
 <script>
 document.addEventListener('DOMContentLoaded', function () {
     const form = document.getElementById('userVideoUploadForm');
+    const fileInput = form ? form.querySelector('input[type="file"]') : null;
     const progressWrap = document.getElementById('userUploadProgress');
     const progressBar = document.getElementById('userUploadProgressBar');
     const progressText = document.getElementById('userUploadProgressText');
@@ -356,7 +376,13 @@ document.addEventListener('DOMContentLoaded', function () {
     form.addEventListener('submit', function (event) {
         event.preventDefault();
 
-        const actionUrl = form.getAttribute('action') || window.location.href;
+        if (!fileInput || !fileInput.files || fileInput.files.length === 0) {
+            progressWrap.classList.remove('d-none');
+            progressText.textContent = 'Veuillez sélectionner un fichier vidéo MP4.';
+            return;
+        }
+
+        const actionUrl = form.action || window.location.href;
         const xhr = new XMLHttpRequest();
         xhr.open(form.method.toUpperCase(), actionUrl);
         xhr.setRequestHeader('X-Requested-With', 'XMLHttpRequest');
@@ -399,18 +425,26 @@ document.addEventListener('DOMContentLoaded', function () {
                 try {
                     const data = JSON.parse(xhr.responseText);
                     if (data.error) {
-                        progressText.textContent = data.error;
+                        if (Array.isArray(data.details) && data.details.length > 0) {
+                            progressText.textContent = data.details.join(' | ');
+                        } else {
+                            progressText.textContent = data.error;
+                        }
                         return;
                     }
                 } catch (e) {
                     // ignore JSON parse errors
                 }
-                progressText.textContent = 'Upload failed. Please try again.';
+                progressText.textContent = 'Upload failed (HTTP ' + xhr.status + '). Please try again.';
             }
         };
 
         xhr.onerror = function () {
             progressText.textContent = 'Network error. Please try again.';
+        };
+
+        xhr.onabort = function () {
+            progressText.textContent = 'Upload cancelled.';
         };
 
         xhr.send(new FormData(form));

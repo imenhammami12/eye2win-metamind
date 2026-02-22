@@ -55,22 +55,56 @@
                     <span>Users</span>
                 </a>
 
-                <a href="{{ path('admin_videos_index') }}" 
+                <a href="{{ path('admin_planning_index') }}" 
+                   class="{{ app.request.attributes.get('_route') starts with 'admin_planning' ? 'active' : '' }}">
+                    <i class="bi bi-calendar-event"></i>
+                    <span>Planning</span>
+                </a>
+                <a href="{{ path('admin_tournoi_index') }}" 
+                   class="{{ app.request.attributes.get('_route') starts with 'admin_tournoi' ? 'active' : '' }}">
+                    <i class="bi bi-trophy"></i>
+                    <span>Tournois</span>
+                </a>
+               <a href="{{ path('admin_videos_index') }}" 
                    class="{{ app.request.attributes.get('_route') starts with 'admin_videos' or app.request.attributes.get('_route') starts with 'admin_video' ? 'active' : '' }}">
                     <i class="bi bi-camera-video"></i>
                     <span>Videos</span>
                 </a>
-                
 
                 <a href="{{ path('admin_coach_applications_index') }}" 
                    class="{{ app.request.attributes.get('_route') starts with 'admin_coach_applications' ? 'active' : '' }}">
                     <i class="bi bi-clipboard-check"></i>
-                    <span>Demandes Coach</span>
+                    <span> Coach Application </span>
                     {% if pendingApplicationsCount|default(0) > 0 %}
                         <span class="badge bg-danger">{{ pendingApplicationsCount }}</span>
                     {% endif %}
                 </a>
 
+                <a href="{{ path('admin_channels_index') }}"
+                   class="{{ app.request.attributes.get('_route') starts with 'admin_channels' ? 'active' : '' }}">
+                    <i class="bi bi-chat-left-text"></i>
+                    <span>Channels</span>
+                </a>
+
+{#                <a href="{{ path('admin_channels_index') }}"#}
+{#                   class="{{ app.request.attributes.get('_route') == 'admin_channels_index' ? 'active' : '' }}">#}
+{#                    <i class="bi bi-hourglass-split"></i>#}
+{#                    <span>Channels Pending</span>#}
+{#                </a>#}
+
+                <a href="{{ path('admin_messages_index') }}"
+                   class="{{ app.request.attributes.get('_route') starts with 'admin_messages' ? 'active' : '' }}">
+                    <i class="bi bi-chat-dots"></i>
+                    <span>Messages</span>
+                </a>
+
+
+
+<a href="{{ path('admin_teams_index') }}" 
+   class="{{ app.request.attributes.get('_route') starts with 'admin_teams' ? 'active' : '' }}">
+    <i class="bi bi-grid-3x3"></i>
+    <span>Teams</span>
+</a>
 
                 <div class="sidebar-divider"></div>
                 
@@ -111,7 +145,7 @@
         <main class="main-content">
             {# Top Bar #}
             <header class="top-bar">
-                <h1 class="page-title">{% block page_title %}Dashboard{% endblock %}</h1>
+                <h1 class="page-title">{% block page_title %}Channels Management{% endblock %}</h1>
                 
                 <div class="header-actions">
                     <div class="user-info">
@@ -145,9 +179,12 @@
             
         </main>
     </div>
+
+    {# Modals Container #}
+    {% block modal_container %}{% endblock %}
     
     {# Bootstrap JS Bundle #}
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     
     {# Chart.js #}
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
@@ -267,5 +304,6 @@
     </script>
     
     {% block javascripts %}{% endblock %}
+    {% block modals %}{% endblock %}
 </body>
 </html>

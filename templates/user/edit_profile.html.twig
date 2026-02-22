@@ -8,8 +8,6 @@
 {% endblock %}
 
 {% block body %}
-<!-- Breadcrumb -->
-
 
 <section class="edit_profile_section section_padding">
     <div class="container">
@@ -54,8 +52,6 @@
                                     </div>
                                 </div>
                             </div>
-                            
-                        
                         </div>
                         
                         <!-- Edit Form -->
@@ -111,16 +107,30 @@
                                                 </div>
                                             </div>
                                             
-                                            <div class="col-md-6">
-                                                <div class="form_group">
-                                                    {{ form_label(form.email, 'Email', {'label_attr': {'class': 'form_label'}}) }}
-                                                    <div class="input_wrapper">
-                                                        <i class="fas fa-envelope input_icon"></i>
-                                                        {{ form_widget(form.email, {'attr': {'class': 'form_input', 'placeholder': 'your@email.com'}}) }}
-                                                    </div>
-                                                    {{ form_errors(form.email) }}
-                                                </div>
-                                            </div>
+                                          <div class="col-md-6">
+    <div class="form_group">
+        {{ form_label(form.email, 'Email', {'label_attr': {'class': 'form_label'}}) }}
+        <div class="input_wrapper">
+            <i class="fas fa-envelope input_icon"></i>
+            {{ form_widget(form.email, {'attr': {'class': 'form_input', 'placeholder': 'your@email.com'}}) }}
+        </div>
+        
+        {# Affichage personnalisé des erreurs #}
+        {% if form.email.vars.errors|length > 0 %}
+            <div class="alert alert-danger mt-2 d-flex align-items-center" style="border-radius: 10px; border-left: 4px solid #dc3545;">
+                <i class="fas fa-exclamation-triangle me-2" style="font-size: 1.2rem;"></i>
+                <div>
+                    {% for error in form.email.vars.errors %}
+                        <strong>{{ error.message }}</strong>
+                    {% endfor %}
+                </div>
+            </div>
+        {% else %}
+            {# Affichage normal des erreurs Symfony #}
+            {{ form_errors(form.email) }}
+        {% endif %}
+    </div>
+</div>
                                         </div>
                                         
                                         <div class="form_group">
@@ -176,6 +186,15 @@
 
 {% block javascripts %}
     {{ parent() }}
+    
+    <script>
+        // Définir l'ID utilisateur pour le script de validation
+        window.currentUserId = {{ user.id }};
+        console.log('🔑 User ID set:', window.currentUserId);
+    </script>
+    
+    <script src="{{ asset('js/profile-edit-validation.js') }}"></script>
+
     <script>
         // Preview image on file select
         document.getElementById('profilePictureInput').addEventListener('change', function(e) {

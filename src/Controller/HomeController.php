@@ -26,9 +26,9 @@ class HomeController extends AbstractController
             'videos' => $videos,
         ]);
     }
-
-    public function index(): Response
+        #[Route('/planning', name: 'app_planning')]
+    public function planning(): Response
     {
-        return $this->redirectToRoute('app_home');
+        return $this->render('home/planning.html.twig');
     }
 }

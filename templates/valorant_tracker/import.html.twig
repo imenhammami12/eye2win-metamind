@@ -1,0 +1,66 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Valorant Tracker - Import{% endblock %}
+
+{% block body %}
+<div class="container py-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h1 class="h3 mb-1">Valorant Tracker</h1>
+            <p class="text-muted mb-0">Importer vos matchs depuis Tracker.gg et choisir un match précis.</p>
+        </div>
+        <a href="{{ path('valorant_tracker_dashboard') }}" class="btn btn-outline-primary">Dashboard</a>
+    </div>
+
+    <div class="card shadow-sm">
+        <div class="card-body">
+            <form method="post" class="row g-3">
+                <input type="hidden" name="_token" value="{{ csrf_token('valorant_tracker_import') }}">
+
+                <div class="col-md-4">
+                    <label for="riotName" class="form-label">Riot Name</label>
+                    <input id="riotName" name="riotName" class="form-control" value="{{ profile.riotName }}" required>
+                </div>
+
+                <div class="col-md-3">
+                    <label for="riotTag" class="form-label">Tag</label>
+                    <input id="riotTag" name="riotTag" class="form-control" value="{{ profile.riotTag }}" required placeholder="EUW">
+                </div>
+
+                <div class="col-md-2">
+                    <label for="region" class="form-label">Région</label>
+                    <select id="region" name="region" class="form-select">
+                        {% for r in ['eu', 'na', 'ap', 'latam', 'kr'] %}
+                            <option value="{{ r }}" {{ profile.region == r ? 'selected' : '' }}>{{ r|upper }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div class="col-md-3 d-flex align-items-end gap-2">
+                    <button type="submit" name="action" value="load" class="btn btn-outline-secondary w-100">Charger les matchs</button>
+                    <button type="submit" name="action" value="import-latest" class="btn btn-primary w-100">Sync auto</button>
+                </div>
+
+                {% if apiMatches is not empty %}
+                    <div class="col-12">
+                        <hr>
+                        <label for="selectedMatchId" class="form-label">Sélectionner un match</label>
+                        <select id="selectedMatchId" name="selectedMatchId" class="form-select">
+                            <option value="">-- Choisir un match --</option>
+                            {% for m in apiMatches %}
+                                <option value="{{ m.trackerMatchId }}" {{ selectedMatchId == m.trackerMatchId ? 'selected' : '' }}>
+                                    {{ m.mapName ?: 'Unknown map' }} • {{ m.mode ?: 'Mode' }} • {{ m.trackerMatchId }}
+                                </option>
+                            {% endfor %}
+                        </select>
+                        <small class="text-muted">Les données affichées proviennent de l’API Tracker.gg pour ce compte.</small>
+                    </div>
+                    <div class="col-12">
+                        <button type="submit" name="action" value="import" class="btn btn-success">Importer le match sélectionné</button>
+                    </div>
+                {% endif %}
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,92 @@
+{# templates/emails/coach_application_rejected.html.twig #}
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+            border-radius: 10px 10px 0 0;
+        }
+        .content {
+            background: #f9f9f9;
+            padding: 30px;
+            border-radius: 0 0 10px 10px;
+        }
+        .button {
+            display: inline-block;
+            background: #667eea;
+            color: white;
+            padding: 12px 30px;
+            text-decoration: none;
+            border-radius: 5px;
+            margin: 20px 0;
+        }
+        .info-box {
+            background: #fff3cd;
+            border-left: 4px solid #ffc107;
+            padding: 15px;
+            margin: 20px 0;
+        }
+        .footer {
+            text-align: center;
+            margin-top: 30px;
+            color: #666;
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>📋 Application Update</h1>
+    </div>
+    
+    <div class="content">
+        <p>Hello <strong>{{ user.username }}</strong>,</p>
+        
+        <p>Thank you for your interest in becoming a coach on Eye2Win.</p>
+        
+        <p>After careful review of your application, we regret to inform you that your application has not been approved at this time.</p>
+        
+        <div class="info-box">
+            <strong>📝 Reason:</strong>
+            <p>{{ reviewComment }}</p>
+        </div>
+        
+        <p><strong>What's next?</strong></p>
+        <ul>
+            <li>📚 Continue developing your skills</li>
+            <li>🎮 Actively participate in the community</li>
+            <li>🏆 Obtain new certifications or achievements</li>
+            <li>🔄 You may submit a new application in the future</li>
+        </ul>
+        
+        <p>This decision does not reflect on your value as a player. We encourage you to keep improving and try again in the future.</p>
+        
+        <div style="text-align: center;">
+            <a href="{{ url('app_dashboard') }}" class="button">Access Dashboard</a>
+        </div>
+        
+        <p>We remain available for any questions.</p>
+        
+        <p>Best regards,<br>
+        <strong>The Eye2Win Team</strong></p>
+    </div>
+    
+    <div class="footer">
+        <p>This email was sent automatically, please do not reply.</p>
+        <p>&copy; {{ "now"|date("Y") }} Eye2Win Platform - All rights reserved</p>
+    </div>
+</body>
+</html>

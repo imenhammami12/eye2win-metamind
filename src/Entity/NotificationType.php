@@ -9,6 +9,8 @@ enum NotificationType: string
     case COACH_APPLICATION = 'COACH_APPLICATION';
     case COACH_APPROVED = 'COACH_APPROVED';
     case COACH_REJECTED = 'COACH_REJECTED';
+    case CHANNEL_APPROVED = 'CHANNEL_APPROVED';
+    case CHANNEL_REJECTED = 'CHANNEL_REJECTED';
     case ACCOUNT_WARNING = 'ACCOUNT_WARNING';
     case SYSTEM = 'SYSTEM';
 
@@ -20,6 +22,8 @@ enum NotificationType: string
             self::COACH_APPLICATION => 'Demande de coach',
             self::COACH_APPROVED => 'Coach approuvé',
             self::COACH_REJECTED => 'Coach rejeté',
+            self::CHANNEL_APPROVED => 'Channel approuvé',
+            self::CHANNEL_REJECTED => 'Channel rejeté',
             self::ACCOUNT_WARNING => 'Avertissement',
             self::SYSTEM => 'Système',
         };
@@ -33,6 +37,8 @@ enum NotificationType: string
             self::COACH_APPLICATION => '📋',
             self::COACH_APPROVED => '🎓',
             self::COACH_REJECTED => '❌',
+            self::CHANNEL_APPROVED => '✅',
+            self::CHANNEL_REJECTED => '❌',
             self::ACCOUNT_WARNING => '⚠️',
             self::SYSTEM => 'ℹ️',
         };

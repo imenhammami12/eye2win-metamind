@@ -4,119 +4,313 @@
 {% block page_title %}Dashboard{% endblock %}
 
 {% block body %}
+
+{# Header Section #}
 <div class="row g-4 mb-4 fade-in">
     <div class="col-12">
-        <div class="stat-card text-center py-5">
-            <div class="stat-card-icon mx-auto mb-4" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); width: 100px; height: 100px; display: flex; align-items: center; justify-content: center; border-radius: 20px;">
-                <i class="bi bi-speedometer2 text-white" style="font-size: 48px;"></i>
+        <div class="welcome-card text-center py-4">
+            <div class="stat-card-icon mx-auto mb-3" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); width: 80px; height: 80px; display: flex; align-items: center; justify-content: center; border-radius: 20px;">
+                <i class="bi bi-speedometer2 text-white" style="font-size: 40px;"></i>
             </div>
-            <h2 class="mb-3">Welcome to the admin panel</h2>
-            <p class="text-muted mb-4">Dashboard under development</p>
-            <div class="d-flex gap-3 justify-content-center flex-wrap">
-                <a href="{{ path('app_home') }}" class="btn btn-outline-primary">
-                    <i class="bi bi-house me-2"></i>Back to site
-                </a>
-                <a href="{{ path('admin_logout') }}" class="btn btn-outline-danger">
-                    <i class="bi bi-box-arrow-right me-2"></i>Logout
-                </a>
-            </div>
+            <h2 class="mb-2">Welcome, {{ app.user.username }}</h2>
+            <p class="text-muted mb-0">Administrative Dashboard - {{ "now"|date("m/d/Y H:i") }}</p>
         </div>
     </div>
 </div>
 
-<div class="row g-4 fade-in" style="animation-delay: 0.1s;">
-    <div class="col-md-6">
-        <div class="table-card">
-            <div class="table-header">
-                <h5><i class="bi bi-info-circle me-2"></i>Information</h5>
+{# Key Performance Indicators - Row 1 #}
+<div class="row g-4 mb-4 fade-in" style="animation-delay: 0.1s;">
+    <div class="col-lg-3 col-md-6">
+        <div class="stat-card">
+            <div class="stat-icon" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
+                <i class="bi bi-people-fill"></i>
             </div>
-            <div class="p-4">
-                <p class="mb-3">
-                    <i class="bi bi-person-badge text-primary me-2"></i>
-                    <strong>Logged-in user:</strong> {{ app.user.username }}
-                </p>
-                <p class="mb-3">
-                    <i class="bi bi-shield-check text-success me-2"></i>
-                    <strong>Roles:</strong> 
-                    {% for role in app.user.roles %}
-                        <span class="badge bg-success">{{ role }}</span>
-                    {% endfor %}
-                </p>
-                <p class="mb-0">
-                    <i class="bi bi-envelope text-info me-2"></i>
-                    <strong>Email:</strong> {{ app.user.email }}
-                </p>
+            <div class="stat-content">
+                <h3 class="stat-value">{{ totalUsers|number_format(0, ',', ' ') }}</h3>
+                <p class="stat-label">Total Users</p>
+                <div class="stat-footer">
+                    {% if userGrowthRate > 0 %}
+                        <span class="badge bg-success"><i class="bi bi-arrow-up"></i> +{{ userGrowthRate }}%</span>
+                    {% elseif userGrowthRate < 0 %}
+                        <span class="badge bg-danger"><i class="bi bi-arrow-down"></i> {{ userGrowthRate }}%</span>
+                    {% else %}
+                        <span class="badge bg-secondary"><i class="bi bi-dash"></i> 0%</span>
+                    {% endif %}
+                    <small class="text-muted ms-2">this month</small>
+                </div>
             </div>
         </div>
     </div>
     
-    <div class="col-md-6">
-        <div class="table-card">
-            <div class="table-header">
-                <h5><i class="bi bi-clock-history me-2"></i>Recent activity</h5>
+    <div class="col-lg-3 col-md-6">
+        <div class="stat-card">
+            <div class="stat-icon" style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);">
+                <i class="bi bi-shield-fill-check"></i>
             </div>
-            <div class="p-4 text-center text-muted">
-                <i class="bi bi-inbox" style="font-size: 48px; opacity: 0.3;"></i>
-                <p class="mt-3 mb-0">No activity to display</p>
+            <div class="stat-content">
+                <h3 class="stat-value">{{ totalTeams|number_format(0, ',', ' ') }}</h3>
+                <p class="stat-label">Active Teams</p>
+                <div class="stat-footer">
+                    {% if teamGrowthRate > 0 %}
+                        <span class="badge bg-success"><i class="bi bi-arrow-up"></i> +{{ teamGrowthRate }}%</span>
+                    {% elseif teamGrowthRate < 0 %}
+                        <span class="badge bg-danger"><i class="bi bi-arrow-down"></i> {{ teamGrowthRate }}%</span>
+                    {% else %}
+                        <span class="badge bg-secondary"><i class="bi bi-dash"></i> 0%</span>
+                    {% endif %}
+                    <small class="text-muted ms-2">this month</small>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-lg-3 col-md-6">
+        <div class="stat-card">
+            <div class="stat-icon" style="background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);">
+                <i class="bi bi-file-earmark-text-fill"></i>
+            </div>
+            <div class="stat-content">
+                <h3 class="stat-value">{{ pendingApplications|number_format(0, ',', ' ') }}</h3>
+                <p class="stat-label">Pending Applications</p>
+                <div class="stat-footer">
+                    <span class="badge bg-warning">{{ applicationsToday }} today</span>
+                    <small class="text-muted ms-2">{{ approvalRate }}% approved</small>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-lg-3 col-md-6">
+        <div class="stat-card">
+            <div class="stat-icon" style="background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);">
+                <i class="bi bi-graph-up-arrow"></i>
+            </div>
+            <div class="stat-content">
+                <h3 class="stat-value">{{ avgUsersPerDay }}</h3>
+                <p class="stat-label">New Users/Day</p>
+                <div class="stat-footer">
+                    <span class="badge bg-info">{{ usersLast7Days }} this week</span>
+                </div>
             </div>
         </div>
     </div>
 </div>
 
-<div class="row g-4 fade-in" style="animation-delay: 0.2s;">
+{# Detailed Statistics - Row 2 #}
+<div class="row g-4 mb-4 fade-in" style="animation-delay: 0.2s;">
+    <div class="col-lg-8">
+        <div class="table-card" style="height: 100%;">
+            <div class="table-header">
+                <h5><i class="bi bi-bar-chart-line me-2"></i>Last 7 Days Activity</h5>
+            </div>
+            <div class="p-4">
+                <canvas id="activityChart" height="80"></canvas>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-lg-4">
+        <div class="table-card" style="height: 100%;">
+            <div class="table-header">
+                <h5><i class="bi bi-pie-chart me-2"></i>User Distribution</h5>
+            </div>
+            <div class="p-4">
+                <canvas id="userDistributionChart"></canvas>
+                <div class="mt-3">
+                    <div class="d-flex justify-content-between mb-2">
+                        <span class="text-muted">Regular users</span>
+                        <strong>{{ regularUsers }}</strong>
+                    </div>
+                    <div class="d-flex justify-content-between mb-2">
+                        <span class="text-muted">Coaches</span>
+                        <strong>{{ totalCoaches }}</strong>
+                    </div>
+                    <div class="d-flex justify-content-between">
+                        <span class="text-muted">Administrators</span>
+                        <strong>{{ totalAdmins }}</strong>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{# Advanced Metrics - Row 3 #}
+<div class="row g-4 mb-4 fade-in" style="animation-delay: 0.3s;">
+    <div class="col-lg-3 col-md-6">
+        <div class="metric-card">
+            <div class="metric-header">
+                <i class="bi bi-person-check-fill"></i>
+                <span>Activation Rate</span>
+            </div>
+            <div class="metric-value">{{ activeUsersPercentage }}%</div>
+            <div class="progress" style="height: 6px;">
+                <div class="progress-bar bg-success" role="progressbar" style="width: {{ activeUsersPercentage }}%"></div>
+            </div>
+            <div class="metric-details">
+                <small>{{ activeUsers }} of {{ totalUsers }} users</small>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-lg-3 col-md-6">
+        <div class="metric-card">
+            <div class="metric-header">
+                <i class="bi bi-people"></i>
+                <span>Members per Team</span>
+            </div>
+            <div class="metric-value">{{ avgMembersPerTeam }}</div>
+            <div class="progress" style="height: 6px;">
+                <div class="progress-bar bg-info" role="progressbar" style="width: {{ (avgMembersPerTeam / 10 * 100) > 100 ? 100 : (avgMembersPerTeam / 10 * 100) }}%"></div>
+            </div>
+            <div class="metric-details">
+                <small>{{ totalMembers }} active members</small>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-lg-3 col-md-6">
+        <div class="metric-card">
+            <div class="metric-header">
+                <i class="bi bi-check-circle-fill"></i>
+                <span>Approval Rate</span>
+            </div>
+            <div class="metric-value">{{ approvalRate }}%</div>
+            <div class="progress" style="height: 6px;">
+                <div class="progress-bar bg-primary" role="progressbar" style="width: {{ approvalRate }}%"></div>
+            </div>
+            <div class="metric-details">
+                <small>{{ approvedApplications }}/{{ totalApplications }} applications</small>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-lg-3 col-md-6">
+        <div class="metric-card">
+            <div class="metric-header">
+                <i class="bi bi-bell-fill"></i>
+                <span>Notifications Read</span>
+            </div>
+            <div class="metric-value">{{ readRate }}%</div>
+            <div class="progress" style="height: 6px;">
+                <div class="progress-bar bg-warning" role="progressbar" style="width: {{ readRate }}%"></div>
+            </div>
+            <div class="metric-details">
+                <small>{{ unreadNotifications }} unread</small>
+            </div>
+        </div>
+    </div>
+</div>
+
+{# Summary Statistics Grid #}
+<div class="row g-4 mb-4 fade-in" style="animation-delay: 0.35s;">
+    <div class="col-lg-3 col-md-6">
+        <div class="summary-stat">
+            <div class="summary-icon" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
+                <i class="bi bi-calendar-day"></i>
+            </div>
+            <div class="summary-content">
+                <h4>{{ usersToday }}</h4>
+                <p>New Today</p>
+                <small class="text-muted">{{ usersYesterday }} yesterday</small>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-lg-3 col-md-6">
+        <div class="summary-stat">
+            <div class="summary-icon" style="background: linear-gradient(135deg, #fa709a 0%, #fee140 100%);">
+                <i class="bi bi-calendar-week"></i>
+            </div>
+            <div class="summary-content">
+                <h4>{{ teamsLast7Days }}</h4>
+                <p>Teams (7 days)</p>
+                <small class="text-muted">{{ teamsThisMonth }} this month</small>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-lg-3 col-md-6">
+        <div class="summary-stat">
+            <div class="summary-icon" style="background: linear-gradient(135deg, #30cfd0 0%, #330867 100%);">
+                <i class="bi bi-file-earmark"></i>
+            </div>
+            <div class="summary-content">
+                <h4>{{ applicationsLast7Days }}</h4>
+                <p>Applications (7 days)</p>
+                <small class="text-muted">{{ applicationsLast30Days }} (30 days)</small>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-lg-3 col-md-6">
+        <div class="summary-stat">
+            <div class="summary-icon" style="background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%);">
+                <i class="bi bi-activity"></i>
+            </div>
+            <div class="summary-content">
+                <h4>{{ totalAuditLogs|number_format(0, ',', ' ') }}</h4>
+                <p>Logged Actions</p>
+                <small class="text-muted">Audit log</small>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+{# Quick Actions #}
+<div class="row g-4 fade-in" style="animation-delay: 0.5s;">
     <div class="col-12">
         <div class="table-card">
             <div class="table-header">
-                <h5><i class="bi bi-camera-video me-2"></i>All Videos</h5>
+                <h5><i class="bi bi-lightning-fill me-2"></i>Quick Actions</h5>
             </div>
             <div class="p-4">
-                {% if videos is empty %}
-                    <div class="alert alert-info">No videos available.</div>
-                {% else %}
-                    <div class="table-responsive">
-                        <table class="custom-table table">
-                            <thead>
-                                <tr>
-                                    <th style="width: 260px;">Title</th>
-                                    <th style="width: 180px;">Uploaded by</th>
-                                    <th style="width: 120px;">Status</th>
-                                    <th style="width: 150px;">Created at</th>
-                                    <th style="width: 140px;">Actions</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {% for video in videos %}
-                                    <tr>
-                                        <td>
-                                            <strong>{{ video.title }}</strong>
-                                            {% if video.gameType %}
-                                                <div class="text-muted small">{{ video.gameType }}</div>
-                                            {% endif %}
-                                        </td>
-                                        <td>{{ video.uploadedBy ? video.uploadedBy.username : '—' }}</td>
-                                        <td><span class="badge bg-info">{{ video.status }}</span></td>
-                                        <td>
-                                            <small class="text-muted">
-                                                <i class="bi bi-calendar3 me-1"></i>
-                                                {{ video.createdAt ? video.createdAt|date('M d, Y H:i') : '—' }}
-                                            </small>
-                                        </td>
-                                        <td>
-                                            <a href="{{ path('admin_videos_index') }}" class="btn btn-sm btn-outline-primary">Manage</a>
-                                        </td>
-                                    </tr>
-                                {% endfor %}
-                            </tbody>
-                        </table>
+                <div class="row g-3">
+                    <div class="col-lg-2 col-md-4 col-sm-6">
+                        <a href="{{ path('app_home') }}" class="action-btn">
+                            <i class="bi bi-house"></i>
+                            <span>Main Site</span>
+                        </a>
                     </div>
-                {% endif %}
+                    <div class="col-lg-2 col-md-4 col-sm-6">
+                        <a href="#" class="action-btn">
+                            <i class="bi bi-people"></i>
+                            <span>Users</span>
+                        </a>
+                    </div>
+                    <div class="col-lg-2 col-md-4 col-sm-6">
+                        <a href="#" class="action-btn">
+                            <i class="bi bi-shield-fill-check"></i>
+                            <span>Teams</span>
+                        </a>
+                    </div>
+                    <div class="col-lg-2 col-md-4 col-sm-6">
+                        <a href="#" class="action-btn">
+                            <i class="bi bi-file-earmark"></i>
+                            <span>Applications</span>
+                        </a>
+                    </div>
+                    <div class="col-lg-2 col-md-4 col-sm-6">
+                        <a href="#" class="action-btn">
+                            <i class="bi bi-gear"></i>
+                            <span>Settings</span>
+                        </a>
+                    </div>
+                    <div class="col-lg-2 col-md-4 col-sm-6">
+                        <a href="{{ path('admin_logout') }}" class="action-btn danger">
+                            <i class="bi bi-box-arrow-right"></i>
+                            <span>Logout</span>
+                        </a>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
 </div>
 
 <style>
-    /* CORRECTION CRITIQUE : Ajouter forwards et opacity: 1 !important */
     .fade-in {
         animation: fadeIn 0.6s ease-in forwards;
         opacity: 1 !important;
@@ -133,15 +327,24 @@
         }
     }
     
+    .welcome-card {
+        background: rgba(255, 255, 255, 0.05);
+        border-radius: 15px;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        opacity: 1 !important;
+    }
+    
     .stat-card {
         background: rgba(255, 255, 255, 0.05);
         border-radius: 15px;
-        padding: 30px;
+        padding: 25px;
         border: 1px solid rgba(255, 255, 255, 0.1);
         transition: all 0.3s ease;
-        /* AJOUT : Forcer la visibilité */
+        height: 100%;
         opacity: 1 !important;
-        visibility: visible !important;
+        display: flex;
+        align-items: center;
+        gap: 20px;
     }
     
     .stat-card:hover {
@@ -150,14 +353,125 @@
         box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
     }
     
+    .stat-icon {
+        width: 70px;
+        height: 70px;
+        border-radius: 15px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 32px;
+        color: white;
+        flex-shrink: 0;
+    }
+    
+    .stat-content {
+        flex: 1;
+    }
+    
+    .stat-value {
+        font-size: 32px;
+        font-weight: 700;
+        margin: 0;
+        color: #fff;
+    }
+    
+    .stat-label {
+        font-size: 14px;
+        color: rgba(255, 255, 255, 0.7);
+        margin: 5px 0;
+    }
+    
+    .stat-footer {
+        margin-top: 10px;
+    }
+    
+    .metric-card {
+        background: rgba(255, 255, 255, 0.05);
+        border-radius: 15px;
+        padding: 20px;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        transition: all 0.3s ease;
+        height: 100%;
+    }
+    
+    .metric-card:hover {
+        background: rgba(255, 255, 255, 0.08);
+        transform: translateY(-2px);
+    }
+    
+    .metric-header {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        margin-bottom: 15px;
+        color: rgba(255, 255, 255, 0.7);
+        font-size: 14px;
+    }
+    
+    .metric-header i {
+        font-size: 20px;
+    }
+    
+    .metric-value {
+        font-size: 36px;
+        font-weight: 700;
+        color: #fff;
+        margin-bottom: 10px;
+    }
+    
+    .metric-details {
+        margin-top: 10px;
+        color: rgba(255, 255, 255, 0.6);
+    }
+    
+    .summary-stat {
+        background: rgba(255, 255, 255, 0.05);
+        border-radius: 15px;
+        padding: 20px;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        display: flex;
+        align-items: center;
+        gap: 15px;
+        transition: all 0.3s ease;
+    }
+    
+    .summary-stat:hover {
+        background: rgba(255, 255, 255, 0.08);
+        transform: translateY(-2px);
+    }
+    
+    .summary-icon {
+        width: 60px;
+        height: 60px;
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 28px;
+        color: white;
+        flex-shrink: 0;
+    }
+    
+    .summary-content h4 {
+        font-size: 28px;
+        font-weight: 700;
+        margin: 0;
+        color: #fff;
+    }
+    
+    .summary-content p {
+        margin: 5px 0 0;
+        color: rgba(255, 255, 255, 0.7);
+        font-size: 14px;
+    }
+    
     .table-card {
         background: rgba(255, 255, 255, 0.05);
         border-radius: 15px;
         border: 1px solid rgba(255, 255, 255, 0.1);
         overflow: hidden;
-        /* AJOUT : Forcer la visibilité */
         opacity: 1 !important;
-        visibility: visible !important;
     }
     
     .table-header {
@@ -169,17 +483,216 @@
     .table-header h5 {
         margin: 0;
         color: rgba(255, 255, 255, 0.9);
+        font-weight: 600;
     }
     
-    /* AJOUT : S'assurer que tous les éléments restent visibles */
-    .row {
-        opacity: 1 !important;
-        visibility: visible !important;
+    .activity-list {
+        max-height: 400px;
+        overflow-y: auto;
     }
     
-    .col-12, .col-md-6 {
+    .activity-item {
+        display: flex;
+        gap: 15px;
+        padding: 15px;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        transition: background 0.2s;
+    }
+    
+    .activity-item:hover {
+        background: rgba(255, 255, 255, 0.03);
+    }
+    
+    .activity-item:last-child {
+        border-bottom: none;
+    }
+    
+    .activity-icon {
+        color: #667eea;
+        font-size: 8px;
+        padding-top: 5px;
+    }
+    
+    .activity-content {
+        flex: 1;
+    }
+    
+    .activity-content p {
+        color: rgba(255, 255, 255, 0.9);
+    }
+    
+    .user-avatar {
+        width: 35px;
+        height: 35px;
+        border-radius: 8px;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 600;
+        font-size: 12px;
+    }
+    
+    .action-btn {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        padding: 20px;
+        background: rgba(255, 255, 255, 0.05);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: 12px;
+        text-decoration: none;
+        color: rgba(255, 255, 255, 0.9);
+        transition: all 0.3s ease;
+        gap: 10px;
+        height: 100%;
+    }
+    
+    .action-btn:hover {
+        background: rgba(255, 255, 255, 0.1);
+        transform: translateY(-3px);
+        color: #fff;
+    }
+    
+    .action-btn.danger:hover {
+        background: rgba(220, 53, 69, 0.2);
+        border-color: rgba(220, 53, 69, 0.5);
+    }
+    
+    .action-btn i {
+        font-size: 24px;
+    }
+    
+    .action-btn span {
+        font-size: 13px;
+        text-align: center;
+    }
+    
+    .progress {
+        background-color: rgba(255, 255, 255, 0.1);
+        border-radius: 10px;
+    }
+    
+    .progress-bar {
+        border-radius: 10px;
+    }
+    
+    .row, .col-12, .col-md-3, .col-md-4, .col-md-6, .col-lg-3, .col-lg-4, .col-lg-8 {
         opacity: 1 !important;
         visibility: visible !important;
     }
 </style>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<script>
+    // Activity Chart (Line Chart)
+    const activityCtx = document.getElementById('activityChart').getContext('2d');
+    new Chart(activityCtx, {
+        type: 'line',
+        data: {
+            labels: {{ chartData.labels|json_encode|raw }},
+            datasets: [
+                {
+                    label: 'Users',
+                    data: {{ chartData.users|json_encode|raw }},
+                    borderColor: '#667eea',
+                    backgroundColor: 'rgba(102, 126, 234, 0.1)',
+                    tension: 0.4,
+                    fill: true
+                },
+                {
+                    label: 'Teams',
+                    data: {{ chartData.teams|json_encode|raw }},
+                    borderColor: '#f093fb',
+                    backgroundColor: 'rgba(240, 147, 251, 0.1)',
+                    tension: 0.4,
+                    fill: true
+                },
+                {
+                    label: 'Applications',
+                    data: {{ chartData.applications|json_encode|raw }},
+                    borderColor: '#4facfe',
+                    backgroundColor: 'rgba(79, 172, 254, 0.1)',
+                    tension: 0.4,
+                    fill: true
+                }
+            ]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: true,
+            plugins: {
+                legend: {
+                    labels: {
+                        color: 'rgba(255, 255, 255, 0.7)',
+                        font: {
+                            size: 12
+                        }
+                    }
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    ticks: {
+                        color: 'rgba(255, 255, 255, 0.5)',
+                        precision: 0
+                    },
+                    grid: {
+                        color: 'rgba(255, 255, 255, 0.1)'
+                    }
+                },
+                x: {
+                    ticks: {
+                        color: 'rgba(255, 255, 255, 0.5)'
+                    },
+                    grid: {
+                        color: 'rgba(255, 255, 255, 0.1)'
+                    }
+                }
+            }
+        }
+    });
+    
+    // User Distribution Chart (Doughnut Chart)
+    const distributionCtx = document.getElementById('userDistributionChart').getContext('2d');
+    new Chart(distributionCtx, {
+        type: 'doughnut',
+        data: {
+            labels: ['Users', 'Coaches', 'Admins'],
+            datasets: [{
+                data: [{{ regularUsers }}, {{ totalCoaches }}, {{ totalAdmins }}],
+                backgroundColor: [
+                    'rgba(102, 126, 234, 0.8)',
+                    'rgba(240, 147, 251, 0.8)',
+                    'rgba(79, 172, 254, 0.8)'
+                ],
+                borderColor: [
+                    '#667eea',
+                    '#f093fb',
+                    '#4facfe'
+                ],
+                borderWidth: 2
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: true,
+            plugins: {
+                legend: {
+                    position: 'bottom',
+                    labels: {
+                        color: 'rgba(255, 255, 255, 0.7)',
+                        padding: 15,
+                        font: {
+                            size: 12
+                        }
+                    }
+                }
+            }
+        }
+    });
+</script>
+
 {% endblock %}
